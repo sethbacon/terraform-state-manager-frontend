@@ -1,0 +1,33 @@
+# Production overrides for Docker Compose
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Prerequisites:
+#   1. Copy .env.production.example to .env.production and fill in secrets
+#   2. Pull or build production images
+#   3. Place a reverse proxy (Traefik, Caddy, nginx) in front for TLS termination
+
+services:
+  postgres:
+    ports: []
+
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/sethbacon/terraform-state-manager-backend}:${TSM_TAG:-latest}
+    env_file:
+      - .env.production
+    environment:
+      TSM_LOGGING_LEVEL: warn
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+
+  frontend:
+    image: ${FRONTEND_IMAGE:-ghcr.io/sethbacon/terraform-state-manager-frontend}:${TSM_TAG:-latest}
+    ports:
+      - "80:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M

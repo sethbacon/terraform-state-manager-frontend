@@ -1,0 +1,104 @@
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: tsm-db
+    environment:
+      POSTGRES_DB: tsm
+      POSTGRES_USER: tsm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-tsm}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tsm -d tsm"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    networks:
+      - tsm-network
+    restart: unless-stopped
+
+  # Terraform State Manager Backend (built locally from source)
+  backend:
+    build:
+      context: ../../terraform-state-manager-backend/backend
+      dockerfile: Dockerfile
+    container_name: tsm-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      # Database configuration
+      TSM_DATABASE_HOST: postgres
+      TSM_DATABASE_PORT: 5432
+      TSM_DATABASE_NAME: tsm
+      TSM_DATABASE_USER: tsm
+      TSM_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-tsm}
+      TSM_DATABASE_SSL_MODE: disable
+
+      # Server configuration
+      TSM_SERVER_PORT: 8080
+      TSM_SERVER_HOST: 0.0.0.0
+
+      # Storage configuration (local filesystem)
+      TSM_STORAGE_DEFAULT_BACKEND: local
+      TSM_STORAGE_LOCAL_BASE_PATH: /app/data
+
+      # Auth configuration
+      TSM_JWT_SECRET: "development-jwt-secret-change-in-production-01234567890"
+
+      # DEV_MODE relaxes security checks (e.g. allows auto-generated JWT secret).
+      # Must be false in production.
+      DEV_MODE: "true"
+
+      # Logging
+      TSM_LOGGING_LEVEL: info
+      TSM_LOGGING_FORMAT: json
+
+      # Security — development values only, not for production use
+      ENCRYPTION_KEY: "01234567890123456789012345678901"
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - tsm-network
+    restart: unless-stopped
+
+  # Terraform State Manager Frontend (nginx + React SPA, built locally from source)
+  #
+  # Serves HTTP on port 3000 → container port 80.
+  # nginx proxies /api/ requests to the backend service.
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: tsm-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:80"
+    networks:
+      - tsm-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  app_data:
+    driver: local
+
+networks:
+  tsm-network:
+    driver: bridge
