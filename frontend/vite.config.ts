@@ -12,6 +12,14 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
+      '/swagger.json': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/swagger.yaml': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
@@ -33,6 +41,7 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           mui: ['@mui/material', '@mui/icons-material'],
           charts: ['recharts'],
+          'swagger-ui': ['swagger-ui-react'],
         },
       },
     },

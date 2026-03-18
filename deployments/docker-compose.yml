@@ -1,3 +1,4 @@
+name: terraform-state-manager
 
 services:
   # PostgreSQL Database
@@ -12,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U tsm -d tsm"]
       interval: 10s
@@ -62,11 +63,19 @@ services:
       # Security — development values only, not for production use
       ENCRYPTION_KEY: "01234567890123456789012345678901"
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - app_data:/app/data
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8080/health",
+        ]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -77,7 +86,7 @@ services:
 
   # Terraform State Manager Frontend (nginx + React SPA, built locally from source)
   #
-  # Serves HTTP on port 3000 → container port 80.
+  # Serves HTTP on port 3001 → container port 80.
   # nginx proxies /api/ requests to the backend service.
   frontend:
     build:
@@ -88,7 +97,7 @@ services:
       backend:
         condition: service_healthy
     ports:
-      - "3000:80"
+      - "3001:80"
     networks:
       - tsm-network
     restart: unless-stopped

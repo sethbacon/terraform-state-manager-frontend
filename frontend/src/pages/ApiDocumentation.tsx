@@ -34,10 +34,26 @@ const BASE_CSS = `
   /* ---------- remove the very wide left margin swagger-ui adds by default ---------- */
   .swagger-ui .wrapper { padding: 0; }
 
-  /* ---------- scheme selector ---------- */
+  /* ---------- scheme selector — sticky below AppBar ---------- */
   .swagger-ui .scheme-container {
     box-shadow: none;
     padding: 12px 0;
+    position: sticky;
+    top: 64px;
+    z-index: 50;
+  }
+
+  /* Make the scheme <select> look clearly like a dropdown */
+  .swagger-ui .scheme-container select {
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    min-width: 90px;
+    border-radius: 4px;
+    border-width: 1.5px !important;
   }
 
   /* ---------- section tags (group headers) ---------- */
@@ -94,6 +110,7 @@ const BASE_CSS = `
 
 const LIGHT_EXTRA = `
   .swagger-ui .scheme-container { background: #fafafa; border-bottom: 1px solid #e0e0e0; }
+  .swagger-ui .scheme-container select { border-color: #5C4EE5 !important; }
   .swagger-ui .opblock-tag { border-bottom: 1px solid #e8e8e8; color: #333; }
   .swagger-ui .opblock-tag a,
   .swagger-ui .opblock-tag .nostyle span { color: #333 !important; }
@@ -305,100 +322,111 @@ const ApiDocumentation: React.FC = () => {
   const activeBg = isDark ? `${primaryColor}26` : `${primaryColor}14`;
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0 }}>
+    <Box>
+      {/* Page title */}
+      <Box sx={{ mb: 3 }}>
+        <Typography variant="h4">API Documentation</Typography>
+        <Typography variant="body2" color="text.secondary">
+          Interactive API reference — use the Authorize button to authenticate with an API key
+        </Typography>
+      </Box>
 
-      {/* ---- Left navigation panel ---- */}
-      {navTags.length > 0 && (
-        <Box
-          sx={{
-            width: NAV_WIDTH,
-            flexShrink: 0,
-            position: 'sticky',
-            top: 80,
-            maxHeight: 'calc(100vh - 100px)',
-            overflowY: 'auto',
-            mr: 2,
-          }}
-        >
-          <Paper
-            elevation={0}
+      {/* Layout: sticky left nav + Swagger UI content */}
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 0 }}>
+
+        {/* ---- Left navigation panel ---- */}
+        {navTags.length > 0 && (
+          <Box
             sx={{
-              background: navBg,
-              border: `1px solid ${navBorder}`,
-              borderRadius: 2,
-              overflow: 'hidden',
+              width: NAV_WIDTH,
+              flexShrink: 0,
+              position: 'sticky',
+              top: 80,
+              maxHeight: 'calc(100vh - 100px)',
+              overflowY: 'auto',
+              mr: 2,
             }}
           >
-            <Typography
-              variant="caption"
+            <Paper
+              elevation={0}
               sx={{
-                display: 'block',
-                px: 2,
-                pt: 1.5,
-                pb: 0.5,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: isDark ? '#888' : '#999',
-                fontSize: '0.68rem',
+                background: navBg,
+                border: `1px solid ${navBorder}`,
+                borderRadius: 2,
+                overflow: 'hidden',
               }}
             >
-              Sections
-            </Typography>
-            <List dense disablePadding>
-              {navTags.map(({ id, label }) => {
-                const isActive = activeTag === id;
-                return (
-                  <ListItemButton
-                    key={id}
-                    onClick={() => scrollToTag(id)}
-                    sx={{
-                      py: 0.5,
-                      px: 2,
-                      borderLeft: isActive
-                        ? `3px solid ${primaryColor}`
-                        : '3px solid transparent',
-                      background: isActive ? activeBg : 'transparent',
-                      borderRadius: 0,
-                      '&:hover': {
-                        background: isDark
-                          ? 'rgba(255,255,255,.05)'
-                          : 'rgba(0,0,0,.04)',
-                      },
-                    }}
-                  >
-                    <ListItemText
-                      primary={label}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontSize: '0.78rem',
-                          fontWeight: isActive ? 600 : 400,
-                          color: isActive ? primaryColor : navText,
-                          lineHeight: 1.4,
+              <Typography
+                variant="caption"
+                sx={{
+                  display: 'block',
+                  px: 2,
+                  pt: 1.5,
+                  pb: 0.5,
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: isDark ? '#888' : '#999',
+                  fontSize: '0.68rem',
+                }}
+              >
+                Sections
+              </Typography>
+              <List dense disablePadding>
+                {navTags.map(({ id, label }) => {
+                  const isActive = activeTag === id;
+                  return (
+                    <ListItemButton
+                      key={id}
+                      onClick={() => scrollToTag(id)}
+                      sx={{
+                        py: 0.5,
+                        px: 2,
+                        borderLeft: isActive
+                          ? `3px solid ${primaryColor}`
+                          : '3px solid transparent',
+                        background: isActive ? activeBg : 'transparent',
+                        borderRadius: 0,
+                        '&:hover': {
+                          background: isDark
+                            ? 'rgba(255,255,255,.05)'
+                            : 'rgba(0,0,0,.04)',
                         },
                       }}
-                    />
-                  </ListItemButton>
-                );
-              })}
-            </List>
-          </Paper>
+                    >
+                      <ListItemText
+                        primary={label}
+                        primaryTypographyProps={{
+                          sx: {
+                            fontSize: '0.78rem',
+                            fontWeight: isActive ? 600 : 400,
+                            color: isActive ? primaryColor : navText,
+                            lineHeight: 1.4,
+                          },
+                        }}
+                      />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
+            </Paper>
+          </Box>
+        )}
+
+        {/* ---- Swagger UI content ---- */}
+        <Box ref={contentRef} sx={{ flex: 1, minWidth: 0 }}>
+          <style>{BASE_CSS + (isDark ? DARK_EXTRA : LIGHT_EXTRA)}</style>
+
+          <SwaggerUI
+            url="/swagger.json"
+            docExpansion="list"
+            deepLinking
+            tryItOutEnabled
+            requestInterceptor={requestInterceptor}
+            persistAuthorization
+            onComplete={onComplete}
+          />
         </Box>
-      )}
-
-      {/* ---- Swagger UI content ---- */}
-      <Box ref={contentRef} sx={{ flex: 1, minWidth: 0 }}>
-        <style>{BASE_CSS + (isDark ? DARK_EXTRA : LIGHT_EXTRA)}</style>
-
-        <SwaggerUI
-          url="/swagger.json"
-          docExpansion="list"
-          deepLinking
-          tryItOutEnabled
-          requestInterceptor={requestInterceptor}
-          persistAuthorization
-          onComplete={onComplete}
-        />
       </Box>
     </Box>
   );
