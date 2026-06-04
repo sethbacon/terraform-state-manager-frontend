@@ -1,0 +1,43 @@
+# Self-contained Keycloak for the State Manager OIDC UAT stack.
+#
+# The docker-compose.oidc.yml overlay expects a Keycloak reachable at
+# keycloak:8180 on the external "shared-keycloak" network (originally provided
+# by the registry stack). This overlay provides that Keycloak directly so the
+# State Manager UAT stack is self-sufficient — no registry stack required.
+#
+# Usage (create the network once, then bring the stack up with all overlays):
+#   docker network create shared-keycloak
+#   docker compose \
+#     -f docker-compose.yml \
+#     -f docker-compose.oidc.yml \
+#     -f docker-compose.keycloak.yml up -d
+#
+# Admin console:  http://localhost:8180/admin  (admin / admin)
+# Discovery:      http://localhost:8180/realms/terraform-state-manager/.well-known/openid-configuration
+# Test users (password TestPass123!): admin.user, alice.analyst, bob.operator, carol.viewer
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: tsm-keycloak
+    command: ["start-dev", "--http-port=8180", "--import-realm"]
+    environment:
+      # Bootstrap admin (26.x uses KC_BOOTSTRAP_ADMIN_*; the KEYCLOAK_ADMIN_*
+      # forms are kept for compatibility with earlier images).
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8180"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    networks:
+      shared-keycloak:
+        aliases:
+          - keycloak
+    restart: unless-stopped
+
+networks:
+  shared-keycloak:
+    external: true

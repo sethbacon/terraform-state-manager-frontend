@@ -31,6 +31,8 @@ BEGIN
     --    Authentication itself is handled via TSM_AUTH_OIDC_* env vars;
     --    client_secret_encrypted is a placeholder (never used for auth here).
     ---------------------------------------------------------------------------
+    -- Idempotent: oidc_config has no unique constraint, so guard with NOT EXISTS
+    -- (a bare ON CONFLICT DO NOTHING would still insert a duplicate on re-run).
     INSERT INTO oidc_config (
         issuer_url,
         client_id,
@@ -38,14 +40,18 @@ BEGIN
         redirect_url,
         scopes,
         is_active
-    ) VALUES (
+    )
+    SELECT
         'http://keycloak:8180/realms/terraform-state-manager',
         'terraform-state-manager',
         'env-var-managed',
-        'http://localhost:3000/api/v1/auth/callback',
+        'http://localhost:3001/api/v1/auth/callback',
         'openid,email,profile',
         true
-    ) ON CONFLICT DO NOTHING;
+    WHERE NOT EXISTS (
+        SELECT 1 FROM oidc_config
+        WHERE issuer_url = 'http://keycloak:8180/realms/terraform-state-manager'
+    );
 
     ---------------------------------------------------------------------------
     -- 3. Pre-provision the Keycloak test admin (admin@example.com / admin.user).
