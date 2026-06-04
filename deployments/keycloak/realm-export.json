@@ -19,11 +19,15 @@
       "secret": "terraform-state-manager-secret",
       "redirectUris": [
         "http://localhost:3000/*",
-        "http://localhost:8080/*"
+        "http://localhost:3001/*",
+        "http://localhost:8080/*",
+        "http://localhost:8081/*"
       ],
       "webOrigins": [
         "http://localhost:3000",
-        "http://localhost:8080"
+        "http://localhost:3001",
+        "http://localhost:8080",
+        "http://localhost:8081"
       ],
       "protocol": "openid-connect",
       "publicClient": false,
@@ -34,7 +38,7 @@
       "authorizationServicesEnabled": false,
       "fullScopeAllowed": true,
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost:3000/*"
+        "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:3001/*"
       },
       "protocolMappers": [
         {
