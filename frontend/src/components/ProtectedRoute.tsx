@@ -1,54 +1,59 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-import { Box, CircularProgress } from '@mui/material';
-import { useAuth } from '../contexts/AuthContext';
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
+import { CircularProgress, Box, Container, Typography, Alert, Button } from '@mui/material'
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
-  requiredScope?: string;
-  requiredScopes?: string[];
-  requireAll?: boolean;
+  children: React.ReactNode
+  requiredScope?: string
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  requiredScope,
-  requiredScopes,
-  requireAll = false,
-}) => {
-  const { isAuthenticated, isLoading, hasScope, hasAnyScope, scopes } = useAuth();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredScope }) => {
+  const { isAuthenticated, isLoading, allowedScopes } = useAuth()
+
+  const hasScope = (scope: string) => {
+    return allowedScopes.includes('admin') || allowedScopes.includes(scope)
+  }
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box
+        aria-busy="true"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh',
+        }}
+      >
         <CircularProgress />
       </Box>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace />
   }
 
-  // Check single scope
   if (requiredScope && !hasScope(requiredScope)) {
-    return <Navigate to="/" replace />;
+    return (
+      <Container maxWidth="md" sx={{ py: 8 }}>
+        <Alert severity="error" sx={{ mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Access Denied
+          </Typography>
+          <Typography variant="body2">
+            You don&apos;t have permission to access this page. This page requires the{' '}
+            <strong>{requiredScope}</strong> permission.
+          </Typography>
+        </Alert>
+        <Button variant="contained" href="/admin">
+          Go to Dashboard
+        </Button>
+      </Container>
+    )
   }
 
-  // Check multiple scopes
-  if (requiredScopes && requiredScopes.length > 0) {
-    if (requireAll) {
-      const hasAll = requiredScopes.every((s) => hasScope(s));
-      if (!hasAll) return <Navigate to="/" replace />;
-    } else {
-      if (!hasAnyScope(requiredScopes)) return <Navigate to="/" replace />;
-    }
-  }
+  return <>{children}</>
+}
 
-  // Suppress unused variable warning - scopes used indirectly via hasScope/hasAnyScope
-  void scopes;
-
-  return <>{children}</>;
-};
-
-export default ProtectedRoute;
+export default ProtectedRoute
