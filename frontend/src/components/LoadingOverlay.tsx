@@ -17,10 +17,12 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ open, message }) => {
       }}
     >
       <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        gap={2}
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 2,
+        }}
       >
         <CircularProgress color="inherit" />
         {message && (

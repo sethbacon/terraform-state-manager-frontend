@@ -125,7 +125,7 @@ const SetupWizardPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <CircularProgress />
       </Box>
     );
@@ -133,7 +133,7 @@ const SetupWizardPage: React.FC = () => {
 
   if (isCompleted) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
         <Card sx={{ maxWidth: 500, width: '100%', mx: 2 }}>
           <CardContent sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h5" gutterBottom>
@@ -164,7 +164,7 @@ const SetupWizardPage: React.FC = () => {
     >
       <Card sx={{ maxWidth: 700, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
-          <Typography variant="h5" fontWeight={600} gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             Terraform State Manager Setup
           </Typography>
           <Stepper activeStep={activeStep} sx={{ mb: 4 }}>

@@ -562,7 +562,7 @@ const HelpPanel = () => {
           py: 1.5,
         }}
       >
-        <Typography variant="subtitle1" fontWeight="bold">
+        <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
           {content.title}
         </Typography>
         <IconButton size="small" onClick={closeHelp} aria-label="Close help panel">
@@ -586,7 +586,7 @@ const HelpPanel = () => {
               disablePadding
               sx={{ display: 'block', mb: 1.5 }}
             >
-              <Typography variant="body2" fontWeight="bold">
+              <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                 {action.heading}
               </Typography>
               <Typography variant="body2" color="text.secondary">

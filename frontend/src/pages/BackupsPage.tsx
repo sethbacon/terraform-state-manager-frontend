@@ -515,7 +515,7 @@ const BackupsPage: React.FC = () => {
         )}
 
         {/* Action bar */}
-        <Stack direction="row" spacing={2} sx={{ mb: 2 }} justifyContent="space-between" alignItems="center">
+        <Stack direction="row" spacing={2} sx={{ mb: 2, justifyContent: "space-between", alignItems: "center" }}>
           <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
               Create Backup
@@ -549,7 +549,7 @@ const BackupsPage: React.FC = () => {
               type="date"
               value={dateFrom}
               onChange={(e) => { setDateFrom(e.target.value); setBackupsPage(0); }}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
             />
             <TextField
               size="small"
@@ -557,7 +557,7 @@ const BackupsPage: React.FC = () => {
               type="date"
               value={dateTo}
               onChange={(e) => { setDateTo(e.target.value); setBackupsPage(0); }}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
             />
           </Stack>
         </Stack>
@@ -596,7 +596,7 @@ const BackupsPage: React.FC = () => {
                   backups.map((backup) => (
                     <TableRow key={backup.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>{backup.workspace_name}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{backup.workspace_name}</Typography>
                       </TableCell>
                       <TableCell>{backup.source_name ?? sourceNameById(backup.source_id)}</TableCell>
                       <TableCell>
@@ -697,7 +697,7 @@ const BackupsPage: React.FC = () => {
                   policies.map((policy) => (
                     <TableRow key={policy.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>{policy.name}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{policy.name}</Typography>
                       </TableCell>
                       <TableCell>{policy.max_age_days}</TableCell>
                       <TableCell>{policy.max_count}</TableCell>
@@ -761,14 +761,17 @@ const BackupsPage: React.FC = () => {
                 fullWidth
                 label="Workspace Name"
                 placeholder={workspaceNames.length > 0 ? 'Select or type a workspace name' : 'Type a workspace name'}
-                InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                    <>
-                      {workspaceNamesLoading ? <CircularProgress size={20} /> : null}
-                      {params.InputProps.endAdornment}
-                    </>
-                  ),
+                slotProps={{
+                  ...params.slotProps,
+                  input: {
+                    ...params.slotProps.input,
+                    endAdornment: (
+                      <>
+                        {workspaceNamesLoading ? <CircularProgress size={20} /> : null}
+                        {params.slotProps.input.endAdornment}
+                      </>
+                    ),
+                  },
                 }}
               />
             )}
@@ -825,7 +828,7 @@ const BackupsPage: React.FC = () => {
               {bulkResult.errors && bulkResult.errors.length > 0 && (
                 <Box sx={{ mt: 1 }}>
                   {bulkResult.errors.map((err, idx) => (
-                    <Typography key={idx} variant="caption" color="error" display="block">
+                    <Typography key={idx} variant="caption" color="error" sx={{ display: "block" }}>
                       {err}
                     </Typography>
                   ))}
@@ -989,7 +992,7 @@ const BackupsPage: React.FC = () => {
             type="number"
             value={policyForm.max_age_days}
             onChange={(e) => setPolicyForm({ ...policyForm, max_age_days: parseInt(e.target.value, 10) || 0 })}
-            inputProps={{ min: 1 }}
+            slotProps={{ htmlInput: { min: 1 } }}
             sx={{ mb: 2 }}
           />
           <TextField
@@ -998,7 +1001,7 @@ const BackupsPage: React.FC = () => {
             type="number"
             value={policyForm.max_count}
             onChange={(e) => setPolicyForm({ ...policyForm, max_count: parseInt(e.target.value, 10) || 0 })}
-            inputProps={{ min: 1 }}
+            slotProps={{ htmlInput: { min: 1 } }}
             sx={{ mb: 2 }}
           />
           <FormControlLabel

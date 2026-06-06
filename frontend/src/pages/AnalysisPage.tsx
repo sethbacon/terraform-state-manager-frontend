@@ -156,7 +156,7 @@ const AnalysisPage: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" fontWeight={600}>
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>
           Analysis Runs
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>

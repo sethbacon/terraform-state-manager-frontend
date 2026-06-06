@@ -33,12 +33,7 @@ const TerraformVersionsChart: React.FC<TerraformVersionsChartProps> = ({ data })
 
   if (data.length === 0) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height={300}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300 }}>
         <Typography color="text.secondary">
           Run an analysis to see Terraform version distribution
         </Typography>

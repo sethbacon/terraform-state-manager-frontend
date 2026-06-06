@@ -402,7 +402,7 @@ const MigrationsPage: React.FC = () => {
     return (
       <Grid container spacing={2}>
         {fields.map((field) => (
-          <Grid item xs={12} sm={field.type === 'password' ? 12 : 6} key={field.key}>
+          <Grid size={{ xs: 12, sm: field.type === 'password' ? 12 : 6 }} key={field.key}>
             <TextField
               fullWidth
               label={field.label}
@@ -431,7 +431,7 @@ const MigrationsPage: React.FC = () => {
     return (
       <TableRow key={migration.id} hover>
         <TableCell>
-          <Typography variant="body2" fontWeight={500}>{migration.name}</Typography>
+          <Typography variant="body2" sx={{ fontWeight: 500 }}>{migration.name}</Typography>
         </TableCell>
         <TableCell>
           <Chip label={migration.source_backend_type} size="small" variant="outlined" />

@@ -125,7 +125,7 @@ const AlertsList: React.FC<AlertsListProps> = ({
                       />
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {alert.title}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">

@@ -96,13 +96,13 @@ const WorkspacesPage: React.FC = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         sx={{ mb: 3, width: { xs: '100%', sm: 360 } }}
-        InputProps={{
+        slotProps={{ input: {
           startAdornment: (
             <InputAdornment position="start">
               <Search color="action" />
             </InputAdornment>
           ),
-        }}
+        } }}
       />
 
       {/* Loading state */}
@@ -149,7 +149,7 @@ const WorkspacesPage: React.FC = () => {
           {filtered.map((ws) => {
             const chip = statusChipProps(ws.status);
             return (
-              <Grid item xs={12} sm={6} md={4} key={ws.workspace_name}>
+              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={ws.workspace_name}>
                 <Card variant="outlined" sx={{ height: '100%' }}>
                   <CardActionArea
                     onClick={() =>
@@ -177,14 +177,14 @@ const WorkspacesPage: React.FC = () => {
                         />
                       </Box>
 
-                      <Typography variant="caption" color="text.secondary" display="block">
+                      <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
                         Source: {ws.source_name ?? 'Unknown'}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                        display="block"
-                        sx={{ mb: 1.5 }}
+                       
+                        sx={{ display: "block",  mb: 1.5 }}
                       >
                         Last analyzed: {formatDate(ws.last_analyzed)}
                       </Typography>
@@ -194,7 +194,7 @@ const WorkspacesPage: React.FC = () => {
                           <Typography variant="caption" color="text.secondary">
                             Resources
                           </Typography>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {(ws.resource_count ?? 0).toLocaleString()}
                           </Typography>
                         </Box>
@@ -202,7 +202,7 @@ const WorkspacesPage: React.FC = () => {
                           <Typography variant="caption" color="text.secondary">
                             RUM
                           </Typography>
-                          <Typography variant="body2" fontWeight={600}>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {(ws.rum_count ?? 0).toLocaleString()}
                           </Typography>
                         </Box>

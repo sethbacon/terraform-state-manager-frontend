@@ -97,6 +97,9 @@
     "devLoginFailed": "Dev login failed. Check server logs.",
     "ldapLoginFailed": "LDAP login failed. Check your credentials."
   },
+  "loginPage": {
+    "loadingProviders": "Loading authentication providers"
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",

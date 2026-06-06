@@ -20,7 +20,7 @@ export function useRouteFocus(): void {
         if (!target.hasAttribute('tabindex')) {
           target.setAttribute('tabindex', '-1')
         }
-        ;(target as HTMLElement).focus({ preventScroll: false })
+        ; (target as HTMLElement).focus({ preventScroll: false })
       }
     }, 100)
 

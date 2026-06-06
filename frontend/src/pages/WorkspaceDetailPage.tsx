@@ -220,7 +220,7 @@ const WorkspaceDetailPage: React.FC = () => {
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <DashboardCard
             title="Total Resources"
             value={summary?.resource_count ?? 0}
@@ -228,7 +228,7 @@ const WorkspaceDetailPage: React.FC = () => {
             accentColor="#2196F3"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <DashboardCard
             title="RUM Count"
             value={summary?.rum_count ?? 0}
@@ -236,7 +236,7 @@ const WorkspaceDetailPage: React.FC = () => {
             accentColor="#FF9800"
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper
             elevation={1}
             sx={{
@@ -251,12 +251,12 @@ const WorkspaceDetailPage: React.FC = () => {
             <Typography variant="body2" color="text.secondary" gutterBottom>
               TF Version
             </Typography>
-            <Typography variant="h4" fontWeight={700} sx={{ mb: 0.5 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700,  mb: 0.5 }}>
               {summary?.terraform_version ?? 'N/A'}
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Paper
             elevation={1}
             sx={{
@@ -271,7 +271,7 @@ const WorkspaceDetailPage: React.FC = () => {
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Last Analyzed
             </Typography>
-            <Typography variant="h5" fontWeight={700} sx={{ mb: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700,  mb: 0.5 }}>
               {formatDate(summary?.last_analyzed)}
             </Typography>
           </Paper>

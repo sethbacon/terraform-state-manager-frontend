@@ -97,11 +97,11 @@ const ResourceTypesTable: React.FC<ResourceTypesTableProps> = ({ resourcesByType
         value={filter}
         onChange={(e) => { setFilter(e.target.value); setShowAll(false); }}
         sx={{ mb: 2, width: 300 }}
-        InputProps={{
+        slotProps={{ input: {
           startAdornment: (
             <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>
           ),
-        }}
+        } }}
       />
       <TableContainer component={Paper} variant="outlined">
         <Table size="small">
@@ -140,7 +140,7 @@ const ResourceTypesTable: React.FC<ResourceTypesTableProps> = ({ resourcesByType
             {displayedEntries.map((entry) => (
               <TableRow key={entry.type} hover>
                 <TableCell>
-                  <Typography variant="body2" fontFamily="monospace">
+                  <Typography variant="body2" sx={{ fontFamily: "monospace" }}>
                     {entry.type}
                   </Typography>
                 </TableCell>

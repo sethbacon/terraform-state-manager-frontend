@@ -6,7 +6,7 @@ import {
   Skeleton,
   Alert,
 } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import Grid from '@mui/material/Grid';
 import DashboardCard from '../components/DashboardCard';
 import ResourceOverviewChart from '../components/charts/ResourceOverviewChart';
 import ProviderDistributionChart from '../components/charts/ProviderDistributionChart';

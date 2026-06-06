@@ -38,7 +38,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
           <Typography variant="body2" color="text.secondary">
             {title}
           </Typography>
-          <Typography variant="h4" fontWeight={700}>
+          <Typography variant="h4" sx={{ fontWeight: 700 }}>
             {value}
           </Typography>
         </Box>
@@ -53,7 +53,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
             justifyContent: 'center',
           }}
         >
-          {React.cloneElement(icon, { sx: { color, fontSize: 28 } })}
+          {React.cloneElement(icon as React.ReactElement<Record<string, unknown>>, { sx: { color, fontSize: 28 } })}
         </Box>
       </Box>
     </CardContent>
@@ -81,7 +81,7 @@ const DashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" py={4}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -101,16 +101,16 @@ const DashboardPage: React.FC = () => {
 
       {stats && (
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard title="Total Users" value={stats.total_users} icon={<PeopleIcon />} color="#7B61FF" />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard title="Organizations" value={stats.total_organizations} icon={<OrgIcon />} color="#00BFA5" />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard title="API Keys" value={stats.total_api_keys} icon={<KeyIcon />} color="#FF6B35" />
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}>
             <StatCard title="Recent Events" value={stats.recent_audit_events} icon={<AuditIcon />} color="#2196F3" />
           </Grid>
         </Grid>
