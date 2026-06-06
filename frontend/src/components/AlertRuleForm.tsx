@@ -22,7 +22,7 @@ interface AlertRulePayload {
   name: string;
   rule_type: string;
   severity: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   is_active: boolean;
 }
 
@@ -58,7 +58,7 @@ const RULE_TYPE_LABELS: Record<RuleType, string> = {
   version_outdated: 'version outdated',
 };
 
-const getDefaultConfig = (ruleType: string): Record<string, any> => {
+const getDefaultConfig = (ruleType: string): Record<string, unknown> => {
   switch (ruleType) {
     case 'stale_workspace':
       return { days_threshold: 30 };
@@ -77,7 +77,7 @@ const getDefaultConfig = (ruleType: string): Record<string, any> => {
   }
 };
 
-const extractConfigFromRule = (rule: AlertRule): Record<string, any> => {
+const extractConfigFromRule = (rule: AlertRule): Record<string, unknown> => {
   const config = rule.config ?? {};
   const defaults = getDefaultConfig(rule.rule_type);
   return { ...defaults, ...config };
@@ -85,8 +85,8 @@ const extractConfigFromRule = (rule: AlertRule): Record<string, any> => {
 
 interface ConfigFieldsProps {
   ruleType: string;
-  config: Record<string, any>;
-  onChange: (config: Record<string, any>) => void;
+  config: Record<string, unknown>;
+  onChange: (config: Record<string, unknown>) => void;
 }
 
 const ConfigFields: React.FC<ConfigFieldsProps> = ({ ruleType, config, onChange }) => {
@@ -102,7 +102,7 @@ const ConfigFields: React.FC<ConfigFieldsProps> = ({ ruleType, config, onChange 
             onChange({ ...config, days_threshold: parseInt(e.target.value, 10) || 0 })
           }
           helperText="Number of days after which a workspace is considered stale"
-          inputProps={{ min: 1 }}
+          slotProps={{ htmlInput: { min: 1 } }}
           sx={{ mb: 2 }}
         />
       );
@@ -118,7 +118,7 @@ const ConfigFields: React.FC<ConfigFieldsProps> = ({ ruleType, config, onChange 
             onChange({ ...config, growth_percentage: parseInt(e.target.value, 10) || 0 })
           }
           helperText="Alert when resource count grows by more than this percentage"
-          inputProps={{ min: 1, max: 100 }}
+          slotProps={{ htmlInput: { min: 1, max: 100 } }}
           sx={{ mb: 2 }}
         />
       );
@@ -134,7 +134,7 @@ const ConfigFields: React.FC<ConfigFieldsProps> = ({ ruleType, config, onChange 
             onChange({ ...config, max_rum_count: parseInt(e.target.value, 10) || 0 })
           }
           helperText="Alert when RUM count exceeds this value"
-          inputProps={{ min: 1 }}
+          slotProps={{ htmlInput: { min: 1 } }}
           sx={{ mb: 2 }}
         />
       );
@@ -196,7 +196,7 @@ const AlertRuleForm: React.FC<AlertRuleFormProps> = ({
   const [name, setName] = useState('');
   const [ruleType, setRuleType] = useState<string>('stale_workspace');
   const [severity, setSeverity] = useState<string>('warning');
-  const [config, setConfig] = useState<Record<string, any>>({});
+  const [config, setConfig] = useState<Record<string, unknown>>({});
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {

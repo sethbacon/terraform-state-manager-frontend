@@ -396,14 +396,14 @@ const ApiDocumentation: React.FC = () => {
                     >
                       <ListItemText
                         primary={label}
-                        primaryTypographyProps={{
+                        slotProps={{ primary: {
                           sx: {
                             fontSize: '0.78rem',
                             fontWeight: isActive ? 600 : 400,
                             color: isActive ? primaryColor : navText,
                             lineHeight: 1.4,
                           },
-                        }}
+                        } }}
                       />
                     </ListItemButton>
                   );

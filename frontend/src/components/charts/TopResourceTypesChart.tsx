@@ -21,12 +21,7 @@ const TopResourceTypesChart: React.FC<TopResourceTypesChartProps> = ({ data }) =
 
   if (data.length === 0) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height={400}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 400 }}>
         <Typography color="text.secondary">
           Run an analysis to see resource type breakdown
         </Typography>

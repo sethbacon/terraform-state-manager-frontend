@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -37,18 +37,15 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          mui: ['@mui/material', '@mui/icons-material'],
-          charts: ['recharts'],
-          'swagger-ui': ['swagger-ui-react'],
+        manualChunks(id: string) {
+          if (!id.includes('node_modules')) return
+          if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/react-router-dom/')) return 'vendor'
+          if (id.includes('/@mui/icons-material/')) return 'mui-icons'
+          if (id.includes('/@mui/material/') || id.includes('/@emotion/')) return 'mui'
+          if (id.includes('/recharts/')) return 'charts'
+          if (id.includes('/swagger-ui-react/') || id.includes('/swagger-ui-dist/')) return 'swagger-ui'
         },
       },
     },
-  },
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: ['./src/test-setup.ts'],
   },
 })

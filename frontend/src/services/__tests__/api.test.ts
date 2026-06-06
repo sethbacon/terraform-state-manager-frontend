@@ -1,65 +1,142 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 
-// We need to test the interceptors in the ApiClient class.
-// Since api.ts exports a singleton, we import it to get the interceptors.
-import api from '../api';
+// ---------------------------------------------------------------------------
+// Helpers – capture the interceptors that ApiClient registers so we can
+// invoke them directly in tests without triggering real navigation.
+// ---------------------------------------------------------------------------
 
-describe('api service', () => {
-  let mock: MockAdapter;
+type ReqFulfilled = (config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig
+type ResFulfilled = (response: AxiosResponse) => AxiosResponse
+type ResRejected = (error: AxiosError) => unknown
 
+let capturedReqFulfilled: ReqFulfilled
+let capturedResRejected: ResRejected
+let _mockAxiosInstance: AxiosInstance
+
+vi.mock('axios', () => {
+  const mockInstance = {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+    interceptors: {
+      request: {
+        use: vi.fn((fulfilled: ReqFulfilled) => {
+          capturedReqFulfilled = fulfilled
+        }),
+      },
+      response: {
+        use: vi.fn((_fulfilled: ResFulfilled, rejected: ResRejected) => {
+          capturedResRejected = rejected
+        }),
+      },
+    },
+  }
+
+  return {
+    default: {
+      create: vi.fn(() => {
+        _mockAxiosInstance = mockInstance as unknown as AxiosInstance
+        return mockInstance
+      }),
+    },
+  }
+})
+
+function getApiClient() {
+  vi.resetModules()
+  vi.doMock('axios', () => {
+    const mockInstance = {
+      get: vi.fn(),
+      post: vi.fn(),
+      put: vi.fn(),
+      delete: vi.fn(),
+      interceptors: {
+        request: {
+          use: vi.fn((fulfilled: ReqFulfilled) => {
+            capturedReqFulfilled = fulfilled
+          }),
+        },
+        response: {
+          use: vi.fn((_fulfilled: ResFulfilled, rejected: ResRejected) => {
+            capturedResRejected = rejected
+          }),
+        },
+      },
+    }
+    return {
+      default: {
+        create: vi.fn(() => {
+          _mockAxiosInstance = mockInstance as unknown as AxiosInstance
+          return mockInstance
+        }),
+      },
+    }
+  })
+
+  return import('../api').then((mod) => mod.default)
+}
+
+describe('ApiClient', () => {
   beforeEach(() => {
-    mock = new MockAdapter((api as any).client || axios);
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   afterEach(() => {
-    mock?.restore();
-    localStorage.clear();
-    vi.restoreAllMocks();
-  });
+    vi.restoreAllMocks()
+  })
 
-  it('attaches Bearer token to requests when token is in localStorage', async () => {
-    localStorage.setItem('tsm_auth_token', 'test-jwt-token');
+  describe('request interceptor – auth token', () => {
+    it('adds Authorization Bearer header when token exists in localStorage', async () => {
+      localStorage.setItem('tsm_auth_token', 'my-jwt-token')
+      await getApiClient()
 
-    let capturedHeaders: Record<string, string> = {};
-    mock.onGet('/api/v1/test').reply((config) => {
-      capturedHeaders = (config.headers as Record<string, string>) || {};
-      return [200, { data: 'ok' }];
-    });
+      const config = {
+        headers: {} as Record<string, string>,
+      } as InternalAxiosRequestConfig
 
-    await api.get('/api/v1/test');
-    expect(capturedHeaders['Authorization']).toBe('Bearer test-jwt-token');
-  });
+      const result = capturedReqFulfilled(config)
+      expect(result.headers.Authorization).toBe('Bearer my-jwt-token')
+    })
 
-  it('does not attach Authorization header when no token in localStorage', async () => {
-    let capturedHeaders: Record<string, string> = {};
-    mock.onGet('/api/v1/test').reply((config) => {
-      capturedHeaders = (config.headers as Record<string, string>) || {};
-      return [200, { data: 'ok' }];
-    });
+    it('does not add Authorization header when no token is stored', async () => {
+      await getApiClient()
 
-    await api.get('/api/v1/test');
-    expect(capturedHeaders['Authorization']).toBeUndefined();
-  });
+      const config = {
+        headers: {} as Record<string, string>,
+      } as InternalAxiosRequestConfig
 
-  it('clears token from localStorage on 401 response', async () => {
-    localStorage.setItem('tsm_auth_token', 'expired-token');
-    mock.onGet('/api/v1/protected').reply(401, { error: 'Unauthorized' });
+      const result = capturedReqFulfilled(config)
+      expect(result.headers.Authorization).toBeUndefined()
+    })
+  })
 
-    // Suppress expected rejection
-    await api.get('/api/v1/protected').catch(() => {});
+  describe('response interceptor – 401 handling', () => {
+    it('clears token from localStorage on 401 response', async () => {
+      localStorage.setItem('tsm_auth_token', 'expired-token')
+      await getApiClient()
 
-    expect(localStorage.getItem('tsm_auth_token')).toBeNull();
-  });
+      const error = {
+        response: { status: 401 },
+        isAxiosError: true,
+      } as AxiosError
 
-  it('does not clear token on non-401 errors', async () => {
-    localStorage.setItem('tsm_auth_token', 'valid-token');
-    mock.onGet('/api/v1/data').reply(500, { error: 'Server Error' });
+      await expect(capturedResRejected(error)).rejects.toBe(error)
+      expect(localStorage.getItem('tsm_auth_token')).toBeNull()
+    })
 
-    await api.get('/api/v1/data').catch(() => {});
+    it('does not clear token on non-401 errors', async () => {
+      localStorage.setItem('tsm_auth_token', 'valid-token')
+      await getApiClient()
 
-    expect(localStorage.getItem('tsm_auth_token')).toBe('valid-token');
-  });
-});
+      const error = {
+        response: { status: 500 },
+        isAxiosError: true,
+      } as AxiosError
+
+      await expect(capturedResRejected(error)).rejects.toBe(error)
+      expect(localStorage.getItem('tsm_auth_token')).toBe('valid-token')
+    })
+  })
+})

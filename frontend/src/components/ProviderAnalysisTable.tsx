@@ -116,7 +116,7 @@ const ProviderAnalysisTable: React.FC<ProviderAnalysisTableProps> = ({ providerA
             {rows.map((row) => (
               <TableRow key={row.provider} hover>
                 <TableCell>
-                  <Typography variant="body2" fontWeight={600} sx={{ fontFamily: 'monospace' }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600,  fontFamily: 'monospace' }}>
                     {row.provider}
                   </Typography>
                 </TableCell>

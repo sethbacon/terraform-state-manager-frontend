@@ -394,7 +394,7 @@ const SchedulerPage: React.FC = () => {
                 tasks.map((task) => (
                   <TableRow key={task.id} hover>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {task.name}
                       </Typography>
                     </TableCell>
@@ -488,7 +488,7 @@ const SchedulerPage: React.FC = () => {
           <Typography variant="subtitle2" sx={{ mb: 1 }}>
             Schedule
           </Typography>
-          <Stack direction="row" spacing={1} sx={{ mb: 1.5 }} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={1} sx={{ mb: 1.5, flexWrap: "wrap" }}>
             {CRON_PRESETS.map((preset) => (
               <Button
                 key={preset.expression}

@@ -392,7 +392,7 @@ const AlertsPage: React.FC = () => {
                   rules.map((rule) => (
                     <TableRow key={rule.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>{rule.name}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{rule.name}</Typography>
                       </TableCell>
                       <TableCell>
                         <Chip label={rule.rule_type.replace(/_/g, ' ')} size="small" variant="outlined" />
@@ -481,7 +481,7 @@ const AlertsPage: React.FC = () => {
                   channels.map((channel) => (
                     <TableRow key={channel.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
                           {channel.name}
                         </Typography>
                       </TableCell>

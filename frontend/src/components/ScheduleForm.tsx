@@ -45,7 +45,7 @@ const ScheduleForm = ({ value, onChange }: ScheduleFormProps) => {
       <Typography variant="subtitle2" sx={{ mb: 1 }}>
         Schedule Presets
       </Typography>
-      <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 2, gap: 1 }}>
+      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap",  mb: 2, gap: 1 }}>
         {PRESETS.map((p) => (
           <Chip
             key={p.cron}

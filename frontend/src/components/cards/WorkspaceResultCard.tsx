@@ -20,24 +20,24 @@ const WorkspaceResultCard: React.FC<WorkspaceResultCardProps> = ({ result }) => 
     <Card variant="outlined">
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600} noWrap sx={{ flex: 1, mr: 1 }}>
+          <Typography variant="subtitle1" noWrap sx={{ fontWeight: 600, flex: 1, mr: 1 }}>
             {result.workspace_name}
           </Typography>
           <StatusChip status={result.status} />
         </Box>
 
-        <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }} gutterBottom>
           {result.organization}
         </Typography>
 
         <Divider sx={{ my: 1 }} />
 
-        <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap' }}>
           <Box>
             <Typography variant="caption" color="text.secondary">
               Total Resources
             </Typography>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {result.total_resources.toLocaleString()}
             </Typography>
           </Box>
@@ -46,7 +46,7 @@ const WorkspaceResultCard: React.FC<WorkspaceResultCardProps> = ({ result }) => 
             <Typography variant="caption" color="text.secondary">
               Managed
             </Typography>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {result.managed_count.toLocaleString()}
             </Typography>
           </Box>
@@ -55,7 +55,7 @@ const WorkspaceResultCard: React.FC<WorkspaceResultCardProps> = ({ result }) => 
             <Typography variant="caption" color="text.secondary">
               RUM
             </Typography>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {result.rum_count.toLocaleString()}
             </Typography>
           </Box>
@@ -64,7 +64,7 @@ const WorkspaceResultCard: React.FC<WorkspaceResultCardProps> = ({ result }) => 
             <Typography variant="caption" color="text.secondary">
               Data Sources
             </Typography>
-            <Typography variant="body2" fontWeight={600}>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {result.data_source_count.toLocaleString()}
             </Typography>
           </Box>

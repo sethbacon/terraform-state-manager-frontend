@@ -228,7 +228,7 @@ const AnalysisDetailPage: React.FC = () => {
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')}>
           Back
         </Button>
-        <Typography variant="h5" fontWeight={600} sx={{ flex: 1 }}>
+        <Typography variant="h5" sx={{ fontWeight: 600,  flex: 1 }}>
           Analysis Run Details
         </Typography>
         <StatusChip status={run.status} size="medium" />
@@ -242,13 +242,13 @@ const AnalysisDetailPage: React.FC = () => {
 
       {/* Summary Cards */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 Total Workspaces
               </Typography>
-              <Typography variant="h4" fontWeight={600}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_workspaces.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -258,13 +258,13 @@ const AnalysisDetailPage: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 Total RUM
               </Typography>
-              <Typography variant="h4" fontWeight={600}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_rum.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -274,13 +274,13 @@ const AnalysisDetailPage: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 Total Resources
               </Typography>
-              <Typography variant="h4" fontWeight={600}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_resources.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -290,13 +290,13 @@ const AnalysisDetailPage: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
                 Success Rate
               </Typography>
-              <Typography variant="h4" fontWeight={600}>
+              <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {successRate}%
               </Typography>
               <Typography variant="caption" color="text.secondary">
@@ -334,11 +334,11 @@ const AnalysisDetailPage: React.FC = () => {
                   value={resultsFilter}
                   onChange={(e) => { setResultsFilter(e.target.value); setResultsPage(0); }}
                   sx={{ mb: 2, width: 300 }}
-                  InputProps={{
+                  slotProps={{ input: {
                     startAdornment: (
                       <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>
                     ),
-                  }}
+                  } }}
                 />
                 <TableContainer>
                   <Table size="small">
@@ -364,7 +364,7 @@ const AnalysisDetailPage: React.FC = () => {
                         paginatedResults.map((result) => (
                           <TableRow key={result.id} hover>
                             <TableCell>
-                              <Typography variant="body2" fontWeight={500}>
+                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
                                 {result.workspace_name}
                               </Typography>
                               <Typography variant="caption" color="text.secondary">

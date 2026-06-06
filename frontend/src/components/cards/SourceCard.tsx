@@ -12,7 +12,7 @@ import {
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
-  PlayCircleOutline as TestIcon,
+  PlayCircleOutlined as TestIcon,
   Cloud as CloudIcon,
   Storage as StorageIcon,
   Dns as DnsIcon,
@@ -82,7 +82,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source, onEdit, onDelete, onTes
         </Typography>
 
         <Box sx={{ mt: 1.5 }}>
-          <Typography variant="caption" color="text.secondary" display="block">
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
             Last Tested: {formatDate(source.last_tested_at)}
           </Typography>
           {source.last_test_status && (

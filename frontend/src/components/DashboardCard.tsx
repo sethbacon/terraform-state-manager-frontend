@@ -29,7 +29,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
       <Typography variant="body2" color="text.secondary" gutterBottom>
         {title}
       </Typography>
-      <Typography variant="h4" fontWeight={700} sx={{ mb: 0.5 }}>
+      <Typography variant="h4" sx={{ fontWeight: 700, mb: 0.5 }}>
         {(value ?? 0).toLocaleString()}
       </Typography>
       {subtitle && (

@@ -149,7 +149,7 @@ const SourcesPage: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" fontWeight={600}>
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>
           State Sources
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -189,7 +189,7 @@ const SourcesPage: React.FC = () => {
       ) : (
         <Grid container spacing={2}>
           {sources.map((source) => (
-            <Grid item xs={12} sm={6} md={4} key={source.id}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={source.id}>
               <SourceCard
                 source={source}
                 onEdit={handleEditClick}

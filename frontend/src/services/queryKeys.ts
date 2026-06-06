@@ -20,6 +20,7 @@ export const queryKeys = {
   apiKeys: {
     _def: ['apiKeys'] as const,
     list: (organizationId?: string) => [...queryKeys.apiKeys._def, 'list', organizationId] as const,
+    memberships: (userId: string) => [...queryKeys.apiKeys._def, 'memberships', userId] as const,
   },
   roles: {
     _def: ['roles'] as const,

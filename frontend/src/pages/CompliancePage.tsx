@@ -280,7 +280,7 @@ const CompliancePage: React.FC = () => {
                   policies.map((policy) => (
                     <TableRow key={policy.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontWeight={500}>{policy.name}</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>{policy.name}</Typography>
                       </TableCell>
                       <TableCell>
                         <Chip label={policy.policy_type} size="small" variant="outlined" />
@@ -347,7 +347,7 @@ const CompliancePage: React.FC = () => {
 
         {score && (
           <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
                 title="Compliance Score"
                 value={score.score_percent}
@@ -355,21 +355,21 @@ const CompliancePage: React.FC = () => {
                 accentColor="#4caf50"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
                 title="Passed"
                 value={score.pass_count}
                 accentColor="#4caf50"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
                 title="Failed"
                 value={score.fail_count}
                 accentColor="#f44336"
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
                 title="Warnings"
                 value={score.warning_count}

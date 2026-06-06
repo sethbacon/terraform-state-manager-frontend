@@ -229,7 +229,7 @@ const ReportsPage: React.FC = () => {
                 reports.map((report) => (
                   <TableRow key={report.id} hover>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={500}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {report.name}
                       </Typography>
                     </TableCell>

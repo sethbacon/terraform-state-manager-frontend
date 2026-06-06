@@ -33,12 +33,7 @@ const ProviderDistributionChart: React.FC<ProviderDistributionChartProps> = ({ d
 
   if (data.length === 0) {
     return (
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        height={350}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: 350 }}>
         <Typography color="text.secondary">
           Run an analysis to see provider distribution
         </Typography>

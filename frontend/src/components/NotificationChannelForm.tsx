@@ -26,14 +26,14 @@ interface NotificationChannel {
   id: string;
   name: string;
   channel_type: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   is_active: boolean;
 }
 
 interface ChannelPayload {
   name: string;
   channel_type: string;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   is_active: boolean;
 }
 
@@ -223,7 +223,7 @@ const NotificationChannelForm: React.FC<NotificationChannelFormProps> = ({
   }, []);
 
   const handleSubmit = useCallback(() => {
-    const config: Record<string, any> = {};
+    const config: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(configValues)) {
       const trimmed = typeof value === 'string' ? value.trim() : String(value);
       if (trimmed !== '') {

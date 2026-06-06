@@ -1,149 +1,248 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import axios from 'axios';
-import api from '../services/api';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  ReactNode,
+} from 'react'
+import { jwtDecode } from 'jwt-decode'
+import { User, AuthContextType, RoleTemplateInfo } from '../types'
+import api from '../services/api'
+import { clearAuthStorage, TOKEN_KEY } from '../utils/authStorage'
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  oidc_sub?: string;
-  is_active: boolean;
-  last_login_at?: string;
-  created_at: string;
-  updated_at: string;
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
+
+export const SESSION_WARNING_LEAD_MS = 2 * 60 * 1000
+
+export function parseTokenExpiry(token: string | null | undefined): Date | null {
+  if (!token) return null
+  try {
+    const decoded = jwtDecode<{ exp?: number }>(token)
+    if (typeof decoded.exp !== 'number' || !isFinite(decoded.exp)) return null
+    return new Date(decoded.exp * 1000)
+  } catch {
+    return null
+  }
 }
 
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  scopes: string[];
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  login: () => void;
-  logout: () => void;
-  setToken: (token: string) => void;
-  refreshToken: () => Promise<void>;
-  hasScope: (scope: string) => boolean;
-  hasAnyScope: (scopes: string[]) => boolean;
+export const useAuth = () => {
+  const context = useContext(AuthContext)
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider')
+  }
+  return context
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+interface AuthProviderProps {
+  children: ReactNode
+}
 
-const TOKEN_KEY = 'tsm_auth_token';
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null)
+  const [roleTemplate, setRoleTemplate] = useState<RoleTemplateInfo | null>(null)
+  const [allowedScopes, setAllowedScopes] = useState<string[]>([])
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<Date | null>(null)
+  const [sessionExpiresSoon, setSessionExpiresSoon] = useState(false)
+  const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const silentRefreshRef = useRef<() => Promise<void>>(async () => { })
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setTokenState] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
-  const [scopes, setScopes] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const clearWarningTimer = useCallback(() => {
+    if (warningTimerRef.current !== null) {
+      clearTimeout(warningTimerRef.current)
+      warningTimerRef.current = null
+    }
+  }, [])
 
-  const setToken = useCallback((newToken: string) => {
-    localStorage.setItem(TOKEN_KEY, newToken);
-    setTokenState(newToken);
-  }, []);
+  const scheduleSessionWarning = useCallback(
+    (token: string | null | undefined, expiresAt?: Date) => {
+      clearWarningTimer()
+      setSessionExpiresSoon(false)
+      const exp = expiresAt ?? parseTokenExpiry(token)
+      setSessionExpiresAt(exp)
+      if (!exp) return
+      const delay = exp.getTime() - Date.now() - SESSION_WARNING_LEAD_MS
+      if (delay <= 0) {
+        silentRefreshRef.current().catch(() => {
+          setSessionExpiresSoon(true)
+        })
+        return
+      }
+      warningTimerRef.current = setTimeout(() => {
+        silentRefreshRef.current().catch(() => {
+          setSessionExpiresSoon(true)
+        })
+      }, delay)
+    },
+    [clearWarningTimer],
+  )
 
-  const clearAuth = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    setTokenState(null);
-    setUser(null);
-    setScopes([]);
-  }, []);
+  const logout = useCallback(() => {
+    setUser(null)
+    setRoleTemplate(null)
+    setAllowedScopes([])
+    setIsAuthenticated(false)
+    clearWarningTimer()
+    setSessionExpiresAt(null)
+    setSessionExpiresSoon(false)
+    clearAuthStorage()
+    api.logout()
+  }, [clearWarningTimer])
 
   const fetchCurrentUser = useCallback(async () => {
-    if (!token) {
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      const data = await api.getCurrentUser();
-      setUser(data);
-      setScopes(data.scopes || data.allowed_scopes || []);
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        clearAuth();
+      const response = await api.getCurrentUserWithRole()
+      setUser(response.user)
+      setRoleTemplate(response.role_template || null)
+      setAllowedScopes(response.allowed_scopes || [])
+      localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('role_template', JSON.stringify(response.role_template))
+      localStorage.setItem('allowed_scopes', JSON.stringify(response.allowed_scopes))
+      if (response.session_expires_at) {
+        scheduleSessionWarning(null, new Date(response.session_expires_at))
       }
-    } finally {
-      setIsLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch current user:', error)
+      logout()
     }
-  }, [token, clearAuth]);
+  }, [logout, scheduleSessionWarning])
 
   useEffect(() => {
-    fetchCurrentUser();
-  }, [fetchCurrentUser]);
+    const token = localStorage.getItem(TOKEN_KEY)
+    const storedUser = localStorage.getItem('user')
+    const storedRoleTemplate = localStorage.getItem('role_template')
+    const storedAllowedScopes = localStorage.getItem('allowed_scopes')
 
-  // Note: Auth header injection and 401 redirect are handled by ApiClient interceptors.
-
-  const login = useCallback(() => {
-    window.location.href = '/api/v1/auth/login';
-  }, []);
-
-  const logout = useCallback(async () => {
-    try {
-      await api.logout();
-    } catch {
-      // Ignore logout errors
-    } finally {
-      clearAuth();
-    }
-  }, [clearAuth]);
-
-  const refreshToken = useCallback(async () => {
-    try {
-      const data = await api.refreshToken();
-      if (data.token) {
-        setToken(data.token);
+    if (token && storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+        if (storedRoleTemplate) {
+          setRoleTemplate(JSON.parse(storedRoleTemplate))
+        }
+        if (storedAllowedScopes) {
+          setAllowedScopes(JSON.parse(storedAllowedScopes))
+        }
+        setIsAuthenticated(true)
+        scheduleSessionWarning(token)
+        fetchCurrentUser()
+      } catch (error) {
+        console.error('Failed to parse stored user:', error)
+        localStorage.removeItem(TOKEN_KEY)
+        localStorage.removeItem('user')
+        localStorage.removeItem('role_template')
+        localStorage.removeItem('allowed_scopes')
       }
-    } catch {
-      clearAuth();
-    }
-  }, [setToken, clearAuth]);
-
-  const hasScope = useCallback(
-    (scope: string) => {
-      if (scopes.includes('admin')) return true;
-      if (scopes.includes(scope)) return true;
-      // write implies read
-      if (scope.endsWith(':read')) {
-        const writeScope = scope.replace(':read', ':write');
-        if (scopes.includes(writeScope)) return true;
+      setIsLoading(false)
+    } else if (token) {
+      setIsAuthenticated(true)
+      scheduleSessionWarning(token)
+      fetchCurrentUser()
+      setIsLoading(false)
+    } else if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser))
+        if (storedRoleTemplate) setRoleTemplate(JSON.parse(storedRoleTemplate))
+        if (storedAllowedScopes) setAllowedScopes(JSON.parse(storedAllowedScopes))
+        setIsAuthenticated(true)
+      } catch {
+        localStorage.removeItem('user')
+        localStorage.removeItem('role_template')
+        localStorage.removeItem('allowed_scopes')
       }
-      return false;
-    },
-    [scopes]
-  );
+      fetchCurrentUser().finally(() => setIsLoading(false))
+    } else {
+      api
+        .getCurrentUserWithRole()
+        .then((response) => {
+          setUser(response.user)
+          setRoleTemplate(response.role_template || null)
+          setAllowedScopes(response.allowed_scopes || [])
+          setIsAuthenticated(true)
+          localStorage.setItem('user', JSON.stringify(response.user))
+          localStorage.setItem('role_template', JSON.stringify(response.role_template))
+          localStorage.setItem('allowed_scopes', JSON.stringify(response.allowed_scopes))
+          if (response.session_expires_at) {
+            scheduleSessionWarning(null, new Date(response.session_expires_at))
+          }
+        })
+        .catch(() => {
+          // No valid session
+        })
+        .finally(() => setIsLoading(false))
+    }
+  }, [fetchCurrentUser, scheduleSessionWarning])
 
-  const hasAnyScope = useCallback(
-    (requiredScopes: string[]) => requiredScopes.some((s) => hasScope(s)),
-    [hasScope]
-  );
-
-  const value = useMemo(
-    () => ({
-      user,
-      token,
-      scopes,
-      isAuthenticated: !!user && !!token,
-      isLoading,
-      login,
-      logout,
-      setToken,
-      refreshToken,
-      hasScope,
-      hasAnyScope,
-    }),
-    [user, token, scopes, isLoading, login, logout, setToken, refreshToken, hasScope, hasAnyScope]
-  );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  const login = async (userOrProvider: User | 'oidc' | 'azuread'): Promise<void> => {
+    if (typeof userOrProvider === 'string') {
+      api.login(userOrProvider)
+    } else {
+      setIsAuthenticated(true)
+      await fetchCurrentUser()
+    }
   }
-  return context;
-};
 
-export default AuthContext;
+  const refreshToken = async () => {
+    try {
+      const response = await api.refreshToken()
+      if (response.token) {
+        localStorage.setItem(TOKEN_KEY, response.token)
+        scheduleSessionWarning(response.token)
+      }
+    } catch (error) {
+      console.error('Failed to refresh token:', error)
+      logout()
+    }
+  }
+
+  const silentRefresh = async () => {
+    const response = await api.refreshToken()
+    if (response.token) {
+      localStorage.setItem(TOKEN_KEY, response.token)
+      scheduleSessionWarning(response.token)
+    } else if (response.expires_in) {
+      scheduleSessionWarning(null, new Date(Date.now() + response.expires_in * 1000))
+    } else {
+      clearWarningTimer()
+      setSessionExpiresAt(null)
+    }
+  }
+  silentRefreshRef.current = silentRefresh
+
+  const setToken = (token: string) => {
+    localStorage.setItem(TOKEN_KEY, token)
+    setIsAuthenticated(true)
+    scheduleSessionWarning(token)
+  }
+
+  useEffect(() => {
+    return () => {
+      clearWarningTimer()
+    }
+  }, [clearWarningTimer])
+
+  const hasScope = useCallback((scope: string) => {
+    return allowedScopes.includes('admin') || allowedScopes.includes(scope)
+  }, [allowedScopes])
+
+  const value: AuthContextType = {
+    user,
+    roleTemplate,
+    allowedScopes,
+    isAuthenticated,
+    isLoading,
+    sessionExpiresAt,
+    sessionExpiresSoon,
+    hasScope,
+    login,
+    logout,
+    refreshToken,
+    setToken,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+export default AuthContext
