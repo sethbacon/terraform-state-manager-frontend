@@ -39,7 +39,7 @@ import Storage from '@mui/icons-material/Storage';
 import Schedule from '@mui/icons-material/Schedule';
 import Brightness4 from '@mui/icons-material/Brightness4';
 import Brightness7 from '@mui/icons-material/Brightness7';
-import HelpOutline from '@mui/icons-material/HelpOutline';
+import HelpOutline from '@mui/icons-material/HelpOutlined';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import { useState } from 'react';
@@ -119,6 +119,8 @@ const Layout = () => {
     { text: 'Organizations', icon: <Business />, path: '/admin/organizations', tooltip: 'Manage organizations', scope: 'organizations:read' as string | null },
     { text: 'Roles', icon: <Shield />, path: '/admin/roles', tooltip: 'Configure role templates', scope: 'admin' as string | null },
     { text: 'API Keys', icon: <VpnKey />, path: '/admin/api-keys', tooltip: 'Create and manage API keys', scope: null as string | null },
+    { text: 'OIDC Settings', icon: <VerifiedUser />, path: '/admin/oidc', tooltip: 'Configure OIDC authentication', scope: 'admin' as string | null },
+    { text: 'Audit Logs', icon: <Assessment />, path: '/admin/audit-logs', tooltip: 'View system audit logs', scope: 'audit:read' as string | null },
   ];
 
   // Bottom nav — always visible, low prominence
@@ -167,7 +169,7 @@ const Layout = () => {
             </ListItemIcon>
             <ListItemText
               primary={item.text}
-              primaryTypographyProps={{ fontWeight: isActive ? 600 : 400 }}
+              slotProps={{ primary: { sx: { fontWeight: isActive ? 600 : 400 } } }}
             />
           </ListItemButton>
         </Tooltip>
@@ -206,12 +208,16 @@ const Layout = () => {
               <ListItem sx={{ py: 0.5, px: 2 }}>
                 <ListItemText
                   primary={section.label}
-                  primaryTypographyProps={{
-                    variant: 'caption',
-                    fontWeight: 600,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: 'text.secondary',
+                  slotProps={{
+                    primary: {
+                      variant: 'caption',
+                      color: 'text.secondary',
+                      sx: {
+                        fontWeight: 600,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      },
+                    }
                   }}
                 />
               </ListItem>
@@ -229,12 +235,16 @@ const Layout = () => {
             <ListItemButton onClick={toggleAdmin} dense sx={{ py: 0.5 }}>
               <ListItemText
                 primary="Admin"
-                primaryTypographyProps={{
-                  variant: 'caption',
-                  fontWeight: 600,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: 'text.secondary',
+                slotProps={{
+                  primary: {
+                    variant: 'caption',
+                    color: 'text.secondary',
+                    sx: {
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                    },
+                  }
                 }}
               />
               {adminOpen
