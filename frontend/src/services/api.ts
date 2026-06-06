@@ -126,6 +126,10 @@ class ApiClient {
   // Dev
   // ===========================================================================
 
+  async devLogin(): Promise<{ token: string }> {
+    const response = await this.client.post('/api/v1/dev/login');
+    return response.data;
+  }
   getDevStatus() { return this.get('/api/v1/dev/status').then(r => r.data); }
   listUsersForImpersonation() { return this.get('/api/v1/dev/users').then(r => r.data); }
   impersonateUser(userId: string) { return this.post(`/api/v1/dev/impersonate/${userId}`).then(r => r.data); }

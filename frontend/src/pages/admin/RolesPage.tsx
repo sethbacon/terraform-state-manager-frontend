@@ -1,255 +1,379 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useQuery } from '@tanstack/react-query'
 import {
-  Alert,
+  Container,
+  Typography,
   Box,
-  Button,
-  Card,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Typography,
   CircularProgress,
+  Alert,
+  Chip,
+  Stack,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Tooltip,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from '@mui/icons-material';
-import api from '../../services/api';
-import { RoleTemplate } from '../../types';
+} from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ShieldIcon from '@mui/icons-material/Shield'
+import LockIcon from '@mui/icons-material/Lock'
+import AdminIcon from '@mui/icons-material/AdminPanelSettings'
+import api from '@/services/api'
+import { RoleTemplate } from '@/types'
+import { AVAILABLE_SCOPES } from '@/types/rbac'
+import { getScopeInfo, getScopeColor } from '@/utils'
+import { queryKeys } from '@/services/queryKeys'
 
-const AVAILABLE_SCOPES = [
-  'admin', 'analysis:read', 'analysis:write', 'sources:read', 'sources:write',
-  'backups:read', 'backups:write', 'migrations:read', 'migrations:write',
-  'reports:read', 'reports:write', 'dashboard:read', 'dashboard:write',
-  'compliance:read', 'compliance:write', 'scheduler:admin', 'alerts:admin',
-  'users:read', 'users:write', 'organizations:read', 'organizations:write',
-];
+// Scope category groupings for better organization
+const SCOPE_CATEGORIES: Record<string, string[]> = {
+  'State Access': ['states:read', 'states:write', 'workspaces:read', 'workspaces:manage'],
+  DevOps: ['sources:read', 'sources:manage', 'analysis:read', 'analysis:manage'],
+  'User & Organization': ['users:read', 'users:write', 'organizations:read', 'organizations:write'],
+  System: ['api_keys:manage', 'audit:read', 'admin'],
+}
 
 const RolesPage: React.FC = () => {
-  const [roles, setRoles] = useState<RoleTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<RoleTemplate | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    display_name: '',
-    description: '',
-    scopes: [] as string[],
-  });
+  const { t } = useTranslation()
+  const [expandedRole, setExpandedRole] = useState<string | false>(false)
 
-  const fetchRoles = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/api/v1/admin/role-templates');
-      const d = response.data?.role_templates;
-      setRoles(Array.isArray(d) ? d : []);
-    } catch {
-      setError('Failed to load roles');
-    } finally {
-      setLoading(false);
+  const {
+    data: roles = [],
+    isLoading: loading,
+    error: queryError,
+  } = useQuery<RoleTemplate[]>({
+    queryKey: queryKeys.roles.list(),
+    queryFn: async () => {
+      const templates = await api.listRoleTemplates()
+      const roleOrder = ['viewer', 'publisher', 'devops', 'user_manager', 'auditor', 'admin']
+      return [...templates].sort((a: RoleTemplate, b: RoleTemplate) => {
+        if (a.is_system && !b.is_system) return -1
+        if (!a.is_system && b.is_system) return 1
+        if (a.is_system && b.is_system) {
+          return roleOrder.indexOf(a.name) - roleOrder.indexOf(b.name)
+        }
+        return a.name.localeCompare(b.name)
+      })
+    },
+  })
+
+  const error = queryError ? t('admin.roles.loadError') : null
+
+  const handleAccordionChange =
+    (roleId: string) => (_: React.SyntheticEvent, isExpanded: boolean) => {
+      setExpandedRole(isExpanded ? roleId : false)
     }
-  }, []);
-
-  useEffect(() => {
-    fetchRoles();
-  }, [fetchRoles]);
-
-  const handleCreate = async () => {
-    try {
-      await api.post('/api/v1/admin/role-templates', formData);
-      setDialogOpen(false);
-      setFormData({ name: '', display_name: '', description: '', scopes: [] });
-      fetchRoles();
-    } catch {
-      setError('Failed to create role');
-    }
-  };
-
-  const handleUpdate = async () => {
-    if (!selectedRole) return;
-    try {
-      await api.put(`/api/v1/admin/role-templates/${selectedRole.id}`, formData);
-      setDialogOpen(false);
-      setSelectedRole(null);
-      setFormData({ name: '', display_name: '', description: '', scopes: [] });
-      fetchRoles();
-    } catch {
-      setError('Failed to update role');
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!selectedRole) return;
-    try {
-      await api.delete(`/api/v1/admin/role-templates/${selectedRole.id}`);
-      setDeleteDialogOpen(false);
-      setSelectedRole(null);
-      fetchRoles();
-    } catch {
-      setError('Failed to delete role');
-    }
-  };
 
   return (
-    <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">Role Templates</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => {
-          setSelectedRole(null);
-          setFormData({ name: '', display_name: '', description: '', scopes: [] });
-          setDialogOpen(true);
-        }}>
-          Create Role
-        </Button>
-      </Box>
+    <Container maxWidth="lg" aria-busy={loading} aria-live="polite">
+      {loading ? (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '400px',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Box sx={{ mb: 4 }}>
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{
+                alignItems: 'center',
+                mb: 2,
+              }}
+            >
+              <ShieldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+              <Typography variant="h4" component="h1">
+                {t('admin.roles.title')}
+              </Typography>
+            </Stack>
+            <Typography
+              variant="body1"
+              sx={{
+                color: 'text.secondary',
+              }}
+            >
+              {t('admin.roles.subtitle')}
+            </Typography>
+          </Box>
 
-      {error && <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>{error}</Alert>}
+          {error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error}
+            </Alert>
+          )}
 
-      <Card>
-        {loading ? (
-          <Box display="flex" justifyContent="center" py={4}><CircularProgress /></Box>
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Display Name</TableCell>
-                  <TableCell>Scopes</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell align="right">Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {roles.length === 0 ? (
+          {/* Scope Reference */}
+          <Paper sx={{ p: 3, mb: 4 }}>
+            <Typography variant="h6" gutterBottom>
+              {t('admin.roles.availableScopesReference')}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+              }}
+            >
+              {t('admin.roles.scopesDefine')}
+            </Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      <Typography color="text.secondary" py={2}>No role templates found</Typography>
+                    <TableCell>
+                      <strong>{t('admin.roles.thScope')}</strong>
+                    </TableCell>
+                    <TableCell>
+                      <strong>{t('admin.roles.thDescription')}</strong>
                     </TableCell>
                   </TableRow>
-                ) : (
-                  roles.map((role) => (
-                    <TableRow key={role.id} hover>
-                      <TableCell>
-                        <Typography fontFamily="monospace">{role.name}</Typography>
-                      </TableCell>
-                      <TableCell>{role.display_name}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                          {role.scopes.slice(0, 4).map((s) => (
-                            <Chip key={s} label={s} size="small" variant="outlined" />
-                          ))}
-                          {role.scopes.length > 4 && (
-                            <Chip label={`+${role.scopes.length - 4}`} size="small" />
-                          )}
-                        </Box>
-                      </TableCell>
+                </TableHead>
+                <TableBody>
+                  {AVAILABLE_SCOPES.map((scope) => (
+                    <TableRow key={scope.value}>
                       <TableCell>
                         <Chip
-                          label={role.is_system ? 'System' : 'Custom'}
-                          color={role.is_system ? 'primary' : 'default'}
+                          label={scope.label}
                           size="small"
+                          color={getScopeColor(scope.value)}
                           variant="outlined"
                         />
                       </TableCell>
-                      <TableCell align="right">
-                        {!role.is_system && (
-                          <>
-                            <Tooltip title="Edit">
-                              <IconButton size="small" onClick={() => {
-                                setSelectedRole(role);
-                                setFormData({
-                                  name: role.name,
-                                  display_name: role.display_name,
-                                  description: role.description || '',
-                                  scopes: role.scopes,
-                                });
-                                setDialogOpen(true);
-                              }}>
-                                <EditIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                              <IconButton size="small" onClick={() => { setSelectedRole(role); setDeleteDialogOpen(true); }} color="error">
-                                <DeleteIcon fontSize="small" />
-                              </IconButton>
-                            </Tooltip>
-                          </>
-                        )}
-                      </TableCell>
+                      <TableCell>{scope.description}</TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Paper>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{selectedRole ? 'Edit Role' : 'Create Role'}</DialogTitle>
-        <DialogContent>
-          <TextField fullWidth label="Name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} sx={{ mt: 1, mb: 2 }} disabled={!!selectedRole} helperText="Unique identifier (e.g., 'reader', 'editor')" />
-          <TextField fullWidth label="Display Name" value={formData.display_name} onChange={(e) => setFormData({ ...formData, display_name: e.target.value })} sx={{ mb: 2 }} />
-          <TextField fullWidth label="Description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} sx={{ mb: 2 }} multiline rows={2} />
-          <FormControl fullWidth>
-            <InputLabel>Scopes</InputLabel>
-            <Select
-              multiple
-              value={formData.scopes}
-              onChange={(e) => setFormData({ ...formData, scopes: e.target.value as string[] })}
-              input={<OutlinedInput label="Scopes" />}
-              renderValue={(selected) => (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                  {selected.map((value) => <Chip key={value} label={value} size="small" />)}
-                </Box>
-              )}
+          {/* Roles List */}
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              {t('admin.roles.roleTemplates')}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                mb: 3,
+              }}
             >
-              {AVAILABLE_SCOPES.map((scope) => (
-                <MenuItem key={scope} value={scope}>{scope}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={selectedRole ? handleUpdate : handleCreate} disabled={!formData.name || !formData.display_name || formData.scopes.length === 0}>
-            {selectedRole ? 'Update' : 'Create'}
-          </Button>
-        </DialogActions>
-      </Dialog>
+              {t('admin.roles.clickRole')}
+            </Typography>
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Role</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete role <strong>{selectedRole?.display_name}</strong>?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleDelete}>Delete</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
-};
+            {roles.length === 0 ? (
+              <Alert severity="info">{t('admin.roles.noRoles')}</Alert>
+            ) : (
+              <Box>
+                {roles.map((role) => (
+                  <Accordion
+                    key={role.id}
+                    expanded={expandedRole === role.id}
+                    onChange={handleAccordionChange(role.id)}
+                    sx={{
+                      mb: 1,
+                      '&:before': { display: 'none' },
+                      border: 1,
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={<ExpandMoreIcon />}
+                      sx={{
+                        backgroundColor: (theme) =>
+                          theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50',
+                      }}
+                    >
+                      <Stack
+                        direction="row"
+                        spacing={2}
+                        sx={{
+                          alignItems: 'center',
+                          width: '100%',
+                          pr: 2,
+                        }}
+                      >
+                        {role.name === 'admin' ? (
+                          <AdminIcon color="error" />
+                        ) : role.is_system ? (
+                          <LockIcon color="action" />
+                        ) : (
+                          <ShieldIcon color="primary" />
+                        )}
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography
+                            variant="subtitle1"
+                            component="span"
+                            sx={{
+                              fontWeight: 'medium',
+                            }}
+                          >
+                            {role.display_name}
+                          </Typography>
+                          {role.is_system && (
+                            <Chip
+                              label={t('admin.roles.systemChip')}
+                              size="small"
+                              color="default"
+                              sx={{ ml: 1, height: 20, fontSize: '0.7rem' }}
+                            />
+                          )}
+                        </Box>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'text.secondary',
+                          }}
+                        >
+                          {t('admin.roles.scopeCount', { count: role.scopes.length })}
+                        </Typography>
+                      </Stack>
+                    </AccordionSummary>
+                    <AccordionDetails sx={{ pt: 2 }}>
+                      {role.description && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: 'text.secondary',
+                            mb: 2,
+                          }}
+                        >
+                          {role.description}
+                        </Typography>
+                      )}
 
-export default RolesPage;
+                      <Typography variant="subtitle2" gutterBottom>
+                        {t('admin.roles.assignedScopes')}
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        useFlexGap
+                        sx={{
+                          flexWrap: 'wrap',
+                          mb: 2,
+                        }}
+                      >
+                        {role.scopes.map((scope) => {
+                          const scopeInfo = getScopeInfo(scope)
+                          return (
+                            <Tooltip key={scope} title={scopeInfo.description} arrow>
+                              <Chip
+                                label={scopeInfo.label}
+                                size="small"
+                                color={getScopeColor(scope)}
+                              />
+                            </Tooltip>
+                          )
+                        })}
+                      </Stack>
+
+                      {/* Scope breakdown by category */}
+                      <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
+                        {t('admin.roles.permissionsByCategory')}
+                      </Typography>
+                      <TableContainer>
+                        <Table size="small">
+                          <TableBody>
+                            {Object.entries(SCOPE_CATEGORIES).map(([category, categoryScopes]) => {
+                              const matchingScopes = role.scopes.filter(
+                                (s) => categoryScopes.includes(s) || s === 'admin',
+                              )
+                              // Admin scope grants all permissions
+                              const hasAdminScope = role.scopes.includes('admin')
+
+                              return (
+                                <TableRow key={category}>
+                                  <TableCell sx={{ fontWeight: 'medium', width: 200 }}>
+                                    {category}
+                                  </TableCell>
+                                  <TableCell>
+                                    {hasAdminScope && category !== 'System' ? (
+                                      <Chip
+                                        label={t('admin.roles.fullAccessViaAdmin')}
+                                        size="small"
+                                        color="error"
+                                        variant="outlined"
+                                      />
+                                    ) : matchingScopes.length > 0 ? (
+                                      <Stack
+                                        direction="row"
+                                        spacing={0.5}
+                                        useFlexGap
+                                        sx={{
+                                          flexWrap: 'wrap',
+                                        }}
+                                      >
+                                        {matchingScopes.map((scope) => {
+                                          const scopeInfo = getScopeInfo(scope)
+                                          return (
+                                            <Chip
+                                              key={scope}
+                                              label={scopeInfo.label}
+                                              size="small"
+                                              color={getScopeColor(scope)}
+                                              variant="outlined"
+                                            />
+                                          )
+                                        })}
+                                      </Stack>
+                                    ) : (
+                                      <Typography
+                                        variant="body2"
+                                        sx={{
+                                          color: 'text.disabled',
+                                        }}
+                                      >
+                                        No access
+                                      </Typography>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            })}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+
+                      {/* Metadata */}
+                      <Box sx={{ mt: 2, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                          }}
+                        >
+                          Role ID: {role.id} | Created:{' '}
+                          {new Date(role.created_at).toLocaleDateString()}
+                          {role.updated_at !== role.created_at && (
+                            <> | Updated: {new Date(role.updated_at).toLocaleDateString()}</>
+                          )}
+                        </Typography>
+                      </Box>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+              </Box>
+            )}
+          </Paper>
+        </>
+      )}
+    </Container>
+  )
+}
+
+export default RolesPage

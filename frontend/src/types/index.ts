@@ -227,3 +227,18 @@ export interface AuthState {
   sessionExpiresAt: Date | null
   sessionExpiresSoon: boolean
 }
+
+export interface AuthContextType {
+  user: User | null
+  roleTemplate: RoleTemplateInfo | null
+  allowedScopes: string[]
+  isAuthenticated: boolean
+  isLoading: boolean
+  sessionExpiresAt: Date | null
+  sessionExpiresSoon: boolean
+  hasScope: (scope: string) => boolean
+  login: (userOrProvider: User | 'oidc' | 'azuread') => Promise<void>
+  logout: () => void
+  refreshToken: () => Promise<void>
+  setToken: (token: string) => void
+}
