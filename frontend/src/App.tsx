@@ -1,5 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { HelpProvider } from './contexts/HelpContext';
@@ -33,8 +34,19 @@ const OIDCSettingsPage = lazy(() => import('./pages/admin/OIDCSettingsPage'));
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
 const ApiDocumentation = lazy(() => import('./pages/ApiDocumentation'));
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 const App: React.FC = () => {
   return (
+    <QueryClientProvider client={queryClient}>
     <ThemeProvider>
       <AuthProvider>
         <HelpProvider>
@@ -241,6 +253,7 @@ const App: React.FC = () => {
         </HelpProvider>
       </AuthProvider>
     </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 
