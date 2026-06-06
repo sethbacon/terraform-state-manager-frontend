@@ -1,9 +1,17 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
 
+const PRIMARY = '#5C4EE5';
+const SECONDARY_LIGHT = '#00796B';
+const SECONDARY_DARK = '#00D9C0';
+const DEFAULT_PRODUCT_NAME = 'Terraform State Manager';
+
 interface ThemeContextType {
   mode: PaletteMode;
   toggleTheme: () => void;
+  productName: string;
+  logoUrl: string | null;
+  direction: 'ltr' | 'rtl';
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -48,10 +56,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         palette: {
           mode,
           primary: {
-            main: '#5C4EE5',
+            main: PRIMARY,
           },
           secondary: {
-            main: '#00D9C0',
+            main: mode === 'dark' ? SECONDARY_DARK : SECONDARY_LIGHT,
           },
           ...(mode === 'dark' && {
             background: {
@@ -66,6 +74,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         components: {
           MuiCssBaseline: {
             styleOverrides: {
+              ':root': {
+                '--brand-primary': PRIMARY,
+                '--brand-secondary': mode === 'dark' ? SECONDARY_DARK : SECONDARY_LIGHT,
+              },
               body: {
                 scrollbarColor: mode === 'dark' ? '#6b6b6b #2b2b2b' : undefined,
                 '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
@@ -79,6 +91,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               'pre, code': {
                 backgroundColor: mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
                 color: mode === 'dark' ? '#e6e6e6' : '#1e1e1e',
+              },
+              '@media (prefers-reduced-motion: reduce)': {
+                '*, *::before, *::after': {
+                  animationDuration: '0.01ms !important',
+                  animationIterationCount: '1 !important',
+                  transitionDuration: '0.01ms !important',
+                },
               },
             },
           },
@@ -101,8 +120,16 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     [mode]
   );
 
+  const value: ThemeContextType = {
+    mode,
+    toggleTheme,
+    productName: DEFAULT_PRODUCT_NAME,
+    logoUrl: null,
+    direction: 'ltr',
+  };
+
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
