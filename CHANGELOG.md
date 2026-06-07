@@ -7,6 +7,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v0.2.0...v0.3.0) (2026-06-07)
+
+
+### Features
+
+* **fe:** add cmdk command palette wired into Layout ([#40](https://github.com/sethbacon/terraform-state-manager-frontend/issues/40)) ([9ca0a3b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/9ca0a3b0a7d46a7578e70ab6916842e998a07578)), closes [#32](https://github.com/sethbacon/terraform-state-manager-frontend/issues/32)
+* **fe:** port icon system (FontAwesome + simple-icons) ([#38](https://github.com/sethbacon/terraform-state-manager-frontend/issues/38)) ([4c7db61](https://github.com/sethbacon/terraform-state-manager-frontend/commit/4c7db6127463f81145aca30211d11d6c6e155d4b))
+* **fe:** wire accessibility (jsx-a11y, axe, RouteFocusManager) [FE-6] ([#41](https://github.com/sethbacon/terraform-state-manager-frontend/issues/41)) ([91a9690](https://github.com/sethbacon/terraform-state-manager-frontend/commit/91a9690fa589a8362b94628227c4979de086fb65)), closes [#33](https://github.com/sethbacon/terraform-state-manager-frontend/issues/33)
+
 ## [0.2.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v0.1.0...v0.2.0) (2026-06-07)
 
 
