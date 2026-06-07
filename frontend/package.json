@@ -18,6 +18,9 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-brands-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.1",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
     "@tanstack/react-query": "^5.101.0",
@@ -33,6 +36,7 @@
     "react-i18next": "^15.4.1",
     "react-router-dom": "^6.30.3",
     "recharts": "^2.15.3",
+    "simple-icons": "^16.23.0",
     "swagger-ui-react": "^5.32.6"
   },
   "devDependencies": {
