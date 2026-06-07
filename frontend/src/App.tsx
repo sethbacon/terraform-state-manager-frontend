@@ -1,12 +1,15 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { CssBaseline } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { HelpProvider } from './contexts/HelpContext';
+import { AnnouncerProvider } from './contexts/AnnouncerContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
+import RouteFocusManager from './components/RouteFocusManager';
 import LoadingOverlay from './components/LoadingOverlay';
 
 // Lazy-loaded pages
@@ -48,9 +51,12 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
     <ThemeProvider>
+      <CssBaseline />
       <AuthProvider>
         <HelpProvider>
+          <AnnouncerProvider>
           <BrowserRouter>
+            <RouteFocusManager />
             <ErrorBoundary>
               <Suspense fallback={<LoadingOverlay open message="Loading..." />}>
                 <Routes>
@@ -250,6 +256,7 @@ const App: React.FC = () => {
               </Suspense>
             </ErrorBoundary>
           </BrowserRouter>
+          </AnnouncerProvider>
         </HelpProvider>
       </AuthProvider>
     </ThemeProvider>
