@@ -7,6 +7,7 @@ import type {
   AuditLogListResponse,
   OIDCConfigResponse,
   OIDCGroupMappingInput,
+  UIThemeConfig,
 } from '../types';
 
 class ApiClient {
@@ -635,6 +636,19 @@ class ApiClient {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   triggerWebhook(data: any) { return this.post('/api/v1/webhooks/trigger', data).then(r => r.data); }
+
+  // ===========================================================================
+  // UI Theme (white-label)
+  // ===========================================================================
+
+  /**
+   * Fetch the public white-label theme from the backend. The endpoint is
+   * unauthenticated and always returns a populated default, so the typed shape
+   * has its colours and product name present in normal operation.
+   */
+  getUiTheme(): Promise<UIThemeConfig> {
+    return this.get<UIThemeConfig>('/api/v1/ui/theme').then(r => r.data);
+  }
 }
 
 const apiClient = new ApiClient();

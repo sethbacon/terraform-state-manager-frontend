@@ -1,22 +1,51 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline, PaletteMode } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import type { UIThemeConfig } from '../types';
+import apiClient from '../services/api';
+import { queryKeys } from '../services/queryKeys';
 
-const PRIMARY = '#5C4EE5';
-const SECONDARY_LIGHT = '#00796B';
-const SECONDARY_DARK = '#00D9C0';
+// Built-in defaults — kept identical to the backend's default white-label
+// theme so the app renders correctly even when the /ui/theme request fails.
+const DEFAULT_PRIMARY = '#5C4EE5';
+const DEFAULT_SECONDARY_LIGHT = '#F4F4F5';
+const DEFAULT_SECONDARY_DARK = '#18181B';
 const DEFAULT_PRODUCT_NAME = 'Terraform State Manager';
+
+const DEFAULT_THEME: UIThemeConfig = {
+  product_name: DEFAULT_PRODUCT_NAME,
+  primary_color: DEFAULT_PRIMARY,
+  secondary_color_light: DEFAULT_SECONDARY_LIGHT,
+  secondary_color_dark: DEFAULT_SECONDARY_DARK,
+  logo_url: null,
+  favicon_url: null,
+  login_hero_url: null,
+};
 
 interface ThemeContextType {
   mode: PaletteMode;
   toggleTheme: () => void;
+  /** Display name for the product, from the white-label config or the built-in default. */
   productName: string;
+  /** Logo image URL, or null if no custom logo is configured. */
   logoUrl: string | null;
+  /** Login-page hero image URL, or null if not configured. */
+  loginHeroUrl: string | null;
   direction: 'ltr' | 'rtl';
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const THEME_KEY = 'tsm_theme_mode';
+
+/** Apply the favicon override to the document's <link rel="icon">. */
+function applyFavicon(faviconUrl: string | null | undefined) {
+  if (!faviconUrl) return;
+  const link = document.querySelector<HTMLLinkElement>('link[rel~="icon"]');
+  if (link) {
+    link.href = faviconUrl;
+  }
+}
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mode, setMode] = useState<PaletteMode>(() => {
@@ -46,20 +75,55 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  // Fetch the public white-label theme once on load. The endpoint is
+  // unauthenticated and always returns a populated default, but we still fall
+  // back to the built-in DEFAULT_THEME on any fetch failure so render is never
+  // blocked. The fetch is non-blocking: the built-in default is used until the
+  // request resolves (via placeholderData), so the app never flashes unstyled.
+  const { data: uiTheme } = useQuery({
+    queryKey: queryKeys.uiTheme.get(),
+    queryFn: () => apiClient.getUiTheme(),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    placeholderData: DEFAULT_THEME,
+  });
+
+  // Resolve each field over the built-in defaults so individual missing fields
+  // (e.g. a null logo) still fall back sensibly. `uiTheme` is only undefined in
+  // the unlikely window before placeholderData applies; default covers it.
+  const theme = uiTheme ?? DEFAULT_THEME;
+  const primaryColor = theme.primary_color ?? DEFAULT_PRIMARY;
+  const secondaryLight = theme.secondary_color_light ?? DEFAULT_SECONDARY_LIGHT;
+  const secondaryDark = theme.secondary_color_dark ?? DEFAULT_SECONDARY_DARK;
+  const productName = theme.product_name ?? DEFAULT_PRODUCT_NAME;
+  const logoUrl = theme.logo_url ?? null;
+  const loginHeroUrl = theme.login_hero_url ?? null;
+  const faviconUrl = theme.favicon_url ?? null;
+
+  // Reflect the product name in the browser tab title.
+  useEffect(() => {
+    document.title = productName;
+  }, [productName]);
+
+  // Apply the favicon override when provided.
+  useEffect(() => {
+    applyFavicon(faviconUrl);
+  }, [faviconUrl]);
+
   const toggleTheme = () => {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
-  const theme = useMemo(
+  const muiTheme = useMemo(
     () =>
       createTheme({
         palette: {
           mode,
           primary: {
-            main: PRIMARY,
+            main: primaryColor,
           },
           secondary: {
-            main: mode === 'dark' ? SECONDARY_DARK : SECONDARY_LIGHT,
+            main: mode === 'dark' ? secondaryDark : secondaryLight,
           },
           ...(mode === 'dark' && {
             background: {
@@ -75,8 +139,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           MuiCssBaseline: {
             styleOverrides: {
               ':root': {
-                '--brand-primary': PRIMARY,
-                '--brand-secondary': mode === 'dark' ? SECONDARY_DARK : SECONDARY_LIGHT,
+                '--brand-primary': primaryColor,
+                '--brand-secondary': mode === 'dark' ? secondaryDark : secondaryLight,
               },
               body: {
                 scrollbarColor: mode === 'dark' ? '#6b6b6b #2b2b2b' : undefined,
@@ -117,20 +181,24 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           },
         },
       }),
-    [mode]
+    [mode, primaryColor, secondaryLight, secondaryDark]
   );
 
-  const value: ThemeContextType = {
-    mode,
-    toggleTheme,
-    productName: DEFAULT_PRODUCT_NAME,
-    logoUrl: null,
-    direction: 'ltr',
-  };
+  const value = useMemo<ThemeContextType>(
+    () => ({
+      mode,
+      toggleTheme,
+      productName,
+      logoUrl,
+      loginHeroUrl,
+      direction: 'ltr',
+    }),
+    [mode, productName, logoUrl, loginHeroUrl]
+  );
 
   return (
     <ThemeContext.Provider value={value}>
-      <MuiThemeProvider theme={theme}>
+      <MuiThemeProvider theme={muiTheme}>
         <CssBaseline />
         {children}
       </MuiThemeProvider>

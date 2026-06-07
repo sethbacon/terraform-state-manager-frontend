@@ -52,7 +52,7 @@ function providerSx(p: AuthProvider): Record<string, unknown> | undefined {
 const LoginPage: React.FC = () => {
   const { t } = useTranslation()
   const { login } = useAuth()
-  const { productName } = useThemeMode()
+  const { productName, loginHeroUrl } = useThemeMode()
   const navigate = useNavigate()
   const [loginError, setLoginError] = React.useState<string | null>(null)
   const isDev = import.meta.env.MODE === 'development'
@@ -138,8 +138,23 @@ const LoginPage: React.FC = () => {
         }}
       >
         <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
+          {loginHeroUrl && (
+            <Box
+              component="img"
+              src={loginHeroUrl}
+              alt=""
+              sx={{
+                display: 'block',
+                width: '100%',
+                maxHeight: 160,
+                objectFit: 'cover',
+                borderRadius: 1,
+                mb: 3,
+              }}
+            />
+          )}
           <Box sx={{ textAlign: 'center', mb: 4 }}>
-            <LoginIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+            {!loginHeroUrl && <LoginIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />}
             <Typography variant="h4" component="h1" gutterBottom>
               {productName}
             </Typography>
