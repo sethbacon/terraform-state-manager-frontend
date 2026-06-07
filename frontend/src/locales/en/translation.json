@@ -1,4 +1,15 @@
 {
+  "commandPalette": {
+    "title": "Command Palette",
+    "searchPlaceholder": "Search pages…",
+    "empty": "No results.",
+    "openButton": "Open command palette",
+    "quickNav": "Quick navigation (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "Navigation",
+      "admin": "Admin"
+    }
+  },
   "nav": {
     "home": "Home",
     "homeTooltip": "Home Page",

@@ -42,16 +42,21 @@ import Brightness7 from '@mui/icons-material/Brightness7';
 import HelpOutline from '@mui/icons-material/HelpOutlined';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
-import { useState } from 'react';
+import Search from '@mui/icons-material/Search';
+import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { useHelp } from '../contexts/HelpContext';
+import { useHotkey } from '../hooks/useHotkey';
 import DevUserSwitcher from './DevUserSwitcher';
 import HelpPanel, { HELP_PANEL_WIDTH } from './HelpPanel';
+import CommandPalette from './CommandPalette';
 
 const drawerWidth = 240;
 
 const Layout = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated, logout, hasScope } = useAuth();
   const { mode, toggleTheme } = useThemeMode();
   const { helpOpen, openHelp } = useHelp();
@@ -61,6 +66,12 @@ const Layout = () => {
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useHotkey(
+    'mod+k',
+    useCallback(() => setPaletteOpen((v) => !v), []),
+  );
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -293,6 +304,17 @@ const Layout = () => {
             Terraform State Manager
           </Typography>
           {isAuthenticated && <DevUserSwitcher />}
+          <Tooltip title={t('commandPalette.quickNav')}>
+            <IconButton
+              color="inherit"
+              onClick={() => setPaletteOpen(true)}
+              aria-label={t('commandPalette.openButton')}
+              data-testid="command-palette-trigger"
+              sx={{ mr: 1 }}
+            >
+              <Search />
+            </IconButton>
+          </Tooltip>
           <Tooltip title={mode === 'dark' ? 'Light mode' : 'Dark mode'}>
             <IconButton
               color="inherit"
@@ -405,6 +427,7 @@ const Layout = () => {
       </Box>
 
       <HelpPanel />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </Box>
   );
 };
