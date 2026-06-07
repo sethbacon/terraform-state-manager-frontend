@@ -39,6 +39,7 @@ BEGIN
         client_secret_encrypted,
         redirect_url,
         scopes,
+        extra_config,
         is_active
     )
     SELECT
@@ -46,7 +47,8 @@ BEGIN
         'terraform-state-manager',
         'env-var-managed',
         'http://localhost:3001/api/v1/auth/callback',
-        'openid,email,profile',
+        '["openid","email","profile"]',
+        '{}'::jsonb,
         true
     WHERE NOT EXISTS (
         SELECT 1 FROM oidc_config
