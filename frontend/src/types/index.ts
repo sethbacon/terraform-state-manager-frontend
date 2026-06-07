@@ -242,3 +242,31 @@ export interface AuthContextType {
   refreshToken: () => Promise<void>
   setToken: (token: string) => void
 }
+
+// ---- Whitelabel / UI theme ----
+
+/**
+ * Runtime white-label theme configuration returned by GET /api/v1/ui/theme.
+ * The backend always responds with a populated default, so `product_name`,
+ * `primary_color`, and `secondary_color_{light,dark}` are present in practice.
+ * Override fields (logos, hero) may be absent or null. The frontend also keeps
+ * a built-in default so it can render even when the request fails entirely.
+ */
+export interface UIThemeConfig {
+  /** Display name for the product, e.g. "Acme Terraform State Manager" */
+  product_name?: string
+  /** Primary brand colour as a hex string, e.g. "#5C4EE5" */
+  primary_color?: string
+  /** Secondary brand colour for light mode as a hex string */
+  secondary_color_light?: string
+  /** Secondary brand colour for dark mode as a hex string */
+  secondary_color_dark?: string
+  /** URL to the logo image shown in the sidebar/app header (null = use default) */
+  logo_url?: string | null
+  /** URL to a custom favicon (overrides the default) */
+  favicon_url?: string | null
+  /** URL to the hero image on the login page (null = no hero) */
+  login_hero_url?: string | null
+  /** RFC3339 timestamp of the last theme update */
+  updated_at?: string
+}

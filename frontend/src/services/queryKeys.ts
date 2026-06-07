@@ -61,4 +61,8 @@ export const queryKeys = {
       [...queryKeys.reports._def, 'list', params] as const,
     detail: (id: string) => [...queryKeys.reports._def, 'detail', id] as const,
   },
+  uiTheme: {
+    _def: ['uiTheme'] as const,
+    get: () => [...queryKeys.uiTheme._def, 'get'] as const,
+  },
 } as const

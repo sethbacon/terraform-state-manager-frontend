@@ -58,7 +58,7 @@ const drawerWidth = 240;
 const Layout = () => {
   const { t } = useTranslation();
   const { user, isAuthenticated, logout, hasScope } = useAuth();
-  const { mode, toggleTheme } = useThemeMode();
+  const { mode, toggleTheme, productName, logoUrl } = useThemeMode();
   const { helpOpen, openHelp } = useHelp();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -191,12 +191,23 @@ const Layout = () => {
   const drawer = (
     <Box>
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, color: 'primary.main' }}>
-          TSM
-        </Typography>
-        <Typography variant="caption" sx={{ ml: 1, opacity: 0.7 }}>
-          State Manager
-        </Typography>
+        {logoUrl ? (
+          <Box
+            component="img"
+            src={logoUrl}
+            alt={productName}
+            sx={{ maxHeight: 32, maxWidth: '100%', objectFit: 'contain' }}
+          />
+        ) : (
+          <>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 700, color: 'primary.main' }}>
+              TSM
+            </Typography>
+            <Typography variant="caption" sx={{ ml: 1, opacity: 0.7 }}>
+              State Manager
+            </Typography>
+          </>
+        )}
       </Toolbar>
       <Divider />
 
@@ -301,7 +312,7 @@ const Layout = () => {
             </IconButton>
           )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Terraform State Manager
+            {productName}
           </Typography>
           {isAuthenticated && <DevUserSwitcher />}
           <Tooltip title={t('commandPalette.quickNav')}>
