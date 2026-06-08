@@ -36,6 +36,33 @@ export interface TerraformVersionInfo {
   count: number;
 }
 
+/** One workspace's Terraform version pin-drift result. */
+export interface VersionDriftEntry {
+  workspace_name: string;
+  /** The declared required_version constraint (e.g. "~> 1.5"). */
+  required: string;
+  /** The in-state terraform_version (e.g. "1.6.2"). */
+  actual: string;
+  /** Whether the actual version satisfies the required constraint. */
+  satisfies: boolean;
+  /** Drift status for the workspace. */
+  status: 'satisfied' | 'drift' | 'unknown';
+}
+
+/**
+ * Terraform version pin-drift summary for the latest completed analysis run:
+ * per-workspace entries plus rollup counts by status. Only workspaces whose
+ * analysis carried repo metadata produce an entry.
+ */
+export interface VersionDrift {
+  run_id: string;
+  total: number;
+  satisfied: number;
+  drift: number;
+  unknown: number;
+  entries: VersionDriftEntry[];
+}
+
 export interface Report {
   id: string;
   organization_id: string;

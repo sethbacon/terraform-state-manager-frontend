@@ -10,6 +10,7 @@ import type {
   UIThemeConfig,
   VersionInfo,
 } from '../types';
+import type { VersionDrift } from '../types/dashboard';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -518,6 +519,26 @@ class ApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getDashboardTrends(params?: Record<string, any>) { return this.get('/api/v1/dashboard/trends', params).then(r => r.data); }
   getDashboardTerraformVersions() { return this.get('/api/v1/dashboard/terraform-versions').then(r => r.data); }
+
+  /**
+   * Fetch the Terraform version pin-drift summary for the latest completed
+   * analysis run. The backend wraps the summary in a `data` envelope; this
+   * unwraps it and normalises the empty/no-run case (where `entries` may be the
+   * only populated field) into a fully-shaped {@link VersionDrift} object.
+   */
+  async getVersionDrift(): Promise<VersionDrift> {
+    const response = await this.client.get('/api/v1/dashboard/version-drift');
+    const d = (response.data?.data ?? {}) as Partial<VersionDrift>;
+    return {
+      run_id: d.run_id ?? '',
+      total: d.total ?? 0,
+      satisfied: d.satisfied ?? 0,
+      drift: d.drift ?? 0,
+      unknown: d.unknown ?? 0,
+      entries: Array.isArray(d.entries) ? d.entries : [],
+    };
+  }
+
   getDashboardOrganizations() { return this.get('/api/v1/dashboard/organizations').then(r => r.data); }
   getDashboardWorkspaces() { return this.get('/api/v1/dashboard/workspaces').then(r => r.data); }
 

@@ -175,4 +175,56 @@ describe('ApiClient', () => {
       expect(result).toEqual([])
     })
   })
+
+  describe('getVersionDrift – response envelope', () => {
+    it('unwraps the { data } envelope into a VersionDrift summary', async () => {
+      const api = await getApiClient()
+      const summary = {
+        run_id: 'run-1',
+        total: 2,
+        satisfied: 1,
+        drift: 1,
+        unknown: 0,
+        entries: [
+          { workspace_name: 'prod', required: '~> 1.5', actual: '1.6.2', satisfies: true, status: 'satisfied' },
+          { workspace_name: 'stg', required: '>= 1.7', actual: '1.6.0', satisfies: false, status: 'drift' },
+        ],
+      }
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: { data: summary } })
+
+      const result = await api.getVersionDrift()
+
+      expect(result).toEqual(summary)
+      expect(Array.isArray(result.entries)).toBe(true)
+    })
+
+    it('normalises the empty/no-run case into a fully-shaped object', async () => {
+      const api = await getApiClient()
+      // Backend's no-completed-run shape: data carries only an empty entries array.
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({
+        data: { data: { entries: [] }, message: 'no completed analysis runs found' },
+      })
+
+      const result = await api.getVersionDrift()
+
+      expect(result).toEqual({
+        run_id: '',
+        total: 0,
+        satisfied: 0,
+        drift: 0,
+        unknown: 0,
+        entries: [],
+      })
+    })
+
+    it('tolerates a missing data envelope', async () => {
+      const api = await getApiClient()
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: {} })
+
+      const result = await api.getVersionDrift()
+
+      expect(result.entries).toEqual([])
+      expect(result.total).toBe(0)
+    })
+  })
 })

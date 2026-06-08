@@ -600,5 +600,31 @@
   "devUserSwitcher": {
     "title": "Development Mode: Switch User",
     "selectUser": "Select user"
+  },
+  "versionDrift": {
+    "title": "Version Drift",
+    "subtitle": "Terraform version pin-drift across the latest completed analysis run: the declared required_version constraint versus the in-state terraform_version per workspace.",
+    "summary": {
+      "satisfied": "Satisfied",
+      "drift": "Drift",
+      "unknown": "Unknown",
+      "total": "Total"
+    },
+    "table": {
+      "workspace": "Workspace",
+      "required": "Required Version",
+      "actual": "In-State Version",
+      "status": "Status"
+    },
+    "status": {
+      "satisfied": "Satisfied",
+      "drift": "Drift",
+      "unknown": "Unknown"
+    },
+    "loadError": "Failed to load version drift. Please try again.",
+    "empty": {
+      "title": "No version drift data yet",
+      "description": "Version drift requires an analysis run that carried repository metadata (required_version constraints). Run an analysis with repo metadata to populate this view."
+    }
   }
 }

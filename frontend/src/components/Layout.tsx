@@ -41,6 +41,7 @@ import ManageAccounts from '@mui/icons-material/ManageAccounts';
 import History from '@mui/icons-material/History';
 import Storage from '@mui/icons-material/Storage';
 import Schedule from '@mui/icons-material/Schedule';
+import RuleFolderOutlined from '@mui/icons-material/RuleFolderOutlined';
 import Brightness4 from '@mui/icons-material/Brightness4';
 import Brightness7 from '@mui/icons-material/Brightness7';
 import HelpOutline from '@mui/icons-material/HelpOutlined';
@@ -182,6 +183,7 @@ const Layout = () => {
       items: [
         { text: 'Alerts', icon: <NotificationsActive />, path: '/alerts', tooltip: 'Alert rules, channels, and notifications', scope: 'alerts:admin' },
         { text: 'Compliance', icon: <VerifiedUser />, path: '/compliance', tooltip: 'Compliance policies and results', scope: 'compliance:read' },
+        { text: 'Version Drift', icon: <RuleFolderOutlined />, path: '/version-drift', tooltip: 'Terraform version pin-drift across workspaces', scope: 'dashboard:read' },
       ],
     },
     {
