@@ -36,7 +36,25 @@ services:
       shared-keycloak:
         aliases:
           - keycloak
+    healthcheck:
+      # Port 9000 (KC management/health) only opens once Quarkus is fully
+      # started AND realms have been imported. Gating the backend on this
+      # avoids the OIDC-discovery race on first boot (no manual restart).
+      # The UBI-minimal image lacks curl/wget, so probe TCP via bash /dev/tcp.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
     restart: unless-stopped
+
+  # Gate the backend on Keycloak being fully ready so OIDC discovery succeeds
+  # on first boot — no manual `docker restart tsm-backend` needed. Merges with
+  # the base compose's postgres dependency.
+  backend:
+    depends_on:
+      keycloak:
+        condition: service_healthy
 
 networks:
   shared-keycloak:
