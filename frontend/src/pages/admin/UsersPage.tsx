@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Container,
   Typography,
   Box,
   Paper,
@@ -43,6 +42,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'
 import EmptyState from '@/components/EmptyState'
 import PageHeader from '@/components/PageHeader'
+import Page from '@/components/Page'
 import api from '@/services/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { User, UserMembership, Organization, RoleTemplate } from '@/types'
@@ -427,7 +427,7 @@ const UsersPage: React.FC = () => {
   )
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Page maxWidth="lg">
       <PageHeader
         title={t('admin.users.pageTitle')}
         description={t('admin.users.pageSubtitle')}
@@ -859,7 +859,7 @@ const UsersPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Page>
   )
 }
 

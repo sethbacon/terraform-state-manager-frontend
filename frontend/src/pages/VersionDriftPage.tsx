@@ -20,6 +20,7 @@ import RuleFolderOutlined from '@mui/icons-material/RuleFolderOutlined';
 import api from '../services/api';
 import { queryKeys } from '../services/queryKeys';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import DashboardCard from '../components/DashboardCard';
 import EmptyState from '../components/EmptyState';
 import type { VersionDriftEntry } from '../types/dashboard';
@@ -57,7 +58,7 @@ const VersionDriftPage: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('versionDrift.title')} description={t('versionDrift.subtitle')} />
 
       {isLoading && (
@@ -161,7 +162,7 @@ const VersionDriftPage: React.FC = () => {
           )}
         </>
       )}
-    </Box>
+    </Page>
   );
 };
 

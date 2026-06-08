@@ -13,6 +13,7 @@ import {
 import { format } from 'date-fns';
 import api from '../services/api';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -497,7 +498,7 @@ const MigrationsPage: React.FC = () => {
   // ---------------------------------------------------------------------------
 
   return (
-    <Box>
+    <Page>
       <PageHeader
         title={t('migrations.title')}
         description={t('migrations.subtitle')}
@@ -940,7 +941,7 @@ const MigrationsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Page>
   );
 };
 

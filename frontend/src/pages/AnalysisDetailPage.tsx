@@ -28,6 +28,7 @@ import { ArrowBack as ArrowBackIcon, Search as SearchIcon } from '@mui/icons-mat
 import api from '../services/api';
 import { AnalysisRun, AnalysisResult, ProviderAnalysis } from '../types/analysis';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import StatusChip from '../components/StatusChip';
 import ResourceTypesTable from '../components/ResourceTypesTable';
 import ProviderAnalysisTable from '../components/ProviderAnalysisTable';
@@ -226,7 +227,7 @@ const AnalysisDetailPage: React.FC = () => {
       : '0';
 
   return (
-    <Box>
+    <Page>
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')} sx={{ mb: 2 }}>
         {t('analysis.detail.back')}
       </Button>
@@ -431,7 +432,7 @@ const AnalysisDetailPage: React.FC = () => {
           </TabPanel>
         </Box>
       </Paper>
-    </Box>
+    </Page>
   );
 };
 

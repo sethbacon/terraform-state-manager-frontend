@@ -16,6 +16,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { format } from 'date-fns';
 import api from '../services/api';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -494,7 +495,7 @@ const BackupsPage: React.FC = () => {
   // ---------------------------------------------------------------------------
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('backups.title')} description={t('backups.subtitle')} />
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
@@ -1047,7 +1048,7 @@ const BackupsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Page>
   );
 };
 

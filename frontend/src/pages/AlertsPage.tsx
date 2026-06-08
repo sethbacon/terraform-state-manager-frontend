@@ -34,6 +34,7 @@ import {
 import api from '../services/api';
 import type { Alert, AlertRule, NotificationChannel } from '../types/alerts';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import AlertsList from '../components/AlertsList';
 import AlertRuleForm from '../components/AlertRuleForm';
 import NotificationChannelForm from '../components/NotificationChannelForm';
@@ -320,7 +321,7 @@ const AlertsPage: React.FC = () => {
   );
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('alerts.title')} description={t('alerts.subtitle')} />
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
@@ -603,7 +604,7 @@ const AlertsPage: React.FC = () => {
           {snackbar.message}
         </MuiAlert>
       </Snackbar>
-    </Box>
+    </Page>
   );
 };
 

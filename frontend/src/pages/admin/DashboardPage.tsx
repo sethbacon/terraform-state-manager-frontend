@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import api from '../../services/api';
 import PageHeader from '../../components/PageHeader';
+import Page from '../../components/Page';
 
 interface DashboardStats {
   total_users: number;
@@ -91,7 +92,7 @@ const DashboardPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Page>
       <PageHeader
         title={t('admin.dashboard.pageTitle')}
         description={t('admin.dashboard.subtitle')}
@@ -119,7 +120,7 @@ const DashboardPage: React.FC = () => {
           </Grid>
         </Grid>
       )}
-    </Box>
+    </Page>
   );
 };
 

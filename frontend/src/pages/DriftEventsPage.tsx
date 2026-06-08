@@ -31,6 +31,7 @@ import { queryKeys } from '@/services/queryKeys'
 import type { DriftEvent, DriftSeverity, DriftSource } from '@/types'
 import EmptyState from '@/components/EmptyState'
 import PageHeader from '@/components/PageHeader'
+import Page from '@/components/Page'
 
 const SEVERITY_COLOR: Record<DriftSeverity, 'info' | 'warning' | 'error'> = {
   info: 'info',
@@ -124,7 +125,7 @@ const DriftEventsPage: React.FC = () => {
   }
 
   return (
-    <Box aria-busy={isLoading} aria-live="polite">
+    <Page aria-busy={isLoading} aria-live="polite">
       <PageHeader
         title={t('drift.title')}
         description={t('drift.subtitle')}
@@ -278,7 +279,7 @@ const DriftEventsPage: React.FC = () => {
           />
         </Paper>
       )}
-    </Box>
+    </Page>
   )
 }
 

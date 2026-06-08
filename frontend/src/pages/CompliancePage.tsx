@@ -40,6 +40,7 @@ import {
 import { format } from 'date-fns';
 import api from '../services/api';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import DashboardCard from '../components/DashboardCard';
 import type {
   CompliancePolicy,
@@ -260,7 +261,7 @@ const CompliancePage: React.FC = () => {
   }, []);
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('compliance.title')} description={t('compliance.subtitle')} />
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
@@ -589,7 +590,7 @@ const CompliancePage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Page>
   );
 };
 

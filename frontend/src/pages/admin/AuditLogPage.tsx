@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import {
-  Container,
   Typography,
   Box,
   Paper,
@@ -32,6 +31,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 import HistoryIcon from '@mui/icons-material/History'
 import EmptyState from '@/components/EmptyState'
 import PageHeader from '@/components/PageHeader'
+import Page from '@/components/Page'
 import api from '@/services/api'
 import { AuditLog } from '@/types'
 import { queryKeys } from '@/services/queryKeys'
@@ -193,7 +193,7 @@ const AuditLogPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }} aria-busy={loading} aria-live="polite">
+    <Page maxWidth="lg" aria-busy={loading} aria-live="polite">
       {/* Header */}
       <PageHeader
         title="Audit Logs"
@@ -515,7 +515,7 @@ const AuditLogPage: React.FC = () => {
           <Button onClick={() => setDetailOpen(false)}>{t('admin.auditLog.close')}</Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Page>
   )
 }
 
