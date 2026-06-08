@@ -21,6 +21,17 @@ export interface RoleTemplateInfo {
   scopes?: string[]
 }
 
+/**
+ * Backend version/build metadata returned by GET /version.
+ * `build_date` is optional because not every backend build stamps it.
+ */
+export interface VersionInfo {
+  version: string
+  api_version: string
+  build_date?: string
+  go_version?: string
+}
+
 export interface RoleTemplate {
   id: string
   name: string
