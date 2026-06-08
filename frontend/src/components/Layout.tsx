@@ -165,6 +165,7 @@ const Layout = () => {
   // Primary nav — no section header
   const primaryNavItems = [
     { text: 'Home', icon: <Dashboard />, path: '/', tooltip: 'Overview charts and metrics', scope: 'dashboard:read' },
+    { text: 'API Docs', icon: <Description />, path: '/api-docs', tooltip: 'API Documentation' },
   ];
 
   // Grouped feature nav sections — each section is collapsible (open/closed
@@ -225,11 +226,6 @@ const Layout = () => {
         { text: t('nav.admin.auditLogs'), icon: <History />, path: '/admin/audit-logs', tooltip: t('nav.admin.auditLogsTooltip'), scope: 'audit:read' as string | null },
       ],
     },
-  ];
-
-  // Bottom nav — always visible, low prominence
-  const bottomNavItems = [
-    { text: 'API Docs', icon: <Description />, path: '/api-docs', tooltip: 'API Documentation' },
   ];
 
   // Every collapsible category section (feature sections + admin groups) shares
@@ -380,13 +376,6 @@ const Layout = () => {
           {visibleAdminGroups.map((group) => renderCollapsibleSection(group))}
         </>
       )}
-
-      <Divider />
-
-      {/* Bottom nav (API Docs) */}
-      <List>
-        {bottomNavItems.map((item) => renderNavItem(item))}
-      </List>
     </Box>
   );
 
