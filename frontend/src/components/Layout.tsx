@@ -169,9 +169,11 @@ const Layout = () => {
     { text: 'Analysis', icon: <Analytics />, path: '/analysis', tooltip: 'Run and view state analysis', scope: 'analysis:read' },
   ];
 
-  // Grouped feature nav sections — non-collapsible, always visible section labels
+  // Grouped feature nav sections — each section is collapsible (open/closed
+  // state persisted to localStorage). `key` is the stable localStorage id.
   const navSections = [
     {
+      key: 'stateManagement',
       label: 'State Management',
       items: [
         { text: 'Backups', icon: <Backup />, path: '/backups', tooltip: 'Manage state backups', scope: 'backups:read' },
@@ -180,6 +182,7 @@ const Layout = () => {
       ],
     },
     {
+      key: 'observability',
       label: 'Observability',
       items: [
         { text: 'Alerts', icon: <NotificationsActive />, path: '/alerts', tooltip: 'Alert rules, channels, and notifications', scope: 'alerts:admin' },
@@ -189,6 +192,7 @@ const Layout = () => {
       ],
     },
     {
+      key: 'configuration',
       label: 'Configuration',
       items: [
         { text: 'State Sources', icon: <Storage />, path: '/sources', tooltip: 'Configure Terraform state sources', scope: 'sources:write' },
@@ -235,15 +239,18 @@ const Layout = () => {
     { text: 'API Docs', icon: <Description />, path: '/api-docs', tooltip: 'API Documentation' },
   ];
 
-  // Track which admin groups are open — persisted to localStorage so state
-  // survives navigation/refresh. New groups default to open.
+  // Every collapsible category section (feature sections + admin groups) shares
+  // a single open/closed map, persisted to localStorage so the state survives
+  // navigation/refresh. New sections default to open.
+  const collapsibleKeys = [...navSections, ...adminNavGroups].map((s) => s.key);
+
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
-    const defaults = Object.fromEntries(adminNavGroups.map((g) => [g.key, true]));
+    const defaults = Object.fromEntries(collapsibleKeys.map((k) => [k, true]));
     try {
-      const stored = localStorage.getItem('tsmAdminNavGroups');
+      const stored = localStorage.getItem('tsmNavSections');
       if (stored) {
         const parsed = JSON.parse(stored) as Record<string, boolean>;
-        return Object.fromEntries(adminNavGroups.map((g) => [g.key, parsed[g.key] ?? true]));
+        return Object.fromEntries(collapsibleKeys.map((k) => [k, parsed[k] ?? true]));
       }
     } catch {
       // ignore malformed storage
@@ -255,7 +262,7 @@ const Layout = () => {
     setOpenGroups((prev) => {
       const next = { ...prev, [key]: !prev[key] };
       try {
-        localStorage.setItem('tsmAdminNavGroups', JSON.stringify(next));
+        localStorage.setItem('tsmNavSections', JSON.stringify(next));
       } catch {
         /* quota */
       }
@@ -307,6 +314,45 @@ const Layout = () => {
     );
   };
 
+  // Renders a collapsible category section: a header row with the section label
+  // and an expand/collapse chevron, wrapping its (already scope-filtered) items
+  // in a <Collapse>. Shared by feature sections and admin groups so every
+  // category behaves identically.
+  const renderCollapsibleSection = (section: {
+    key: string;
+    label: string;
+    items: { text: string; icon: React.ReactNode; path: string; tooltip: string }[];
+  }) => (
+    <Box key={section.key}>
+      <List disablePadding>
+        <ListItemButton onClick={() => toggleGroup(section.key)} dense sx={{ py: 0.5 }}>
+          <ListItemText
+            primary={section.label}
+            slotProps={{
+              primary: {
+                variant: 'caption',
+                color: 'text.secondary',
+                sx: {
+                  fontWeight: 600,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                },
+              },
+            }}
+          />
+          {openGroups[section.key]
+            ? <ExpandLess fontSize="small" sx={{ color: 'text.secondary' }} />
+            : <ExpandMore fontSize="small" sx={{ color: 'text.secondary' }} />}
+        </ListItemButton>
+        <Collapse in={openGroups[section.key]} timeout="auto" unmountOnExit>
+          <List disablePadding>
+            {section.items.map((item) => renderNavItem(item, true))}
+          </List>
+        </Collapse>
+      </List>
+    </Box>
+  );
+
   const drawer = (
     <Box component="nav" aria-label={t('layout.mainNavigation', 'Main navigation')}>
       <Toolbar>
@@ -328,33 +374,11 @@ const Layout = () => {
 
       <Divider />
 
-      {/* Sectioned feature nav */}
+      {/* Sectioned feature nav — collapsible, scope-filtered */}
       {navSections.map((section) => {
         const visibleItems = section.items.filter(item => !item.scope || hasScope(item.scope));
         if (visibleItems.length === 0) return null;
-        return (
-          <Box key={section.label}>
-            <List disablePadding>
-              <ListItem sx={{ py: 0.5, px: 2 }}>
-                <ListItemText
-                  primary={section.label}
-                  slotProps={{
-                    primary: {
-                      variant: 'caption',
-                      color: 'text.secondary',
-                      sx: {
-                        fontWeight: 600,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                      },
-                    }
-                  }}
-                />
-              </ListItem>
-              {visibleItems.map((item) => renderNavItem(item, true))}
-            </List>
-          </Box>
-        );
+        return renderCollapsibleSection({ ...section, items: visibleItems });
       })}
 
       {/* Admin / identity section — Dashboard standalone, then collapsible groups */}
@@ -366,36 +390,7 @@ const Layout = () => {
             <List disablePadding>{renderNavItem(adminDashboardItem)}</List>
           )}
 
-          {visibleAdminGroups.map((group) => (
-            <Box key={group.key}>
-              <List disablePadding>
-                <ListItemButton onClick={() => toggleGroup(group.key)} dense sx={{ py: 0.5 }}>
-                  <ListItemText
-                    primary={group.label}
-                    slotProps={{
-                      primary: {
-                        variant: 'caption',
-                        color: 'text.secondary',
-                        sx: {
-                          fontWeight: 600,
-                          letterSpacing: '0.08em',
-                          textTransform: 'uppercase',
-                        },
-                      }
-                    }}
-                  />
-                  {openGroups[group.key]
-                    ? <ExpandLess fontSize="small" sx={{ color: 'text.secondary' }} />
-                    : <ExpandMore fontSize="small" sx={{ color: 'text.secondary' }} />}
-                </ListItemButton>
-                <Collapse in={openGroups[group.key]} timeout="auto" unmountOnExit>
-                  <List disablePadding>
-                    {group.items.map((item) => renderNavItem(item, true))}
-                  </List>
-                </Collapse>
-              </List>
-            </Box>
-          ))}
+          {visibleAdminGroups.map((group) => renderCollapsibleSection(group))}
         </>
       )}
 
