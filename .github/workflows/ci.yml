@@ -14,19 +14,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── Lint (report-only until the Phase 2 re-baseline) ──────────────────
-  # The first-draft code has ~73 @typescript-eslint/no-explicit-any findings
-  # that will be rewritten when the FE is re-based on the registry stack
-  # (React 19 / MUI 9). Kept report-only and NOT a required check until then.
+  # ── Lint (required) ───────────────────────────────────────────────────
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-frontend
-      - name: Lint (non-blocking)
+      - name: Lint
         working-directory: frontend
-        continue-on-error: true
         run: npm run lint
 
   # ── Typecheck (required) ──────────────────────────────────────────────
@@ -40,18 +36,15 @@ jobs:
         working-directory: frontend
         run: npx tsc --noEmit
 
-  # ── Unit Tests (report-only until the Phase 2 re-baseline) ────────────
-  # 4 tests currently fail on a localStorage test-env stub; the suite is
-  # rewritten at re-baseline. Report-only and NOT a required check until then.
+  # ── Unit Tests (required) ─────────────────────────────────────────────
   unit-test:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - uses: ./.github/actions/setup-frontend
-      - name: Run tests (non-blocking)
+      - name: Run tests
         working-directory: frontend
-        continue-on-error: true
         run: npx vitest run
 
   # ── Build (required) ──────────────────────────────────────────────────
