@@ -39,6 +39,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import api from '../../services/api';
+import PageHeader from '../../components/PageHeader';
 
 // --- Types ---
 
@@ -336,19 +337,15 @@ const SchedulerPage: React.FC = () => {
   return (
     <Box>
       {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" sx={{ mb: 0.5 }}>
-            {t('scheduler.title')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('scheduler.subtitle')}
-          </Typography>
-        </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
-          {t('scheduler.createTask')}
-        </Button>
-      </Box>
+      <PageHeader
+        title={t('scheduler.title')}
+        description={t('scheduler.subtitle')}
+        actions={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
+            {t('scheduler.createTask')}
+          </Button>
+        }
+      />
 
       {/* Error banner */}
       {error && (

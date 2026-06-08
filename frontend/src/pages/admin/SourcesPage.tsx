@@ -17,6 +17,7 @@ import {
 import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import api from '../../services/api';
 import { StateSource } from '../../types/analysis';
+import PageHeader from '../../components/PageHeader';
 import SourceCard from '../../components/cards/SourceCard';
 import SourceConfigForm from '../../components/SourceConfigForm';
 
@@ -150,24 +151,25 @@ const SourcesPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          {t('sources.title')}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchSources}
-            disabled={loading}
-          >
-            {t('sources.refresh')}
-          </Button>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
-            {t('sources.addSource')}
-          </Button>
-        </Box>
-      </Box>
+      <PageHeader
+        title={t('sources.title')}
+        description={t('sources.subtitle')}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchSources}
+              disabled={loading}
+            >
+              {t('sources.refresh')}
+            </Button>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
+              {t('sources.addSource')}
+            </Button>
+          </Box>
+        }
+      />
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

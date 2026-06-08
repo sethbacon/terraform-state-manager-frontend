@@ -27,6 +27,7 @@ import {
 import { ArrowBack as ArrowBackIcon, Search as SearchIcon } from '@mui/icons-material';
 import api from '../services/api';
 import { AnalysisRun, AnalysisResult, ProviderAnalysis } from '../types/analysis';
+import PageHeader from '../components/PageHeader';
 import StatusChip from '../components/StatusChip';
 import ResourceTypesTable from '../components/ResourceTypesTable';
 import ProviderAnalysisTable from '../components/ProviderAnalysisTable';
@@ -226,15 +227,14 @@ const AnalysisDetailPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')}>
-          {t('analysis.detail.back')}
-        </Button>
-        <Typography variant="h5" sx={{ fontWeight: 600,  flex: 1 }}>
-          {t('analysis.detail.title')}
-        </Typography>
-        <StatusChip status={run.status} size="medium" />
-      </Box>
+      <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')} sx={{ mb: 2 }}>
+        {t('analysis.detail.back')}
+      </Button>
+      <PageHeader
+        title={t('analysis.detail.title')}
+        description={t('analysis.detail.subtitle')}
+        actions={<StatusChip status={run.status} size="medium" />}
+      />
 
       {run.error_message && (
         <Alert severity="error" sx={{ mb: 2 }}>

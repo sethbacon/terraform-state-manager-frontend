@@ -19,6 +19,7 @@ import Grid from '@mui/material/Grid';
 import RuleFolderOutlined from '@mui/icons-material/RuleFolderOutlined';
 import api from '../services/api';
 import { queryKeys } from '../services/queryKeys';
+import PageHeader from '../components/PageHeader';
 import DashboardCard from '../components/DashboardCard';
 import EmptyState from '../components/EmptyState';
 import type { VersionDriftEntry } from '../types/dashboard';
@@ -57,12 +58,7 @@ const VersionDriftPage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        {t('versionDrift.title')}
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        {t('versionDrift.subtitle')}
-      </Typography>
+      <PageHeader title={t('versionDrift.title')} description={t('versionDrift.subtitle')} />
 
       {isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>

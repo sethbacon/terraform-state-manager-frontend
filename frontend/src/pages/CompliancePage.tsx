@@ -39,6 +39,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 import DashboardCard from '../components/DashboardCard';
 import type {
   CompliancePolicy,
@@ -260,9 +261,7 @@ const CompliancePage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        {t('compliance.title')}
-      </Typography>
+      <PageHeader title={t('compliance.title')} description={t('compliance.subtitle')} />
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
         <Tab label={t('compliance.tabPolicies')} />

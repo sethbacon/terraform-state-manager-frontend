@@ -7,6 +7,7 @@ import {
   Grid,
 } from '@mui/material';
 import { format } from 'date-fns';
+import PageHeader from '../components/PageHeader';
 import DashboardCard from '../components/DashboardCard';
 import SnapshotCompareView from '../components/SnapshotCompareView';
 import api from '../services/api';
@@ -216,9 +217,7 @@ const WorkspaceDetailPage: React.FC = () => {
         <Typography color="text.primary">{decodedName}</Typography>
       </Breadcrumbs>
 
-      <Typography variant="h4" gutterBottom>
-        {decodedName}
-      </Typography>
+      <PageHeader title={decodedName} />
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>

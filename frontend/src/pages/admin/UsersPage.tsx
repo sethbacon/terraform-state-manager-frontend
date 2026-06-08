@@ -42,6 +42,7 @@ import PersonIcon from '@mui/icons-material/Person'
 import DownloadIcon from '@mui/icons-material/Download'
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'
 import EmptyState from '@/components/EmptyState'
+import PageHeader from '@/components/PageHeader'
 import api from '@/services/api'
 import { useAuth } from '@/contexts/AuthContext'
 import { User, UserMembership, Organization, RoleTemplate } from '@/types'
@@ -427,24 +428,15 @@ const UsersPage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {t('admin.users.pageTitle')}
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: 'text.secondary',
-            }}
-          >
-            {t('admin.users.pageSubtitle')}
-          </Typography>
-        </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
-          {t('admin.users.addUser')}
-        </Button>
-      </Box>
+      <PageHeader
+        title={t('admin.users.pageTitle')}
+        description={t('admin.users.pageSubtitle')}
+        actions={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
+            {t('admin.users.addUser')}
+          </Button>
+        }
+      />
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
           {error}

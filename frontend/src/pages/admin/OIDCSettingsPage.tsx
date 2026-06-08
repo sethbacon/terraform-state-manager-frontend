@@ -37,6 +37,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import SaveIcon from '@mui/icons-material/Save'
+import PageHeader from '@/components/PageHeader'
 import api from '@/services/api'
 import type {
   OIDCConfigResponse,
@@ -183,27 +184,15 @@ const OIDCSettingsPage: React.FC = () => {
       ) : (
         <>
           {/* Header */}
-          <Box sx={{ mb: 4 }}>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{
-                alignItems: 'center',
-                mb: 1,
-              }}
-            >
-              <ManageAccountsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              <Typography variant="h4">{t('admin.oidcSettings.pageTitle')}</Typography>
-            </Stack>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-              }}
-            >
-              {t('admin.oidcSettings.pageSubtitle')}
-            </Typography>
-          </Box>
+          <PageHeader
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ManageAccountsIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+                {t('admin.oidcSettings.pageTitle')}
+              </Box>
+            }
+            description={t('admin.oidcSettings.pageSubtitle')}
+          />
 
           {error && (
             <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>

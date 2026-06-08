@@ -15,6 +15,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import { format } from 'date-fns';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -494,12 +495,7 @@ const BackupsPage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        {t('backups.title')}
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-        {t('backups.subtitle')}
-      </Typography>
+      <PageHeader title={t('backups.title')} description={t('backups.subtitle')} />
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
         <Tab label={t('backups.tabBackups')} />
