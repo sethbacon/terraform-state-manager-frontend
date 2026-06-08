@@ -28,6 +28,7 @@ import {
   CircularProgress,
   Tooltip,
   FormControl,
+  FormHelperText,
   InputLabel,
   Grid,
 } from '@mui/material';
@@ -41,6 +42,7 @@ import api from '../services/api';
 import DashboardCard from '../components/DashboardCard';
 import type {
   CompliancePolicy,
+  ComplianceEngine,
   ComplianceResult,
   ComplianceScore,
 } from '../types/alerts';
@@ -58,6 +60,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 
 const POLICY_TYPES = ['tagging', 'naming', 'version', 'custom'] as const;
 const SEVERITIES = ['info', 'warning', 'critical'] as const;
+const DEFAULT_ENGINE = 'custom';
 
 const statusColor = (status: string): 'success' | 'error' | 'warning' => {
   switch (status) {
@@ -83,9 +86,13 @@ const CompliancePage: React.FC = () => {
     name: '',
     policy_type: 'tagging' as CompliancePolicy['policy_type'],
     severity: 'warning' as CompliancePolicy['severity'],
+    engine_type: DEFAULT_ENGINE,
     config: '{}',
     is_active: true,
   });
+
+  // Available compliance engines (e.g. custom, opa) — fetched from the backend.
+  const [engines, setEngines] = useState<ComplianceEngine[]>([]);
 
   // Delete dialog state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -107,6 +114,16 @@ const CompliancePage: React.FC = () => {
     }
     return map;
   }, [policies]);
+
+  // Engine names from the API, ensuring the currently selected engine is always
+  // a valid option even if the list has not loaded or omits it.
+  const engineOptions = useMemo(() => {
+    const names = engines.map((e) => e.name);
+    if (policyForm.engine_type && !names.includes(policyForm.engine_type)) {
+      names.push(policyForm.engine_type);
+    }
+    return names;
+  }, [engines, policyForm.engine_type]);
 
   const fetchPolicies = useCallback(async () => {
     setPoliciesLoading(true);
@@ -149,9 +166,20 @@ const CompliancePage: React.FC = () => {
     }
   }, []);
 
+  const fetchEngines = useCallback(async () => {
+    try {
+      const data = await api.listComplianceEngines();
+      const d = data?.data;
+      setEngines(Array.isArray(d) ? d : []);
+    } catch {
+      // Engine list failure is non-critical; the form falls back to the default.
+    }
+  }, []);
+
   useEffect(() => {
     fetchPolicies();
-  }, [fetchPolicies]);
+    fetchEngines();
+  }, [fetchPolicies, fetchEngines]);
 
   useEffect(() => {
     if (tabIndex === 1) {
@@ -166,6 +194,7 @@ const CompliancePage: React.FC = () => {
       name: '',
       policy_type: 'tagging',
       severity: 'warning',
+      engine_type: DEFAULT_ENGINE,
       config: '{}',
       is_active: true,
     });
@@ -178,6 +207,7 @@ const CompliancePage: React.FC = () => {
       name: policy.name,
       policy_type: policy.policy_type,
       severity: policy.severity,
+      engine_type: policy.engine_type || DEFAULT_ENGINE,
       config: JSON.stringify(policy.config, null, 2),
       is_active: policy.is_active,
     });
@@ -190,6 +220,7 @@ const CompliancePage: React.FC = () => {
         name: policyForm.name,
         policy_type: policyForm.policy_type,
         severity: policyForm.severity,
+        engine_type: policyForm.engine_type,
         config: JSON.parse(policyForm.config),
         is_active: policyForm.is_active,
       };
@@ -259,6 +290,7 @@ const CompliancePage: React.FC = () => {
                 <TableRow>
                   <TableCell>{t('compliance.thName')}</TableCell>
                   <TableCell>{t('compliance.thType')}</TableCell>
+                  <TableCell>{t('compliance.thEngine')}</TableCell>
                   <TableCell>{t('compliance.thSeverity')}</TableCell>
                   <TableCell>{t('compliance.thActive')}</TableCell>
                   <TableCell>{t('compliance.thCreated')}</TableCell>
@@ -268,13 +300,13 @@ const CompliancePage: React.FC = () => {
               <TableBody>
                 {policiesLoading ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 4 }}>
+                    <TableCell colSpan={7} align="center" sx={{ py: 4 }}>
                       <CircularProgress />
                     </TableCell>
                   </TableRow>
                 ) : policies.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                    <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                       <Typography color="text.secondary">{t('compliance.emptyPolicies')}</Typography>
                     </TableCell>
                   </TableRow>
@@ -286,6 +318,9 @@ const CompliancePage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip label={policy.policy_type} size="small" variant="outlined" />
+                      </TableCell>
+                      <TableCell>
+                        <Chip label={policy.engine_type} size="small" variant="outlined" />
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -489,6 +524,23 @@ const CompliancePage: React.FC = () => {
                 </MenuItem>
               ))}
             </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>{t('compliance.fieldEngine')}</InputLabel>
+            <Select
+              value={policyForm.engine_type}
+              label={t('compliance.fieldEngine')}
+              onChange={(e) =>
+                setPolicyForm({ ...policyForm, engine_type: e.target.value })
+              }
+            >
+              {engineOptions.map((name) => (
+                <MenuItem key={name} value={name}>
+                  {name}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText>{t('compliance.engineHelp')}</FormHelperText>
           </FormControl>
           <TextField
             fullWidth

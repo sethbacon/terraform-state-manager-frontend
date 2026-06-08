@@ -690,6 +690,7 @@ class ApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getComplianceResults(params?: Record<string, any>) { return this.get('/api/v1/compliance/results', params).then(r => r.data); }
   getComplianceScore() { return this.get('/api/v1/compliance/score').then(r => r.data); }
+  listComplianceEngines() { return this.get('/api/v1/compliance/engines').then(r => r.data); }
 
   // ===========================================================================
   // Webhooks
