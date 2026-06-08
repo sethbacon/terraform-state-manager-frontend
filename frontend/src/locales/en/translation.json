@@ -35,6 +35,7 @@
       "dashboard": "Dashboard",
       "dashboardTooltip": "Admin Dashboard",
       "identity": "Identity",
+      "system": "System",
       "organizations": "Organizations",
       "organizationsTooltip": "Manage organizations and members",
       "roles": "Roles",

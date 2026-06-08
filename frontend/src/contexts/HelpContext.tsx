@@ -20,15 +20,12 @@ export const HelpProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const openHelp = () => {
-    setHelpOpen((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
+    setHelpOpen(true);
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true');
+    } catch {
+      // ignore
+    }
   };
 
   const closeHelp = () => {

@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import pkg from './package.json'
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    // Exposes the frontend package version to the app at build time so the
+    // About dialog can display it (mirrors the registry frontend).
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

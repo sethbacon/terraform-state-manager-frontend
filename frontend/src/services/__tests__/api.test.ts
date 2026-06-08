@@ -139,4 +139,40 @@ describe('ApiClient', () => {
       expect(localStorage.getItem('tsm_auth_token')).toBe('valid-token')
     })
   })
+
+  describe('listRoleTemplates – response envelope', () => {
+    it('unwraps the { role_templates } envelope into a bare array', async () => {
+      const api = await getApiClient()
+      const templates = [
+        { id: 'r-1', name: 'admin', display_name: 'Administrator', scopes: ['admin'], is_system: true },
+      ]
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: { role_templates: templates } })
+
+      const result = await api.listRoleTemplates()
+
+      // Must be a spreadable array (the RolesPage does `[...templates].sort(...)`).
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toEqual(templates)
+    })
+
+    it('tolerates a bare-array response', async () => {
+      const api = await getApiClient()
+      const templates = [{ id: 'r-2', name: 'viewer', display_name: 'Viewer', scopes: [], is_system: true }]
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: templates })
+
+      const result = await api.listRoleTemplates()
+
+      expect(Array.isArray(result)).toBe(true)
+      expect(result).toEqual(templates)
+    })
+
+    it('returns an empty array when the envelope is empty', async () => {
+      const api = await getApiClient()
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: {} })
+
+      const result = await api.listRoleTemplates()
+
+      expect(result).toEqual([])
+    })
+  })
 })

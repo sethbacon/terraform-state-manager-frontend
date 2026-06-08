@@ -8,6 +8,7 @@ import type {
   OIDCConfigResponse,
   OIDCGroupMappingInput,
   UIThemeConfig,
+  VersionInfo,
 } from '../types';
 
 class ApiClient {
@@ -77,6 +78,16 @@ class ApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   configureAdmin(config: any) { return this.post('/api/v1/setup/admin', config).then(r => r.data); }
   completeSetup() { return this.post('/api/v1/setup/complete').then(r => r.data); }
+
+  // ===========================================================================
+  // Version
+  // ===========================================================================
+
+  /** Fetch backend version/build metadata from GET /version (served at the root). */
+  async getVersionInfo(): Promise<VersionInfo> {
+    const response = await this.client.get('/version');
+    return response.data;
+  }
 
   // ===========================================================================
   // Auth
@@ -364,7 +375,11 @@ class ApiClient {
 
   async listRoleTemplates() {
     const response = await this.client.get('/api/v1/admin/role-templates');
-    return response.data || [];
+    // The backend wraps the list in a `role_templates` envelope, matching the
+    // convention used by listUsers/listOrganizations above. Unwrap it so callers
+    // receive a bare array. (Tolerate a bare-array response too, for safety.)
+    const data = response.data;
+    return Array.isArray(data) ? data : data?.role_templates || [];
   }
 
   async getRoleTemplate(id: string) {
