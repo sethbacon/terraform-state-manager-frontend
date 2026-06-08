@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "name": "terraform-state-manager-frontend-scripts",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}
