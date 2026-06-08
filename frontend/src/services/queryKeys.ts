@@ -2,6 +2,7 @@ export const queryKeys = {
   dashboard: {
     _def: ['dashboard'] as const,
     stats: () => [...queryKeys.dashboard._def, 'stats'] as const,
+    versionDrift: () => [...queryKeys.dashboard._def, 'versionDrift'] as const,
   },
   users: {
     _def: ['users'] as const,
