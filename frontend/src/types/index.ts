@@ -281,3 +281,59 @@ export interface UIThemeConfig {
   /** RFC3339 timestamp of the last theme update */
   updated_at?: string
 }
+
+// ---- Drift events ----
+
+/** Severity classification for a drift event (see backend ClassifyDriftSeverity). */
+export type DriftSeverity = 'info' | 'warning' | 'critical'
+
+/**
+ * Where a drift event originated. Currently the backend only emits
+ * snapshot-comparison drift, but the ingest pipeline (issue #60) is expected to
+ * add `code` and `environment` sources, so the type is left open-ended.
+ */
+export type DriftSource = 'snapshot' | 'code' | 'environment'
+
+/**
+ * The resource-type changes captured for a drift event, stored as JSONB on the
+ * backend. `added`/`removed`/`modified` are lists of Terraform resource types;
+ * the UI summarises them as +/-/~ counts.
+ */
+export interface DriftChanges {
+  added: string[]
+  removed: string[]
+  modified: string[]
+  /** Net change in total resource count between the two snapshots. */
+  resource_delta: number
+}
+
+/**
+ * A detected drift event between two state snapshots for a workspace, as
+ * returned by GET /api/v1/drift/events.
+ *
+ * `drift_source` and `external_ref` are optional: the current backend schema
+ * does not yet expose them (planned via the Phase-4 ingest slice), so the UI
+ * renders them only when present.
+ */
+export interface DriftEvent {
+  id: string
+  organization_id: string
+  workspace_name: string
+  snapshot_before?: string | null
+  snapshot_after?: string | null
+  changes: DriftChanges
+  severity: DriftSeverity
+  detected_at: string
+  /** Origin of the drift (snapshot comparison, code, or live environment). */
+  drift_source?: DriftSource
+  /** External reference (e.g. a run/plan URL) for code/environment drift. */
+  external_ref?: string | null
+}
+
+/** Unwrapped result of GET /api/v1/drift/events. */
+export interface DriftEventList {
+  events: DriftEvent[]
+  total: number
+  limit: number
+  offset: number
+}

@@ -183,9 +183,8 @@ const WorkspaceDetailPage: React.FC = () => {
     if (!decodedName) return;
     setDriftLoading(true);
     try {
-      const res = await api.listDriftEvents({ workspace_name: decodedName });
-      const data = res.data ?? res ?? [];
-      setDriftEvents(Array.isArray(data) ? data : []);
+      const res = await api.getDriftEvents({ workspace_name: decodedName });
+      setDriftEvents(res.events as unknown as DriftEventRow[]);
     } catch {
       // non-blocking
     } finally {

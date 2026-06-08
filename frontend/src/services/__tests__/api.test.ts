@@ -227,4 +227,60 @@ describe('ApiClient', () => {
       expect(result.total).toBe(0)
     })
   })
+
+  describe('getDriftEvents – response envelope', () => {
+    it('unwraps the { data, total, limit, offset } envelope into { events, ... }', async () => {
+      const api = await getApiClient()
+      const events = [
+        {
+          id: 'd-1',
+          organization_id: 'org-1',
+          workspace_name: 'prod',
+          changes: { added: [], removed: ['aws_instance'], modified: [], resource_delta: -1 },
+          severity: 'critical',
+          detected_at: '2026-06-01T00:00:00Z',
+        },
+      ]
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({
+        data: { data: events, total: 7, limit: 25, offset: 0 },
+      })
+
+      const result = await api.getDriftEvents({ limit: 25, offset: 0 })
+
+      expect(result.events).toEqual(events)
+      expect(result.total).toBe(7)
+      expect(result.limit).toBe(25)
+      expect(result.offset).toBe(0)
+    })
+
+    it('returns an empty list when the envelope has no data array', async () => {
+      const api = await getApiClient()
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: {} })
+
+      const result = await api.getDriftEvents()
+
+      expect(result.events).toEqual([])
+      expect(result.total).toBe(0)
+    })
+
+    it('falls back to the local count when total is absent', async () => {
+      const api = await getApiClient()
+      const events = [
+        {
+          id: 'd-2',
+          organization_id: 'org-1',
+          workspace_name: 'staging',
+          changes: { added: ['aws_s3_bucket'], removed: [], modified: [], resource_delta: 1 },
+          severity: 'warning',
+          detected_at: '2026-06-02T00:00:00Z',
+        },
+      ]
+      vi.mocked(_mockAxiosInstance.get).mockResolvedValue({ data: { data: events } })
+
+      const result = await api.getDriftEvents()
+
+      expect(result.events).toEqual(events)
+      expect(result.total).toBe(1)
+    })
+  })
 })

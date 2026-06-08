@@ -62,6 +62,12 @@ export const queryKeys = {
       [...queryKeys.reports._def, 'list', params] as const,
     detail: (id: string) => [...queryKeys.reports._def, 'detail', id] as const,
   },
+  drift: {
+    _def: ['drift'] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.drift._def, 'list', params] as const,
+    detail: (id: string) => [...queryKeys.drift._def, 'detail', id] as const,
+  },
   uiTheme: {
     _def: ['uiTheme'] as const,
     get: () => [...queryKeys.uiTheme._def, 'get'] as const,

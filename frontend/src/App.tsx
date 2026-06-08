@@ -29,6 +29,7 @@ const DashboardsPage = lazy(() => import('./pages/DashboardPage'));
 const AlertsPage = lazy(() => import('./pages/AlertsPage'));
 const CompliancePage = lazy(() => import('./pages/CompliancePage'));
 const VersionDriftPage = lazy(() => import('./pages/VersionDriftPage'));
+const DriftEventsPage = lazy(() => import('./pages/DriftEventsPage'));
 const WorkspacesPage = lazy(() => import('./pages/WorkspacesPage'));
 const WorkspaceDetailPage = lazy(() => import('./pages/WorkspaceDetailPage'));
 const BackupsPage = lazy(() => import('./pages/BackupsPage'));
@@ -218,6 +219,16 @@ const App: React.FC = () => {
                       element={
                         <ProtectedRoute requiredScope="dashboard:read">
                           <VersionDriftPage />
+                        </ProtectedRoute>
+                      }
+                    />
+
+                    {/* Drift */}
+                    <Route
+                      path="drift"
+                      element={
+                        <ProtectedRoute requiredScope="sources:read">
+                          <DriftEventsPage />
                         </ProtectedRoute>
                       }
                     />
