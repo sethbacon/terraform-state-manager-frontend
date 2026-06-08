@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Button,
@@ -15,9 +16,16 @@ import {
 } from '@mui/material';
 import api from '../services/api';
 
-const steps = ['Validate Token', 'Configure OIDC', 'Test OIDC', 'Create Admin', 'Complete'];
+const stepKeys = [
+  'setup.stepValidateToken',
+  'setup.stepConfigureOidc',
+  'setup.stepTestOidc',
+  'setup.stepCreateAdmin',
+  'setup.stepComplete',
+];
 
 const SetupWizardPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
   const [setupToken, setSetupToken] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -63,10 +71,10 @@ const SetupWizardPage: React.FC = () => {
     setError('');
     try {
       await api.post('/api/v1/setup/validate-token', {}, getAuthHeaders());
-      setSuccess('Token validated successfully');
+      setSuccess(t('setup.tokenValidated'));
       setActiveStep(1);
     } catch {
-      setError('Invalid setup token');
+      setError(t('setup.errInvalidToken'));
     }
   };
 
@@ -81,10 +89,10 @@ const SetupWizardPage: React.FC = () => {
         },
         getAuthHeaders()
       );
-      setSuccess('OIDC configuration saved');
+      setSuccess(t('setup.oidcSaved'));
       setActiveStep(2);
     } catch {
-      setError('Failed to save OIDC configuration');
+      setError(t('setup.errSaveOidc'));
     }
   };
 
@@ -92,10 +100,10 @@ const SetupWizardPage: React.FC = () => {
     setError('');
     try {
       await api.post('/api/v1/setup/oidc/test', {}, getAuthHeaders());
-      setSuccess('OIDC connection test passed');
+      setSuccess(t('setup.oidcTestPassed'));
       setActiveStep(3);
     } catch {
-      setError('OIDC connection test failed. Check your configuration.');
+      setError(t('setup.errOidcTest'));
     }
   };
 
@@ -103,10 +111,10 @@ const SetupWizardPage: React.FC = () => {
     setError('');
     try {
       await api.post('/api/v1/setup/admin', adminConfig, getAuthHeaders());
-      setSuccess('Admin user created');
+      setSuccess(t('setup.adminCreated'));
       setActiveStep(4);
     } catch {
-      setError('Failed to create admin user');
+      setError(t('setup.errCreateAdmin'));
     }
   };
 
@@ -114,12 +122,12 @@ const SetupWizardPage: React.FC = () => {
     setError('');
     try {
       await api.post('/api/v1/setup/complete', {}, getAuthHeaders());
-      setSuccess('Setup completed! Redirecting to login...');
+      setSuccess(t('setup.setupCompleted'));
       setTimeout(() => {
         window.location.href = '/login';
       }, 2000);
     } catch {
-      setError('Failed to complete setup');
+      setError(t('setup.errComplete'));
     }
   };
 
@@ -137,13 +145,13 @@ const SetupWizardPage: React.FC = () => {
         <Card sx={{ maxWidth: 500, width: '100%', mx: 2 }}>
           <CardContent sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h5" gutterBottom>
-              Setup Already Completed
+              {t('setup.alreadyCompletedTitle')}
             </Typography>
             <Typography color="text.secondary" gutterBottom>
-              The initial setup has already been completed.
+              {t('setup.alreadyCompletedText')}
             </Typography>
             <Button variant="contained" href="/login" sx={{ mt: 2 }}>
-              Go to Login
+              {t('setup.goToLogin')}
             </Button>
           </CardContent>
         </Card>
@@ -165,12 +173,12 @@ const SetupWizardPage: React.FC = () => {
       <Card sx={{ maxWidth: 700, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            Terraform State Manager Setup
+            {t('setup.title')}
           </Typography>
           <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+            {stepKeys.map((labelKey) => (
+              <Step key={labelKey}>
+                <StepLabel>{t(labelKey)}</StepLabel>
               </Step>
             ))}
           </Stepper>
@@ -190,17 +198,17 @@ const SetupWizardPage: React.FC = () => {
           {activeStep === 0 && (
             <Stack spacing={2}>
               <Typography variant="body1">
-                Enter the setup token from the server logs to begin configuration.
+                {t('setup.tokenIntro')}
               </Typography>
               <TextField
                 fullWidth
-                label="Setup Token"
+                label={t('setup.labelSetupToken')}
                 value={setupToken}
                 onChange={(e) => setSetupToken(e.target.value)}
                 placeholder="tsm_setup_..."
               />
               <Button variant="contained" onClick={handleValidateToken} disabled={!setupToken}>
-                Validate Token
+                {t('setup.validateToken')}
               </Button>
             </Stack>
           )}
@@ -208,42 +216,42 @@ const SetupWizardPage: React.FC = () => {
           {/* Step 1: Configure OIDC */}
           {activeStep === 1 && (
             <Stack spacing={2}>
-              <Typography variant="body1">Configure your OIDC identity provider.</Typography>
+              <Typography variant="body1">{t('setup.oidcIntro')}</Typography>
               <TextField
                 fullWidth
-                label="Provider Name"
+                label={t('setup.labelProviderName')}
                 value={oidcConfig.provider_name}
                 onChange={(e) => setOidcConfig({ ...oidcConfig, provider_name: e.target.value })}
-                placeholder="e.g., Azure AD, Okta, Auth0"
+                placeholder={t('setup.placeholderProviderName')}
               />
               <TextField
                 fullWidth
-                label="Issuer URL"
+                label={t('setup.labelIssuerUrl')}
                 value={oidcConfig.issuer_url}
                 onChange={(e) => setOidcConfig({ ...oidcConfig, issuer_url: e.target.value })}
                 placeholder="https://login.microsoftonline.com/{tenant}/v2.0"
               />
               <TextField
                 fullWidth
-                label="Client ID"
+                label={t('setup.labelClientId')}
                 value={oidcConfig.client_id}
                 onChange={(e) => setOidcConfig({ ...oidcConfig, client_id: e.target.value })}
               />
               <TextField
                 fullWidth
-                label="Client Secret"
+                label={t('setup.labelClientSecret')}
                 type="password"
                 value={oidcConfig.client_secret}
                 onChange={(e) => setOidcConfig({ ...oidcConfig, client_secret: e.target.value })}
               />
               <TextField
                 fullWidth
-                label="Scopes (comma-separated)"
+                label={t('setup.labelScopes')}
                 value={oidcConfig.scopes}
                 onChange={(e) => setOidcConfig({ ...oidcConfig, scopes: e.target.value })}
               />
               <Button variant="contained" onClick={handleSaveOIDC}>
-                Save OIDC Configuration
+                {t('setup.saveOidc')}
               </Button>
             </Stack>
           )}
@@ -252,13 +260,13 @@ const SetupWizardPage: React.FC = () => {
           {activeStep === 2 && (
             <Stack spacing={2}>
               <Typography variant="body1">
-                Test the OIDC connection to verify your configuration is correct.
+                {t('setup.testIntro')}
               </Typography>
               <Button variant="contained" onClick={handleTestOIDC}>
-                Test OIDC Connection
+                {t('setup.testOidc')}
               </Button>
               <Button variant="text" onClick={() => setActiveStep(3)}>
-                Skip Test
+                {t('setup.skipTest')}
               </Button>
             </Stack>
           )}
@@ -267,23 +275,23 @@ const SetupWizardPage: React.FC = () => {
           {activeStep === 3 && (
             <Stack spacing={2}>
               <Typography variant="body1">
-                Create the initial admin user. This user will have full access.
+                {t('setup.adminIntro')}
               </Typography>
               <TextField
                 fullWidth
-                label="Admin Email"
+                label={t('setup.labelAdminEmail')}
                 type="email"
                 value={adminConfig.email}
                 onChange={(e) => setAdminConfig({ ...adminConfig, email: e.target.value })}
               />
               <TextField
                 fullWidth
-                label="Admin Name"
+                label={t('setup.labelAdminName')}
                 value={adminConfig.name}
                 onChange={(e) => setAdminConfig({ ...adminConfig, name: e.target.value })}
               />
               <Button variant="contained" onClick={handleCreateAdmin} disabled={!adminConfig.email || !adminConfig.name}>
-                Create Admin User
+                {t('setup.createAdmin')}
               </Button>
             </Stack>
           )}
@@ -292,13 +300,13 @@ const SetupWizardPage: React.FC = () => {
           {activeStep === 4 && (
             <Stack spacing={2}>
               <Typography variant="body1">
-                Setup is ready to be finalized. Click below to complete the setup and lock the setup wizard.
+                {t('setup.completeIntro')}
               </Typography>
               <Alert severity="warning">
-                After completing setup, the setup wizard will be permanently locked. You will need to use the OIDC login flow going forward.
+                {t('setup.completeWarning')}
               </Alert>
               <Button variant="contained" color="primary" onClick={handleComplete}>
-                Complete Setup
+                {t('setup.completeButton')}
               </Button>
             </Stack>
           )}

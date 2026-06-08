@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Autocomplete, Box, Typography, Tabs, Tab, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, Paper, Button, IconButton, Dialog,
@@ -105,6 +106,7 @@ const statusColor = (status: string): 'success' | 'error' | 'warning' | 'default
 // ---------------------------------------------------------------------------
 
 const BackupsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   // ---------- Sources (shared) ----------
@@ -205,11 +207,11 @@ const BackupsPage: React.FC = () => {
       setBackups(response.data ?? []);
       setBackupsTotal(response.total ?? 0);
     } catch {
-      setBackupsError('Failed to load backups');
+      setBackupsError(t('backups.errLoad'));
     } finally {
       setBackupsLoading(false);
     }
-  }, [backupsPage, backupsRowsPerPage, sourceFilter, dateFrom, dateTo]);
+  }, [backupsPage, backupsRowsPerPage, sourceFilter, dateFrom, dateTo, t]);
 
   const fetchPolicies = useCallback(async () => {
     setPoliciesLoading(true);
@@ -219,11 +221,11 @@ const BackupsPage: React.FC = () => {
       const d = response.data ?? response;
       setPolicies(Array.isArray(d) ? d : []);
     } catch {
-      setPoliciesError('Failed to load retention policies');
+      setPoliciesError(t('backups.errLoadPolicies'));
     } finally {
       setPoliciesLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchSources();
@@ -315,11 +317,11 @@ const BackupsPage: React.FC = () => {
       setCreateDialogOpen(false);
       fetchBackups();
     } catch {
-      setBackupsError('Failed to create backup');
+      setBackupsError(t('backups.errCreate'));
     } finally {
       setCreateLoading(false);
     }
-  }, [createForm, fetchBackups]);
+  }, [createForm, fetchBackups, t]);
 
   // -- Bulk Backup --
 
@@ -337,12 +339,12 @@ const BackupsPage: React.FC = () => {
       setBulkResult(result);
       fetchBackups();
     } catch {
-      setBackupsError('Failed to create bulk backup');
+      setBackupsError(t('backups.errBulk'));
       setBulkDialogOpen(false);
     } finally {
       setBulkLoading(false);
     }
-  }, [bulkSourceId, fetchBackups]);
+  }, [bulkSourceId, fetchBackups, t]);
 
   // -- Restore --
 
@@ -360,11 +362,11 @@ const BackupsPage: React.FC = () => {
       setRestoringBackup(null);
       fetchBackups();
     } catch {
-      setBackupsError('Failed to restore backup');
+      setBackupsError(t('backups.errRestore'));
     } finally {
       setRestoreLoading(false);
     }
-  }, [restoringBackup, fetchBackups]);
+  }, [restoringBackup, fetchBackups, t]);
 
   // -- Delete --
 
@@ -382,11 +384,11 @@ const BackupsPage: React.FC = () => {
       setDeletingBackup(null);
       fetchBackups();
     } catch {
-      setBackupsError('Failed to delete backup');
+      setBackupsError(t('backups.errDelete'));
     } finally {
       setDeleteLoading(false);
     }
-  }, [deletingBackup, fetchBackups]);
+  }, [deletingBackup, fetchBackups, t]);
 
   // -- Verify --
 
@@ -405,12 +407,12 @@ const BackupsPage: React.FC = () => {
         });
       })
       .catch(() => {
-        setVerifyResult({ valid: false, expected_checksum: '', actual_checksum: 'Verification failed' });
+        setVerifyResult({ valid: false, expected_checksum: '', actual_checksum: t('backups.verifyFailed') });
       })
       .finally(() => {
         setVerifyLoading(false);
       });
-  }, []);
+  }, [t]);
 
   // ---------------------------------------------------------------------------
   // Retention policy handlers
@@ -451,11 +453,11 @@ const BackupsPage: React.FC = () => {
       setEditingPolicy(null);
       fetchPolicies();
     } catch {
-      setPoliciesError(editingPolicy ? 'Failed to update retention policy' : 'Failed to create retention policy');
+      setPoliciesError(editingPolicy ? t('backups.errUpdatePolicy') : t('backups.errCreatePolicy'));
     } finally {
       setPolicyLoading(false);
     }
-  }, [policyForm, editingPolicy, fetchPolicies]);
+  }, [policyForm, editingPolicy, fetchPolicies, t]);
 
   const handleOpenDeletePolicy = useCallback((policy: RetentionPolicy) => {
     setDeletingPolicy(policy);
@@ -471,11 +473,11 @@ const BackupsPage: React.FC = () => {
       setDeletingPolicy(null);
       fetchPolicies();
     } catch {
-      setPoliciesError('Failed to delete retention policy');
+      setPoliciesError(t('backups.errDeletePolicy'));
     } finally {
       setDeletePolicyLoading(false);
     }
-  }, [deletingPolicy, fetchPolicies]);
+  }, [deletingPolicy, fetchPolicies, t]);
 
   // ---------------------------------------------------------------------------
   // Source name helper
@@ -493,15 +495,15 @@ const BackupsPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 1 }}>
-        Backups
+        {t('backups.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-        Manage Terraform state backups and configure retention policies.
+        {t('backups.subtitle')}
       </Typography>
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
-        <Tab label="Backups" />
-        <Tab label="Retention Policies" />
+        <Tab label={t('backups.tabBackups')} />
+        <Tab label={t('backups.tabRetentionPolicies')} />
       </Tabs>
 
       {/* ==================================================================
@@ -518,26 +520,26 @@ const BackupsPage: React.FC = () => {
         <Stack direction="row" spacing={2} sx={{ mb: 2, justifyContent: "space-between", alignItems: "center" }}>
           <Stack direction="row" spacing={1}>
             <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateDialog}>
-              Create Backup
+              {t('backups.createBackup')}
             </Button>
             <Button variant="outlined" startIcon={<BulkIcon />} onClick={handleOpenBulkDialog}>
-              Bulk Backup
+              {t('backups.bulkBackup')}
             </Button>
           </Stack>
 
           {/* Filters */}
           <Stack direction="row" spacing={1}>
             <FormControl size="small" sx={{ minWidth: 160 }}>
-              <InputLabel>Source</InputLabel>
+              <InputLabel>{t('backups.filterSource')}</InputLabel>
               <Select
                 value={sourceFilter}
-                label="Source"
+                label={t('backups.filterSource')}
                 onChange={(e) => {
                   setSourceFilter(e.target.value);
                   setBackupsPage(0);
                 }}
               >
-                <MenuItem value="all">All Sources</MenuItem>
+                <MenuItem value="all">{t('backups.allSources')}</MenuItem>
                 {sources.map((s) => (
                   <MenuItem key={s.id} value={s.id}>{s.name}</MenuItem>
                 ))}
@@ -545,7 +547,7 @@ const BackupsPage: React.FC = () => {
             </FormControl>
             <TextField
               size="small"
-              label="From"
+              label={t('backups.filterFrom')}
               type="date"
               value={dateFrom}
               onChange={(e) => { setDateFrom(e.target.value); setBackupsPage(0); }}
@@ -553,7 +555,7 @@ const BackupsPage: React.FC = () => {
             />
             <TextField
               size="small"
-              label="To"
+              label={t('backups.filterTo')}
               type="date"
               value={dateTo}
               onChange={(e) => { setDateTo(e.target.value); setBackupsPage(0); }}
@@ -568,15 +570,15 @@ const BackupsPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Workspace</TableCell>
-                  <TableCell>Source</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell>Size</TableCell>
-                  <TableCell>TF Version</TableCell>
-                  <TableCell>Serial</TableCell>
-                  <TableCell>Checksum</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('backups.thWorkspace')}</TableCell>
+                  <TableCell>{t('backups.thSource')}</TableCell>
+                  <TableCell>{t('backups.thCreated')}</TableCell>
+                  <TableCell>{t('backups.thSize')}</TableCell>
+                  <TableCell>{t('backups.thTfVersion')}</TableCell>
+                  <TableCell>{t('backups.thSerial')}</TableCell>
+                  <TableCell>{t('backups.thChecksum')}</TableCell>
+                  <TableCell>{t('backups.thStatus')}</TableCell>
+                  <TableCell align="right">{t('backups.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -589,7 +591,7 @@ const BackupsPage: React.FC = () => {
                 ) : backups.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No backups found.</Typography>
+                      <Typography color="text.secondary">{t('backups.emptyBackups')}</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -616,17 +618,17 @@ const BackupsPage: React.FC = () => {
                         <Chip label={backup.status} color={statusColor(backup.status)} size="small" />
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Restore">
+                        <Tooltip title={t('backups.tooltipRestore')}>
                           <IconButton size="small" onClick={() => handleOpenRestore(backup)}>
                             <RestoreIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Verify">
+                        <Tooltip title={t('backups.tooltipVerify')}>
                           <IconButton size="small" color="info" onClick={() => handleOpenVerify(backup)}>
                             <VerifyIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title={t('backups.tooltipDelete')}>
                           <IconButton size="small" color="error" onClick={() => handleOpenDelete(backup)}>
                             <DeleteIcon fontSize="small" />
                           </IconButton>
@@ -664,7 +666,7 @@ const BackupsPage: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreatePolicy}>
-            Create Policy
+            {t('backups.createPolicy')}
           </Button>
         </Box>
 
@@ -673,11 +675,11 @@ const BackupsPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Max Age (days)</TableCell>
-                  <TableCell>Max Count</TableCell>
-                  <TableCell>Default</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('backups.thPolicyName')}</TableCell>
+                  <TableCell>{t('backups.thMaxAge')}</TableCell>
+                  <TableCell>{t('backups.thMaxCount')}</TableCell>
+                  <TableCell>{t('backups.thDefault')}</TableCell>
+                  <TableCell align="right">{t('backups.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -690,7 +692,7 @@ const BackupsPage: React.FC = () => {
                 ) : policies.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No retention policies configured.</Typography>
+                      <Typography color="text.secondary">{t('backups.emptyPolicies')}</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -703,16 +705,16 @@ const BackupsPage: React.FC = () => {
                       <TableCell>{policy.max_count}</TableCell>
                       <TableCell>
                         {policy.is_default && (
-                          <Chip label="Default" color="primary" size="small" variant="outlined" />
+                          <Chip label={t('backups.defaultChip')} color="primary" size="small" variant="outlined" />
                         )}
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Edit">
+                        <Tooltip title={t('backups.tooltipEdit')}>
                           <IconButton size="small" onClick={() => handleOpenEditPolicy(policy)}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title={t('backups.tooltipDelete')}>
                           <IconButton
                             size="small"
                             color="error"
@@ -735,13 +737,13 @@ const BackupsPage: React.FC = () => {
           Create Backup Dialog
           ================================================================== */}
       <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Create Backup</DialogTitle>
+        <DialogTitle>{t('backups.createBackup')}</DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ mt: 1, mb: 2 }}>
-            <InputLabel>Source</InputLabel>
+            <InputLabel>{t('backups.labelSource')}</InputLabel>
             <Select
               value={createForm.source_id}
-              label="Source"
+              label={t('backups.labelSource')}
               onChange={(e) => setCreateForm({ source_id: e.target.value, workspace_name: '' })}
             >
               {sources.map((s) => (
@@ -759,8 +761,8 @@ const BackupsPage: React.FC = () => {
               <TextField
                 {...params}
                 fullWidth
-                label="Workspace Name"
-                placeholder={workspaceNames.length > 0 ? 'Select or type a workspace name' : 'Type a workspace name'}
+                label={t('backups.labelWorkspaceName')}
+                placeholder={workspaceNames.length > 0 ? t('backups.placeholderWorkspaceSelect') : t('backups.placeholderWorkspaceType')}
                 slotProps={{
                   ...params.slotProps,
                   input: {
@@ -778,13 +780,13 @@ const BackupsPage: React.FC = () => {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCreateDialogOpen(false)} disabled={createLoading}>Cancel</Button>
+          <Button onClick={() => setCreateDialogOpen(false)} disabled={createLoading}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handleCreateBackup}
             disabled={createLoading || !createForm.source_id || !createForm.workspace_name}
           >
-            {createLoading ? <CircularProgress size={20} /> : 'Create'}
+            {createLoading ? <CircularProgress size={20} /> : t('backups.create')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -793,16 +795,16 @@ const BackupsPage: React.FC = () => {
           Bulk Backup Dialog
           ================================================================== */}
       <Dialog open={bulkDialogOpen} onClose={() => setBulkDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Bulk Backup</DialogTitle>
+        <DialogTitle>{t('backups.bulkBackup')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Create backups for all workspaces in the selected source.
+            {t('backups.bulkDescription')}
           </Typography>
           <FormControl fullWidth sx={{ mt: 1 }}>
-            <InputLabel>Source</InputLabel>
+            <InputLabel>{t('backups.labelSource')}</InputLabel>
             <Select
               value={bulkSourceId}
-              label="Source"
+              label={t('backups.labelSource')}
               onChange={(e) => setBulkSourceId(e.target.value)}
               disabled={bulkLoading}
             >
@@ -815,15 +817,15 @@ const BackupsPage: React.FC = () => {
           {bulkLoading && (
             <Box sx={{ display: 'flex', alignItems: 'center', mt: 2, gap: 1 }}>
               <CircularProgress size={20} />
-              <Typography variant="body2" color="text.secondary">Creating backups...</Typography>
+              <Typography variant="body2" color="text.secondary">{t('backups.creatingBackups')}</Typography>
             </Box>
           )}
 
           {bulkResult && (
             <Box sx={{ mt: 2 }}>
               <MuiAlert severity={bulkResult.failed === 0 ? 'success' : 'warning'} sx={{ mb: 1 }}>
-                {bulkResult.successful} of {bulkResult.total} backups created successfully.
-                {bulkResult.failed > 0 && ` ${bulkResult.failed} failed.`}
+                {t('backups.bulkResult', { successful: bulkResult.successful, total: bulkResult.total })}
+                {bulkResult.failed > 0 && ` ${t('backups.bulkFailed', { failed: bulkResult.failed })}`}
               </MuiAlert>
               {bulkResult.errors && bulkResult.errors.length > 0 && (
                 <Box sx={{ mt: 1 }}>
@@ -839,7 +841,7 @@ const BackupsPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setBulkDialogOpen(false)} disabled={bulkLoading}>
-            {bulkResult ? 'Close' : 'Cancel'}
+            {bulkResult ? t('common.close') : t('common.cancel')}
           </Button>
           {!bulkResult && (
             <Button
@@ -847,7 +849,7 @@ const BackupsPage: React.FC = () => {
               onClick={handleBulkBackup}
               disabled={bulkLoading || !bulkSourceId}
             >
-              {bulkLoading ? <CircularProgress size={20} /> : 'Start Bulk Backup'}
+              {bulkLoading ? <CircularProgress size={20} /> : t('backups.startBulkBackup')}
             </Button>
           )}
         </DialogActions>
@@ -857,30 +859,30 @@ const BackupsPage: React.FC = () => {
           Restore Confirmation Dialog
           ================================================================== */}
       <Dialog open={restoreDialogOpen} onClose={() => setRestoreDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Restore Backup</DialogTitle>
+        <DialogTitle>{t('backups.restoreTitle')}</DialogTitle>
         <DialogContent>
           <MuiAlert severity="warning" sx={{ mb: 2 }}>
-            This will overwrite the current state for this workspace. This action cannot be undone.
+            {t('backups.restoreWarning')}
           </MuiAlert>
           {restoringBackup && (
             <Box>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Workspace:</strong> {restoringBackup.workspace_name}
+                <strong>{t('backups.detailWorkspace')}</strong> {restoringBackup.workspace_name}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Created:</strong> {format(new Date(restoringBackup.created_at), 'MMM d, yyyy HH:mm')}
+                <strong>{t('backups.detailCreated')}</strong> {format(new Date(restoringBackup.created_at), 'MMM d, yyyy HH:mm')}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Size:</strong> {restoringBackup.file_size_bytes ? formatBytes(restoringBackup.file_size_bytes) : '—'}
+                <strong>{t('backups.detailSize')}</strong> {restoringBackup.file_size_bytes ? formatBytes(restoringBackup.file_size_bytes) : '—'}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>TF Version:</strong> {restoringBackup.terraform_version ?? '—'}
+                <strong>{t('backups.detailTfVersion')}</strong> {restoringBackup.terraform_version ?? '—'}
               </Typography>
               <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Serial:</strong> {restoringBackup.state_serial ?? '—'}
+                <strong>{t('backups.detailSerial')}</strong> {restoringBackup.state_serial ?? '—'}
               </Typography>
               <Typography variant="body2">
-                <strong>Checksum:</strong>{' '}
+                <strong>{t('backups.detailChecksum')}</strong>{' '}
                 <Typography component="span" sx={{ fontFamily: 'monospace' }}>
                   {restoringBackup.checksum_sha256 ?? '—'}
                 </Typography>
@@ -889,14 +891,14 @@ const BackupsPage: React.FC = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRestoreDialogOpen(false)} disabled={restoreLoading}>Cancel</Button>
+          <Button onClick={() => setRestoreDialogOpen(false)} disabled={restoreLoading}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             color="warning"
             onClick={handleRestoreConfirm}
             disabled={restoreLoading}
           >
-            {restoreLoading ? <CircularProgress size={20} /> : 'Restore'}
+            {restoreLoading ? <CircularProgress size={20} /> : t('backups.restore')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -905,17 +907,16 @@ const BackupsPage: React.FC = () => {
           Delete Backup Confirmation Dialog
           ================================================================== */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Backup</DialogTitle>
+        <DialogTitle>{t('backups.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete the backup for workspace{' '}
-            <strong>{deletingBackup?.workspace_name}</strong>? This action cannot be undone.
+            {t('backups.deleteConfirm', { name: deletingBackup?.workspace_name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleteLoading}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleteLoading}>{t('common.cancel')}</Button>
           <Button variant="contained" color="error" onClick={handleDeleteConfirm} disabled={deleteLoading}>
-            {deleteLoading ? <CircularProgress size={20} /> : 'Delete'}
+            {deleteLoading ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -924,11 +925,11 @@ const BackupsPage: React.FC = () => {
           Verify Dialog
           ================================================================== */}
       <Dialog open={verifyDialogOpen} onClose={() => setVerifyDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Verify Backup</DialogTitle>
+        <DialogTitle>{t('backups.verifyTitle')}</DialogTitle>
         <DialogContent>
           {verifyingBackup && (
             <Typography variant="body2" sx={{ mb: 2 }}>
-              Verifying backup for workspace <strong>{verifyingBackup.workspace_name}</strong>...
+              {t('backups.verifyingFor', { name: verifyingBackup.workspace_name })}
             </Typography>
           )}
 
@@ -944,32 +945,32 @@ const BackupsPage: React.FC = () => {
                 <>
                   <CheckCircleIcon color="success" sx={{ fontSize: 48, mb: 1 }} />
                   <Typography variant="h6" color="success.main" sx={{ mb: 2 }}>
-                    Checksum Verified
+                    {t('backups.checksumVerified')}
                   </Typography>
                 </>
               ) : (
                 <>
                   <ErrorIcon color="error" sx={{ fontSize: 48, mb: 1 }} />
                   <Typography variant="h6" color="error.main" sx={{ mb: 2 }}>
-                    Checksum Mismatch
+                    {t('backups.checksumMismatch')}
                   </Typography>
                 </>
               )}
               {verifyResult.expected_checksum && (
                 <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                  Expected: {verifyResult.expected_checksum}
+                  {t('backups.expectedChecksum', { checksum: verifyResult.expected_checksum })}
                 </Typography>
               )}
               {verifyResult.actual_checksum && (
                 <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
-                  Actual: {verifyResult.actual_checksum}
+                  {t('backups.actualChecksum', { checksum: verifyResult.actual_checksum })}
                 </Typography>
               )}
             </Box>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setVerifyDialogOpen(false)}>Close</Button>
+          <Button onClick={() => setVerifyDialogOpen(false)}>{t('common.close')}</Button>
         </DialogActions>
       </Dialog>
 
@@ -977,18 +978,18 @@ const BackupsPage: React.FC = () => {
           Retention Policy Create/Edit Dialog
           ================================================================== */}
       <Dialog open={policyDialogOpen} onClose={() => setPolicyDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingPolicy ? 'Edit Retention Policy' : 'Create Retention Policy'}</DialogTitle>
+        <DialogTitle>{editingPolicy ? t('backups.editPolicyTitle') : t('backups.createPolicyTitle')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label="Name"
+            label={t('backups.labelPolicyName')}
             value={policyForm.name}
             onChange={(e) => setPolicyForm({ ...policyForm, name: e.target.value })}
             sx={{ mt: 1, mb: 2 }}
           />
           <TextField
             fullWidth
-            label="Max Age (days)"
+            label={t('backups.labelMaxAge')}
             type="number"
             value={policyForm.max_age_days}
             onChange={(e) => setPolicyForm({ ...policyForm, max_age_days: parseInt(e.target.value, 10) || 0 })}
@@ -997,7 +998,7 @@ const BackupsPage: React.FC = () => {
           />
           <TextField
             fullWidth
-            label="Max Count"
+            label={t('backups.labelMaxCount')}
             type="number"
             value={policyForm.max_count}
             onChange={(e) => setPolicyForm({ ...policyForm, max_count: parseInt(e.target.value, 10) || 0 })}
@@ -1011,17 +1012,17 @@ const BackupsPage: React.FC = () => {
                 onChange={(e) => setPolicyForm({ ...policyForm, is_default: e.target.checked })}
               />
             }
-            label="Default Policy"
+            label={t('backups.labelDefaultPolicy')}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPolicyDialogOpen(false)} disabled={policyLoading}>Cancel</Button>
+          <Button onClick={() => setPolicyDialogOpen(false)} disabled={policyLoading}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handlePolicySubmit}
             disabled={policyLoading || !policyForm.name || policyForm.max_age_days < 1 || policyForm.max_count < 1}
           >
-            {policyLoading ? <CircularProgress size={20} /> : editingPolicy ? 'Update' : 'Create'}
+            {policyLoading ? <CircularProgress size={20} /> : editingPolicy ? t('backups.update') : t('backups.create')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1030,16 +1031,15 @@ const BackupsPage: React.FC = () => {
           Delete Retention Policy Confirmation Dialog
           ================================================================== */}
       <Dialog open={deletePolicyDialogOpen} onClose={() => setDeletePolicyDialogOpen(false)}>
-        <DialogTitle>Delete Retention Policy</DialogTitle>
+        <DialogTitle>{t('backups.deletePolicyTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete retention policy <strong>{deletingPolicy?.name}</strong>?
-            This action cannot be undone.
+            {t('backups.deletePolicyConfirm', { name: deletingPolicy?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeletePolicyDialogOpen(false)} disabled={deletePolicyLoading}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -1047,7 +1047,7 @@ const BackupsPage: React.FC = () => {
             onClick={handleDeletePolicyConfirm}
             disabled={deletePolicyLoading}
           >
-            {deletePolicyLoading ? <CircularProgress size={20} /> : 'Delete'}
+            {deletePolicyLoading ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

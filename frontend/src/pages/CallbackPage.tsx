@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Container, Box, CircularProgress, Typography, Alert } from '@mui/material'
 import { useAuth } from '../contexts/AuthContext'
 
 const CallbackPage: React.FC = () => {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { setToken } = useAuth()
@@ -59,18 +61,18 @@ const CallbackPage: React.FC = () => {
         {error ? (
           <Alert severity="error" sx={{ width: '100%' }}>
             <Typography variant="h6" gutterBottom>
-              Authentication Error
+              {t('auth.callbackError')}
             </Typography>
             <Typography variant="body2">{error}</Typography>
             <Typography variant="body2" sx={{ mt: 1 }}>
-              Redirecting to login page...
+              {t('auth.callbackRedirecting')}
             </Typography>
           </Alert>
         ) : (
           <Box sx={{ textAlign: 'center' }}>
             <CircularProgress size={60} />
             <Typography variant="h6" sx={{ mt: 2 }}>
-              Completing authentication...
+              {t('auth.callbackCompleting')}
             </Typography>
           </Box>
         )}

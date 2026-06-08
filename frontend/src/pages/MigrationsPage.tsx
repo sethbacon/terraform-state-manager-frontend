@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead,
   TableRow, Paper, Button, IconButton, Dialog, DialogTitle, DialogContent,
@@ -54,39 +55,45 @@ interface DryRunResult {
 const BACKEND_TYPES = ['s3', 'azure_blob', 'gcs', 'local', 'consul', 'pg'] as const;
 type BackendType = typeof BACKEND_TYPES[number];
 
-const WIZARD_STEPS = ['Source Backend', 'Target Backend', 'Validate', 'Dry Run', 'Execute'];
+const WIZARD_STEP_KEYS = [
+  'migrations.stepSourceBackend',
+  'migrations.stepTargetBackend',
+  'migrations.stepValidate',
+  'migrations.stepDryRun',
+  'migrations.stepExecute',
+];
 
-const BACKEND_CONFIG_FIELDS: Record<BackendType, { key: string; label: string; required: boolean; type?: string }[]> = {
+const BACKEND_CONFIG_FIELDS: Record<BackendType, { key: string; labelKey: string; required: boolean; type?: string }[]> = {
   s3: [
-    { key: 'bucket', label: 'Bucket', required: true },
-    { key: 'region', label: 'Region', required: true },
-    { key: 'prefix', label: 'Key Prefix', required: false },
-    { key: 'access_key', label: 'Access Key', required: false },
-    { key: 'secret_key', label: 'Secret Key', required: false, type: 'password' },
+    { key: 'bucket', labelKey: 'migrations.field.bucket', required: true },
+    { key: 'region', labelKey: 'migrations.field.region', required: true },
+    { key: 'prefix', labelKey: 'migrations.field.keyPrefix', required: false },
+    { key: 'access_key', labelKey: 'migrations.field.accessKey', required: false },
+    { key: 'secret_key', labelKey: 'migrations.field.secretKey', required: false, type: 'password' },
   ],
   azure_blob: [
-    { key: 'storage_account_name', label: 'Storage Account Name', required: true },
-    { key: 'container_name', label: 'Container Name', required: true },
-    { key: 'access_key', label: 'Access Key', required: false, type: 'password' },
-    { key: 'sas_token', label: 'SAS Token', required: false, type: 'password' },
+    { key: 'storage_account_name', labelKey: 'migrations.field.storageAccountName', required: true },
+    { key: 'container_name', labelKey: 'migrations.field.containerName', required: true },
+    { key: 'access_key', labelKey: 'migrations.field.accessKey', required: false, type: 'password' },
+    { key: 'sas_token', labelKey: 'migrations.field.sasToken', required: false, type: 'password' },
   ],
   gcs: [
-    { key: 'bucket', label: 'Bucket', required: true },
-    { key: 'prefix', label: 'Prefix', required: false },
-    { key: 'credentials', label: 'Credentials JSON', required: false, type: 'password' },
+    { key: 'bucket', labelKey: 'migrations.field.bucket', required: true },
+    { key: 'prefix', labelKey: 'migrations.field.prefix', required: false },
+    { key: 'credentials', labelKey: 'migrations.field.credentialsJson', required: false, type: 'password' },
   ],
   local: [
-    { key: 'path', label: 'Directory Path', required: true },
+    { key: 'path', labelKey: 'migrations.field.directoryPath', required: true },
   ],
   consul: [
-    { key: 'address', label: 'Address', required: true },
-    { key: 'scheme', label: 'Scheme (http/https)', required: false },
-    { key: 'path', label: 'Path Prefix', required: true },
-    { key: 'access_token', label: 'Access Token', required: false, type: 'password' },
+    { key: 'address', labelKey: 'migrations.field.address', required: true },
+    { key: 'scheme', labelKey: 'migrations.field.scheme', required: false },
+    { key: 'path', labelKey: 'migrations.field.pathPrefix', required: true },
+    { key: 'access_token', labelKey: 'migrations.field.accessToken', required: false, type: 'password' },
   ],
   pg: [
-    { key: 'conn_str', label: 'Connection String', required: true, type: 'password' },
-    { key: 'schema_name', label: 'Schema Name', required: false },
+    { key: 'conn_str', labelKey: 'migrations.field.connectionString', required: true, type: 'password' },
+    { key: 'schema_name', labelKey: 'migrations.field.schemaName', required: false },
   ],
 };
 
@@ -123,6 +130,7 @@ function formatBytes(bytes: number): string {
 // ---------------------------------------------------------------------------
 
 const MigrationsPage: React.FC = () => {
+  const { t } = useTranslation();
   // ---------- Job list state ----------
   const [migrations, setMigrations] = useState<Migration[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,11 +179,11 @@ const MigrationsPage: React.FC = () => {
       const d = response.data ?? response;
       setMigrations(Array.isArray(d) ? d : []);
     } catch {
-      setError('Failed to load migrations');
+      setError(t('migrations.errLoad'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchMigrations();
@@ -294,7 +302,7 @@ const MigrationsPage: React.FC = () => {
           valid: false,
           source_accessible: false,
           target_accessible: false,
-          errors: ['Validation request failed. Check your configuration.'],
+          errors: [t('migrations.validationRequestFailed')],
           warnings: [],
         });
       } finally {
@@ -311,7 +319,7 @@ const MigrationsPage: React.FC = () => {
         const result = await api.dryRunMigration(buildMigrationData());
         setDryRunResult(result);
       } catch {
-        setError('Dry run failed');
+        setError(t('migrations.dryRunFailed'));
         setDryRunning(false);
       } finally {
         setDryRunning(false);
@@ -345,7 +353,7 @@ const MigrationsPage: React.FC = () => {
           }
         }, 2000);
       } catch {
-        setError('Failed to start migration');
+        setError(t('migrations.errStart'));
         setExecuting(false);
       }
       return;
@@ -353,7 +361,7 @@ const MigrationsPage: React.FC = () => {
 
     // Normal step advance
     setActiveStep((prev) => prev + 1);
-  }, [activeStep, validationResult, dryRunResult, executing, buildMigrationData]);
+  }, [activeStep, validationResult, dryRunResult, executing, buildMigrationData, t]);
 
   const handleBack = useCallback(() => {
     if (activeStep === 2) {
@@ -383,11 +391,11 @@ const MigrationsPage: React.FC = () => {
       setCancellingMigration(null);
       fetchMigrations();
     } catch {
-      setError('Failed to cancel migration');
+      setError(t('migrations.errCancel'));
     } finally {
       setCancelLoading(false);
     }
-  }, [cancellingMigration, fetchMigrations]);
+  }, [cancellingMigration, fetchMigrations, t]);
 
   // ---------------------------------------------------------------------------
   // Config field renderer
@@ -405,7 +413,7 @@ const MigrationsPage: React.FC = () => {
           <Grid size={{ xs: 12, sm: field.type === 'password' ? 12 : 6 }} key={field.key}>
             <TextField
               fullWidth
-              label={field.label}
+              label={t(field.labelKey)}
               value={config[field.key] ?? ''}
               onChange={(e) => setConfig((prev) => ({ ...prev, [field.key]: e.target.value }))}
               required={field.required}
@@ -444,7 +452,7 @@ const MigrationsPage: React.FC = () => {
         </TableCell>
         <TableCell>
           {migration.total_files > 0 ? (
-            <Tooltip title={`${migration.migrated_files} / ${migration.total_files} files`}>
+            <Tooltip title={t('migrations.filesProgress', { migrated: migration.migrated_files, total: migration.total_files })}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 120 }}>
                 <LinearProgress
                   variant="determinate"
@@ -472,7 +480,7 @@ const MigrationsPage: React.FC = () => {
         </TableCell>
         <TableCell align="right">
           {(migration.status === 'running' || migration.status === 'pending') && (
-            <Tooltip title="Cancel">
+            <Tooltip title={t('migrations.tooltipCancel')}>
               <IconButton size="small" color="error" onClick={() => handleOpenCancel(migration)}>
                 <CancelIcon fontSize="small" />
               </IconButton>
@@ -490,10 +498,10 @@ const MigrationsPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 1 }}>
-        Migrations
+        {t('migrations.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-        Migrate Terraform state between backend storage providers.
+        {t('migrations.subtitle')}
       </Typography>
 
       {error && (
@@ -504,7 +512,7 @@ const MigrationsPage: React.FC = () => {
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenWizard}>
-          New Migration
+          {t('migrations.newMigration')}
         </Button>
       </Box>
 
@@ -514,7 +522,7 @@ const MigrationsPage: React.FC = () => {
         </Box>
       ) : migrations.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 6 }}>
-          <Typography color="text.secondary">No migration jobs.</Typography>
+          <Typography color="text.secondary">{t('migrations.empty')}</Typography>
         </Box>
       ) : (
         <>
@@ -523,20 +531,20 @@ const MigrationsPage: React.FC = () => {
               ============================================================ */}
           {activeJobs.length > 0 && (
             <Box sx={{ mb: 4 }}>
-              <Typography variant="h6" sx={{ mb: 1 }}>Active Jobs</Typography>
+              <Typography variant="h6" sx={{ mb: 1 }}>{t('migrations.activeJobs')}</Typography>
               <Paper>
                 <TableContainer>
                   <Table>
                     <TableHead>
                       <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Source</TableCell>
-                        <TableCell>Target</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Progress</TableCell>
-                        <TableCell>Started</TableCell>
-                        <TableCell>Completed</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell>{t('migrations.thName')}</TableCell>
+                        <TableCell>{t('migrations.thSource')}</TableCell>
+                        <TableCell>{t('migrations.thTarget')}</TableCell>
+                        <TableCell>{t('migrations.thStatus')}</TableCell>
+                        <TableCell>{t('migrations.thProgress')}</TableCell>
+                        <TableCell>{t('migrations.thStarted')}</TableCell>
+                        <TableCell>{t('migrations.thCompleted')}</TableCell>
+                        <TableCell align="right">{t('migrations.thActions')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -552,27 +560,27 @@ const MigrationsPage: React.FC = () => {
               Job History
               ============================================================ */}
           <Box>
-            <Typography variant="h6" sx={{ mb: 1 }}>Job History</Typography>
+            <Typography variant="h6" sx={{ mb: 1 }}>{t('migrations.jobHistory')}</Typography>
             <Paper>
               <TableContainer>
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Name</TableCell>
-                      <TableCell>Source</TableCell>
-                      <TableCell>Target</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Progress</TableCell>
-                      <TableCell>Started</TableCell>
-                      <TableCell>Completed</TableCell>
-                      <TableCell align="right">Actions</TableCell>
+                      <TableCell>{t('migrations.thName')}</TableCell>
+                      <TableCell>{t('migrations.thSource')}</TableCell>
+                      <TableCell>{t('migrations.thTarget')}</TableCell>
+                      <TableCell>{t('migrations.thStatus')}</TableCell>
+                      <TableCell>{t('migrations.thProgress')}</TableCell>
+                      <TableCell>{t('migrations.thStarted')}</TableCell>
+                      <TableCell>{t('migrations.thCompleted')}</TableCell>
+                      <TableCell align="right">{t('migrations.thActions')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {jobHistory.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={8} align="center" sx={{ py: 6 }}>
-                          <Typography color="text.secondary">No completed migrations yet.</Typography>
+                          <Typography color="text.secondary">{t('migrations.emptyHistory')}</Typography>
                         </TableCell>
                       </TableRow>
                     ) : (
@@ -590,12 +598,12 @@ const MigrationsPage: React.FC = () => {
           Migration Wizard Dialog
           ================================================================== */}
       <Dialog open={wizardOpen} onClose={handleCloseWizard} maxWidth="md" fullWidth>
-        <DialogTitle>New Migration</DialogTitle>
+        <DialogTitle>{t('migrations.newMigration')}</DialogTitle>
         <DialogContent>
           <Stepper activeStep={activeStep} sx={{ mb: 3, mt: 1 }}>
-            {WIZARD_STEPS.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+            {WIZARD_STEP_KEYS.map((labelKey) => (
+              <Step key={labelKey}>
+                <StepLabel>{t(labelKey)}</StepLabel>
               </Step>
             ))}
           </Stepper>
@@ -605,17 +613,17 @@ const MigrationsPage: React.FC = () => {
             <Box>
               <TextField
                 fullWidth
-                label="Migration Name"
+                label={t('migrations.labelMigrationName')}
                 value={wizardName}
                 onChange={(e) => setWizardName(e.target.value)}
                 required
                 sx={{ mb: 2 }}
               />
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Source Backend Type</InputLabel>
+                <InputLabel>{t('migrations.labelSourceBackendType')}</InputLabel>
                 <Select
                   value={sourceType}
-                  label="Source Backend Type"
+                  label={t('migrations.labelSourceBackendType')}
                   onChange={(e) => {
                     setSourceType(e.target.value as BackendType);
                     setSourceConfig({});
@@ -636,10 +644,10 @@ const MigrationsPage: React.FC = () => {
           {activeStep === 1 && (
             <Box>
               <FormControl fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Target Backend Type</InputLabel>
+                <InputLabel>{t('migrations.labelTargetBackendType')}</InputLabel>
                 <Select
                   value={targetType}
-                  label="Target Backend Type"
+                  label={t('migrations.labelTargetBackendType')}
                   onChange={(e) => {
                     setTargetType(e.target.value as BackendType);
                     setTargetConfig({});
@@ -662,14 +670,14 @@ const MigrationsPage: React.FC = () => {
               {!validationResult && !validating && (
                 <Box sx={{ textAlign: 'center', py: 3 }}>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    Validate the source and target backend configurations before proceeding.
+                    {t('migrations.validateIntro')}
                   </Typography>
                   <Button
                     variant="contained"
                     onClick={handleNext}
                     startIcon={<RunIcon />}
                   >
-                    Run Validation
+                    {t('migrations.runValidation')}
                   </Button>
                 </Box>
               )}
@@ -677,7 +685,7 @@ const MigrationsPage: React.FC = () => {
               {validating && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
                   <CircularProgress sx={{ mb: 2 }} />
-                  <Typography variant="body2" color="text.secondary">Validating configurations...</Typography>
+                  <Typography variant="body2" color="text.secondary">{t('migrations.validating')}</Typography>
                 </Box>
               )}
 
@@ -685,23 +693,23 @@ const MigrationsPage: React.FC = () => {
                 <Box>
                   <MuiAlert severity={validationResult.valid ? 'success' : 'error'} sx={{ mb: 2 }}>
                     {validationResult.valid
-                      ? 'Validation passed. Both source and target backends are accessible.'
-                      : 'Validation failed. Please fix the errors below.'}
+                      ? t('migrations.validationPassed')
+                      : t('migrations.validationFailed')}
                   </MuiAlert>
 
                   <Stack spacing={1} sx={{ mb: 2 }}>
                     <Typography variant="body2">
-                      Source accessible:{' '}
+                      {t('migrations.sourceAccessible')}{' '}
                       <Chip
-                        label={validationResult.source_accessible ? 'Yes' : 'No'}
+                        label={validationResult.source_accessible ? t('migrations.yes') : t('migrations.no')}
                         color={validationResult.source_accessible ? 'success' : 'error'}
                         size="small"
                       />
                     </Typography>
                     <Typography variant="body2">
-                      Target accessible:{' '}
+                      {t('migrations.targetAccessible')}{' '}
                       <Chip
-                        label={validationResult.target_accessible ? 'Yes' : 'No'}
+                        label={validationResult.target_accessible ? t('migrations.yes') : t('migrations.no')}
                         color={validationResult.target_accessible ? 'success' : 'error'}
                         size="small"
                       />
@@ -710,7 +718,7 @@ const MigrationsPage: React.FC = () => {
 
                   {validationResult.errors.length > 0 && (
                     <Box sx={{ mb: 2 }}>
-                      <Typography variant="subtitle2" color="error" sx={{ mb: 0.5 }}>Errors:</Typography>
+                      <Typography variant="subtitle2" color="error" sx={{ mb: 0.5 }}>{t('migrations.errorsLabel')}</Typography>
                       {validationResult.errors.map((err, i) => (
                         <MuiAlert key={i} severity="error" sx={{ mb: 0.5 }} icon={false}>
                           {err}
@@ -721,7 +729,7 @@ const MigrationsPage: React.FC = () => {
 
                   {validationResult.warnings.length > 0 && (
                     <Box>
-                      <Typography variant="subtitle2" color="warning.main" sx={{ mb: 0.5 }}>Warnings:</Typography>
+                      <Typography variant="subtitle2" color="warning.main" sx={{ mb: 0.5 }}>{t('migrations.warningsLabel')}</Typography>
                       {validationResult.warnings.map((w, i) => (
                         <MuiAlert key={i} severity="warning" sx={{ mb: 0.5 }} icon={false}>
                           {w}
@@ -740,14 +748,14 @@ const MigrationsPage: React.FC = () => {
               {!dryRunResult && !dryRunning && (
                 <Box sx={{ textAlign: 'center', py: 3 }}>
                   <Typography variant="body1" sx={{ mb: 2 }}>
-                    Perform a dry run to see what will be migrated without making any changes.
+                    {t('migrations.dryRunIntro')}
                   </Typography>
                   <Button
                     variant="contained"
                     onClick={handleNext}
                     startIcon={<RunIcon />}
                   >
-                    Run Dry Run
+                    {t('migrations.runDryRun')}
                   </Button>
                 </Box>
               )}
@@ -755,27 +763,27 @@ const MigrationsPage: React.FC = () => {
               {dryRunning && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
                   <CircularProgress sx={{ mb: 2 }} />
-                  <Typography variant="body2" color="text.secondary">Running dry run...</Typography>
+                  <Typography variant="body2" color="text.secondary">{t('migrations.runningDryRun')}</Typography>
                 </Box>
               )}
 
               {dryRunResult && (
                 <Box>
                   <MuiAlert severity="info" sx={{ mb: 2 }}>
-                    Dry run complete. Review the results below before executing.
+                    {t('migrations.dryRunComplete')}
                   </MuiAlert>
 
                   <Stack spacing={1}>
                     <Typography variant="body2">
-                      <strong>Total files:</strong> {dryRunResult.total_files}
+                      <strong>{t('migrations.totalFiles')}</strong> {dryRunResult.total_files}
                     </Typography>
                     <Typography variant="body2">
-                      <strong>Estimated size:</strong> {formatBytes(dryRunResult.estimated_size_bytes)}
+                      <strong>{t('migrations.estimatedSize')}</strong> {formatBytes(dryRunResult.estimated_size_bytes)}
                     </Typography>
                     {dryRunResult.workspaces && dryRunResult.workspaces.length > 0 && (
                       <Box>
                         <Typography variant="body2" sx={{ mb: 0.5 }}>
-                          <strong>Workspaces ({dryRunResult.workspaces.length}):</strong>
+                          <strong>{t('migrations.workspacesCount', { count: dryRunResult.workspaces.length })}</strong>
                         </Typography>
                         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                           {dryRunResult.workspaces.map((ws) => (
@@ -796,8 +804,7 @@ const MigrationsPage: React.FC = () => {
               {!executionMigration && !executing && (
                 <Box sx={{ textAlign: 'center', py: 3 }}>
                   <MuiAlert severity="warning" sx={{ mb: 2 }}>
-                    You are about to start the migration. This will copy state files from the source
-                    backend to the target backend.
+                    {t('migrations.executeWarning')}
                   </MuiAlert>
                   <Button
                     variant="contained"
@@ -805,7 +812,7 @@ const MigrationsPage: React.FC = () => {
                     onClick={handleNext}
                     startIcon={<RunIcon />}
                   >
-                    Execute Migration
+                    {t('migrations.executeMigration')}
                   </Button>
                 </Box>
               )}
@@ -813,7 +820,7 @@ const MigrationsPage: React.FC = () => {
               {executing && !executionMigration && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
                   <CircularProgress sx={{ mb: 2 }} />
-                  <Typography variant="body2" color="text.secondary">Starting migration...</Typography>
+                  <Typography variant="body2" color="text.secondary">{t('migrations.startingMigration')}</Typography>
                 </Box>
               )}
 
@@ -821,7 +828,7 @@ const MigrationsPage: React.FC = () => {
                 <Box>
                   <Stack spacing={2}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2"><strong>Status:</strong></Typography>
+                      <Typography variant="body2"><strong>{t('migrations.statusLabel')}</strong></Typography>
                       <Chip
                         label={executionMigration.status}
                         color={statusColor(executionMigration.status)}
@@ -832,7 +839,7 @@ const MigrationsPage: React.FC = () => {
                     {executionMigration.total_files > 0 && (
                       <Box>
                         <Typography variant="body2" sx={{ mb: 0.5 }}>
-                          <strong>Progress:</strong> {executionMigration.migrated_files} / {executionMigration.total_files} files
+                          <strong>{t('migrations.progressLabel')}</strong> {t('migrations.filesProgress', { migrated: executionMigration.migrated_files, total: executionMigration.total_files })}
                         </Typography>
                         <LinearProgress
                           variant="determinate"
@@ -852,26 +859,26 @@ const MigrationsPage: React.FC = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <CircularProgress size={16} />
                         <Typography variant="caption" color="text.secondary">
-                          Polling for updates...
+                          {t('migrations.pollingUpdates')}
                         </Typography>
                       </Box>
                     )}
 
                     {executionMigration.status === 'completed' && (
                       <MuiAlert severity="success">
-                        Migration completed successfully. {executionMigration.migrated_files} files migrated.
+                        {t('migrations.completedSuccess', { count: executionMigration.migrated_files })}
                       </MuiAlert>
                     )}
 
                     {executionMigration.status === 'failed' && (
                       <MuiAlert severity="error">
-                        Migration failed.
-                        {executionMigration.error_message && ` Error: ${executionMigration.error_message}`}
+                        {t('migrations.failedMessage')}
+                        {executionMigration.error_message && ` ${t('migrations.errorPrefix', { error: executionMigration.error_message })}`}
                       </MuiAlert>
                     )}
 
                     {executionMigration.status === 'cancelled' && (
-                      <MuiAlert severity="warning">Migration was cancelled.</MuiAlert>
+                      <MuiAlert severity="warning">{t('migrations.cancelledMessage')}</MuiAlert>
                     )}
                   </Stack>
                 </Box>
@@ -885,27 +892,27 @@ const MigrationsPage: React.FC = () => {
               (executionMigration.status === 'completed' ||
                 executionMigration.status === 'failed' ||
                 executionMigration.status === 'cancelled')
-              ? 'Close'
-              : 'Cancel'}
+              ? t('common.close')
+              : t('common.cancel')}
           </Button>
           {activeStep > 0 && activeStep < 4 && (
             <Button onClick={handleBack} disabled={validating || dryRunning}>
-              Back
+              {t('migrations.back')}
             </Button>
           )}
           {activeStep < 2 && (
             <Button variant="contained" onClick={handleNext} disabled={!canAdvance()}>
-              Next
+              {t('migrations.next')}
             </Button>
           )}
           {(activeStep === 2 && validationResult?.valid) && (
             <Button variant="contained" onClick={() => setActiveStep(3)}>
-              Next
+              {t('migrations.next')}
             </Button>
           )}
           {(activeStep === 3 && dryRunResult) && (
             <Button variant="contained" onClick={() => setActiveStep(4)}>
-              Next
+              {t('migrations.next')}
             </Button>
           )}
         </DialogActions>
@@ -915,17 +922,15 @@ const MigrationsPage: React.FC = () => {
           Cancel Confirmation Dialog
           ================================================================== */}
       <Dialog open={cancelDialogOpen} onClose={() => setCancelDialogOpen(false)}>
-        <DialogTitle>Cancel Migration</DialogTitle>
+        <DialogTitle>{t('migrations.cancelTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to cancel migration{' '}
-            <strong>{cancellingMigration?.name}</strong>? Any files already migrated will remain
-            in the target backend.
+            {t('migrations.cancelConfirm', { name: cancellingMigration?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCancelDialogOpen(false)} disabled={cancelLoading}>
-            No, Keep Running
+            {t('migrations.keepRunning')}
           </Button>
           <Button
             variant="contained"
@@ -933,7 +938,7 @@ const MigrationsPage: React.FC = () => {
             onClick={handleCancelConfirm}
             disabled={cancelLoading}
           >
-            {cancelLoading ? <CircularProgress size={20} /> : 'Yes, Cancel'}
+            {cancelLoading ? <CircularProgress size={20} /> : t('migrations.confirmCancel')}
           </Button>
         </DialogActions>
       </Dialog>

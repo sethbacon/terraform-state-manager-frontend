@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import { Box, Typography, List, ListItemButton, ListItemText, Paper } from '@mui/material';
@@ -248,6 +249,7 @@ function buildNavTags(spec: Record<string, unknown>): NavTag[] {
 const NAV_WIDTH = 200;
 
 const ApiDocumentation: React.FC = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
 
@@ -325,9 +327,9 @@ const ApiDocumentation: React.FC = () => {
     <Box>
       {/* Page title */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h4">API Documentation</Typography>
+        <Typography variant="h4">{t('apiDocs.title')}</Typography>
         <Typography variant="body2" color="text.secondary">
-          Interactive API reference — use the Authorize button to authenticate with an API key
+          {t('apiDocs.subtitle')}
         </Typography>
       </Box>
 
@@ -370,7 +372,7 @@ const ApiDocumentation: React.FC = () => {
                   fontSize: '0.68rem',
                 }}
               >
-                Sections
+                {t('apiDocs.sections')}
               </Typography>
               <List dense disablePadding>
                 {navTags.map(({ id, label }) => {

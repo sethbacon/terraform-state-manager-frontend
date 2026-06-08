@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Box, Typography, Grid, Card, CardContent, CardActionArea, TextField,
   InputAdornment, CircularProgress, Chip, Stack, Button,
@@ -16,8 +18,8 @@ interface Workspace {
   status: string;
 }
 
-function formatDate(dateStr: string | null): string {
-  if (!dateStr) return 'Never';
+function formatDate(dateStr: string | null, t: TFunction): string {
+  if (!dateStr) return t('workspaces.never');
   return new Date(dateStr).toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
@@ -25,17 +27,17 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
-function statusChipProps(status: string): {
+function statusChipProps(status: string, t: TFunction): {
   label: string;
   color: 'success' | 'warning' | 'error' | 'default';
 } {
   switch (status) {
     case 'healthy':
-      return { label: 'Healthy', color: 'success' };
+      return { label: t('workspaces.statusHealthy'), color: 'success' };
     case 'stale':
-      return { label: 'Stale', color: 'warning' };
+      return { label: t('workspaces.statusStale'), color: 'warning' };
     case 'failed':
-      return { label: 'Failed', color: 'error' };
+      return { label: t('workspaces.statusFailed'), color: 'error' };
     default:
       return {
         label: status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' '),
@@ -45,6 +47,7 @@ function statusChipProps(status: string): {
 }
 
 const WorkspacesPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,14 +63,14 @@ const WorkspacesPage: React.FC = () => {
         const data = res.data ?? res ?? [];
         setWorkspaces(Array.isArray(data) ? data : []);
       } catch {
-        setError('Failed to load workspaces.');
+        setError(t('workspaces.errLoad'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchWorkspaces();
-  }, []);
+  }, [t]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return workspaces;
@@ -83,15 +86,15 @@ const WorkspacesPage: React.FC = () => {
     <Box>
       {/* Header */}
       <Typography variant="h4" gutterBottom>
-        Workspaces
+        {t('workspaces.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Browse and inspect Terraform workspaces that have been analyzed across all configured sources.
+        {t('workspaces.subtitle')}
       </Typography>
 
       {/* Search bar */}
       <TextField
-        placeholder="Search workspaces..."
+        placeholder={t('workspaces.searchPlaceholder')}
         size="small"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -123,13 +126,13 @@ const WorkspacesPage: React.FC = () => {
       {!loading && !error && filtered.length === 0 && workspaces.length === 0 && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-            No workspaces analyzed yet.
+            {t('workspaces.empty')}
           </Typography>
           <Button
             variant="contained"
             onClick={() => navigate('/analysis')}
           >
-            Run Analysis
+            {t('workspaces.runAnalysis')}
           </Button>
         </Box>
       )}
@@ -138,7 +141,7 @@ const WorkspacesPage: React.FC = () => {
       {!loading && !error && filtered.length === 0 && workspaces.length > 0 && (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="body1" color="text.secondary">
-            No workspaces match your search.
+            {t('workspaces.noMatch')}
           </Typography>
         </Box>
       )}
@@ -147,7 +150,7 @@ const WorkspacesPage: React.FC = () => {
       {!loading && filtered.length > 0 && (
         <Grid container spacing={3}>
           {filtered.map((ws) => {
-            const chip = statusChipProps(ws.status);
+            const chip = statusChipProps(ws.status, t);
             return (
               <Grid size={{ xs: 12, sm: 6, md: 4 }} key={ws.workspace_name}>
                 <Card variant="outlined" sx={{ height: '100%' }}>
@@ -178,21 +181,21 @@ const WorkspacesPage: React.FC = () => {
                       </Box>
 
                       <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
-                        Source: {ws.source_name ?? 'Unknown'}
+                        {t('workspaces.cardSource', { source: ws.source_name ?? t('workspaces.unknownSource') })}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="text.secondary"
-                       
+
                         sx={{ display: "block",  mb: 1.5 }}
                       >
-                        Last analyzed: {formatDate(ws.last_analyzed)}
+                        {t('workspaces.cardLastAnalyzed', { date: formatDate(ws.last_analyzed, t) })}
                       </Typography>
 
                       <Stack direction="row" spacing={3}>
                         <Box>
                           <Typography variant="caption" color="text.secondary">
-                            Resources
+                            {t('workspaces.cardResources')}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {(ws.resource_count ?? 0).toLocaleString()}
@@ -200,7 +203,7 @@ const WorkspacesPage: React.FC = () => {
                         </Box>
                         <Box>
                           <Typography variant="caption" color="text.secondary">
-                            RUM
+                            {t('workspaces.cardRum')}
                           </Typography>
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>
                             {(ws.rum_count ?? 0).toLocaleString()}

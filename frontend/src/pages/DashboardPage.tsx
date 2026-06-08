@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -23,6 +24,7 @@ import type {
 } from '../types/dashboard';
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [trends, setTrends] = useState<TrendDataPoint[]>([]);
   const [providers, setProviders] = useState<ProviderDistribution[]>([]);
@@ -69,17 +71,17 @@ const DashboardPage: React.FC = () => {
         const allFailed = [overviewRes, trendsRes, providersRes, resourcesRes, versionsRes]
           .every((r) => r.status === 'rejected');
         if (allFailed) {
-          setError('Failed to load dashboard data. Please try again later.');
+          setError(t('dashboards.errLoad'));
         }
       } catch {
-        setError('Failed to load dashboard data. Please try again later.');
+        setError(t('dashboards.errLoad'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, [t]);
 
   const successRate = overview
     ? overview.total_workspaces > 0
@@ -91,7 +93,7 @@ const DashboardPage: React.FC = () => {
     return (
       <Box>
         <Typography variant="h4" gutterBottom>
-          Dashboard
+          {t('dashboards.title')}
         </Typography>
         <Grid container spacing={3} sx={{ mb: 3 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -115,7 +117,7 @@ const DashboardPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Dashboard
+        {t('dashboards.title')}
       </Typography>
 
       {error && (
@@ -128,49 +130,49 @@ const DashboardPage: React.FC = () => {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="RUM Count"
+            title={t('dashboards.cards.rumCount')}
             value={overview?.total_rum ?? 0}
-            subtitle="Resources Under Management"
+            subtitle={t('dashboards.cards.rumCountSubtitle')}
             accentColor="#FF9800"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="Managed Resources"
+            title={t('dashboards.cards.managedResources')}
             value={overview?.total_managed ?? 0}
-            subtitle="Total managed resources"
+            subtitle={t('dashboards.cards.managedResourcesSubtitle')}
             accentColor="#4CAF50"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="Total Resources"
+            title={t('dashboards.cards.totalResources')}
             value={overview?.total_resources ?? 0}
-            subtitle="All resource types"
+            subtitle={t('dashboards.cards.totalResourcesSubtitle')}
             accentColor="#2196F3"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="Data Sources"
+            title={t('dashboards.cards.dataSources')}
             value={overview?.total_data_sources ?? 0}
-            subtitle="Data source resources"
+            subtitle={t('dashboards.cards.dataSourcesSubtitle')}
             accentColor="#9C27B0"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="Workspaces"
+            title={t('dashboards.cards.workspaces')}
             value={overview?.total_workspaces ?? 0}
-            subtitle={`${overview?.successful_workspaces ?? 0} successful`}
+            subtitle={t('dashboards.cards.workspacesSubtitle', { count: overview?.successful_workspaces ?? 0 })}
             accentColor="#00BCD4"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
           <DashboardCard
-            title="Success Rate"
+            title={t('dashboards.cards.successRate')}
             value={successRate}
-            subtitle={`${successRate}% of workspaces`}
+            subtitle={t('dashboards.cards.successRateSubtitle', { percent: successRate })}
             accentColor="#7B61FF"
           />
         </Grid>
@@ -181,7 +183,7 @@ const DashboardPage: React.FC = () => {
         <Grid size={{ xs: 12, lg: 8 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Resource Overview Trends
+              {t('dashboards.charts.resourceOverviewTrends')}
             </Typography>
             <ResourceOverviewChart data={trends} />
           </Paper>
@@ -189,7 +191,7 @@ const DashboardPage: React.FC = () => {
         <Grid size={{ xs: 12, lg: 4 }}>
           <Paper sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" gutterBottom>
-              Provider Distribution
+              {t('dashboards.charts.providerDistribution')}
             </Typography>
             <ProviderDistributionChart data={providers} />
           </Paper>
@@ -201,7 +203,7 @@ const DashboardPage: React.FC = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Top Resource Types
+              {t('dashboards.charts.topResourceTypes')}
             </Typography>
             <TopResourceTypesChart data={resources} />
           </Paper>
@@ -209,7 +211,7 @@ const DashboardPage: React.FC = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              Terraform Versions
+              {t('dashboards.charts.terraformVersions')}
             </Typography>
             <TerraformVersionsChart data={versions} />
           </Paper>
@@ -221,7 +223,7 @@ const DashboardPage: React.FC = () => {
         <Grid size={{ xs: 12 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
-              RUM Trend Over Time
+              {t('dashboards.charts.rumTrendOverTime')}
             </Typography>
             <RUMTrendChart data={trends} />
           </Paper>
