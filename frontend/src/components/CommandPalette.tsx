@@ -16,8 +16,8 @@ export interface CommandPaletteNavItem {
 
 /** Default navigation commands. Exported for unit tests. */
 export const defaultCommands: CommandPaletteNavItem[] = [
-  { label: 'Dashboard', path: '/', group: 'Navigation' },
-  { label: 'Workspaces', path: '/workspaces', scope: 'sources:read', group: 'Navigation' },
+  { label: 'Home', path: '/', group: 'Navigation' },
+  { label: 'State Files', path: '/workspaces', scope: 'sources:read', group: 'Navigation' },
   { label: 'Analysis', path: '/analysis', scope: 'analysis:read', group: 'Navigation' },
   { label: 'Backups', path: '/backups', scope: 'backups:read', group: 'Navigation' },
   { label: 'Migrations', path: '/migrations', scope: 'migrations:read', group: 'Navigation' },

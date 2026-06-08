@@ -59,7 +59,7 @@ describe('CommandPalette', () => {
     renderPalette(true)
     expect(screen.getByTestId('command-palette-input')).toBeInTheDocument()
     expect(screen.getByText('Navigation')).toBeInTheDocument()
-    expect(screen.getByText('Dashboard')).toBeInTheDocument()
+    expect(screen.getByText('Home')).toBeInTheDocument()
   })
 
   it('is not rendered when closed', () => {

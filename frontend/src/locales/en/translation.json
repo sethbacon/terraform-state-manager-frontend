@@ -32,7 +32,7 @@
     "apiDocs": "API Docs",
     "apiDocsTooltip": "API Documentation",
     "admin": {
-      "dashboard": "Dashboard",
+      "dashboard": "Admin Dashboard",
       "dashboardTooltip": "Admin Dashboard",
       "identity": "Identity",
       "system": "System",
@@ -790,13 +790,13 @@
     "deleteConfirm": "Are you sure you want to delete the source \"{{name}}\"? This action cannot be undone. All associated analysis data may be affected."
   },
   "workspaces": {
-    "title": "Workspaces",
-    "subtitle": "Browse and inspect Terraform workspaces that have been analyzed across all configured sources.",
-    "searchPlaceholder": "Search workspaces...",
-    "errLoad": "Failed to load workspaces.",
-    "empty": "No workspaces analyzed yet.",
+    "title": "State Files",
+    "subtitle": "Browse and inspect Terraform state files that have been analyzed across all configured sources.",
+    "searchPlaceholder": "Search state files...",
+    "errLoad": "Failed to load state files.",
+    "empty": "No state files analyzed yet.",
     "runAnalysis": "Run Analysis",
-    "noMatch": "No workspaces match your search.",
+    "noMatch": "No state files match your search.",
     "never": "Never",
     "unknownSource": "Unknown",
     "statusHealthy": "Healthy",
@@ -822,13 +822,13 @@
       "thResources": "Resources",
       "thRum": "RUM",
       "thTfVersion": "TF Version",
-      "noRuns": "No analysis runs found for this workspace.",
+      "noRuns": "No analysis runs found for this state file.",
       "thDetectedAt": "Detected At",
       "thDriftType": "Drift Type",
       "thSeverity": "Severity",
       "thResourceAddress": "Resource Address",
       "thId": "ID",
-      "noDrift": "No drift events detected for this workspace."
+      "noDrift": "No drift events detected for this state file."
     }
   },
   "scheduler": {
@@ -1167,7 +1167,7 @@
     "sections": "Sections"
   },
   "dashboards": {
-    "title": "Dashboard",
+    "title": "Home",
     "errLoad": "Failed to load dashboard data. Please try again later.",
     "cards": {
       "rumCount": "RUM Count",
