@@ -443,6 +443,96 @@ const SCHEDULER_HELP: HelpContent = {
   ],
 };
 
+const DRIFT_HELP: HelpContent = {
+  title: 'Drift Events',
+  overview:
+    'Drift events record when your real infrastructure diverges from the recorded Terraform ' +
+    'state. Events come from two sources: snapshot comparisons (state-vs-state) and code drift ' +
+    'ingested from Terraform plans run in your pipelines.',
+  actions: [
+    {
+      heading: 'Read the source badge',
+      text: 'A "snapshot" badge marks drift found by comparing two state snapshots; a "code" badge marks drift ingested from a Terraform plan (e.g. an ADO pipeline run) — its external reference links back to that run.',
+    },
+    {
+      heading: 'Triage by severity',
+      text: 'Each event is classified info, warning, or critical based on the resource changes (deletions raise severity). Filter by severity to focus on the most impactful drift first.',
+    },
+    {
+      heading: 'Review the change summary',
+      text: 'The added / removed / modified counts summarise what diverged. A larger resource delta usually warrants a closer look at the affected workspace.',
+    },
+    {
+      heading: 'Filter by source or workspace',
+      text: 'Narrow the list to a particular workspace or drift source to investigate a specific environment or pipeline.',
+    },
+  ],
+};
+
+const VERSION_DRIFT_HELP: HelpContent = {
+  title: 'Version Drift',
+  overview:
+    "Version drift compares each workspace's declared Terraform required_version constraint " +
+    'against the version recorded in its state file, flagging workspaces pinned below — or no ' +
+    'longer satisfying — their constraint.',
+  actions: [
+    {
+      heading: 'Read the rollup',
+      text: 'The summary cards count workspaces as Satisfied (in-state version meets the constraint), Drift (it does not), or Unknown (no constraint or version available) for the latest completed analysis run.',
+    },
+    {
+      heading: 'Spot pin drift',
+      text: 'Rows marked "drift" have an in-state Terraform version that does not satisfy the required_version constraint — upgrade the workspace or relax the constraint.',
+    },
+    {
+      heading: 'Supply repo metadata',
+      text: 'Only workspaces whose analysis run was given repo metadata (required_version + lockfile) carry a drift report. Link a state source to its repository so analysis runs can compute drift.',
+    },
+  ],
+};
+
+const OIDC_GROUPS_HELP: HelpContent = {
+  title: 'OIDC Group Mappings',
+  overview:
+    'Map groups from your OIDC identity provider to Terraform State Manager roles, so users ' +
+    'are automatically granted the right permissions based on their IdP group membership at login.',
+  actions: [
+    {
+      heading: 'Add a group mapping',
+      text: 'Map an OIDC group claim value to a TSM role. Users in that group receive the role\'s scopes automatically on their next login.',
+    },
+    {
+      heading: 'Understand precedence',
+      text: 'When a user belongs to multiple mapped groups, their effective permissions are the union of all matched roles\' scopes.',
+    },
+    {
+      heading: 'Keep mappings in sync',
+      text: 'Update mappings when you add roles or restructure IdP groups so access stays aligned with your identity provider.',
+    },
+  ],
+};
+
+const AUDIT_LOGS_HELP: HelpContent = {
+  title: 'Audit Logs',
+  overview:
+    'A tamper-evident record of every mutating action taken in the system — who did what, when, ' +
+    'and from where. Use audit logs for security review, compliance evidence, and incident investigation.',
+  actions: [
+    {
+      heading: 'Filter the trail',
+      text: 'Narrow by user, action type, date range, or affected resource to find the events relevant to an investigation.',
+    },
+    {
+      heading: 'Inspect an event',
+      text: 'Each entry records the actor, IP address, timestamp, and the resource that changed, giving a full picture of the action.',
+    },
+    {
+      heading: 'Export for auditors',
+      text: 'Export the filtered log for compliance evidence or to feed an external SIEM.',
+    },
+  ],
+};
+
 const DEFAULT_HELP: HelpContent = {
   title: 'Terraform State Manager',
   overview:
@@ -497,6 +587,10 @@ export const getHelpContent = (pathname: string): HelpContent => {
       return SCHEDULER_HELP;
     case '/api-docs':
       return API_DOCS_HELP;
+    case '/drift':
+      return DRIFT_HELP;
+    case '/version-drift':
+      return VERSION_DRIFT_HELP;
 
     // Admin routes
     case '/admin/dashboard':
@@ -509,6 +603,10 @@ export const getHelpContent = (pathname: string): HelpContent => {
       return ROLES_HELP;
     case '/admin/api-keys':
       return APIKEYS_HELP;
+    case '/admin/oidc':
+      return OIDC_GROUPS_HELP;
+    case '/admin/audit-logs':
+      return AUDIT_LOGS_HELP;
 
     // Legacy redirects — keep for the instant before redirect fires
     case '/admin/sources':
