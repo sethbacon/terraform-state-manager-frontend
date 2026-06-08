@@ -46,15 +46,18 @@ import Brightness7 from '@mui/icons-material/Brightness7';
 import HelpOutline from '@mui/icons-material/HelpOutlined';
 import InfoOutlined from '@mui/icons-material/InfoOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
+import Search from '@mui/icons-material/Search';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import { useState, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useThemeMode } from '../contexts/ThemeContext';
 import { useHelp } from '../contexts/HelpContext';
+import { useHotkey } from '../hooks/useHotkey';
 import DevUserSwitcher from './DevUserSwitcher';
 import HelpPanel, { HELP_PANEL_WIDTH } from './HelpPanel';
 import AboutModal from './AboutModal';
+import CommandPalette from './CommandPalette';
 
 const drawerWidth = 240;
 
@@ -94,8 +97,15 @@ const Layout = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(null);
   const [supportAnchorEl, setSupportAnchorEl] = useState<null | HTMLElement>(null);
+
+  // Cmd/Ctrl-K toggles the command palette (restored for registry parity).
+  useHotkey(
+    'mod+k',
+    useCallback(() => setPaletteOpen((v) => !v), []),
+  );
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -419,6 +429,19 @@ const Layout = () => {
           </Typography>
           {isAuthenticated && <DevUserSwitcher />}
 
+          {/* Command palette trigger (Cmd/Ctrl-K) */}
+          <Tooltip title={t('commandPalette.openButton')}>
+            <IconButton
+              color="inherit"
+              onClick={() => setPaletteOpen(true)}
+              aria-label={t('commandPalette.openButton')}
+              data-testid="command-palette-trigger"
+              sx={{ mr: 1 }}
+            >
+              <Search />
+            </IconButton>
+          </Tooltip>
+
           {/* Settings dropdown: dark mode + language */}
           <Tooltip title={t('header.settings')}>
             <IconButton
@@ -584,6 +607,7 @@ const Layout = () => {
       </Box>
 
       <HelpPanel />
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </Box>
   );
