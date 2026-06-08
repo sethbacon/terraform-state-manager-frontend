@@ -9,6 +9,8 @@ import type {
   OIDCGroupMappingInput,
   UIThemeConfig,
   VersionInfo,
+  DriftEvent,
+  DriftEventList,
 } from '../types';
 import type { VersionDrift } from '../types/dashboard';
 
@@ -572,9 +574,32 @@ class ApiClient {
   // Drift
   // ===========================================================================
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  listDriftEvents(params?: Record<string, any>) { return this.get('/api/v1/drift/events', params).then(r => r.data); }
-  getDriftEvent(id: string) { return this.get(`/api/v1/drift/events/${id}`).then(r => r.data); }
+  /**
+   * List drift events. The backend wraps the list in a paginated envelope
+   * (`{ data, total, limit, offset }`), which this unwraps into a typed
+   * { events, total, limit, offset } shape — matching the unwrapping done by
+   * the other list helpers above. Tolerates a bare-array `data` for safety.
+   */
+  async getDriftEvents(params?: {
+    limit?: number;
+    offset?: number;
+    workspace_name?: string;
+  }): Promise<DriftEventList> {
+    const response = await this.get('/api/v1/drift/events', params);
+    const body = response.data ?? {};
+    const events: DriftEvent[] = Array.isArray(body.data) ? body.data : [];
+    return {
+      events,
+      total: typeof body.total === 'number' ? body.total : events.length,
+      limit: typeof body.limit === 'number' ? body.limit : (params?.limit ?? events.length),
+      offset: typeof body.offset === 'number' ? body.offset : (params?.offset ?? 0),
+    };
+  }
+
+  async getDriftEvent(id: string): Promise<DriftEvent> {
+    const response = await this.get(`/api/v1/drift/events/${id}`);
+    return response.data?.data as DriftEvent;
+  }
 
   // ===========================================================================
   // Backups

@@ -32,6 +32,7 @@ import Assessment from '@mui/icons-material/Assessment';
 import Dashboard from '@mui/icons-material/Dashboard';
 import NotificationsActive from '@mui/icons-material/NotificationsActive';
 import VerifiedUser from '@mui/icons-material/VerifiedUser';
+import CompareArrows from '@mui/icons-material/CompareArrows';
 import Description from '@mui/icons-material/Description';
 import People from '@mui/icons-material/People';
 import Business from '@mui/icons-material/Business';
@@ -184,6 +185,7 @@ const Layout = () => {
         { text: 'Alerts', icon: <NotificationsActive />, path: '/alerts', tooltip: 'Alert rules, channels, and notifications', scope: 'alerts:admin' },
         { text: 'Compliance', icon: <VerifiedUser />, path: '/compliance', tooltip: 'Compliance policies and results', scope: 'compliance:read' },
         { text: 'Version Drift', icon: <RuleFolderOutlined />, path: '/version-drift', tooltip: 'Terraform version pin-drift across workspaces', scope: 'dashboard:read' },
+        { text: 'Drift', icon: <CompareArrows />, path: '/drift', tooltip: 'Configuration drift detected between snapshots', scope: 'sources:read' },
       ],
     },
     {

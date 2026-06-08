@@ -626,5 +626,46 @@
       "title": "No version drift data yet",
       "description": "Version drift requires an analysis run that carried repository metadata (required_version constraints). Run an analysis with repo metadata to populate this view."
     }
+  },
+  "drift": {
+    "title": "Drift Events",
+    "subtitle": "Configuration drift detected between state snapshots",
+    "refresh": "Refresh",
+    "columns": {
+      "severity": "Severity",
+      "source": "Source",
+      "workspace": "Workspace",
+      "changes": "Changes",
+      "reference": "Reference",
+      "detectedAt": "Detected"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "source": {
+      "snapshot": "Snapshot",
+      "code": "Code",
+      "environment": "Environment",
+      "unknown": "Snapshot"
+    },
+    "changes": {
+      "added": "{{count}} added",
+      "removed": "{{count}} removed",
+      "modified": "{{count}} modified",
+      "none": "No changes"
+    },
+    "filters": {
+      "severityLabel": "Severity",
+      "sourceLabel": "Source",
+      "all": "All"
+    },
+    "noReference": "—",
+    "loadError": "Failed to load drift events. Please try again.",
+    "empty": {
+      "title": "No drift detected",
+      "description": "No configuration drift has been detected yet. Drift events are recorded when a new state snapshot differs from the previous one."
+    }
   }
 }
