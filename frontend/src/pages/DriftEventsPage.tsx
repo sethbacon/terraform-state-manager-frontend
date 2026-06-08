@@ -30,6 +30,7 @@ import api from '@/services/api'
 import { queryKeys } from '@/services/queryKeys'
 import type { DriftEvent, DriftSeverity, DriftSource } from '@/types'
 import EmptyState from '@/components/EmptyState'
+import PageHeader from '@/components/PageHeader'
 
 const SEVERITY_COLOR: Record<DriftSeverity, 'info' | 'warning' | 'error'> = {
   info: 'info',
@@ -124,22 +125,20 @@ const DriftEventsPage: React.FC = () => {
 
   return (
     <Box aria-busy={isLoading} aria-live="polite">
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          {t('drift.title')}
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<RefreshIcon />}
-          onClick={() => refetch()}
-          disabled={isFetching}
-        >
-          {t('drift.refresh')}
-        </Button>
-      </Box>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        {t('drift.subtitle')}
-      </Typography>
+      <PageHeader
+        title={t('drift.title')}
+        description={t('drift.subtitle')}
+        actions={
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            {t('drift.refresh')}
+          </Button>
+        }
+      />
 
       <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
         <TextField

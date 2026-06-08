@@ -38,6 +38,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import AddIcon from '@mui/icons-material/Add'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import PageHeader from '@/components/PageHeader'
 import api from '@/services/api'
 import { Organization, OrganizationMemberWithUser, User, RoleTemplate } from '@/types'
 import { useAuth } from '@/contexts/AuthContext'
@@ -268,24 +269,15 @@ const OrganizationsPage: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Box>
-          <Typography variant="h4" gutterBottom>
-            {t('admin.organizations.pageTitle')}
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: 'text.secondary',
-            }}
-          >
-            {t('admin.organizations.pageSubtitle')}
-          </Typography>
-        </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
-          {t('admin.organizations.addOrganization')}
-        </Button>
-      </Box>
+      <PageHeader
+        title={t('admin.organizations.pageTitle')}
+        description={t('admin.organizations.pageSubtitle')}
+        actions={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={() => handleOpenDialog()}>
+            {t('admin.organizations.addOrganization')}
+          </Button>
+        }
+      />
       {error && !import.meta.env.DEV && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}

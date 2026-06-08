@@ -25,6 +25,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 import ReportGenerateDialog from '../components/ReportGenerateDialog';
 import type { Report, GenerateReportRequest } from '../types/dashboard';
 import type { AnalysisRun } from '../types/analysis';
@@ -178,16 +179,19 @@ const ReportsPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">{t('reports.title')}</Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={handleOpenDialog}
-        >
-          {t('reports.generate')}
-        </Button>
-      </Box>
+      <PageHeader
+        title={t('reports.title')}
+        description={t('reports.subtitle')}
+        actions={
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenDialog}
+          >
+            {t('reports.generate')}
+          </Button>
+        }
+      />
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>

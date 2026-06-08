@@ -719,6 +719,7 @@
   },
   "analysis": {
     "title": "Analysis Runs",
+    "subtitle": "Inspect Terraform state files for resource drift, unused resources, cost anomalies, and security misconfigurations.",
     "refresh": "Refresh",
     "newAnalysis": "New Analysis",
     "errLoad": "Failed to load analysis runs",
@@ -745,6 +746,7 @@
       "notFound": "Analysis run not found.",
       "back": "Back",
       "title": "Analysis Run Details",
+      "subtitle": "Full results of a single analysis run: every finding, drifted resources, and recommended remediation.",
       "totalWorkspaces": "Total Workspaces",
       "succeededFailed": "{{succeeded}} succeeded, {{failed}} failed",
       "totalRum": "Total RUM",
@@ -769,6 +771,7 @@
   },
   "sources": {
     "title": "State Sources",
+    "subtitle": "Configure connections to the Terraform backends that TSM reads state files from.",
     "refresh": "Refresh",
     "addSource": "Add Source",
     "errLoad": "Failed to load state sources",
@@ -891,6 +894,7 @@
   },
   "alerts": {
     "title": "Alerts & Notifications",
+    "subtitle": "Define alert rules that fire on conditions like drift, backup failures, or resource thresholds, delivered through your notification channels.",
     "tabAlerts": "Alerts",
     "tabRules": "Rules",
     "tabChannels": "Channels",
@@ -1017,6 +1021,7 @@
   },
   "compliance": {
     "title": "Compliance",
+    "subtitle": "Evaluate your Terraform state against organizational policies and industry standards.",
     "tabPolicies": "Policies",
     "tabResults": "Results",
     "createPolicy": "Create Policy",
@@ -1147,6 +1152,7 @@
   },
   "reports": {
     "title": "Reports",
+    "subtitle": "Generate and download reports on the health, compliance, and cost profile of your Terraform-managed infrastructure.",
     "generate": "Generate Report",
     "errLoad": "Failed to load reports",
     "errDownload": "Failed to download report",
@@ -1168,6 +1174,7 @@
   },
   "dashboards": {
     "title": "Home",
+    "subtitle": "Visualize key Terraform state metrics aggregated across all connected sources.",
     "errLoad": "Failed to load dashboard data. Please try again later.",
     "cards": {
       "rumCount": "RUM Count",

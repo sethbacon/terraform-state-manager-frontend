@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import Search from '@mui/icons-material/Search';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 
 interface Workspace {
   workspace_name: string;
@@ -84,13 +85,7 @@ const WorkspacesPage: React.FC = () => {
 
   return (
     <Box>
-      {/* Header */}
-      <Typography variant="h4" gutterBottom>
-        {t('workspaces.title')}
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        {t('workspaces.subtitle')}
-      </Typography>
+      <PageHeader title={t('workspaces.title')} description={t('workspaces.subtitle')} />
 
       {/* Search bar */}
       <TextField

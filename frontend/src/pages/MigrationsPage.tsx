@@ -12,6 +12,7 @@ import {
 } from '@mui/icons-material';
 import { format } from 'date-fns';
 import api from '../services/api';
+import PageHeader from '../components/PageHeader';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -497,24 +498,21 @@ const MigrationsPage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        {t('migrations.title')}
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 2 }}>
-        {t('migrations.subtitle')}
-      </Typography>
+      <PageHeader
+        title={t('migrations.title')}
+        description={t('migrations.subtitle')}
+        actions={
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenWizard}>
+            {t('migrations.newMigration')}
+          </Button>
+        }
+      />
 
       {error && (
         <MuiAlert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>
           {error}
         </MuiAlert>
       )}
-
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 3 }}>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenWizard}>
-          {t('migrations.newMigration')}
-        </Button>
-      </Box>
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>

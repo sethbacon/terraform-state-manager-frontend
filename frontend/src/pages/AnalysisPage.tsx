@@ -31,6 +31,7 @@ import {
 } from '@mui/icons-material';
 import api from '../services/api';
 import { AnalysisRun, StateSource } from '../types/analysis';
+import PageHeader from '../components/PageHeader';
 import StatusChip from '../components/StatusChip';
 import AnalysisRunDialog from '../components/AnalysisRunDialog';
 
@@ -157,28 +158,29 @@ const AnalysisPage: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          {t('analysis.title')}
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon />}
-            onClick={fetchRuns}
-            disabled={loading}
-          >
-            {t('analysis.refresh')}
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={() => setDialogOpen(true)}
-          >
-            {t('analysis.newAnalysis')}
-          </Button>
-        </Box>
-      </Box>
+      <PageHeader
+        title={t('analysis.title')}
+        description={t('analysis.subtitle')}
+        actions={
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<RefreshIcon />}
+              onClick={fetchRuns}
+              disabled={loading}
+            >
+              {t('analysis.refresh')}
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setDialogOpen(true)}
+            >
+              {t('analysis.newAnalysis')}
+            </Button>
+          </Box>
+        }
+      />
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

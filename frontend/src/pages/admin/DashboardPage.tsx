@@ -16,6 +16,7 @@ import {
   History as AuditIcon,
 } from '@mui/icons-material';
 import api from '../../services/api';
+import PageHeader from '../../components/PageHeader';
 
 interface DashboardStats {
   total_users: number;
@@ -91,9 +92,10 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        {t('admin.dashboard.pageTitle')}
-      </Typography>
+      <PageHeader
+        title={t('admin.dashboard.pageTitle')}
+        description={t('admin.dashboard.subtitle')}
+      />
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

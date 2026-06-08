@@ -8,6 +8,7 @@ import {
   Alert,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
+import PageHeader from '../components/PageHeader';
 import DashboardCard from '../components/DashboardCard';
 import ResourceOverviewChart from '../components/charts/ResourceOverviewChart';
 import ProviderDistributionChart from '../components/charts/ProviderDistributionChart';
@@ -92,9 +93,7 @@ const DashboardPage: React.FC = () => {
   if (loading) {
     return (
       <Box>
-        <Typography variant="h4" gutterBottom>
-          {t('dashboards.title')}
-        </Typography>
+        <PageHeader title={t('dashboards.title')} description={t('dashboards.subtitle')} />
         <Grid container spacing={3} sx={{ mb: 3 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Grid key={i} size={{ xs: 12, sm: 6, md: 4, lg: 2 }}>
@@ -116,9 +115,7 @@ const DashboardPage: React.FC = () => {
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
-        {t('dashboards.title')}
-      </Typography>
+      <PageHeader title={t('dashboards.title')} description={t('dashboards.subtitle')} />
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

@@ -25,6 +25,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ShieldIcon from '@mui/icons-material/Shield'
 import LockIcon from '@mui/icons-material/Lock'
 import AdminIcon from '@mui/icons-material/AdminPanelSettings'
+import PageHeader from '@/components/PageHeader'
 import api from '@/services/api'
 import { RoleTemplate } from '@/types'
 import { AVAILABLE_SCOPES } from '@/types/rbac'
@@ -85,29 +86,15 @@ const RolesPage: React.FC = () => {
         </Box>
       ) : (
         <>
-          <Box sx={{ mb: 4 }}>
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{
-                alignItems: 'center',
-                mb: 2,
-              }}
-            >
-              <ShieldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
-              <Typography variant="h4" component="h1">
+          <PageHeader
+            title={
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <ShieldIcon sx={{ fontSize: 32, color: 'primary.main' }} />
                 {t('admin.roles.title')}
-              </Typography>
-            </Stack>
-            <Typography
-              variant="body1"
-              sx={{
-                color: 'text.secondary',
-              }}
-            >
-              {t('admin.roles.subtitle')}
-            </Typography>
-          </Box>
+              </Box>
+            }
+            description={t('admin.roles.subtitle')}
+          />
 
           {error && (
             <Alert severity="error" sx={{ mb: 3 }}>
