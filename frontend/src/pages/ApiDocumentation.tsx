@@ -4,6 +4,7 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import { Box, Typography, List, ListItemButton, ListItemText, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import Page from '../components/Page';
 
 // ---------------------------------------------------------------------------
 // Theme-aligned CSS overrides for Swagger UI
@@ -324,7 +325,7 @@ const ApiDocumentation: React.FC = () => {
   const activeBg = isDark ? `${primaryColor}26` : `${primaryColor}14`;
 
   return (
-    <Box>
+    <Page>
       {/* Page title */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4">{t('apiDocs.title')}</Typography>
@@ -430,7 +431,7 @@ const ApiDocumentation: React.FC = () => {
           />
         </Box>
       </Box>
-    </Box>
+    </Page>
   );
 };
 

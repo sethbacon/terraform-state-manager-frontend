@@ -9,6 +9,7 @@ import {
 import Search from '@mui/icons-material/Search';
 import api from '../services/api';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 
 interface Workspace {
   workspace_name: string;
@@ -84,7 +85,7 @@ const WorkspacesPage: React.FC = () => {
   }, [workspaces, search]);
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('workspaces.title')} description={t('workspaces.subtitle')} />
 
       {/* Search bar */}
@@ -213,7 +214,7 @@ const WorkspacesPage: React.FC = () => {
           })}
         </Grid>
       )}
-    </Box>
+    </Page>
   );
 };
 

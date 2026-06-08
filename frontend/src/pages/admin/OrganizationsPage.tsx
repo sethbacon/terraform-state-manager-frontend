@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  Container,
   Typography,
   Box,
   Paper,
@@ -39,6 +38,7 @@ import AddIcon from '@mui/icons-material/Add'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PageHeader from '@/components/PageHeader'
+import Page from '@/components/Page'
 import api from '@/services/api'
 import { Organization, OrganizationMemberWithUser, User, RoleTemplate } from '@/types'
 import { useAuth } from '@/contexts/AuthContext'
@@ -268,7 +268,7 @@ const OrganizationsPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Page maxWidth="lg">
       <PageHeader
         title={t('admin.organizations.pageTitle')}
         description={t('admin.organizations.pageSubtitle')}
@@ -689,7 +689,7 @@ const OrganizationsPage: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Page>
   )
 }
 

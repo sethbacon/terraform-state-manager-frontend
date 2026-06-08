@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import {
-  Box,
   Typography,
   Table,
   TableBody,
@@ -40,6 +39,7 @@ import {
 import { format } from 'date-fns';
 import api from '../../services/api';
 import PageHeader from '../../components/PageHeader';
+import Page from '../../components/Page';
 
 // --- Types ---
 
@@ -335,7 +335,7 @@ const SchedulerPage: React.FC = () => {
   // --- Render ---
 
   return (
-    <Box>
+    <Page>
       {/* Header */}
       <PageHeader
         title={t('scheduler.title')}
@@ -613,7 +613,7 @@ const SchedulerPage: React.FC = () => {
           {snackbar.message}
         </MuiAlert>
       </Snackbar>
-    </Box>
+    </Page>
   );
 };
 

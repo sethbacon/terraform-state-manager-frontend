@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box,
   Typography,
   Paper,
   Skeleton,
@@ -9,6 +8,7 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import DashboardCard from '../components/DashboardCard';
 import ResourceOverviewChart from '../components/charts/ResourceOverviewChart';
 import ProviderDistributionChart from '../components/charts/ProviderDistributionChart';
@@ -92,7 +92,7 @@ const DashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Box>
+      <Page>
         <PageHeader title={t('dashboards.title')} description={t('dashboards.subtitle')} />
         <Grid container spacing={3} sx={{ mb: 3 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -109,12 +109,12 @@ const DashboardPage: React.FC = () => {
             <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 1 }} />
           </Grid>
         </Grid>
-      </Box>
+      </Page>
     );
   }
 
   return (
-    <Box>
+    <Page>
       <PageHeader title={t('dashboards.title')} description={t('dashboards.subtitle')} />
 
       {error && (
@@ -226,7 +226,7 @@ const DashboardPage: React.FC = () => {
           </Paper>
         </Grid>
       </Grid>
-    </Box>
+    </Page>
   );
 };
 

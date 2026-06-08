@@ -32,6 +32,7 @@ import {
 import api from '../services/api';
 import { AnalysisRun, StateSource } from '../types/analysis';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import StatusChip from '../components/StatusChip';
 import AnalysisRunDialog from '../components/AnalysisRunDialog';
 
@@ -157,7 +158,7 @@ const AnalysisPage: React.FC = () => {
   }, [deleteTarget, fetchRuns, t]);
 
   return (
-    <Box>
+    <Page>
       <PageHeader
         title={t('analysis.title')}
         description={t('analysis.subtitle')}
@@ -309,7 +310,7 @@ const AnalysisPage: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Page>
   );
 };
 

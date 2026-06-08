@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { format } from 'date-fns';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import DashboardCard from '../components/DashboardCard';
 import SnapshotCompareView from '../components/SnapshotCompareView';
 import api from '../services/api';
@@ -209,7 +210,7 @@ const WorkspaceDetailPage: React.FC = () => {
   }
 
   return (
-    <Box>
+    <Page>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link component={RouterLink} to="/workspaces" underline="hover" color="inherit">
           {t('workspaces.title')}
@@ -427,7 +428,7 @@ const WorkspaceDetailPage: React.FC = () => {
           </TabPanel>
         </Box>
       </Paper>
-    </Box>
+    </Page>
   );
 };
 

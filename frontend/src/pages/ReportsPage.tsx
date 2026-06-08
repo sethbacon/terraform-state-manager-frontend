@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Box,
   Typography,
   Paper,
   Table,
@@ -26,6 +25,7 @@ import {
 import { format } from 'date-fns';
 import api from '../services/api';
 import PageHeader from '../components/PageHeader';
+import Page from '../components/Page';
 import ReportGenerateDialog from '../components/ReportGenerateDialog';
 import type { Report, GenerateReportRequest } from '../types/dashboard';
 import type { AnalysisRun } from '../types/analysis';
@@ -178,7 +178,7 @@ const ReportsPage: React.FC = () => {
   };
 
   return (
-    <Box>
+    <Page>
       <PageHeader
         title={t('reports.title')}
         description={t('reports.subtitle')}
@@ -297,7 +297,7 @@ const ReportsPage: React.FC = () => {
         analysisRuns={analysisRuns}
         loading={generating}
       />
-    </Box>
+    </Page>
   );
 };
 

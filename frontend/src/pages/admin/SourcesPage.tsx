@@ -18,6 +18,7 @@ import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import api from '../../services/api';
 import { StateSource } from '../../types/analysis';
 import PageHeader from '../../components/PageHeader';
+import Page from '../../components/Page';
 import SourceCard from '../../components/cards/SourceCard';
 import SourceConfigForm from '../../components/SourceConfigForm';
 
@@ -150,7 +151,7 @@ const SourcesPage: React.FC = () => {
   );
 
   return (
-    <Box>
+    <Page>
       <PageHeader
         title={t('sources.title')}
         description={t('sources.subtitle')}
@@ -277,7 +278,7 @@ const SourcesPage: React.FC = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Box>
+    </Page>
   );
 };
 

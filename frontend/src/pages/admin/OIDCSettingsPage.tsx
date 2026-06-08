@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Autocomplete,
-  Container,
   Typography,
   Box,
   Paper,
@@ -38,6 +37,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import SaveIcon from '@mui/icons-material/Save'
 import PageHeader from '@/components/PageHeader'
+import Page from '@/components/Page'
 import api from '@/services/api'
 import type {
   OIDCConfigResponse,
@@ -176,7 +176,7 @@ const OIDCSettingsPage: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" aria-busy={loading} aria-live="polite">
+    <Page maxWidth="lg" aria-busy={loading} aria-live="polite">
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
           <CircularProgress />
@@ -535,7 +535,7 @@ const OIDCSettingsPage: React.FC = () => {
           </Dialog>
         </>
       )}
-    </Container>
+    </Page>
   )
 }
 
