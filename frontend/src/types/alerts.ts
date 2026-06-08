@@ -44,9 +44,14 @@ export interface CompliancePolicy {
   policy_type: 'tagging' | 'naming' | 'version' | 'custom';
   config: Record<string, unknown>;
   severity: 'info' | 'warning' | 'critical';
+  engine_type: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
+}
+
+export interface ComplianceEngine {
+  name: string;
 }
 
 export interface ComplianceResult {
