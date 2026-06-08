@@ -164,9 +164,7 @@ const Layout = () => {
 
   // Primary nav — no section header
   const primaryNavItems = [
-    { text: 'Dashboard', icon: <Dashboard />, path: '/', tooltip: 'Overview charts and metrics', scope: 'dashboard:read' },
-    { text: 'Workspaces', icon: <WorkspacesOutlined />, path: '/workspaces', tooltip: 'Browse Terraform workspaces', scope: 'sources:read' },
-    { text: 'Analysis', icon: <Analytics />, path: '/analysis', tooltip: 'Run and view state analysis', scope: 'analysis:read' },
+    { text: 'Home', icon: <Dashboard />, path: '/', tooltip: 'Overview charts and metrics', scope: 'dashboard:read' },
   ];
 
   // Grouped feature nav sections — each section is collapsible (open/closed
@@ -176,6 +174,8 @@ const Layout = () => {
       key: 'stateManagement',
       label: 'State Management',
       items: [
+        { text: 'State Files', icon: <WorkspacesOutlined />, path: '/workspaces', tooltip: 'Browse Terraform state files', scope: 'sources:read' },
+        { text: 'Analysis', icon: <Analytics />, path: '/analysis', tooltip: 'Run and view state analysis', scope: 'analysis:read' },
         { text: 'Backups', icon: <Backup />, path: '/backups', tooltip: 'Manage state backups', scope: 'backups:read' },
         { text: 'Migrations', icon: <SwapHoriz />, path: '/migrations', tooltip: 'Migrate state between backends', scope: 'migrations:read' },
         { text: 'Reports', icon: <Assessment />, path: '/reports', tooltip: 'Generate and download reports', scope: 'reports:read' },
@@ -201,23 +201,16 @@ const Layout = () => {
     },
   ];
 
-  // Admin dashboard — shown alone, no group header (mirrors the registry).
-  const adminDashboardItem = {
-    text: t('nav.admin.dashboard'),
-    icon: <Dashboard />,
-    path: '/admin/dashboard',
-    tooltip: t('nav.admin.dashboardTooltip'),
-    scope: 'admin' as string | null,
-  };
-
   // Admin / identity nav groups — each group is collapsible. Items are filtered
   // by scope. De-lumped from the previous single "Admin" bucket to mirror the
-  // registry's Identity / System grouping.
+  // registry's Identity / System grouping. The admin dashboard leads the
+  // Identity group.
   const adminNavGroups = [
     {
       key: 'identity',
       label: t('nav.admin.identity'),
       items: [
+        { text: t('nav.admin.dashboard'), icon: <Dashboard />, path: '/admin/dashboard', tooltip: t('nav.admin.dashboardTooltip'), scope: 'admin' as string | null },
         { text: t('nav.admin.users'), icon: <People />, path: '/admin/users', tooltip: t('nav.admin.usersTooltip'), scope: 'users:read' as string | null },
         { text: t('nav.admin.organizations'), icon: <Business />, path: '/admin/organizations', tooltip: t('nav.admin.organizationsTooltip'), scope: 'organizations:read' as string | null },
         { text: t('nav.admin.roles'), icon: <Shield />, path: '/admin/roles', tooltip: t('nav.admin.rolesTooltip'), scope: 'admin' as string | null },
@@ -279,9 +272,7 @@ const Layout = () => {
         .filter((group) => group.items.length > 0)
     : [];
 
-  const showAdminDashboard =
-    isAuthenticated && (adminDashboardItem.scope === null || hasScope(adminDashboardItem.scope));
-  const showAdminSection = showAdminDashboard || visibleAdminGroups.length > 0;
+  const showAdminSection = visibleAdminGroups.length > 0;
 
   const renderNavItem = (item: { text: string; icon: React.ReactNode; path: string; tooltip: string }, indented = false) => {
     const isActive = item.path === '/'
@@ -381,14 +372,10 @@ const Layout = () => {
         return renderCollapsibleSection({ ...section, items: visibleItems });
       })}
 
-      {/* Admin / identity section — Dashboard standalone, then collapsible groups */}
+      {/* Admin / identity section — collapsible groups (admin dashboard leads Identity) */}
       {showAdminSection && (
         <>
           <Divider />
-
-          {showAdminDashboard && (
-            <List disablePadding>{renderNavItem(adminDashboardItem)}</List>
-          )}
 
           {visibleAdminGroups.map((group) => renderCollapsibleSection(group))}
         </>
