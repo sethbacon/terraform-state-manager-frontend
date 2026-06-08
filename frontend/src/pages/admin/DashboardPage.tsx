@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Card,
@@ -61,6 +62,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => (
 );
 
 const DashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -71,13 +73,13 @@ const DashboardPage: React.FC = () => {
         const response = await api.get('/api/v1/admin/stats/dashboard');
         setStats(response.data);
       } catch {
-        setError('Failed to load dashboard stats');
+        setError(t('admin.dashboard.errLoadStats'));
       } finally {
         setLoading(false);
       }
     };
     fetchStats();
-  }, []);
+  }, [t]);
 
   if (loading) {
     return (
@@ -90,7 +92,7 @@ const DashboardPage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Admin Dashboard
+        {t('admin.dashboard.pageTitle')}
       </Typography>
 
       {error && (
@@ -102,16 +104,16 @@ const DashboardPage: React.FC = () => {
       {stats && (
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <StatCard title="Total Users" value={stats.total_users} icon={<PeopleIcon />} color="#7B61FF" />
+            <StatCard title={t('admin.dashboard.statTotalUsers')} value={stats.total_users} icon={<PeopleIcon />} color="#7B61FF" />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <StatCard title="Organizations" value={stats.total_organizations} icon={<OrgIcon />} color="#00BFA5" />
+            <StatCard title={t('admin.dashboard.statOrganizations')} value={stats.total_organizations} icon={<OrgIcon />} color="#00BFA5" />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <StatCard title="API Keys" value={stats.total_api_keys} icon={<KeyIcon />} color="#FF6B35" />
+            <StatCard title={t('admin.dashboard.statApiKeys')} value={stats.total_api_keys} icon={<KeyIcon />} color="#FF6B35" />
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-            <StatCard title="Recent Events" value={stats.recent_audit_events} icon={<AuditIcon />} color="#2196F3" />
+            <StatCard title={t('admin.dashboard.statRecentEvents')} value={stats.recent_audit_events} icon={<AuditIcon />} color="#2196F3" />
           </Grid>
         </Grid>
       )}

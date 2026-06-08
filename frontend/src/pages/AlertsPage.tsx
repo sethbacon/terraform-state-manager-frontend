@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -71,6 +72,7 @@ const severityColor = (severity: string): 'info' | 'warning' | 'error' => {
 };
 
 const AlertsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const initialTab = parseInt(searchParams.get('tab') ?? '0', 10);
   const [tabIndex, setTabIndex] = useState(
@@ -138,11 +140,11 @@ const AlertsPage: React.FC = () => {
       setAlerts(data.data ?? []);
       setAlertsTotal(data.total ?? 0);
     } catch {
-      setAlertsError('Failed to load alerts');
+      setAlertsError(t('alerts.errLoadAlerts'));
     } finally {
       setAlertsLoading(false);
     }
-  }, [alertsPage, alertsRowsPerPage, severityFilter]);
+  }, [alertsPage, alertsRowsPerPage, severityFilter, t]);
 
   const fetchRules = useCallback(async () => {
     setRulesLoading(true);
@@ -152,11 +154,11 @@ const AlertsPage: React.FC = () => {
       const d = response.data?.data;
       setRules(Array.isArray(d) ? d : []);
     } catch {
-      setRulesError('Failed to load alert rules');
+      setRulesError(t('alerts.errLoadRules'));
     } finally {
       setRulesLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchAlerts();
@@ -173,9 +175,9 @@ const AlertsPage: React.FC = () => {
       await api.put(`/api/v1/alerts/${alertId}/acknowledge`);
       fetchAlerts();
     } catch {
-      setAlertsError('Failed to acknowledge alert');
+      setAlertsError(t('alerts.errAcknowledge'));
     }
-  }, [fetchAlerts]);
+  }, [fetchAlerts, t]);
 
   const handleAlertsPageChange = useCallback((_event: unknown, newPage: number) => {
     setAlertsPage(newPage);
@@ -207,9 +209,9 @@ const AlertsPage: React.FC = () => {
       setEditingRule(null);
       fetchRules();
     } catch {
-      setRulesError(editingRule ? 'Failed to update rule' : 'Failed to create rule');
+      setRulesError(editingRule ? t('alerts.errUpdateRule') : t('alerts.errCreateRule'));
     }
-  }, [editingRule, fetchRules]);
+  }, [editingRule, fetchRules, t]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingRule) return;
@@ -219,9 +221,9 @@ const AlertsPage: React.FC = () => {
       setDeletingRule(null);
       fetchRules();
     } catch {
-      setRulesError('Failed to delete rule');
+      setRulesError(t('alerts.errDeleteRule'));
     }
-  }, [deletingRule, fetchRules]);
+  }, [deletingRule, fetchRules, t]);
 
   // ---- Channels callbacks ----
 
@@ -240,11 +242,11 @@ const AlertsPage: React.FC = () => {
       const d = response.data?.data;
       setChannels(Array.isArray(d) ? d : []);
     } catch {
-      setChannelsError('Failed to load notification channels');
+      setChannelsError(t('alerts.errLoadChannels'));
     } finally {
       setChannelsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (tabIndex === 2) {
@@ -275,57 +277,57 @@ const AlertsPage: React.FC = () => {
       try {
         if (editingChannel) {
           await api.put(`/api/v1/notifications/channels/${editingChannel.id}`, payload);
-          showSnackbar('Channel updated successfully', 'success');
+          showSnackbar(t('alerts.channelUpdated'), 'success');
         } else {
           await api.post('/api/v1/notifications/channels', payload);
-          showSnackbar('Channel created successfully', 'success');
+          showSnackbar(t('alerts.channelCreated'), 'success');
         }
         setChannelDialogOpen(false);
         setEditingChannel(null);
         fetchChannels();
       } catch {
-        setChannelFormError(editingChannel ? 'Failed to update channel' : 'Failed to create channel');
+        setChannelFormError(editingChannel ? t('alerts.errUpdateChannel') : t('alerts.errCreateChannel'));
       }
     },
-    [editingChannel, fetchChannels, showSnackbar]
+    [editingChannel, fetchChannels, showSnackbar, t]
   );
 
   const handleDeleteChannelConfirm = useCallback(async () => {
     if (!deletingChannel) return;
     try {
       await api.delete(`/api/v1/notifications/channels/${deletingChannel.id}`);
-      showSnackbar('Channel deleted successfully', 'success');
+      showSnackbar(t('alerts.channelDeleted'), 'success');
       setDeleteChannelDialogOpen(false);
       setDeletingChannel(null);
       fetchChannels();
     } catch {
-      showSnackbar('Failed to delete channel', 'error');
+      showSnackbar(t('alerts.errDeleteChannel'), 'error');
     }
-  }, [deletingChannel, fetchChannels, showSnackbar]);
+  }, [deletingChannel, fetchChannels, showSnackbar, t]);
 
   const handleTestChannel = useCallback(
     async (channelId: string) => {
-      showSnackbar('Testing channel...', 'info');
+      showSnackbar(t('alerts.testingChannel'), 'info');
       try {
         await api.post(`/api/v1/notifications/channels/${channelId}/test`);
-        showSnackbar('Test notification sent successfully', 'success');
+        showSnackbar(t('alerts.testSent'), 'success');
       } catch {
-        showSnackbar('Test notification failed', 'error');
+        showSnackbar(t('alerts.testFailed'), 'error');
       }
     },
-    [showSnackbar]
+    [showSnackbar, t]
   );
 
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 2 }}>
-        Alerts &amp; Notifications
+        {t('alerts.title')}
       </Typography>
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
-        <Tab label="Alerts" />
-        <Tab label="Rules" />
-        <Tab label="Channels" />
+        <Tab label={t('alerts.tabAlerts')} />
+        <Tab label={t('alerts.tabRules')} />
+        <Tab label={t('alerts.tabChannels')} />
       </Tabs>
 
       {/* ---- Alerts Tab ---- */}
@@ -359,7 +361,7 @@ const AlertsPage: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateRule}>
-            Create Rule
+            {t('alerts.createRule')}
           </Button>
         </Box>
 
@@ -368,11 +370,11 @@ const AlertsPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Severity</TableCell>
-                  <TableCell>Active</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('alerts.thName')}</TableCell>
+                  <TableCell>{t('alerts.thType')}</TableCell>
+                  <TableCell>{t('alerts.thSeverity')}</TableCell>
+                  <TableCell>{t('alerts.thActive')}</TableCell>
+                  <TableCell align="right">{t('alerts.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -385,7 +387,7 @@ const AlertsPage: React.FC = () => {
                 ) : rules.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No alert rules configured.</Typography>
+                      <Typography color="text.secondary">{t('alerts.emptyRules')}</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -402,19 +404,19 @@ const AlertsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={rule.is_active ? 'Active' : 'Inactive'}
+                          label={rule.is_active ? t('alerts.active') : t('alerts.inactive')}
                           color={rule.is_active ? 'success' : 'default'}
                           size="small"
                           variant="outlined"
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Edit">
+                        <Tooltip title={t('alerts.tooltipEdit')}>
                           <IconButton size="small" onClick={() => handleOpenEditRule(rule)}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title={t('alerts.tooltipDelete')}>
                           <IconButton
                             size="small"
                             color="error"
@@ -446,7 +448,7 @@ const AlertsPage: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreateChannel}>
-            Add Channel
+            {t('alerts.addChannel')}
           </Button>
         </Box>
 
@@ -455,11 +457,11 @@ const AlertsPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Active</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('alerts.thName')}</TableCell>
+                  <TableCell>{t('alerts.thType')}</TableCell>
+                  <TableCell>{t('alerts.thActive')}</TableCell>
+                  <TableCell>{t('alerts.thCreated')}</TableCell>
+                  <TableCell align="right">{t('alerts.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -473,7 +475,7 @@ const AlertsPage: React.FC = () => {
                   <TableRow>
                     <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
                       <Typography color="text.secondary">
-                        No notification channels configured.
+                        {t('alerts.emptyChannels')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -490,7 +492,7 @@ const AlertsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={channel.is_active ? 'Active' : 'Inactive'}
+                          label={channel.is_active ? t('alerts.active') : t('alerts.inactive')}
                           color={channel.is_active ? 'success' : 'default'}
                           size="small"
                           variant="outlined"
@@ -500,7 +502,7 @@ const AlertsPage: React.FC = () => {
                         {new Date(channel.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Test">
+                        <Tooltip title={t('alerts.tooltipTest')}>
                           <IconButton
                             size="small"
                             color="primary"
@@ -509,12 +511,12 @@ const AlertsPage: React.FC = () => {
                             <TestIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Edit">
+                        <Tooltip title={t('alerts.tooltipEdit')}>
                           <IconButton size="small" onClick={() => handleOpenEditChannel(channel)}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title={t('alerts.tooltipDelete')}>
                           <IconButton
                             size="small"
                             color="error"
@@ -547,17 +549,16 @@ const AlertsPage: React.FC = () => {
 
       {/* ---- Delete Rule Confirmation Dialog ---- */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Alert Rule</DialogTitle>
+        <DialogTitle>{t('alerts.deleteRuleTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete rule <strong>{deletingRule?.name}</strong>? This action
-            cannot be undone.
+            {t('alerts.deleteRuleConfirm', { name: deletingRule?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button variant="contained" color="error" onClick={handleDeleteConfirm}>
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -574,17 +575,16 @@ const AlertsPage: React.FC = () => {
 
       {/* ---- Delete Channel Confirmation Dialog ---- */}
       <Dialog open={deleteChannelDialogOpen} onClose={() => setDeleteChannelDialogOpen(false)}>
-        <DialogTitle>Delete Notification Channel</DialogTitle>
+        <DialogTitle>{t('alerts.deleteChannelTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete channel <strong>{deletingChannel?.name}</strong>? This
-            action cannot be undone.
+            {t('alerts.deleteChannelConfirm', { name: deletingChannel?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteChannelDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteChannelDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button variant="contained" color="error" onClick={handleDeleteChannelConfirm}>
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

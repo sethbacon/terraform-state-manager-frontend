@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer,
   TableHead, TableRow, Paper, Chip, CircularProgress, Breadcrumbs, Link,
@@ -96,6 +97,7 @@ function severityColor(sev: string): 'error' | 'warning' | 'info' | 'default' {
 }
 
 const WorkspaceDetailPage: React.FC = () => {
+  const { t } = useTranslation();
   const { name } = useParams<{ name: string }>();
   const decodedName = name ? decodeURIComponent(name) : '';
 
@@ -209,7 +211,7 @@ const WorkspaceDetailPage: React.FC = () => {
     <Box>
       <Breadcrumbs sx={{ mb: 2 }}>
         <Link component={RouterLink} to="/workspaces" underline="hover" color="inherit">
-          Workspaces
+          {t('workspaces.title')}
         </Link>
         <Typography color="text.primary">{decodedName}</Typography>
       </Breadcrumbs>
@@ -221,17 +223,17 @@ const WorkspaceDetailPage: React.FC = () => {
       <Grid container spacing={3} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <DashboardCard
-            title="Total Resources"
+            title={t('workspaces.detail.totalResources')}
             value={summary?.resource_count ?? 0}
-            subtitle="All resource types"
+            subtitle={t('workspaces.detail.totalResourcesSubtitle')}
             accentColor="#2196F3"
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <DashboardCard
-            title="RUM Count"
+            title={t('workspaces.detail.rumCount')}
             value={summary?.rum_count ?? 0}
-            subtitle="Resources Under Management"
+            subtitle={t('workspaces.detail.rumCountSubtitle')}
             accentColor="#FF9800"
           />
         </Grid>
@@ -248,10 +250,10 @@ const WorkspaceDetailPage: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              TF Version
+              {t('workspaces.detail.tfVersion')}
             </Typography>
             <Typography variant="h4" sx={{ fontWeight: 700,  mb: 0.5 }}>
-              {summary?.terraform_version ?? 'N/A'}
+              {summary?.terraform_version ?? t('workspaces.detail.notAvailable')}
             </Typography>
           </Paper>
         </Grid>
@@ -268,7 +270,7 @@ const WorkspaceDetailPage: React.FC = () => {
             }}
           >
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              Last Analyzed
+              {t('workspaces.detail.lastAnalyzed')}
             </Typography>
             <Typography variant="h5" sx={{ fontWeight: 700,  mb: 0.5 }}>
               {formatDate(summary?.last_analyzed)}
@@ -283,9 +285,9 @@ const WorkspaceDetailPage: React.FC = () => {
           onChange={(_e, v) => setTabIndex(v)}
           sx={{ px: 2, borderBottom: 1, borderColor: 'divider' }}
         >
-          <Tab label="History" />
-          <Tab label="Snapshots" />
-          <Tab label="Drift Events" />
+          <Tab label={t('workspaces.detail.tabHistory')} />
+          <Tab label={t('workspaces.detail.tabSnapshots')} />
+          <Tab label={t('workspaces.detail.tabDriftEvents')} />
         </Tabs>
 
         <Box sx={{ p: 2 }}>
@@ -300,11 +302,11 @@ const WorkspaceDetailPage: React.FC = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Run Date</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell align="right">Resources</TableCell>
-                      <TableCell align="right">RUM</TableCell>
-                      <TableCell>TF Version</TableCell>
+                      <TableCell>{t('workspaces.detail.thRunDate')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thStatus')}</TableCell>
+                      <TableCell align="right">{t('workspaces.detail.thResources')}</TableCell>
+                      <TableCell align="right">{t('workspaces.detail.thRum')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thTfVersion')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -312,7 +314,7 @@ const WorkspaceDetailPage: React.FC = () => {
                       <TableRow>
                         <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                           <Typography variant="body2" color="text.secondary">
-                            No analysis runs found for this workspace.
+                            {t('workspaces.detail.noRuns')}
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -344,7 +346,7 @@ const WorkspaceDetailPage: React.FC = () => {
                                 variant="outlined"
                               />
                             ) : (
-                              'N/A'
+                              t('workspaces.detail.notAvailable')
                             )}
                           </TableCell>
                         </TableRow>
@@ -372,11 +374,11 @@ const WorkspaceDetailPage: React.FC = () => {
                 <Table size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Detected At</TableCell>
-                      <TableCell>Drift Type</TableCell>
-                      <TableCell>Severity</TableCell>
-                      <TableCell>Resource Address</TableCell>
-                      <TableCell>ID</TableCell>
+                      <TableCell>{t('workspaces.detail.thDetectedAt')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thDriftType')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thSeverity')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thResourceAddress')}</TableCell>
+                      <TableCell>{t('workspaces.detail.thId')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -384,7 +386,7 @@ const WorkspaceDetailPage: React.FC = () => {
                       <TableRow>
                         <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                           <Typography variant="body2" color="text.secondary">
-                            No drift events detected for this workspace.
+                            {t('workspaces.detail.noDrift')}
                           </Typography>
                         </TableCell>
                       </TableRow>

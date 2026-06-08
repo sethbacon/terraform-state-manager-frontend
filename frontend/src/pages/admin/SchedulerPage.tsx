@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import {
   Box,
   Typography,
@@ -69,13 +71,8 @@ const TASK_TYPES = [
 
 type TaskType = (typeof TASK_TYPES)[number];
 
-const TASK_TYPE_LABELS: Record<TaskType, string> = {
-  analysis: 'Analysis',
-  snapshot: 'Snapshot',
-  report: 'Report',
-  backup: 'Backup',
-  retention_cleanup: 'Retention Cleanup',
-};
+const taskTypeLabel = (type: TaskType, t: TFunction): string =>
+  t(`scheduler.taskType.${type}`);
 
 const TASK_TYPE_COLORS: Record<TaskType, 'primary' | 'secondary' | 'info' | 'warning' | 'success'> = {
   analysis: 'primary',
@@ -89,15 +86,15 @@ const TASK_TYPE_COLORS: Record<TaskType, 'primary' | 'secondary' | 'info' | 'war
 const SOURCE_REQUIRED_TYPES: TaskType[] = ['analysis', 'backup', 'snapshot'];
 
 interface CronPreset {
-  label: string;
+  labelKey: string;
   expression: string;
 }
 
 const CRON_PRESETS: CronPreset[] = [
-  { label: 'Every hour', expression: '0 * * * *' },
-  { label: 'Daily midnight', expression: '0 0 * * *' },
-  { label: 'Weekly Monday', expression: '0 0 * * 1' },
-  { label: 'Every 6 hours', expression: '0 */6 * * *' },
+  { labelKey: 'scheduler.cronPreset.everyHour', expression: '0 * * * *' },
+  { labelKey: 'scheduler.cronPreset.dailyMidnight', expression: '0 0 * * *' },
+  { labelKey: 'scheduler.cronPreset.weeklyMonday', expression: '0 0 * * 1' },
+  { labelKey: 'scheduler.cronPreset.every6Hours', expression: '0 */6 * * *' },
 ];
 
 interface TaskFormState {
@@ -129,9 +126,9 @@ function formatDateTime(value: string | null): string {
   }
 }
 
-function describeSchedule(expression: string): string {
+function describeSchedule(expression: string, t: TFunction): string {
   const preset = CRON_PRESETS.find((p) => p.expression === expression);
-  if (preset) return preset.label;
+  if (preset) return t(preset.labelKey);
   return expression;
 }
 
@@ -147,6 +144,7 @@ function isValidJson(str: string): boolean {
 // --- Component ---
 
 const SchedulerPage: React.FC = () => {
+  const { t } = useTranslation();
   // Task list
   const [tasks, setTasks] = useState<ScheduledTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -189,11 +187,11 @@ const SchedulerPage: React.FC = () => {
       const list = data?.data ?? data;
       setTasks(Array.isArray(list) ? list : []);
     } catch {
-      setError('Failed to load scheduled tasks');
+      setError(t('scheduler.errLoad'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchSources = useCallback(async () => {
     try {
@@ -253,23 +251,23 @@ const SchedulerPage: React.FC = () => {
 
       if (editingTask) {
         await api.updateScheduledTask(editingTask.id, payload);
-        showSnackbar('Task updated successfully', 'success');
+        showSnackbar(t('scheduler.taskUpdated'), 'success');
       } else {
         await api.createScheduledTask(payload);
-        showSnackbar('Task created successfully', 'success');
+        showSnackbar(t('scheduler.taskCreated'), 'success');
       }
       setDialogOpen(false);
       setEditingTask(null);
       fetchTasks();
     } catch {
       showSnackbar(
-        editingTask ? 'Failed to update task' : 'Failed to create task',
+        editingTask ? t('scheduler.errUpdate') : t('scheduler.errCreate'),
         'error',
       );
     } finally {
       setSubmitting(false);
     }
-  }, [form, editingTask, fetchTasks, showSnackbar]);
+  }, [form, editingTask, fetchTasks, showSnackbar, t]);
 
   // --- Delete handlers ---
 
@@ -287,29 +285,29 @@ const SchedulerPage: React.FC = () => {
     if (!deletingTask) return;
     try {
       await api.deleteScheduledTask(deletingTask.id);
-      showSnackbar('Task deleted successfully', 'success');
+      showSnackbar(t('scheduler.taskDeleted'), 'success');
       setDeleteDialogOpen(false);
       setDeletingTask(null);
       fetchTasks();
     } catch {
-      showSnackbar('Failed to delete task', 'error');
+      showSnackbar(t('scheduler.errDelete'), 'error');
     }
-  }, [deletingTask, fetchTasks, showSnackbar]);
+  }, [deletingTask, fetchTasks, showSnackbar, t]);
 
   // --- Trigger Now handler ---
 
   const handleTriggerNow = useCallback(
     async (task: ScheduledTask) => {
-      showSnackbar(`Triggering "${task.name}"...`, 'info');
+      showSnackbar(t('scheduler.triggering', { name: task.name }), 'info');
       try {
         await api.triggerScheduledTask(task.id);
-        showSnackbar(`Task "${task.name}" triggered successfully`, 'success');
+        showSnackbar(t('scheduler.triggered', { name: task.name }), 'success');
         fetchTasks();
       } catch {
-        showSnackbar(`Failed to trigger "${task.name}"`, 'error');
+        showSnackbar(t('scheduler.errTrigger', { name: task.name }), 'error');
       }
     },
-    [fetchTasks, showSnackbar],
+    [fetchTasks, showSnackbar, t],
   );
 
   // --- Form field updater ---
@@ -341,15 +339,14 @@ const SchedulerPage: React.FC = () => {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
         <Box>
           <Typography variant="h4" sx={{ mb: 0.5 }}>
-            Scheduler
+            {t('scheduler.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage scheduled tasks for automated analysis, snapshots, reports, backups, and retention
-            cleanup.
+            {t('scheduler.subtitle')}
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
-          Create Task
+          {t('scheduler.createTask')}
         </Button>
       </Box>
 
@@ -366,13 +363,13 @@ const SchedulerPage: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Schedule</TableCell>
-                <TableCell>Next Run</TableCell>
-                <TableCell>Last Run</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                <TableCell>{t('scheduler.thName')}</TableCell>
+                <TableCell>{t('scheduler.thType')}</TableCell>
+                <TableCell>{t('scheduler.thSchedule')}</TableCell>
+                <TableCell>{t('scheduler.thNextRun')}</TableCell>
+                <TableCell>{t('scheduler.thLastRun')}</TableCell>
+                <TableCell>{t('scheduler.thStatus')}</TableCell>
+                <TableCell align="right">{t('scheduler.thActions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -386,7 +383,7 @@ const SchedulerPage: React.FC = () => {
                 <TableRow>
                   <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
                     <Typography color="text.secondary">
-                      No scheduled tasks configured.
+                      {t('scheduler.empty')}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -400,7 +397,7 @@ const SchedulerPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={TASK_TYPE_LABELS[task.task_type] ?? task.task_type}
+                        label={taskTypeLabel(task.task_type, t) ?? task.task_type}
                         color={TASK_TYPE_COLORS[task.task_type] ?? 'default'}
                         size="small"
                       />
@@ -408,7 +405,7 @@ const SchedulerPage: React.FC = () => {
                     <TableCell>
                       <Tooltip title={task.schedule}>
                         <Typography variant="body2">
-                          {describeSchedule(task.schedule)}
+                          {describeSchedule(task.schedule, t)}
                         </Typography>
                       </Tooltip>
                     </TableCell>
@@ -416,14 +413,14 @@ const SchedulerPage: React.FC = () => {
                     <TableCell>{formatDateTime(task.last_run_at)}</TableCell>
                     <TableCell>
                       <Chip
-                        label={task.is_active ? 'Active' : 'Inactive'}
+                        label={task.is_active ? t('scheduler.active') : t('scheduler.inactive')}
                         color={task.is_active ? 'success' : 'default'}
                         size="small"
                         variant="outlined"
                       />
                     </TableCell>
                     <TableCell align="right">
-                      <Tooltip title="Trigger Now">
+                      <Tooltip title={t('scheduler.tooltipTrigger')}>
                         <IconButton
                           size="small"
                           color="primary"
@@ -432,12 +429,12 @@ const SchedulerPage: React.FC = () => {
                           <TriggerIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Edit">
+                      <Tooltip title={t('scheduler.tooltipEdit')}>
                         <IconButton size="small" onClick={() => handleOpenEdit(task)}>
                           <EditIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Delete">
+                      <Tooltip title={t('scheduler.tooltipDelete')}>
                         <IconButton
                           size="small"
                           color="error"
@@ -457,12 +454,12 @@ const SchedulerPage: React.FC = () => {
 
       {/* ---- Create / Edit Task Dialog ---- */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingTask ? 'Edit Scheduled Task' : 'Create Scheduled Task'}</DialogTitle>
+        <DialogTitle>{editingTask ? t('scheduler.dialogTitleEdit') : t('scheduler.dialogTitleCreate')}</DialogTitle>
         <DialogContent>
           {/* Name */}
           <TextField
             fullWidth
-            label="Name"
+            label={t('scheduler.labelName')}
             value={form.name}
             onChange={(e) => updateField('name', e.target.value)}
             sx={{ mt: 1, mb: 2 }}
@@ -470,15 +467,15 @@ const SchedulerPage: React.FC = () => {
 
           {/* Task Type */}
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Task Type</InputLabel>
+            <InputLabel>{t('scheduler.labelTaskType')}</InputLabel>
             <Select
               value={form.task_type}
-              label="Task Type"
+              label={t('scheduler.labelTaskType')}
               onChange={(e) => updateField('task_type', e.target.value as TaskType)}
             >
               {TASK_TYPES.map((tt) => (
                 <MenuItem key={tt} value={tt}>
-                  {TASK_TYPE_LABELS[tt]}
+                  {taskTypeLabel(tt, t)}
                 </MenuItem>
               ))}
             </Select>
@@ -486,7 +483,7 @@ const SchedulerPage: React.FC = () => {
 
           {/* Schedule -- preset buttons */}
           <Typography variant="subtitle2" sx={{ mb: 1 }}>
-            Schedule
+            {t('scheduler.scheduleHeading')}
           </Typography>
           <Stack direction="row" spacing={1} sx={{ mb: 1.5, flexWrap: "wrap" }}>
             {CRON_PRESETS.map((preset) => (
@@ -496,7 +493,7 @@ const SchedulerPage: React.FC = () => {
                 variant={form.schedule === preset.expression ? 'contained' : 'outlined'}
                 onClick={() => updateField('schedule', preset.expression)}
               >
-                {preset.label}
+                {t(preset.labelKey)}
               </Button>
             ))}
           </Stack>
@@ -504,14 +501,14 @@ const SchedulerPage: React.FC = () => {
           {/* Schedule -- raw cron input */}
           <TextField
             fullWidth
-            label="Cron Expression"
+            label={t('scheduler.labelCronExpression')}
             value={form.schedule}
             onChange={(e) => updateField('schedule', e.target.value)}
             placeholder="* * * * *"
             helperText={
               form.schedule.trim()
-                ? `Schedule: ${describeSchedule(form.schedule)}`
-                : 'Enter a valid cron expression'
+                ? t('scheduler.scheduleHelper', { schedule: describeSchedule(form.schedule, t) })
+                : t('scheduler.cronHelperEmpty')
             }
             sx={{ mb: 1 }}
           />
@@ -519,21 +516,21 @@ const SchedulerPage: React.FC = () => {
           {/* Next 3 runs placeholder */}
           {form.schedule.trim() && (
             <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-              Next 3 runs: computed at runtime by the server based on the cron expression.
+              {t('scheduler.nextRunsNote')}
             </Typography>
           )}
 
           {/* Source selector (conditional) */}
           {showSourceSelector && (
             <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Source</InputLabel>
+              <InputLabel>{t('scheduler.labelSource')}</InputLabel>
               <Select
                 value={form.source_id}
-                label="Source"
+                label={t('scheduler.labelSource')}
                 onChange={(e) => updateField('source_id', e.target.value as string)}
               >
                 <MenuItem value="">
-                  <em>Select a source</em>
+                  <em>{t('scheduler.selectSource')}</em>
                 </MenuItem>
                 {sources.map((s) => (
                   <MenuItem key={s.id} value={s.id}>
@@ -547,13 +544,13 @@ const SchedulerPage: React.FC = () => {
           {/* Config JSON */}
           <TextField
             fullWidth
-            label="Config (JSON)"
+            label={t('scheduler.labelConfig')}
             value={form.config}
             onChange={(e) => updateField('config', e.target.value)}
             multiline
             rows={4}
             error={!isValidJson(form.config)}
-            helperText={!isValidJson(form.config) ? 'Invalid JSON' : ''}
+            helperText={!isValidJson(form.config) ? t('scheduler.invalidJson') : ''}
             sx={{ mb: 2 }}
           />
 
@@ -565,12 +562,12 @@ const SchedulerPage: React.FC = () => {
                 onChange={(e) => updateField('is_active', e.target.checked)}
               />
             }
-            label="Active"
+            label={t('scheduler.active')}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} disabled={submitting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="contained"
@@ -580,9 +577,9 @@ const SchedulerPage: React.FC = () => {
             {submitting ? (
               <CircularProgress size={20} />
             ) : editingTask ? (
-              'Update'
+              t('scheduler.update')
             ) : (
-              'Create'
+              t('scheduler.create')
             )}
           </Button>
         </DialogActions>
@@ -590,17 +587,16 @@ const SchedulerPage: React.FC = () => {
 
       {/* ---- Delete Confirmation Dialog ---- */}
       <Dialog open={deleteDialogOpen} onClose={handleCloseDelete}>
-        <DialogTitle>Delete Scheduled Task</DialogTitle>
+        <DialogTitle>{t('scheduler.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete task <strong>{deletingTask?.name}</strong>? This action
-            cannot be undone.
+            {t('scheduler.deleteConfirm', { name: deletingTask?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDelete}>Cancel</Button>
+          <Button onClick={handleCloseDelete}>{t('common.cancel')}</Button>
           <Button variant="contained" color="error" onClick={handleDeleteConfirm}>
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

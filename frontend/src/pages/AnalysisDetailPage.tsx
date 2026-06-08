@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -51,6 +52,7 @@ function formatDuration(ms: number): string {
 }
 
 const AnalysisDetailPage: React.FC = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
@@ -72,12 +74,12 @@ const AnalysisDetailPage: React.FC = () => {
       const response = await api.get(`/api/v1/analysis/runs/${id}`);
       setRun(response.data.data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load analysis run details';
+      const message = err instanceof Error ? err.message : t('analysis.detail.errLoad');
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, t]);
 
   const fetchResults = useCallback(async () => {
     if (!id) return;
@@ -199,7 +201,7 @@ const AnalysisDetailPage: React.FC = () => {
     return (
       <Box>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')} sx={{ mb: 2 }}>
-          Back to Analysis
+          {t('analysis.detail.backToAnalysis')}
         </Button>
         <Alert severity="error">{error}</Alert>
       </Box>
@@ -210,9 +212,9 @@ const AnalysisDetailPage: React.FC = () => {
     return (
       <Box>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')} sx={{ mb: 2 }}>
-          Back to Analysis
+          {t('analysis.detail.backToAnalysis')}
         </Button>
-        <Alert severity="warning">Analysis run not found.</Alert>
+        <Alert severity="warning">{t('analysis.detail.notFound')}</Alert>
       </Box>
     );
   }
@@ -226,10 +228,10 @@ const AnalysisDetailPage: React.FC = () => {
     <Box>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
         <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/analysis')}>
-          Back
+          {t('analysis.detail.back')}
         </Button>
         <Typography variant="h5" sx={{ fontWeight: 600,  flex: 1 }}>
-          Analysis Run Details
+          {t('analysis.detail.title')}
         </Typography>
         <StatusChip status={run.status} size="medium" />
       </Box>
@@ -246,13 +248,13 @@ const AnalysisDetailPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
-                Total Workspaces
+                {t('analysis.detail.totalWorkspaces')}
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_workspaces.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {run.successful_count} succeeded, {run.failed_count} failed
+                {t('analysis.detail.succeededFailed', { succeeded: run.successful_count, failed: run.failed_count })}
               </Typography>
             </CardContent>
           </Card>
@@ -262,13 +264,13 @@ const AnalysisDetailPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
-                Total RUM
+                {t('analysis.detail.totalRum')}
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_rum.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Resource Under Management
+                {t('analysis.detail.rumSubtitle')}
               </Typography>
             </CardContent>
           </Card>
@@ -278,13 +280,13 @@ const AnalysisDetailPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
-                Total Resources
+                {t('analysis.detail.totalResources')}
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {run.total_resources.toLocaleString()}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {run.total_managed.toLocaleString()} managed, {run.total_data_sources.toLocaleString()} data sources
+                {t('analysis.detail.resourcesSubtitle', { managed: run.total_managed.toLocaleString(), dataSources: run.total_data_sources.toLocaleString() })}
               </Typography>
             </CardContent>
           </Card>
@@ -294,13 +296,13 @@ const AnalysisDetailPage: React.FC = () => {
           <Card variant="outlined">
             <CardContent>
               <Typography variant="overline" color="text.secondary">
-                Success Rate
+                {t('analysis.detail.successRate')}
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: 600 }}>
                 {successRate}%
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Duration: {formatDuration(run.performance_ms)}
+                {t('analysis.detail.duration', { duration: formatDuration(run.performance_ms) })}
               </Typography>
             </CardContent>
           </Card>
@@ -314,9 +316,9 @@ const AnalysisDetailPage: React.FC = () => {
           onChange={(_, newValue) => setTabValue(newValue)}
           sx={{ px: 2, borderBottom: 1, borderColor: 'divider' }}
         >
-          <Tab label="Results" />
-          <Tab label="Resource Types" />
-          <Tab label="Providers" />
+          <Tab label={t('analysis.detail.tabResults')} />
+          <Tab label={t('analysis.detail.tabResourceTypes')} />
+          <Tab label={t('analysis.detail.tabProviders')} />
         </Tabs>
 
         <Box sx={{ p: 2 }}>
@@ -330,7 +332,7 @@ const AnalysisDetailPage: React.FC = () => {
               <>
                 <TextField
                   size="small"
-                  placeholder="Filter workspaces..."
+                  placeholder={t('analysis.detail.filterPlaceholder')}
                   value={resultsFilter}
                   onChange={(e) => { setResultsFilter(e.target.value); setResultsPage(0); }}
                   sx={{ mb: 2, width: 300 }}
@@ -344,11 +346,11 @@ const AnalysisDetailPage: React.FC = () => {
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell>Workspace Name</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell align="right">Resources</TableCell>
-                        <TableCell align="right">RUM</TableCell>
-                        <TableCell>Terraform Version</TableCell>
+                        <TableCell>{t('analysis.detail.thWorkspaceName')}</TableCell>
+                        <TableCell>{t('analysis.detail.thStatus')}</TableCell>
+                        <TableCell align="right">{t('analysis.detail.thResources')}</TableCell>
+                        <TableCell align="right">{t('analysis.detail.thRum')}</TableCell>
+                        <TableCell>{t('analysis.detail.thTerraformVersion')}</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -356,7 +358,7 @@ const AnalysisDetailPage: React.FC = () => {
                         <TableRow>
                           <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
                             <Typography variant="body2" color="text.secondary">
-                              {resultsFilter ? 'No workspaces match your filter.' : 'No results available yet.'}
+                              {resultsFilter ? t('analysis.detail.noMatch') : t('analysis.detail.noResults')}
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -423,7 +425,7 @@ const AnalysisDetailPage: React.FC = () => {
               <ProviderAnalysisTable providerAnalysis={aggregatedProviderAnalysis} />
             ) : (
               <Typography variant="body2" color="text.secondary">
-                No provider analysis data available.
+                {t('analysis.detail.noProviderData')}
               </Typography>
             )}
           </TabPanel>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -20,6 +21,7 @@ import SourceCard from '../../components/cards/SourceCard';
 import SourceConfigForm from '../../components/SourceConfigForm';
 
 const SourcesPage: React.FC = () => {
+  const { t } = useTranslation();
   const [sources, setSources] = useState<StateSource[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,12 +57,12 @@ const SourcesPage: React.FC = () => {
       const response = await api.get('/api/v1/sources');
       setSources(response.data.data || []);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load state sources';
+      const message = err instanceof Error ? err.message : t('sources.errLoad');
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     fetchSources();
@@ -92,22 +94,22 @@ const SourcesPage: React.FC = () => {
       try {
         if (data.id) {
           await api.put(`/api/v1/sources/${data.id}`, data);
-          showSnackbar('Source updated successfully', 'success');
+          showSnackbar(t('sources.updated'), 'success');
         } else {
           await api.post('/api/v1/sources', data);
-          showSnackbar('Source created successfully', 'success');
+          showSnackbar(t('sources.created'), 'success');
         }
         setFormDialogOpen(false);
         setEditingSource(undefined);
         fetchSources();
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to save source';
+        const message = err instanceof Error ? err.message : t('sources.errSave');
         showSnackbar(message, 'error');
       } finally {
         setActionLoading(false);
       }
     },
-    [fetchSources, showSnackbar]
+    [fetchSources, showSnackbar, t]
   );
 
   const handleDeleteConfirm = useCallback(async () => {
@@ -115,42 +117,42 @@ const SourcesPage: React.FC = () => {
     setActionLoading(true);
     try {
       await api.delete(`/api/v1/sources/${deletingSource.id}`);
-      showSnackbar('Source deleted successfully', 'success');
+      showSnackbar(t('sources.deleted'), 'success');
       setDeleteDialogOpen(false);
       setDeletingSource(null);
       fetchSources();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete source';
+      const message = err instanceof Error ? err.message : t('sources.errDelete');
       showSnackbar(message, 'error');
     } finally {
       setActionLoading(false);
     }
-  }, [deletingSource, fetchSources, showSnackbar]);
+  }, [deletingSource, fetchSources, showSnackbar, t]);
 
   const handleTestConnection = useCallback(
     async (source: StateSource) => {
-      showSnackbar(`Testing connection to "${source.name}"...`, 'info');
+      showSnackbar(t('sources.testing', { name: source.name }), 'info');
       try {
         const response = await api.post(`/api/v1/sources/${source.id}/test`);
         if (response.data.success) {
-          showSnackbar(`Connection test successful for ${response.data.source_type} source`, 'success');
+          showSnackbar(t('sources.testSuccess', { type: response.data.source_type }), 'success');
         } else {
-          showSnackbar(`Connection test failed: ${response.data.error || 'Unknown error'}`, 'error');
+          showSnackbar(t('sources.testFailedWithError', { error: response.data.error || t('sources.unknownError') }), 'error');
         }
         fetchSources();
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Connection test failed';
+        const message = err instanceof Error ? err.message : t('sources.testFailed');
         showSnackbar(message, 'error');
       }
     },
-    [fetchSources, showSnackbar]
+    [fetchSources, showSnackbar, t]
   );
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          State Sources
+          {t('sources.title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
@@ -159,10 +161,10 @@ const SourcesPage: React.FC = () => {
             onClick={fetchSources}
             disabled={loading}
           >
-            Refresh
+            {t('sources.refresh')}
           </Button>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick}>
-            Add Source
+            {t('sources.addSource')}
           </Button>
         </Box>
       </Box>
@@ -180,10 +182,10 @@ const SourcesPage: React.FC = () => {
       ) : sources.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 6 }}>
           <Typography variant="body1" color="text.secondary" gutterBottom>
-            No state sources configured yet.
+            {t('sources.empty')}
           </Typography>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleAddClick} sx={{ mt: 1 }}>
-            Add Your First Source
+            {t('sources.addFirst')}
           </Button>
         </Box>
       ) : (
@@ -208,7 +210,7 @@ const SourcesPage: React.FC = () => {
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle>{editingSource ? 'Edit State Source' : 'Add State Source'}</DialogTitle>
+        <DialogTitle>{editingSource ? t('sources.dialogTitleEdit') : t('sources.dialogTitleAdd')}</DialogTitle>
         <DialogContent>
           <SourceConfigForm
             source={editingSource}
@@ -231,11 +233,10 @@ const SourcesPage: React.FC = () => {
           setDeletingSource(null);
         }}
       >
-        <DialogTitle>Delete State Source</DialogTitle>
+        <DialogTitle>{t('sources.deleteTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete the source "{deletingSource?.name}"? This action cannot
-            be undone. All associated analysis data may be affected.
+            {t('sources.deleteConfirm', { name: deletingSource?.name ?? '' })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -246,7 +247,7 @@ const SourcesPage: React.FC = () => {
             }}
             disabled={actionLoading}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             onClick={handleDeleteConfirm}
@@ -254,7 +255,7 @@ const SourcesPage: React.FC = () => {
             variant="contained"
             disabled={actionLoading}
           >
-            {actionLoading ? <CircularProgress size={20} /> : 'Delete'}
+            {actionLoading ? <CircularProgress size={20} /> : t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

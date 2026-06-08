@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -48,6 +49,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 const AnalysisPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [runs, setRuns] = useState<AnalysisRun[]>([]);
   const [sources, setSources] = useState<StateSource[]>([]);
@@ -75,12 +77,12 @@ const AnalysisPage: React.FC = () => {
       setRuns(response.data.data || []);
       setTotal(response.data.total || 0);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load analysis runs';
+      const message = err instanceof Error ? err.message : t('analysis.errLoad');
       setError(message);
     } finally {
       setLoading(false);
     }
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, t]);
 
   const fetchSources = useCallback(async () => {
     try {
@@ -110,7 +112,7 @@ const AnalysisPage: React.FC = () => {
       setDialogOpen(false);
       try {
         const response = await api.post('/api/v1/analysis/run', { source_id: sourceId, trigger_type: 'manual' });
-        setSnackbar({ open: true, message: 'Analysis run started successfully', severity: 'success' });
+        setSnackbar({ open: true, message: t('analysis.runStarted'), severity: 'success' });
         const runId = response.data?.data?.id;
         if (runId) {
           navigate(`/analysis/${runId}`);
@@ -118,11 +120,11 @@ const AnalysisPage: React.FC = () => {
           fetchRuns();
         }
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Failed to start analysis run';
+        const message = err instanceof Error ? err.message : t('analysis.errStart');
         setSnackbar({ open: true, message, severity: 'error' });
       }
     },
-    [navigate, fetchRuns]
+    [navigate, fetchRuns, t]
   );
 
   const handleRowClick = useCallback(
@@ -143,21 +145,21 @@ const AnalysisPage: React.FC = () => {
     if (!deleteTarget) return;
     try {
       await api.delete(`/api/v1/analysis/runs/${deleteTarget.id}`);
-      setSnackbar({ open: true, message: 'Analysis run deleted', severity: 'success' });
+      setSnackbar({ open: true, message: t('analysis.runDeleted'), severity: 'success' });
       fetchRuns();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete analysis run';
+      const message = err instanceof Error ? err.message : t('analysis.errDelete');
       setSnackbar({ open: true, message, severity: 'error' });
     } finally {
       setDeleteTarget(null);
     }
-  }, [deleteTarget, fetchRuns]);
+  }, [deleteTarget, fetchRuns, t]);
 
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          Analysis Runs
+          {t('analysis.title')}
         </Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
@@ -166,14 +168,14 @@ const AnalysisPage: React.FC = () => {
             onClick={fetchRuns}
             disabled={loading}
           >
-            Refresh
+            {t('analysis.refresh')}
           </Button>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setDialogOpen(true)}
           >
-            New Analysis
+            {t('analysis.newAnalysis')}
           </Button>
         </Box>
       </Box>
@@ -194,15 +196,15 @@ const AnalysisPage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Source</TableCell>
-                  <TableCell align="right">Total Workspaces</TableCell>
-                  <TableCell align="right">RUM</TableCell>
-                  <TableCell align="right">Resources</TableCell>
-                  <TableCell>Duration</TableCell>
-                  <TableCell>Started</TableCell>
-                  <TableCell>Trigger</TableCell>
-                  <TableCell align="center">Actions</TableCell>
+                  <TableCell>{t('analysis.thStatus')}</TableCell>
+                  <TableCell>{t('analysis.thSource')}</TableCell>
+                  <TableCell align="right">{t('analysis.thTotalWorkspaces')}</TableCell>
+                  <TableCell align="right">{t('analysis.thRum')}</TableCell>
+                  <TableCell align="right">{t('analysis.thResources')}</TableCell>
+                  <TableCell>{t('analysis.thDuration')}</TableCell>
+                  <TableCell>{t('analysis.thStarted')}</TableCell>
+                  <TableCell>{t('analysis.thTrigger')}</TableCell>
+                  <TableCell align="center">{t('analysis.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -210,7 +212,7 @@ const AnalysisPage: React.FC = () => {
                   <TableRow>
                     <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                       <Typography variant="body2" color="text.secondary">
-                        No analysis runs found. Click "New Analysis" to start one.
+                        {t('analysis.empty')}
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -236,7 +238,7 @@ const AnalysisPage: React.FC = () => {
                       <TableCell>{run.trigger_type}</TableCell>
                       <TableCell align="center">
                         {run.status !== 'pending' && run.status !== 'running' && (
-                          <Tooltip title="Delete run">
+                          <Tooltip title={t('analysis.tooltipDelete')}>
                             <IconButton
                               size="small"
                               onClick={(e) => handleDeleteClick(e, run)}
@@ -277,16 +279,16 @@ const AnalysisPage: React.FC = () => {
       />
 
       <Dialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>Delete Analysis Run</DialogTitle>
+        <DialogTitle>{t('analysis.deleteTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            This will permanently delete this analysis run and all its results. This action cannot be undone.
+            {t('analysis.deleteConfirm')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>Cancel</Button>
+          <Button onClick={() => setDeleteTarget(null)}>{t('common.cancel')}</Button>
           <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>

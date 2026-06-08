@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Typography,
@@ -67,6 +68,7 @@ const statusColor = (status: string): 'success' | 'error' | 'warning' => {
 };
 
 const CompliancePage: React.FC = () => {
+  const { t } = useTranslation();
   const [tabIndex, setTabIndex] = useState(0);
 
   // Policies tab state
@@ -114,11 +116,11 @@ const CompliancePage: React.FC = () => {
       const d = response.data?.data;
       setPolicies(Array.isArray(d) ? d : []);
     } catch {
-      setPoliciesError('Failed to load compliance policies');
+      setPoliciesError(t('compliance.errLoadPolicies'));
     } finally {
       setPoliciesLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const fetchResults = useCallback(async () => {
     setResultsLoading(true);
@@ -132,11 +134,11 @@ const CompliancePage: React.FC = () => {
       const d = response.data?.data;
       setResults(Array.isArray(d) ? d : []);
     } catch {
-      setResultsError('Failed to load compliance results');
+      setResultsError(t('compliance.errLoadResults'));
     } finally {
       setResultsLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, t]);
 
   const fetchScore = useCallback(async () => {
     try {
@@ -200,9 +202,9 @@ const CompliancePage: React.FC = () => {
       setEditingPolicy(null);
       fetchPolicies();
     } catch {
-      setPoliciesError(editingPolicy ? 'Failed to update policy' : 'Failed to create policy');
+      setPoliciesError(editingPolicy ? t('compliance.errUpdatePolicy') : t('compliance.errCreatePolicy'));
     }
-  }, [policyForm, editingPolicy, fetchPolicies]);
+  }, [policyForm, editingPolicy, fetchPolicies, t]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deletingPolicy) return;
@@ -212,9 +214,9 @@ const CompliancePage: React.FC = () => {
       setDeletingPolicy(null);
       fetchPolicies();
     } catch {
-      setPoliciesError('Failed to delete policy');
+      setPoliciesError(t('compliance.errDeletePolicy'));
     }
-  }, [deletingPolicy, fetchPolicies]);
+  }, [deletingPolicy, fetchPolicies, t]);
 
   const isConfigValid = useCallback((configStr: string): boolean => {
     try {
@@ -228,12 +230,12 @@ const CompliancePage: React.FC = () => {
   return (
     <Box>
       <Typography variant="h4" sx={{ mb: 2 }}>
-        Compliance
+        {t('compliance.title')}
       </Typography>
 
       <Tabs value={tabIndex} onChange={(_e, v) => setTabIndex(v)} sx={{ mb: 1 }}>
-        <Tab label="Policies" />
-        <Tab label="Results" />
+        <Tab label={t('compliance.tabPolicies')} />
+        <Tab label={t('compliance.tabResults')} />
       </Tabs>
 
       {/* ---- Policies Tab ---- */}
@@ -246,7 +248,7 @@ const CompliancePage: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreatePolicy}>
-            Create Policy
+            {t('compliance.createPolicy')}
           </Button>
         </Box>
 
@@ -255,12 +257,12 @@ const CompliancePage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Severity</TableCell>
-                  <TableCell>Active</TableCell>
-                  <TableCell>Created</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell>{t('compliance.thName')}</TableCell>
+                  <TableCell>{t('compliance.thType')}</TableCell>
+                  <TableCell>{t('compliance.thSeverity')}</TableCell>
+                  <TableCell>{t('compliance.thActive')}</TableCell>
+                  <TableCell>{t('compliance.thCreated')}</TableCell>
+                  <TableCell align="right">{t('compliance.thActions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -273,7 +275,7 @@ const CompliancePage: React.FC = () => {
                 ) : policies.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No compliance policies configured.</Typography>
+                      <Typography color="text.secondary">{t('compliance.emptyPolicies')}</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -300,7 +302,7 @@ const CompliancePage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={policy.is_active ? 'Active' : 'Inactive'}
+                          label={policy.is_active ? t('compliance.active') : t('compliance.inactive')}
                           color={policy.is_active ? 'success' : 'default'}
                           size="small"
                           variant="outlined"
@@ -310,12 +312,12 @@ const CompliancePage: React.FC = () => {
                         {format(new Date(policy.created_at), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Edit">
+                        <Tooltip title={t('compliance.tooltipEdit')}>
                           <IconButton size="small" onClick={() => handleOpenEditPolicy(policy)}>
                             <EditIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
-                        <Tooltip title="Delete">
+                        <Tooltip title={t('compliance.tooltipDelete')}>
                           <IconButton
                             size="small"
                             color="error"
@@ -349,29 +351,29 @@ const CompliancePage: React.FC = () => {
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
-                title="Compliance Score"
+                title={t('compliance.scoreTitle')}
                 value={score.score_percent}
-                subtitle={`${score.total_checks} total checks`}
+                subtitle={t('compliance.scoreSubtitle', { count: score.total_checks })}
                 accentColor="#4caf50"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
-                title="Passed"
+                title={t('compliance.passed')}
                 value={score.pass_count}
                 accentColor="#4caf50"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
-                title="Failed"
+                title={t('compliance.failed')}
                 value={score.fail_count}
                 accentColor="#f44336"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <DashboardCard
-                title="Warnings"
+                title={t('compliance.warnings')}
                 value={score.warning_count}
                 accentColor="#ff9800"
               />
@@ -381,16 +383,16 @@ const CompliancePage: React.FC = () => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
           <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Status</InputLabel>
+            <InputLabel>{t('compliance.filterStatus')}</InputLabel>
             <Select
               value={statusFilter}
-              label="Status"
+              label={t('compliance.filterStatus')}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="pass">Pass</MenuItem>
-              <MenuItem value="fail">Fail</MenuItem>
-              <MenuItem value="warning">Warning</MenuItem>
+              <MenuItem value="all">{t('compliance.statusAll')}</MenuItem>
+              <MenuItem value="pass">{t('compliance.statusPass')}</MenuItem>
+              <MenuItem value="fail">{t('compliance.statusFail')}</MenuItem>
+              <MenuItem value="warning">{t('compliance.statusWarning')}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -400,11 +402,11 @@ const CompliancePage: React.FC = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Workspace</TableCell>
-                  <TableCell>Policy</TableCell>
-                  <TableCell>Status</TableCell>
-                  <TableCell>Violations</TableCell>
-                  <TableCell>Created</TableCell>
+                  <TableCell>{t('compliance.thWorkspace')}</TableCell>
+                  <TableCell>{t('compliance.thPolicy')}</TableCell>
+                  <TableCell>{t('compliance.thStatus')}</TableCell>
+                  <TableCell>{t('compliance.thViolations')}</TableCell>
+                  <TableCell>{t('compliance.thCreated')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -417,7 +419,7 @@ const CompliancePage: React.FC = () => {
                 ) : results.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
-                      <Typography color="text.secondary">No compliance results found.</Typography>
+                      <Typography color="text.secondary">{t('compliance.emptyResults')}</Typography>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -447,20 +449,20 @@ const CompliancePage: React.FC = () => {
 
       {/* ---- Create/Edit Policy Dialog ---- */}
       <Dialog open={policyDialogOpen} onClose={() => setPolicyDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingPolicy ? 'Edit Compliance Policy' : 'Create Compliance Policy'}</DialogTitle>
+        <DialogTitle>{editingPolicy ? t('compliance.dialogTitleEdit') : t('compliance.dialogTitleCreate')}</DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
-            label="Name"
+            label={t('compliance.labelName')}
             value={policyForm.name}
             onChange={(e) => setPolicyForm({ ...policyForm, name: e.target.value })}
             sx={{ mt: 1, mb: 2 }}
           />
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Policy Type</InputLabel>
+            <InputLabel>{t('compliance.labelPolicyType')}</InputLabel>
             <Select
               value={policyForm.policy_type}
-              label="Policy Type"
+              label={t('compliance.labelPolicyType')}
               onChange={(e) =>
                 setPolicyForm({ ...policyForm, policy_type: e.target.value as CompliancePolicy['policy_type'] })
               }
@@ -473,10 +475,10 @@ const CompliancePage: React.FC = () => {
             </Select>
           </FormControl>
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Severity</InputLabel>
+            <InputLabel>{t('compliance.labelSeverity')}</InputLabel>
             <Select
               value={policyForm.severity}
-              label="Severity"
+              label={t('compliance.labelSeverity')}
               onChange={(e) =>
                 setPolicyForm({ ...policyForm, severity: e.target.value as CompliancePolicy['severity'] })
               }
@@ -490,13 +492,13 @@ const CompliancePage: React.FC = () => {
           </FormControl>
           <TextField
             fullWidth
-            label="Config (JSON)"
+            label={t('compliance.labelConfig')}
             value={policyForm.config}
             onChange={(e) => setPolicyForm({ ...policyForm, config: e.target.value })}
             multiline
             rows={4}
             error={!isConfigValid(policyForm.config)}
-            helperText={!isConfigValid(policyForm.config) ? 'Invalid JSON' : ''}
+            helperText={!isConfigValid(policyForm.config) ? t('compliance.invalidJson') : ''}
             sx={{ mb: 2 }}
           />
           <FormControlLabel
@@ -506,34 +508,33 @@ const CompliancePage: React.FC = () => {
                 onChange={(e) => setPolicyForm({ ...policyForm, is_active: e.target.checked })}
               />
             }
-            label="Active"
+            label={t('compliance.active')}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPolicyDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setPolicyDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             onClick={handlePolicySubmit}
             disabled={!policyForm.name || !isConfigValid(policyForm.config)}
           >
-            {editingPolicy ? 'Update' : 'Create'}
+            {editingPolicy ? t('compliance.update') : t('compliance.create')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* ---- Delete Confirmation Dialog ---- */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Delete Compliance Policy</DialogTitle>
+        <DialogTitle>{t('compliance.deleteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete policy <strong>{deletingPolicy?.name}</strong>? This action
-            cannot be undone.
+            {t('compliance.deleteConfirm', { name: deletingPolicy?.name ?? '' })}
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button variant="contained" color="error" onClick={handleDeleteConfirm}>
-            Delete
+            {t('common.delete')}
           </Button>
         </DialogActions>
       </Dialog>
