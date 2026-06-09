@@ -31,6 +31,7 @@ import DescriptionIcon from '@mui/icons-material/Description'
 import { useTranslation } from 'react-i18next'
 import { api, type DriftRun, type PipelineConnection } from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
+import PageHeader from '../components/PageHeader'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -103,27 +104,27 @@ export default function DriftPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-          {t('nav.drift')}
-        </Typography>
-        <Button variant="outlined" startIcon={<DescriptionIcon />} sx={{ mr: 1 }} onClick={() => setWorkflowOpen(true)}>
-          {t('actions.workflowTemplate')}
-        </Button>
-        {canRun && (
-          <Button
-            variant="contained"
-            startIcon={<PlayArrowIcon />}
-            disabled={!pipelinesQuery.data?.length}
-            onClick={() => setNewRunOpen(true)}
-          >
-            {t('actions.newDriftRun')}
-          </Button>
-        )}
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        {t('help.pages.drift.body')}
-      </Typography>
+      <PageHeader
+        title={t('nav.drift')}
+        description={t('help.pages.drift.body')}
+        actions={
+          <Stack direction="row" spacing={1}>
+            <Button variant="outlined" startIcon={<DescriptionIcon />} onClick={() => setWorkflowOpen(true)}>
+              {t('actions.workflowTemplate')}
+            </Button>
+            {canRun && (
+              <Button
+                variant="contained"
+                startIcon={<PlayArrowIcon />}
+                disabled={!pipelinesQuery.data?.length}
+                onClick={() => setNewRunOpen(true)}
+              >
+                {t('actions.newDriftRun')}
+              </Button>
+            )}
+          </Stack>
+        }
+      />
 
       {/* Pipeline connections */}
       <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>

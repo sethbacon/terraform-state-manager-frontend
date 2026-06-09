@@ -18,9 +18,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import AssessmentIcon from '@mui/icons-material/Assessment'
 import DownloadIcon from '@mui/icons-material/Download'
 import { useTranslation } from 'react-i18next'
+import PageHeader from '../components/PageHeader'
 import { api, type ReportFormat } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
@@ -75,15 +75,7 @@ export default function ReportsPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <AssessmentIcon sx={{ mr: 1 }} />
-        <Typography variant="h4" component="h1">
-          {t('nav.reports')}
-        </Typography>
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        {t('help.pages.reports.body')}
-      </Typography>
+      <PageHeader title={t('nav.reports')} description={t('help.pages.reports.body')} />
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3, maxWidth: 760 }}>
         <TextField select label={t('pages.reports.source')} value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>

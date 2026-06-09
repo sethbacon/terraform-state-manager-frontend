@@ -44,6 +44,7 @@ import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
+import PageHeader from '../components/PageHeader'
 
 function errMsg(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -88,26 +89,25 @@ export default function SourcesPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-          {t('nav.sources')}
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<UploadFileIcon />}
-          sx={{ mr: 1 }}
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {t('pages.sources.uploadAnalyze')}
-        </Button>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
-          {t('actions.addSource')}
-        </Button>
-        <input ref={fileInputRef} type="file" accept=".tfstate,application/json" hidden onChange={handleFile} />
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 720 }}>
-        {t('help.pages.sources.body')}
-      </Typography>
+      <PageHeader
+        title={t('nav.sources')}
+        description={t('help.pages.sources.body')}
+        actions={
+          <Stack direction="row" spacing={1}>
+            <Button
+              variant="outlined"
+              startIcon={<UploadFileIcon />}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {t('pages.sources.uploadAnalyze')}
+            </Button>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
+              {t('actions.addSource')}
+            </Button>
+          </Stack>
+        }
+      />
+      <input ref={fileInputRef} type="file" accept=".tfstate,application/json" hidden onChange={handleFile} />
 
       {uploadError && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setUploadError(null)}>

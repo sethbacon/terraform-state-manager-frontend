@@ -14,6 +14,7 @@ import {
 } from '@mui/material'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
+import PageHeader from '../components/PageHeader'
 import { api, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -84,15 +85,7 @@ export default function TransferPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <SwapHorizIcon sx={{ mr: 1 }} />
-        <Typography variant="h4" component="h1">
-          {t('nav.transfer')}
-        </Typography>
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        {t('help.pages.transfer.body')}
-      </Typography>
+      <PageHeader title={t('nav.transfer')} description={t('help.pages.transfer.body')} />
 
       {!canTransfer && (
         <Alert severity="warning" sx={{ mb: 3 }}>

@@ -16,6 +16,10 @@ function initialMode(): ThemeMode {
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
+function prefersReducedMotion(): boolean {
+  return window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
+}
+
 /**
  * AppThemeProvider holds the light/dark preference (persisted to localStorage) and
  * installs the MUI theme + CssBaseline. Mirrors the registry frontend's ThemeContext.
@@ -30,7 +34,8 @@ export function AppThemeProvider({ children }: { children: ReactNode }) {
       return next
     })
 
-  const theme = useMemo(() => createAppTheme(mode), [mode])
+  const reducedMotion = useMemo(prefersReducedMotion, [])
+  const theme = useMemo(() => createAppTheme(mode, reducedMotion), [mode, reducedMotion])
   const value = useMemo(() => ({ mode, toggle }), [mode])
 
   return (

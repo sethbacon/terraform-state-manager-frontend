@@ -27,6 +27,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import ScienceIcon from '@mui/icons-material/Science'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { useTranslation } from 'react-i18next'
+import PageHeader from '../components/PageHeader'
 import { api, type HealthRun, type PipelineConnection } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -79,27 +80,27 @@ export default function VersionLabPage() {
 
   return (
     <Box>
-      <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
-          {t('nav.versionLab')}
-        </Typography>
-        <Button variant="outlined" startIcon={<DescriptionIcon />} sx={{ mr: 1 }} onClick={() => setWorkflowOpen(true)}>
-          {t('actions.workflowTemplate')}
-        </Button>
-        {canRun && (
-          <Button
-            variant="contained"
-            startIcon={<ScienceIcon />}
-            disabled={!pipelinesQuery.data?.length}
-            onClick={() => setNewRunOpen(true)}
-          >
-            {t('actions.newHealthRun')}
-          </Button>
-        )}
-      </Stack>
-      <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        {t('help.pages.versionLab.body')}
-      </Typography>
+      <PageHeader
+        title={t('nav.versionLab')}
+        description={t('help.pages.versionLab.body')}
+        actions={
+          <Stack direction="row" spacing={1}>
+            <Button variant="outlined" startIcon={<DescriptionIcon />} onClick={() => setWorkflowOpen(true)}>
+              {t('actions.workflowTemplate')}
+            </Button>
+            {canRun && (
+              <Button
+                variant="contained"
+                startIcon={<ScienceIcon />}
+                disabled={!pipelinesQuery.data?.length}
+                onClick={() => setNewRunOpen(true)}
+              >
+                {t('actions.newHealthRun')}
+              </Button>
+            )}
+          </Stack>
+        }
+      />
 
       {pipelinesQuery.data && pipelinesQuery.data.length === 0 && (
         <Alert severity="info" sx={{ mb: 3 }}>
