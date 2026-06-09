@@ -25,6 +25,7 @@ export interface AuthContextType {
   isLoading: boolean
   login: (provider?: string) => void
   devLogin: () => Promise<void>
+  ldapLogin: (username: string, password: string) => Promise<void>
   logout: () => void
   hasScope: (scope: string) => boolean
 }

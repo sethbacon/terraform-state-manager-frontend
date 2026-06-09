@@ -27,6 +27,7 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage')
 const UsersPage = lazy(() => import('./pages/admin/UsersPage'))
 const OrganizationsPage = lazy(() => import('./pages/admin/OrganizationsPage'))
 const RolesPage = lazy(() => import('./pages/admin/RolesPage'))
+const SSOPage = lazy(() => import('./pages/admin/SSOPage'))
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
 
 // Routes backed by a real page (home is mounted separately at '/').
@@ -41,6 +42,7 @@ const realPages: Record<string, ReactNode> = {
   '/admin/users': <UsersPage />,
   '/admin/organizations': <OrganizationsPage />,
   '/admin/roles': <RolesPage />,
+  '/admin/sso': <SSOPage />,
   '/admin/audit-logs': <AuditLogPage />,
 }
 

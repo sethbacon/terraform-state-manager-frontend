@@ -1,9 +1,20 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
-import { Box, Button, Card, CardContent, CircularProgress, Divider, Stack, Typography } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Divider,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
 import { useTranslation } from 'react-i18next'
-import { api } from '../services/api'
+import { api, type AuthProvider } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
 function Centered({ children }: { children: ReactNode }) {
@@ -16,10 +27,16 @@ function Centered({ children }: { children: ReactNode }) {
 
 export default function LoginPage() {
   const { t } = useTranslation()
-  const { isAuthenticated, isLoading, login, devLogin } = useAuth()
-  const [providers, setProviders] = useState<{ type: string; name: string }[]>([])
+  const { isAuthenticated, isLoading, login, devLogin, ldapLogin } = useAuth()
+  const [providers, setProviders] = useState<AuthProvider[]>([])
   const [devMode, setDevMode] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  // LDAP form state.
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [ldapBusy, setLdapBusy] = useState(false)
 
   useEffect(() => {
     api
@@ -42,6 +59,23 @@ export default function LoginPage() {
     return <Navigate to="/" replace />
   }
 
+  // SAML requests a specific IdP via provider=saml:<id>; OIDC uses its type.
+  const ssoProviders = providers.filter((p) => p.type !== 'ldap')
+  const hasLdap = providers.some((p) => p.type === 'ldap')
+
+  const handleLdapSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError(null)
+    setLdapBusy(true)
+    try {
+      await ldapLogin(username, password)
+    } catch {
+      setError(t('pages.login.ldapError'))
+    } finally {
+      setLdapBusy(false)
+    }
+  }
+
   return (
     <Centered>
       <Card sx={{ width: 380, maxWidth: '90vw' }}>
@@ -53,16 +87,61 @@ export default function LoginPage() {
             {t('pages.login.subtitle')}
           </Typography>
           <Stack spacing={1.5}>
-            {providers.map((p) => (
-              <Button key={p.type} variant="contained" startIcon={<LoginIcon />} onClick={() => login(p.type)}>
+            {error && (
+              <Alert severity="error" onClose={() => setError(null)}>
+                {error}
+              </Alert>
+            )}
+
+            {ssoProviders.map((p) => (
+              <Button
+                key={p.id ?? p.type}
+                variant="contained"
+                startIcon={<LoginIcon />}
+                onClick={() => login(p.type === 'saml' && p.id ? `saml:${p.id}` : p.type)}
+              >
                 {t('pages.login.signInWith', { provider: p.name })}
               </Button>
             ))}
+
+            {hasLdap && (
+              <>
+                {ssoProviders.length > 0 && <Divider>{t('pages.login.or')}</Divider>}
+                <Box component="form" onSubmit={handleLdapSubmit}>
+                  <Stack spacing={1.5}>
+                    <TextField
+                      label={t('pages.login.username')}
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                      fullWidth
+                      size="small"
+                      autoComplete="username"
+                    />
+                    <TextField
+                      label={t('pages.login.password')}
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      fullWidth
+                      size="small"
+                      autoComplete="current-password"
+                    />
+                    <Button type="submit" variant="contained" disabled={ldapBusy || !username || !password}>
+                      {ldapBusy ? <CircularProgress size={22} /> : t('pages.login.signIn')}
+                    </Button>
+                  </Stack>
+                </Box>
+              </>
+            )}
+
             {providers.length === 0 && !devMode && (
               <Typography color="text.secondary" align="center">
                 {t('pages.login.noProviders')}
               </Typography>
             )}
+
             {devMode && (
               <>
                 <Divider>dev</Divider>

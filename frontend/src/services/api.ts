@@ -55,9 +55,70 @@ export interface HealthInfo {
   status: string
 }
 
+export interface AuthProvider {
+  type: string
+  name: string
+  /** Present for SAML: the IdP name, used to request that specific IdP. */
+  id?: string
+}
+
 export interface ProvidersInfo {
-  providers: { type: string; name: string }[]
+  providers: AuthProvider[]
   dev_mode: boolean
+}
+
+export interface SSOGroupMapping {
+  group: string
+  organization: string
+  role: string
+}
+
+export interface SSOLdapMapping {
+  group_dn: string
+  organization: string
+  role: string
+}
+
+export interface SSOMtlsMapping {
+  subject: string
+  scopes: string[]
+}
+
+export interface SSOConfig {
+  oidc: {
+    enabled: boolean
+    issuer_url: string
+    group_claim_name: string
+    default_role: string
+    group_mappings: SSOGroupMapping[]
+  }
+  saml: {
+    enabled: boolean
+    entity_id: string
+    acs_url: string
+    allow_idp_initiated: boolean
+    group_attribute_name: string
+    default_role: string
+    idps: string[]
+    group_mappings: SSOGroupMapping[]
+  }
+  ldap: {
+    enabled: boolean
+    host: string
+    use_tls: boolean
+    start_tls: boolean
+    base_dn: string
+    default_role: string
+    group_mappings: SSOLdapMapping[]
+  }
+  mtls: {
+    enabled: boolean
+    client_ca_file: string
+    mappings: SSOMtlsMapping[]
+  }
+  scim: {
+    enabled: boolean
+  }
 }
 
 export interface Count {
@@ -296,6 +357,8 @@ export const api = {
     (await apiClient.get<{ roles: RoleTemplate[] }>('/api/v1/admin/roles')).data.roles,
   listAuditLogs: async (): Promise<AuditLogEntry[]> =>
     (await apiClient.get<{ logs: AuditLogEntry[] }>('/api/v1/admin/audit-logs')).data.logs,
+  getSSOConfig: async (): Promise<SSOConfig> =>
+    (await apiClient.get<SSOConfig>('/api/v1/admin/sso')).data,
 
   // Auth
   getProviders: async (): Promise<ProvidersInfo> => (await apiClient.get<ProvidersInfo>('/api/v1/auth/providers')).data,
@@ -304,6 +367,9 @@ export const api = {
     (await apiClient.post<{ expires_in: number }>('/api/v1/auth/refresh')).data,
   devLogin: async (): Promise<{ expires_in: number }> =>
     (await apiClient.post<{ expires_in: number }>('/api/v1/dev/login')).data,
+  // LDAP search-bind login; sets the HttpOnly session cookie like the OIDC flow.
+  ldapLogin: async (username: string, password: string): Promise<{ expires_in: number }> =>
+    (await apiClient.post<{ expires_in: number }>('/api/v1/auth/ldap/login', { username, password })).data,
   // Full-page redirects (OAuth + logout leave the SPA).
   login: (provider = 'oidc'): void => {
     window.location.href = `/api/v1/auth/login?provider=${encodeURIComponent(provider)}`

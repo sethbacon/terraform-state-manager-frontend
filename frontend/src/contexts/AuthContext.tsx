@@ -50,6 +50,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadUser()
   }, [loadUser])
 
+  const ldapLogin = useCallback(
+    async (username: string, password: string) => {
+      // Like devLogin, the LDAP login sets the cookie; resolve the user from it.
+      await api.ldapLogin(username, password)
+      await loadUser()
+    },
+    [loadUser],
+  )
+
   const logout = useCallback(() => {
     setUser(null)
     setAllowedScopes([])
@@ -66,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading,
     login,
     devLogin,
+    ldapLogin,
     logout,
     hasScope,
   }

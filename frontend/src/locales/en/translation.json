@@ -32,6 +32,8 @@
       "organizationsTooltip": "Organizations and IdP bindings",
       "roles": "Roles",
       "rolesTooltip": "Role templates and scopes",
+      "sso": "SSO",
+      "ssoTooltip": "Single sign-on providers and mappings",
       "auditLogs": "Audit Log",
       "auditLogsTooltip": "Security and activity audit trail"
     }
@@ -210,7 +212,41 @@
       "signInWith": "Sign in with {{provider}}",
       "devLogin": "Dev Login (Admin)",
       "subtitle": "Sign in to manage your Terraform state.",
-      "noProviders": "No login providers are configured."
+      "noProviders": "No login providers are configured.",
+      "or": "or",
+      "username": "Username",
+      "password": "Password",
+      "ldapError": "Invalid username or password."
+    },
+    "sso": {
+      "title": "SSO / Identity",
+      "description": "Read-only view of the configured single sign-on and provisioning. Edit these in the server configuration file.",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIM provisioning",
+      "scimNote": "When enabled, /scim/v2 accepts SCIM 2.0 user and group provisioning from a bearer-token client holding the scim:provision scope.",
+      "group": "Group",
+      "groupDn": "Group DN",
+      "organization": "Organization",
+      "role": "Role",
+      "subject": "Certificate subject",
+      "scopes": "Scopes",
+      "idps": "Identity providers",
+      "idpInitiated": "IdP-initiated SSO",
+      "issuer": "Issuer URL",
+      "groupClaim": "Group claim",
+      "groupAttribute": "Group attribute",
+      "entityId": "Entity ID",
+      "acsUrl": "ACS URL",
+      "host": "Host",
+      "baseDn": "Base DN",
+      "caFile": "Client CA file",
+      "defaultRole": "Default role",
+      "noMappings": "No group mappings configured."
     }
   },
   "commandPalette": {
