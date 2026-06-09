@@ -67,11 +67,23 @@
   },
   "about": {
     "title": "About",
-    "version": "Version",
-    "buildDate": "Build date",
     "description": "A web application to analyze, safely edit, and move Terraform state across existing backends — with CI-driven drift detection and version testing.",
-    "viewProject": "View project",
-    "backendVersion": "Backend version"
+    "versionsHeading": "Versions",
+    "frontend": "Frontend {{version}}",
+    "backend": "Backend {{version}}",
+    "backendUnavailable": "Backend unavailable",
+    "built": "Built {{date}}",
+    "licenseHeading": "License",
+    "licenseText": "Licensed under the",
+    "apache": "Apache License 2.0",
+    "sourceHeading": "Source",
+    "repoBackend": "Backend repository",
+    "repoFrontend": "Frontend repository",
+    "close": "Close"
+  },
+  "auth": {
+    "account": "Account",
+    "signOut": "Sign out"
   },
   "help": {
     "title": "Help",
@@ -118,12 +130,14 @@
   "a11y": {
     "skipToContent": "Skip to main content",
     "openNavigation": "Open navigation",
-    "closeNavigation": "Close navigation"
+    "closeNavigation": "Close navigation",
+    "navigatedTo": "Navigated to {{title}}"
   },
-  "error": {
-    "boundaryTitle": "Something went wrong",
-    "boundaryBody": "An unexpected error occurred while rendering this page.",
-    "reload": "Reload page"
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred while rendering this page.",
+    "tryAgain": "Try again",
+    "reloadPage": "Reload page"
   },
   "empty": {
     "default": "Nothing here yet."

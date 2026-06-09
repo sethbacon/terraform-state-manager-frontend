@@ -8,49 +8,52 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 export interface NavItem {
   path: string
-  label: string
+  /** i18n key for the label. */
+  labelKey: string
+  /** i18n key for the sidebar tooltip (optional). */
+  tooltipKey?: string
   icon: ReactNode
-  /** Roadmap phase the page is delivered in (shown on placeholder pages). */
-  phase?: string
-  description?: string
+  /** Scope required to see this item; null = always visible to authenticated users. */
+  scope: string | null
 }
 
-// Single source of truth for the sidebar and the route table (see App.tsx).
-export const navItems: NavItem[] = [
-  { path: '/', label: 'Dashboard', icon: <DashboardIcon /> },
+export interface NavGroup {
+  key: string
+  /** i18n key for the collapsible group header. */
+  labelKey: string
+  items: NavItem[]
+}
+
+// Home is shown standalone at the top, above the grouped sections.
+export const homeItem: NavItem = {
+  path: '/',
+  labelKey: 'nav.dashboard',
+  tooltipKey: 'nav.dashboardTooltip',
+  icon: <DashboardIcon />,
+  scope: null,
+}
+
+// Collapsible, scope-filtered nav groups. The Administration group is populated
+// in Phase D (identity management); until then it has no items and is not shown.
+export const navGroups: NavGroup[] = [
   {
-    path: '/sources',
-    label: 'Sources',
-    icon: <StorageIcon />,
-    phase: 'Phase 1',
-    description: 'Connect to existing state backends (HCP/TFC, Azure Blob, S3, GCS, local, Git) and browse their state.',
+    key: 'main',
+    labelKey: 'nav.groups.main',
+    items: [
+      { path: '/sources', labelKey: 'nav.sources', tooltipKey: 'nav.sourcesTooltip', icon: <StorageIcon />, scope: 'state:read' },
+      { path: '/drift', labelKey: 'nav.drift', tooltipKey: 'nav.driftTooltip', icon: <CompareArrowsIcon />, scope: 'state:read' },
+      { path: '/version-lab', labelKey: 'nav.versionLab', tooltipKey: 'nav.versionLabTooltip', icon: <ScienceIcon />, scope: 'state:read' },
+      { path: '/reports', labelKey: 'nav.reports', tooltipKey: 'nav.reportsTooltip', icon: <AssessmentIcon />, scope: 'state:read' },
+      { path: '/transfer', labelKey: 'nav.transfer', tooltipKey: 'nav.transferTooltip', icon: <SwapHorizIcon />, scope: 'state:transfer' },
+    ],
   },
   {
-    path: '/drift',
-    label: 'Drift',
-    icon: <CompareArrowsIcon />,
-    phase: 'Phase 3',
-    description: 'Compare state ↔ code ↔ live infrastructure via CI pipelines and diagnose drift.',
-  },
-  {
-    path: '/version-lab',
-    label: 'Version Lab',
-    icon: <ScienceIcon />,
-    phase: 'Phase 4',
-    description: 'Test plan health against specific Terraform, provider, and module versions.',
-  },
-  {
-    path: '/reports',
-    label: 'Reports',
-    icon: <AssessmentIcon />,
-    phase: 'Phase 1',
-    description: 'Generate and download Markdown / JSON / CSV analyzer reports.',
-  },
-  {
-    path: '/transfer',
-    label: 'Transfer',
-    icon: <SwapHorizIcon />,
-    phase: 'Phase 2',
-    description: 'Back up or migrate Terraform state between backends with verification.',
+    key: 'administration',
+    labelKey: 'nav.groups.administration',
+    items: [],
   },
 ]
+
+// Flattened list of every routable nav item (home + all group items) for the
+// route table in App.tsx.
+export const allNavItems: NavItem[] = [homeItem, ...navGroups.flatMap((g) => g.items)]

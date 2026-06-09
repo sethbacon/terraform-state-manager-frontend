@@ -3,13 +3,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { AnnouncerProvider } from './contexts/AnnouncerContext'
+import { HelpProvider } from './contexts/HelpContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
+import ErrorBoundary from './components/ErrorBoundary'
+import RouteFocusManager from './components/RouteFocusManager'
 import PlaceholderPage from './components/PlaceholderPage'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import CallbackPage from './pages/CallbackPage'
-import { navItems } from './navigation'
+import { allNavItems } from './navigation'
 
 // Heavy domain pages are code-split (lazy) to keep the initial bundle small;
 // a Suspense boundary lives around the Layout's Outlet.
@@ -19,7 +23,7 @@ const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const TransferPage = lazy(() => import('./pages/TransferPage'))
 
-// Routes backed by a real page (others render a roadmap placeholder).
+// Routes backed by a real page (home is mounted separately at '/').
 const realPages: Record<string, ReactNode> = {
   '/sources': <SourcesPage />,
   '/drift': <DriftPage />,
@@ -38,40 +42,44 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppThemeProvider>
-        <AuthProvider>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/auth/callback" element={<CallbackPage />} />
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <Layout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route path="/" element={<DashboardPage />} />
-                {navItems
-                  .filter((item) => item.path !== '/')
-                  .map((item) => (
+        <AnnouncerProvider>
+          <AuthProvider>
+            <HelpProvider>
+              <BrowserRouter>
+                <RouteFocusManager />
+                <ErrorBoundary>
+                  <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/auth/callback" element={<CallbackPage />} />
                     <Route
-                      key={item.path}
-                      path={item.path}
                       element={
-                        realPages[item.path] ?? (
-                          <PlaceholderPage title={item.label} phase={item.phase} description={item.description} />
-                        )
+                        <ProtectedRoute>
+                          <Layout />
+                        </ProtectedRoute>
                       }
-                    />
-                  ))}
-                <Route
-                  path="*"
-                  element={<PlaceholderPage title="Page not found" description="The page you requested does not exist." />}
-                />
-              </Route>
-            </Routes>
-          </BrowserRouter>
-        </AuthProvider>
+                    >
+                      <Route path="/" element={<DashboardPage />} />
+                      {allNavItems
+                        .filter((item) => item.path !== '/' && realPages[item.path])
+                        .map((item) => (
+                          <Route key={item.path} path={item.path} element={realPages[item.path]} />
+                        ))}
+                      <Route
+                        path="*"
+                        element={
+                          <PlaceholderPage
+                            title="Page not found"
+                            description="The page you requested does not exist."
+                          />
+                        }
+                      />
+                    </Route>
+                  </Routes>
+                </ErrorBoundary>
+              </BrowserRouter>
+            </HelpProvider>
+          </AuthProvider>
+        </AnnouncerProvider>
       </AppThemeProvider>
     </QueryClientProvider>
   )
