@@ -13,6 +13,7 @@ import BusinessIcon from '@mui/icons-material/Business'
 import BadgeIcon from '@mui/icons-material/Badge'
 import HistoryIcon from '@mui/icons-material/History'
 import VpnKeyIcon from '@mui/icons-material/VpnKey'
+import NotificationsIcon from '@mui/icons-material/Notifications'
 
 export interface NavItem {
   path: string
@@ -65,6 +66,7 @@ export const navGroups: NavGroup[] = [
       { path: '/admin/organizations', labelKey: 'nav.admin.organizations', tooltipKey: 'nav.admin.organizationsTooltip', icon: <BusinessIcon />, scope: 'admin' },
       { path: '/admin/roles', labelKey: 'nav.admin.roles', tooltipKey: 'nav.admin.rolesTooltip', icon: <BadgeIcon />, scope: 'admin' },
       { path: '/admin/sso', labelKey: 'nav.admin.sso', tooltipKey: 'nav.admin.ssoTooltip', icon: <VpnKeyIcon />, scope: 'admin' },
+      { path: '/admin/notifications', labelKey: 'nav.admin.notifications', tooltipKey: 'nav.admin.notificationsTooltip', icon: <NotificationsIcon />, scope: 'admin' },
       { path: '/admin/audit-logs', labelKey: 'nav.admin.auditLogs', tooltipKey: 'nav.admin.auditLogsTooltip', icon: <HistoryIcon />, scope: 'admin' },
     ],
   },

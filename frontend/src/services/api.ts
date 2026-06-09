@@ -344,6 +344,28 @@ export interface ScheduleInput {
   enabled: boolean
 }
 
+export interface NotificationChannel {
+  id: string
+  name: string
+  type: string
+  has_target: boolean
+  events: string[]
+  enabled: boolean
+  last_status: string | null
+  last_error: string | null
+  last_sent_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface NotificationChannelInput {
+  name: string
+  type: string
+  target?: string
+  events: string[]
+  enabled: boolean
+}
+
 export interface HealthRun {
   id: string
   pipeline_connection_id: string | null
@@ -540,6 +562,19 @@ export const api = {
   },
   runSchedule: async (id: string): Promise<Schedule> =>
     (await apiClient.post<Schedule>(`/api/v1/schedules/${id}/run`)).data,
+
+  // Notification channels (admin)
+  listNotificationChannels: async (): Promise<NotificationChannel[]> =>
+    (await apiClient.get<{ channels: NotificationChannel[] }>('/api/v1/notifications/channels')).data.channels,
+  createNotificationChannel: async (input: NotificationChannelInput): Promise<NotificationChannel> =>
+    (await apiClient.post<NotificationChannel>('/api/v1/notifications/channels', input)).data,
+  updateNotificationChannel: async (id: string, input: NotificationChannelInput): Promise<NotificationChannel> =>
+    (await apiClient.put<NotificationChannel>(`/api/v1/notifications/channels/${id}`, input)).data,
+  deleteNotificationChannel: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/notifications/channels/${id}`)
+  },
+  testNotificationChannel: async (id: string): Promise<{ status: string }> =>
+    (await apiClient.post<{ status: string }>(`/api/v1/notifications/channels/${id}/test`)).data,
   getDriftWorkflow: async (provider: string): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/drift/workflow', {

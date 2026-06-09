@@ -15,6 +15,7 @@ export const queryKeys = {
     roles: () => ['admin', 'roles'] as const,
     auditLogs: () => ['admin', 'audit-logs'] as const,
     sso: () => ['admin', 'sso'] as const,
+    notifications: () => ['admin', 'notifications'] as const,
   },
   sources: {
     all: ['sources'] as const,

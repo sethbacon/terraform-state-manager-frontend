@@ -36,6 +36,8 @@
       "rolesTooltip": "Role templates and scopes",
       "sso": "SSO",
       "ssoTooltip": "Single sign-on providers and mappings",
+      "notifications": "Notifications",
+      "notificationsTooltip": "Alert channels for drift and run failures",
       "auditLogs": "Audit Log",
       "auditLogsTooltip": "Security and activity audit trail"
     }
@@ -218,6 +220,31 @@
       "noSchedules": "No schedules yet. Add one to run drift checks automatically.",
       "deleteTitle": "Delete schedule",
       "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Send alerts to a webhook or Slack when a drift run detects drift or fails. Destination URLs are stored encrypted and never shown again.",
+      "add": "Add channel",
+      "edit": "Edit channel",
+      "noChannels": "No notification channels yet. Add one to receive drift alerts.",
+      "events": "Events",
+      "allEvents": "All events",
+      "target": "Destination URL",
+      "targetHelp": "The webhook or Slack incoming-webhook URL to POST to.",
+      "targetKeep": "Leave blank to keep the current URL.",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "eventsHelp": "Leave both unchecked to receive every event.",
+      "test": "Send test",
+      "testSent": "Test notification sent.",
+      "lastDelivery": "Last delivery",
+      "neverSent": "Never sent",
+      "deleteTitle": "Delete channel",
+      "deleteConfirm": "Delete the channel \"{{name}}\"?",
+      "event": {
+        "drift_detected": "Drift detected",
+        "run_failed": "Run failed"
+      }
     },
     "reports": {
       "source": "Source",
