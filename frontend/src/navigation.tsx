@@ -5,6 +5,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows'
 import ScienceIcon from '@mui/icons-material/Science'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import ScheduleIcon from '@mui/icons-material/Schedule'
 import ApiIcon from '@mui/icons-material/Api'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 import PeopleIcon from '@mui/icons-material/People'
@@ -50,6 +51,7 @@ export const navGroups: NavGroup[] = [
       { path: '/sources', labelKey: 'nav.sources', tooltipKey: 'nav.sourcesTooltip', icon: <StorageIcon />, scope: 'state:read' },
       { path: '/drift', labelKey: 'nav.drift', tooltipKey: 'nav.driftTooltip', icon: <CompareArrowsIcon />, scope: 'state:read' },
       { path: '/version-lab', labelKey: 'nav.versionLab', tooltipKey: 'nav.versionLabTooltip', icon: <ScienceIcon />, scope: 'state:read' },
+      { path: '/schedules', labelKey: 'nav.schedules', tooltipKey: 'nav.schedulesTooltip', icon: <ScheduleIcon />, scope: 'sources:manage' },
       { path: '/reports', labelKey: 'nav.reports', tooltipKey: 'nav.reportsTooltip', icon: <AssessmentIcon />, scope: 'state:read' },
       { path: '/transfer', labelKey: 'nav.transfer', tooltipKey: 'nav.transferTooltip', icon: <SwapHorizIcon />, scope: 'state:transfer' },
     ],

@@ -313,6 +313,37 @@ export interface CreateDriftRunInput {
   working_dir?: string
 }
 
+export interface ScheduleTargetConfig {
+  pipeline_connection_id: string
+  source_id?: string
+  state_key?: string
+  repo_ref?: string
+  working_dir?: string
+}
+
+export interface Schedule {
+  id: string
+  name: string
+  cron_expr: string
+  target_type: string
+  target_config: ScheduleTargetConfig
+  enabled: boolean
+  last_run_at: string | null
+  next_run_at: string | null
+  last_run_id: string | null
+  last_status: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface ScheduleInput {
+  name: string
+  cron_expr: string
+  target_type: string
+  target_config: ScheduleTargetConfig
+  enabled: boolean
+}
+
 export interface HealthRun {
   id: string
   pipeline_connection_id: string | null
@@ -496,6 +527,19 @@ export const api = {
     (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
     (await apiClient.post<DriftRun>('/api/v1/drift/runs', input)).data,
+
+  // Schedules
+  listSchedules: async (): Promise<Schedule[]> =>
+    (await apiClient.get<{ schedules: Schedule[] }>('/api/v1/schedules')).data.schedules,
+  createSchedule: async (input: ScheduleInput): Promise<Schedule> =>
+    (await apiClient.post<Schedule>('/api/v1/schedules', input)).data,
+  updateSchedule: async (id: string, input: ScheduleInput): Promise<Schedule> =>
+    (await apiClient.put<Schedule>(`/api/v1/schedules/${id}`, input)).data,
+  deleteSchedule: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/schedules/${id}`)
+  },
+  runSchedule: async (id: string): Promise<Schedule> =>
+    (await apiClient.post<Schedule>(`/api/v1/schedules/${id}/run`)).data,
   getDriftWorkflow: async (provider: string): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/drift/workflow', {

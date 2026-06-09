@@ -17,6 +17,8 @@
     "driftTooltip": "Compare state to code and infrastructure",
     "versionLab": "Version Lab",
     "versionLabTooltip": "Test plan health against pinned versions",
+    "schedules": "Schedules",
+    "schedulesTooltip": "Recurring drift runs on a cron schedule",
     "reports": "Reports",
     "reportsTooltip": "Generate and download analyzer reports",
     "transfer": "Transfer",
@@ -195,6 +197,27 @@
     "versionLab": {
       "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",
       "noRuns": "No health runs yet."
+    },
+    "schedules": {
+      "title": "Schedules",
+      "description": "Run drift checks automatically on a cron schedule. Each fire dispatches a drift run on the chosen CI pipeline.",
+      "add": "Add schedule",
+      "edit": "Edit schedule",
+      "cron": "Schedule",
+      "cronHelp": "Cron expression (e.g. \"0 3 * * *\") or a keyword: daily, weekly, every 15m.",
+      "pipeline": "CI pipeline",
+      "sourceId": "Source ID (optional)",
+      "stateKey": "State key (optional)",
+      "repoRef": "Repo ref (optional)",
+      "workingDir": "Working directory (optional)",
+      "enabled": "Enabled",
+      "lastRun": "Last run",
+      "nextRun": "Next run",
+      "runNow": "Run now",
+      "never": "Never run",
+      "noSchedules": "No schedules yet. Add one to run drift checks automatically.",
+      "deleteTitle": "Delete schedule",
+      "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running."
     },
     "reports": {
       "source": "Source",

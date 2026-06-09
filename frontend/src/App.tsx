@@ -20,6 +20,7 @@ import { allNavItems } from './navigation'
 const SourcesPage = lazy(() => import('./pages/SourcesPage'))
 const DriftPage = lazy(() => import('./pages/DriftPage'))
 const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
+const SchedulesPage = lazy(() => import('./pages/SchedulesPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const TransferPage = lazy(() => import('./pages/TransferPage'))
 const ApiDocumentation = lazy(() => import('./pages/ApiDocumentation'))
@@ -35,6 +36,7 @@ const realPages: Record<string, ReactNode> = {
   '/sources': <SourcesPage />,
   '/drift': <DriftPage />,
   '/version-lab': <VersionLabPage />,
+  '/schedules': <SchedulesPage />,
   '/reports': <ReportsPage />,
   '/transfer': <TransferPage />,
   '/api-docs': <ApiDocumentation />,

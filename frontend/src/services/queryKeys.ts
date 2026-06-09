@@ -33,6 +33,10 @@ export const queryKeys = {
     all: ['drift'] as const,
     runs: () => ['drift', 'runs'] as const,
   },
+  schedules: {
+    all: ['schedules'] as const,
+    list: () => ['schedules', 'list'] as const,
+  },
   health: {
     all: ['health'] as const,
     runs: () => ['health', 'runs'] as const,
