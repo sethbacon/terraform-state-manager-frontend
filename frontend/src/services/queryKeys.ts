@@ -8,6 +8,13 @@ export const queryKeys = {
   dashboard: {
     overview: () => ['dashboard', 'overview'] as const,
   },
+  admin: {
+    stats: () => ['admin', 'stats'] as const,
+    users: () => ['admin', 'users'] as const,
+    organizations: () => ['admin', 'organizations'] as const,
+    roles: () => ['admin', 'roles'] as const,
+    auditLogs: () => ['admin', 'audit-logs'] as const,
+  },
   sources: {
     all: ['sources'] as const,
     list: () => ['sources', 'list'] as const,

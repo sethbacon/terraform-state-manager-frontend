@@ -6,6 +6,11 @@ import ScienceIcon from '@mui/icons-material/Science'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import ApiIcon from '@mui/icons-material/Api'
+import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
+import PeopleIcon from '@mui/icons-material/People'
+import BusinessIcon from '@mui/icons-material/Business'
+import BadgeIcon from '@mui/icons-material/Badge'
+import HistoryIcon from '@mui/icons-material/History'
 
 export interface NavItem {
   path: string
@@ -51,7 +56,13 @@ export const navGroups: NavGroup[] = [
   {
     key: 'administration',
     labelKey: 'nav.groups.administration',
-    items: [],
+    items: [
+      { path: '/admin', labelKey: 'nav.admin.dashboard', tooltipKey: 'nav.admin.dashboardTooltip', icon: <DashboardCustomizeIcon />, scope: 'admin' },
+      { path: '/admin/users', labelKey: 'nav.admin.users', tooltipKey: 'nav.admin.usersTooltip', icon: <PeopleIcon />, scope: 'admin' },
+      { path: '/admin/organizations', labelKey: 'nav.admin.organizations', tooltipKey: 'nav.admin.organizationsTooltip', icon: <BusinessIcon />, scope: 'admin' },
+      { path: '/admin/roles', labelKey: 'nav.admin.roles', tooltipKey: 'nav.admin.rolesTooltip', icon: <BadgeIcon />, scope: 'admin' },
+      { path: '/admin/audit-logs', labelKey: 'nav.admin.auditLogs', tooltipKey: 'nav.admin.auditLogsTooltip', icon: <HistoryIcon />, scope: 'admin' },
+    ],
   },
 ]
 

@@ -22,7 +22,19 @@
     "transfer": "Transfer",
     "transferTooltip": "Back up or migrate state between sources",
     "apiDocs": "API Docs",
-    "apiDocsTooltip": "Interactive OpenAPI documentation"
+    "apiDocsTooltip": "Interactive OpenAPI documentation",
+    "admin": {
+      "dashboard": "Admin",
+      "dashboardTooltip": "Identity management overview",
+      "users": "Users",
+      "usersTooltip": "Users and memberships",
+      "organizations": "Organizations",
+      "organizationsTooltip": "Organizations and IdP bindings",
+      "roles": "Roles",
+      "rolesTooltip": "Role templates and scopes",
+      "auditLogs": "Audit Log",
+      "auditLogsTooltip": "Security and activity audit trail"
+    }
   },
   "common": {
     "loading": "Loading…",
@@ -133,6 +145,26 @@
     "newTransfer": "New transfer"
   },
   "pages": {
+    "admin": {
+      "overview": "Identity management overview. Users, organizations, and role templates come from the shared identity service.",
+      "users": "Users",
+      "organizations": "Organizations",
+      "roles": "Roles",
+      "auditLogs": "Audit Log",
+      "email": "Email",
+      "memberships": "Memberships",
+      "displayName": "Display name",
+      "idp": "Identity provider",
+      "scopes": "Scopes",
+      "system": "System",
+      "action": "Action",
+      "resource": "Resource",
+      "user": "User",
+      "ip": "IP address",
+      "time": "Time",
+      "noAudit": "No audit entries yet.",
+      "providersNote": "SSO providers (LDAP, SAML, mTLS, SCIM) and group mapping are managed in a dedicated follow-up."
+    },
     "dashboard": {
       "rum": "RUM",
       "rumHint": "Resources Under Management",

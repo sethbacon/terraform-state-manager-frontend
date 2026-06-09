@@ -23,6 +23,11 @@ const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const TransferPage = lazy(() => import('./pages/TransferPage'))
 const ApiDocumentation = lazy(() => import('./pages/ApiDocumentation'))
+const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
+const UsersPage = lazy(() => import('./pages/admin/UsersPage'))
+const OrganizationsPage = lazy(() => import('./pages/admin/OrganizationsPage'))
+const RolesPage = lazy(() => import('./pages/admin/RolesPage'))
+const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
 
 // Routes backed by a real page (home is mounted separately at '/').
 const realPages: Record<string, ReactNode> = {
@@ -32,6 +37,11 @@ const realPages: Record<string, ReactNode> = {
   '/reports': <ReportsPage />,
   '/transfer': <TransferPage />,
   '/api-docs': <ApiDocumentation />,
+  '/admin': <AdminDashboardPage />,
+  '/admin/users': <UsersPage />,
+  '/admin/organizations': <OrganizationsPage />,
+  '/admin/roles': <RolesPage />,
+  '/admin/audit-logs': <AuditLogPage />,
 }
 
 const queryClient = new QueryClient({

@@ -78,6 +78,51 @@ export interface DashboardOverview {
   source_errors: number
 }
 
+export interface AdminUserMembership {
+  organization_id?: string
+  organization_name?: string
+  role_template_name?: string
+}
+export interface AdminUser {
+  id: string
+  email: string
+  name: string
+  oidc_sub?: string | null
+  created_at: string
+  memberships?: AdminUserMembership[]
+}
+export interface AdminOrganization {
+  id: string
+  name: string
+  display_name: string
+  idp_type?: string | null
+  idp_name?: string | null
+  created_at: string
+}
+export interface RoleTemplate {
+  id: string
+  name: string
+  display_name: string
+  description?: string | null
+  scopes: string[]
+  is_system: boolean
+}
+export interface AuditLogEntry {
+  id: string
+  action: string
+  resource_type?: string | null
+  resource_id?: string | null
+  ip_address?: string | null
+  created_at: string
+  user_email?: string | null
+  user_name?: string | null
+}
+export interface AdminStats {
+  users: number
+  organizations: number
+  roles: number
+}
+
 export interface StateSource {
   id: string
   name: string
@@ -240,6 +285,17 @@ export const api = {
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
   getDashboardOverview: async (): Promise<DashboardOverview> =>
     (await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview')).data,
+
+  // Identity management (admin scope)
+  getAdminStats: async (): Promise<AdminStats> => (await apiClient.get<AdminStats>('/api/v1/admin/stats')).data,
+  listAdminUsers: async (): Promise<AdminUser[]> =>
+    (await apiClient.get<{ users: AdminUser[] }>('/api/v1/admin/users')).data.users,
+  listAdminOrganizations: async (): Promise<AdminOrganization[]> =>
+    (await apiClient.get<{ organizations: AdminOrganization[] }>('/api/v1/admin/organizations')).data.organizations,
+  listAdminRoles: async (): Promise<RoleTemplate[]> =>
+    (await apiClient.get<{ roles: RoleTemplate[] }>('/api/v1/admin/roles')).data.roles,
+  listAuditLogs: async (): Promise<AuditLogEntry[]> =>
+    (await apiClient.get<{ logs: AuditLogEntry[] }>('/api/v1/admin/audit-logs')).data.logs,
 
   // Auth
   getProviders: async (): Promise<ProvidersInfo> => (await apiClient.get<ProvidersInfo>('/api/v1/auth/providers')).data,
