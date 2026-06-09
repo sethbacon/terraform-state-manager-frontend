@@ -1,0 +1,59 @@
+---
+name: PR Checks
+
+# Validates PR hygiene on all branches targeting main.
+"on":
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  # ── Conventional Commit PR title ──────────────────────
+  conventional-title:
+    name: Conventional PR Title
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Check PR title follows Conventional Commits
+        # v6.1.1
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+            deps
+            security
+          requireScope: false
+          subjectPattern: ^.+$
+          subjectPatternError: >-
+            The PR title must have a non-empty description after the type
+            (e.g. "feat: add login page", not "feat:").
+
+  # ── Dependency review ─────────────────────────────────
+  dependency-review:
+    name: Dependency Review
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Review dependency changes
+        # v5.0.0
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure

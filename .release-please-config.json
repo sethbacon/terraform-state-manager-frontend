@@ -1,0 +1,26 @@
+{
+  "packages": {
+    ".": {
+      "release-type": "simple",
+      "package-name": "terraform-state-manager-frontend",
+      "include-component-in-tag": false,
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "frontend/package.json",
+          "jsonpath": "$.version"
+        }
+      ],
+      "changelog-sections": [
+        {"type": "feat", "section": "Features"},
+        {"type": "fix", "section": "Bug Fixes"},
+        {"type": "perf", "section": "Performance"},
+        {"type": "deps", "section": "Dependencies"},
+        {"type": "docs", "section": "Documentation"},
+        {"type": "refactor", "section": "Refactor"},
+        {"type": "revert", "section": "Reverts"},
+        {"type": "security", "section": "Security"}
+      ]
+    }
+  }
+}
