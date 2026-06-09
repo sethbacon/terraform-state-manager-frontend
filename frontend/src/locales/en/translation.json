@@ -20,7 +20,9 @@
     "reports": "Reports",
     "reportsTooltip": "Generate and download analyzer reports",
     "transfer": "Transfer",
-    "transferTooltip": "Back up or migrate state between sources"
+    "transferTooltip": "Back up or migrate state between sources",
+    "apiDocs": "API Docs",
+    "apiDocsTooltip": "Interactive OpenAPI documentation"
   },
   "common": {
     "loading": "Loading…",
@@ -114,6 +116,10 @@
       "transfer": {
         "title": "Transfer",
         "body": "Copy (backup) or move (migrate) a state file between sources. Migrate verifies serial/lineage/resource-count parity on the target and can optionally decommission the original after a type-to-confirm guard."
+      },
+      "apiDocs": {
+        "title": "API Docs",
+        "body": "Interactive OpenAPI documentation for the backend, generated from handler annotations. Raw spec:"
       }
     }
   },

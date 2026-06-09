@@ -36,7 +36,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import CheckIcon from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
 import i18n, { SUPPORTED_LANGUAGES } from '../i18n'
-import { homeItem, navGroups } from '../navigation'
+import { homeItem, navGroups, apiDocsItem } from '../navigation'
 import { useThemeMode } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useHelp } from '../contexts/HelpContext'
@@ -155,6 +155,18 @@ export default function Layout() {
             </Collapse>
           </Box>
         ))}
+
+        {/* API docs — standalone at the bottom */}
+        <ListItemButton
+          component={RouterLink}
+          to={apiDocsItem.path}
+          selected={location.pathname === apiDocsItem.path}
+          onClick={closeDrawerOnNav}
+          sx={{ mt: 0.5 }}
+        >
+          <ListItemIcon>{apiDocsItem.icon}</ListItemIcon>
+          <ListItemText primary={t(apiDocsItem.labelKey)} />
+        </ListItemButton>
       </List>
     </Box>
   )

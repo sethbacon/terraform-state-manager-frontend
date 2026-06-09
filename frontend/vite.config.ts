@@ -40,6 +40,7 @@ export default defineConfig({
       '/api/': { target: proxyTarget, changeOrigin: true, secure: false },
       '/health': { target: proxyTarget, changeOrigin: true, secure: false },
       '/ready': { target: proxyTarget, changeOrigin: true, secure: false },
+      '/swagger': { target: proxyTarget, changeOrigin: true, secure: false },
     },
   },
 })

@@ -22,6 +22,7 @@ const DriftPage = lazy(() => import('./pages/DriftPage'))
 const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const TransferPage = lazy(() => import('./pages/TransferPage'))
+const ApiDocumentation = lazy(() => import('./pages/ApiDocumentation'))
 
 // Routes backed by a real page (home is mounted separately at '/').
 const realPages: Record<string, ReactNode> = {
@@ -30,6 +31,7 @@ const realPages: Record<string, ReactNode> = {
   '/version-lab': <VersionLabPage />,
   '/reports': <ReportsPage />,
   '/transfer': <TransferPage />,
+  '/api-docs': <ApiDocumentation />,
 }
 
 const queryClient = new QueryClient({

@@ -5,6 +5,7 @@ import CompareArrowsIcon from '@mui/icons-material/CompareArrows'
 import ScienceIcon from '@mui/icons-material/Science'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import ApiIcon from '@mui/icons-material/Api'
 
 export interface NavItem {
   path: string
@@ -54,6 +55,15 @@ export const navGroups: NavGroup[] = [
   },
 ]
 
-// Flattened list of every routable nav item (home + all group items) for the
-// route table in App.tsx.
-export const allNavItems: NavItem[] = [homeItem, ...navGroups.flatMap((g) => g.items)]
+// API docs — shown standalone at the bottom of the drawer (always visible).
+export const apiDocsItem: NavItem = {
+  path: '/api-docs',
+  labelKey: 'nav.apiDocs',
+  tooltipKey: 'nav.apiDocsTooltip',
+  icon: <ApiIcon />,
+  scope: null,
+}
+
+// Flattened list of every routable nav item (home + group items + api docs) for
+// the route table in App.tsx and the command palette.
+export const allNavItems: NavItem[] = [homeItem, ...navGroups.flatMap((g) => g.items), apiDocsItem]
