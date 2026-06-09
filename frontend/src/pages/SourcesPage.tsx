@@ -42,6 +42,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import { api, type AnalysisResult, type StateSource, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
+import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 
 function errMsg(e: unknown): string {
@@ -49,6 +50,7 @@ function errMsg(e: unknown): string {
 }
 
 export default function SourcesPage() {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [addOpen, setAddOpen] = useState(false)
   const [selectedSource, setSelectedSource] = useState<StateSource | null>(null)
@@ -87,8 +89,8 @@ export default function SourcesPage() {
   return (
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Sources
+        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+          {t('nav.sources')}
         </Typography>
         <Button
           variant="outlined"
@@ -96,17 +98,15 @@ export default function SourcesPage() {
           sx={{ mr: 1 }}
           onClick={() => fileInputRef.current?.click()}
         >
-          Analyze a file
+          {t('pages.sources.uploadAnalyze')}
         </Button>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => setAddOpen(true)}>
-          Add source
+          {t('actions.addSource')}
         </Button>
         <input ref={fileInputRef} type="file" accept=".tfstate,application/json" hidden onChange={handleFile} />
       </Stack>
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 720 }}>
-        Connect to where Terraform state already lives, then browse and analyze it. Local directories, HCP/TFC,
-        AWS S3 (and S3-compatible), and Azure Blob are supported; GCS and Git are on the roadmap. You can also
-        analyze a one-off <code>.tfstate</code> file without saving a source.
+        {t('help.pages.sources.body')}
       </Typography>
 
       {uploadError && (
@@ -119,7 +119,7 @@ export default function SourcesPage() {
       {sourcesQuery.isError && <Alert severity="error">Failed to load sources.</Alert>}
 
       {sourcesQuery.data && sourcesQuery.data.length === 0 && (
-        <Alert severity="info">No sources yet. Add a local source pointing at a directory of `.tfstate` files.</Alert>
+        <Alert severity="info">{t('pages.sources.empty')}</Alert>
       )}
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>

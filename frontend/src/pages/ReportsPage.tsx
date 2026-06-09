@@ -20,6 +20,7 @@ import {
 } from '@mui/material'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import DownloadIcon from '@mui/icons-material/Download'
+import { useTranslation } from 'react-i18next'
 import { api, type ReportFormat } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
@@ -34,6 +35,7 @@ const FORMATS: { value: ReportFormat; label: string }[] = [
 ]
 
 export default function ReportsPage() {
+  const { t } = useTranslation()
   const [sourceId, setSourceId] = useState('')
   const [stateKey, setStateKey] = useState('')
   const [downloading, setDownloading] = useState<ReportFormat | null>(null)
@@ -75,15 +77,16 @@ export default function ReportsPage() {
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
         <AssessmentIcon sx={{ mr: 1 }} />
-        <Typography variant="h4">Reports</Typography>
+        <Typography variant="h4" component="h1">
+          {t('nav.reports')}
+        </Typography>
       </Stack>
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        Generate an analyzer report for a state file — Resources Under Management, resource/provider/version
-        breakdowns — and download it as Markdown, JSON, or CSV.
+        {t('help.pages.reports.body')}
       </Typography>
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3, maxWidth: 760 }}>
-        <TextField select label="Source" value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
+        <TextField select label={t('pages.reports.source')} value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
           {(sourcesQuery.data ?? []).map((s) => (
             <MenuItem key={s.id} value={s.id}>
               {s.name} ({s.type})
@@ -92,12 +95,12 @@ export default function ReportsPage() {
         </TextField>
         <TextField
           select
-          label="State file"
+          label={t('pages.reports.stateFile')}
           value={stateKey}
           onChange={(e) => setStateKey(e.target.value)}
           fullWidth
           disabled={!sourceId || statesQuery.isLoading}
-          helperText={sourceId && statesQuery.data?.length === 0 ? 'No state files in this source' : ' '}
+          helperText={sourceId && statesQuery.data?.length === 0 ? t('pages.reports.noStates') : ' '}
         >
           {(statesQuery.data ?? []).map((st) => (
             <MenuItem key={st.key} value={st.key}>
@@ -107,9 +110,7 @@ export default function ReportsPage() {
         </TextField>
       </Stack>
 
-      {!sourceId && (
-        <Alert severity="info">Choose a source and a state file to preview and export its report.</Alert>
-      )}
+      {!sourceId && <Alert severity="info">{t('pages.reports.chooseSource')}</Alert>}
 
       {sourceId && stateKey && (
         <Stack spacing={2}>

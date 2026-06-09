@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import { useTranslation } from 'react-i18next'
 import { api, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -22,6 +23,7 @@ function apiErr(e: unknown): string {
 }
 
 export default function TransferPage() {
+  const { t } = useTranslation()
   const { hasScope } = useAuth()
   const queryClient = useQueryClient()
   const canTransfer = hasScope('state:transfer')
@@ -84,16 +86,17 @@ export default function TransferPage() {
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
         <SwapHorizIcon sx={{ mr: 1 }} />
-        <Typography variant="h4">Transfer</Typography>
+        <Typography variant="h4" component="h1">
+          {t('nav.transfer')}
+        </Typography>
       </Stack>
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        Copy (<b>backup</b>) or move (<b>migrate</b>) a Terraform state file between sources. Migrate verifies
-        serial / lineage / resource-count parity on the target, and can optionally decommission the original.
+        {t('help.pages.transfer.body')}
       </Typography>
 
       {!canTransfer && (
         <Alert severity="warning" sx={{ mb: 3 }}>
-          You need the <code>state:transfer</code> scope to run transfers.
+          {t('pages.transfer.needScope')}
         </Alert>
       )}
 
@@ -115,7 +118,7 @@ export default function TransferPage() {
         ) : (
           <Stack spacing={2}>
             <Typography variant="subtitle2" color="text.secondary">
-              Source
+              {t('pages.transfer.source')}
             </Typography>
             <TextField select label="Source" value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
               {(sourcesQuery.data ?? []).map((s) => (
@@ -141,7 +144,7 @@ export default function TransferPage() {
             </TextField>
 
             <Typography variant="subtitle2" color="text.secondary" sx={{ pt: 1 }}>
-              Destination
+              {t('pages.transfer.destination')}
             </Typography>
             <TextField select label="Mode" value={mode} onChange={(e) => setMode(e.target.value as 'backup' | 'migrate')} fullWidth>
               <MenuItem value="backup">Backup (copy)</MenuItem>

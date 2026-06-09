@@ -117,6 +117,49 @@
       }
     }
   },
+  "actions": {
+    "addSource": "Add source",
+    "browseStates": "Browse states",
+    "newDriftRun": "New drift run",
+    "newHealthRun": "New health run",
+    "addPipeline": "Add pipeline",
+    "workflowTemplate": "Workflow template",
+    "newTransfer": "New transfer"
+  },
+  "pages": {
+    "sources": {
+      "empty": "No sources connected yet. Add one to browse and analyze its state.",
+      "uploadAnalyze": "Analyze an uploaded state file"
+    },
+    "drift": {
+      "pipelines": "Pipeline connections",
+      "noPipelines": "No pipeline connections yet. Add one to dispatch drift runs.",
+      "noRuns": "No drift runs yet.",
+      "runs": "Drift runs"
+    },
+    "versionLab": {
+      "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",
+      "noRuns": "No health runs yet."
+    },
+    "reports": {
+      "source": "Source",
+      "stateFile": "State file",
+      "chooseSource": "Choose a source and a state file to preview and export its report.",
+      "noStates": "No state files in this source"
+    },
+    "transfer": {
+      "needScope": "You need the state:transfer scope to run transfers.",
+      "source": "Source",
+      "destination": "Destination"
+    },
+    "login": {
+      "signIn": "Sign in",
+      "signInWith": "Sign in with {{provider}}",
+      "devLogin": "Dev Login (Admin)",
+      "subtitle": "Sign in to manage your Terraform state.",
+      "noProviders": "No login providers are configured."
+    }
+  },
   "commandPalette": {
     "title": "Command palette",
     "placeholder": "Search pages…",

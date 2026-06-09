@@ -26,6 +26,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ScienceIcon from '@mui/icons-material/Science'
 import DescriptionIcon from '@mui/icons-material/Description'
+import { useTranslation } from 'react-i18next'
 import { api, type HealthRun, type PipelineConnection } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -60,6 +61,7 @@ function okText(label: string, v: boolean | null) {
 }
 
 export default function VersionLabPage() {
+  const { t } = useTranslation()
   const { hasScope } = useAuth()
   const queryClient = useQueryClient()
   const canRun = hasScope('state:execute')
@@ -78,11 +80,11 @@ export default function VersionLabPage() {
   return (
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Version Lab
+        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+          {t('nav.versionLab')}
         </Typography>
         <Button variant="outlined" startIcon={<DescriptionIcon />} sx={{ mr: 1 }} onClick={() => setWorkflowOpen(true)}>
-          Workflow template
+          {t('actions.workflowTemplate')}
         </Button>
         {canRun && (
           <Button
@@ -91,24 +93,22 @@ export default function VersionLabPage() {
             disabled={!pipelinesQuery.data?.length}
             onClick={() => setNewRunOpen(true)}
           >
-            New health run
+            {t('actions.newHealthRun')}
           </Button>
         )}
       </Stack>
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        Test whether your Terraform code plans cleanly against a chosen Terraform version (and optional provider
-        versions / registry mirror) by dispatching <code>terraform init/plan</code> to your CI. Pipeline connections
-        are shared with Drift — add one there first.
+        {t('help.pages.versionLab.body')}
       </Typography>
 
       {pipelinesQuery.data && pipelinesQuery.data.length === 0 && (
         <Alert severity="info" sx={{ mb: 3 }}>
-          No pipeline connections yet — add one on the <b>Drift</b> page, then return here to run version checks.
+          {t('pages.versionLab.noPipelines')}
         </Alert>
       )}
 
       {runsQuery.isLoading && <CircularProgress size={20} />}
-      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">No health runs yet.</Alert>}
+      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">{t('pages.versionLab.noRuns')}</Alert>}
       {runsQuery.data && runsQuery.data.length > 0 && (
         <Table size="small">
           <TableHead>

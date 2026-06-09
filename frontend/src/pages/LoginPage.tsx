@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Box, Button, Card, CardContent, CircularProgress, Divider, Stack, Typography } from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
+import { useTranslation } from 'react-i18next'
 import { api } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -14,6 +15,7 @@ function Centered({ children }: { children: ReactNode }) {
 }
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const { isAuthenticated, isLoading, login, devLogin } = useAuth()
   const [providers, setProviders] = useState<{ type: string; name: string }[]>([])
   const [devMode, setDevMode] = useState(false)
@@ -45,20 +47,20 @@ export default function LoginPage() {
       <Card sx={{ width: 380, maxWidth: '90vw' }}>
         <CardContent>
           <Typography variant="h5" align="center" gutterBottom>
-            Terraform State Manager
+            {t('app.name')}
           </Typography>
           <Typography color="text.secondary" align="center" sx={{ mb: 3 }}>
-            Sign in to continue
+            {t('pages.login.subtitle')}
           </Typography>
           <Stack spacing={1.5}>
             {providers.map((p) => (
               <Button key={p.type} variant="contained" startIcon={<LoginIcon />} onClick={() => login(p.type)}>
-                Sign in with {p.name}
+                {t('pages.login.signInWith', { provider: p.name })}
               </Button>
             ))}
             {providers.length === 0 && !devMode && (
               <Typography color="text.secondary" align="center">
-                No login providers are configured.
+                {t('pages.login.noProviders')}
               </Typography>
             )}
             {devMode && (
@@ -76,7 +78,7 @@ export default function LoginPage() {
                     }
                   }}
                 >
-                  Dev Login (Admin)
+                  {t('pages.login.devLogin')}
                 </Button>
               </>
             )}

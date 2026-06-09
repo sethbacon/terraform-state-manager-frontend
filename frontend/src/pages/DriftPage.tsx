@@ -28,6 +28,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import DescriptionIcon from '@mui/icons-material/Description'
+import { useTranslation } from 'react-i18next'
 import { api, type DriftRun, type PipelineConnection } from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
 import { queryKeys } from '../services/queryKeys'
@@ -73,6 +74,7 @@ function statusChip(run: DriftRun) {
 }
 
 export default function DriftPage() {
+  const { t } = useTranslation()
   const { hasScope } = useAuth()
   const queryClient = useQueryClient()
   const canManage = hasScope('sources:manage')
@@ -102,11 +104,11 @@ export default function DriftPage() {
   return (
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Drift
+        <Typography variant="h4" component="h1" sx={{ flexGrow: 1 }}>
+          {t('nav.drift')}
         </Typography>
         <Button variant="outlined" startIcon={<DescriptionIcon />} sx={{ mr: 1 }} onClick={() => setWorkflowOpen(true)}>
-          Workflow template
+          {t('actions.workflowTemplate')}
         </Button>
         {canRun && (
           <Button
@@ -115,24 +117,22 @@ export default function DriftPage() {
             disabled={!pipelinesQuery.data?.length}
             onClick={() => setNewRunOpen(true)}
           >
-            New drift run
+            {t('actions.newDriftRun')}
           </Button>
         )}
       </Stack>
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 760 }}>
-        Drift is detected by dispatching <code>terraform plan</code> to your own CI (GitHub Actions or Azure DevOps),
-        which runs against live infrastructure and posts the result back. No Terraform binary or cloud credentials
-        live in this app — add the workflow template to your repo, register a pipeline connection, then trigger runs.
+        {t('help.pages.drift.body')}
       </Typography>
 
       {/* Pipeline connections */}
       <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Pipeline connections
+          {t('pages.drift.pipelines')}
         </Typography>
         {canManage && (
           <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
-            Add pipeline
+            {t('actions.addPipeline')}
           </Button>
         )}
       </Stack>
