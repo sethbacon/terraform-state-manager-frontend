@@ -10,3 +10,6 @@ frontend/dist/
 
 # OS / editor
 .DS_Store
+
+# Runtime state backups created by edit/transfer in the seed dir
+deployments/seed-states/*.backup.tfstate
