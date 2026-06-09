@@ -1,0 +1,78 @@
+import { lazy, type ReactNode } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AppThemeProvider } from './contexts/ThemeContext'
+import { AuthProvider } from './contexts/AuthContext'
+import Layout from './components/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
+import PlaceholderPage from './components/PlaceholderPage'
+import DashboardPage from './pages/DashboardPage'
+import LoginPage from './pages/LoginPage'
+import CallbackPage from './pages/CallbackPage'
+import { navItems } from './navigation'
+
+// Heavy domain pages are code-split (lazy) to keep the initial bundle small;
+// a Suspense boundary lives around the Layout's Outlet.
+const SourcesPage = lazy(() => import('./pages/SourcesPage'))
+const DriftPage = lazy(() => import('./pages/DriftPage'))
+const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
+const ReportsPage = lazy(() => import('./pages/ReportsPage'))
+const TransferPage = lazy(() => import('./pages/TransferPage'))
+
+// Routes backed by a real page (others render a roadmap placeholder).
+const realPages: Record<string, ReactNode> = {
+  '/sources': <SourcesPage />,
+  '/drift': <DriftPage />,
+  '/version-lab': <VersionLabPage />,
+  '/reports': <ReportsPage />,
+  '/transfer': <TransferPage />,
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false },
+  },
+})
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppThemeProvider>
+        <AuthProvider>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/auth/callback" element={<CallbackPage />} />
+              <Route
+                element={
+                  <ProtectedRoute>
+                    <Layout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/" element={<DashboardPage />} />
+                {navItems
+                  .filter((item) => item.path !== '/')
+                  .map((item) => (
+                    <Route
+                      key={item.path}
+                      path={item.path}
+                      element={
+                        realPages[item.path] ?? (
+                          <PlaceholderPage title={item.label} phase={item.phase} description={item.description} />
+                        )
+                      }
+                    />
+                  ))}
+                <Route
+                  path="*"
+                  element={<PlaceholderPage title="Page not found" description="The page you requested does not exist." />}
+                />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </AppThemeProvider>
+    </QueryClientProvider>
+  )
+}

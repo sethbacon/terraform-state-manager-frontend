@@ -1,0 +1,119 @@
+# Local development stack for the Terraform State Manager:
+#   Postgres + Keycloak (OIDC) + backend (Go) + frontend (React/nginx).
+#
+# Ports are chosen to NOT collide with a running terraform-registry stack:
+#   frontend  http://localhost:3001
+#   backend   http://localhost:8081        (also reachable via the frontend proxy at /api)
+#   keycloak  http://localhost:8180
+#   postgres  localhost:5433
+#
+# REQUIRED /etc/hosts entry (so the browser and the backend both resolve the
+# Keycloak issuer http://keycloak:8180 to the same place):
+#   127.0.0.1 keycloak
+#
+# Test users (realm "terraform-state-manager", password TestPass123!):
+#   admin.user  alice.analyst  bob.operator  carol.viewer
+# (DEFAULT_ROLE=admin grants every user the admin role in the default org for local dev.)
+#
+# Run from this directory:  docker compose up --build   (or `make oidc-up` from the repo root)
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: terraform_state_manager
+      POSTGRES_USER: tsm
+      POSTGRES_PASSWORD: tsm
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tsm -d terraform_state_manager"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.4
+    command: ["start-dev", "--import-realm", "--http-port=8180"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: dev-file
+      KC_HTTP_ENABLED: "true"
+      # Full-URL hostname so issued tokens carry issuer http://keycloak:8180,
+      # which both the browser (via /etc/hosts) and the backend (via Docker DNS) reach.
+      KC_HOSTNAME: http://keycloak:8180
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8180"
+    volumes:
+      - ./tsm-realm-export.json:/opt/keycloak/data/import/tsm-realm-export.json:ro
+
+  backend:
+    build:
+      context: ../../terraform-state-manager-backend/backend
+      dockerfile: Dockerfile
+    environment:
+      TSM_DATABASE_HOST: postgres
+      TSM_DATABASE_PORT: "5432"
+      TSM_DATABASE_NAME: terraform_state_manager
+      TSM_DATABASE_USER: tsm
+      TSM_DATABASE_PASSWORD: tsm
+      TSM_DATABASE_SSL_MODE: disable
+      TSM_LOGGING_FORMAT: text
+      TSM_LOGGING_LEVEL: info
+      TSM_SERVER_PUBLIC_URL: http://localhost:3001
+      TSM_AUTH_OIDC_ENABLED: "true"
+      TSM_AUTH_OIDC_ISSUER_URL: http://keycloak:8180/realms/terraform-state-manager
+      TSM_AUTH_OIDC_CLIENT_ID: terraform-state-manager
+      TSM_AUTH_OIDC_CLIENT_SECRET: terraform-state-manager-secret
+      TSM_AUTH_OIDC_REDIRECT_URL: http://localhost:3001/api/v1/auth/callback
+      # ┌─────────────────────────────────────────────────────────────────────┐
+      # │ ⚠ DEV ONLY — INSECURE DEFAULTS. NEVER deploy this file to a shared or │
+      # │ production environment. DEFAULT_ROLE=admin makes every newly         │
+      # │ provisioned user an admin; the JWT/encryption keys are public and    │
+      # │ weak; DEV_MODE enables the Keycloak-bypassing dev login. In real     │
+      # │ deployments leave DEFAULT_ROLE empty (or map roles from IdP groups), │
+      # │ generate strong unique secrets, and set DEV_MODE=false.              │
+      # │ (Logging in never escalates an existing member's role — see          │
+      # │ assignRole — so changing DEFAULT_ROLE only affects future new users.)│
+      # └─────────────────────────────────────────────────────────────────────┘
+      TSM_AUTH_OIDC_DEFAULT_ROLE: admin
+      TSM_JWT_SECRET: dev-jwt-secret-change-me-0123456789abcdef
+      # 32-byte key for encrypting per-source credentials (e.g. HCP tokens) at rest.
+      TSM_ENCRYPTION_KEY: dev-encryption-key-0123456789abc
+      DEV_MODE: "true"
+    ports:
+      - "8081:8080"
+      - "9091:9090"
+    volumes:
+      # Persistent local state files for the "demo-local" source (base_path
+      # /data/states). Host uid matches the container's tsm uid (1000), so edits
+      # write back to the host directory. Seed .tfstate files live here.
+      - ./seed-states:/data/states
+    depends_on:
+      postgres:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+    # Keycloak takes ~30s to be ready; the backend performs OIDC discovery at
+    # startup and exits if Keycloak isn't reachable yet. Restart until it is.
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:80"
+    depends_on:
+      # nginx resolves the "backend" upstream at startup and aborts if it isn't
+      # resolvable yet, so wait for the backend to be healthy before starting.
+      backend:
+        condition: service_healthy
+    # Self-heal if nginx ever loses the upstream (matches the backend policy).
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
