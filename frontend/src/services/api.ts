@@ -60,6 +60,24 @@ export interface ProvidersInfo {
   dev_mode: boolean
 }
 
+export interface Count {
+  key: string
+  count: number
+}
+
+export interface DashboardOverview {
+  sources: number
+  states: number
+  rum: number
+  managed_resources: number
+  data_sources: number
+  total_resources: number
+  providers: Count[]
+  resource_types: Count[]
+  terraform_versions: Count[]
+  source_errors: number
+}
+
 export interface StateSource {
   id: string
   name: string
@@ -220,6 +238,8 @@ export interface CreateHealthRunInput {
 export const api = {
   getVersion: async (): Promise<VersionInfo> => (await apiClient.get<VersionInfo>('/api/v1/version')).data,
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
+  getDashboardOverview: async (): Promise<DashboardOverview> =>
+    (await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview')).data,
 
   // Auth
   getProviders: async (): Promise<ProvidersInfo> => (await apiClient.get<ProvidersInfo>('/api/v1/auth/providers')).data,

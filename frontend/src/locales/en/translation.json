@@ -133,6 +133,21 @@
     "newTransfer": "New transfer"
   },
   "pages": {
+    "dashboard": {
+      "rum": "RUM",
+      "rumHint": "Resources Under Management",
+      "managed": "Managed",
+      "dataSources": "Data sources",
+      "totalInstances": "Total instances",
+      "sources": "Sources",
+      "states": "State files",
+      "providerDistribution": "Provider distribution",
+      "topResourceTypes": "Top resource types",
+      "terraformVersions": "Terraform versions",
+      "sourceErrors": "{{count}} source(s) could not be read and were skipped.",
+      "empty": "No state yet. Connect a source to see your fleet's metrics here.",
+      "goToSources": "Add a source"
+    },
     "sources": {
       "empty": "No sources connected yet. Add one to browse and analyze its state.",
       "uploadAnalyze": "Analyze an uploaded state file"

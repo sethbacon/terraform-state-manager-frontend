@@ -5,6 +5,9 @@ export const queryKeys = {
     version: ['system', 'version'] as const,
     health: ['system', 'health'] as const,
   },
+  dashboard: {
+    overview: () => ['dashboard', 'overview'] as const,
+  },
   sources: {
     all: ['sources'] as const,
     list: () => ['sources', 'list'] as const,
