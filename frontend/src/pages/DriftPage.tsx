@@ -29,6 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { api, type DriftRun, type PipelineConnection } from '../services/api'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -81,6 +82,7 @@ export default function DriftPage() {
   const [newRunOpen, setNewRunOpen] = useState(false)
   const [workflowOpen, setWorkflowOpen] = useState(false)
   const [selectedRun, setSelectedRun] = useState<DriftRun | null>(null)
+  const [deletePipelineTarget, setDeletePipelineTarget] = useState<PipelineConnection | null>(null)
 
   const pipelinesQuery = useQuery({ queryKey: queryKeys.pipelines.list(), queryFn: api.listPipelines })
 
@@ -149,7 +151,7 @@ export default function DriftPage() {
                   {p.name}
                 </Typography>
                 {canManage && (
-                  <IconButton size="small" aria-label="delete" onClick={() => deletePipeline.mutate(p.id)}>
+                  <IconButton size="small" aria-label="delete" onClick={() => setDeletePipelineTarget(p)}>
                     <DeleteIcon fontSize="small" />
                   </IconButton>
                 )}
@@ -216,6 +218,26 @@ export default function DriftPage() {
       />
       <WorkflowDialog open={workflowOpen} onClose={() => setWorkflowOpen(false)} />
       <DriftRunDetailDialog run={selectedRun} onClose={() => setSelectedRun(null)} />
+
+      <ConfirmDialog
+        open={Boolean(deletePipelineTarget)}
+        onClose={() => setDeletePipelineTarget(null)}
+        title="Delete pipeline connection"
+        severity="error"
+        description={
+          <>
+            Remove the pipeline connection <b>{deletePipelineTarget?.name}</b>? Drift and version-lab
+            runs will no longer be able to dispatch through it.
+          </>
+        }
+        confirmLabel="Delete"
+        loading={deletePipeline.isPending}
+        onConfirm={async () => {
+          if (!deletePipelineTarget) return
+          await deletePipeline.mutateAsync(deletePipelineTarget.id)
+          setDeletePipelineTarget(null)
+        }}
+      />
     </Box>
   )
 }

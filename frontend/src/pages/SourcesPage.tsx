@@ -42,6 +42,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import { api, type AnalysisResult, type StateSource, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
+import ConfirmDialog from '../components/ConfirmDialog'
 
 function errMsg(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -52,6 +53,7 @@ export default function SourcesPage() {
   const [addOpen, setAddOpen] = useState(false)
   const [selectedSource, setSelectedSource] = useState<StateSource | null>(null)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<StateSource | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
 
@@ -151,7 +153,7 @@ export default function SourcesPage() {
               <IconButton
                 size="small"
                 aria-label="delete source"
-                onClick={() => deleteMutation.mutate(s.id)}
+                onClick={() => setDeleteTarget(s)}
                 disabled={deleteMutation.isPending}
               >
                 <DeleteIcon fontSize="small" />
@@ -185,6 +187,27 @@ export default function SourcesPage() {
           <Button onClick={() => setUploadResult(null)}>Close</Button>
         </DialogActions>
       </Dialog>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        title="Delete source"
+        severity="error"
+        description={
+          <>
+            Remove the source <b>{deleteTarget?.name}</b>? This disconnects it from the State Manager.
+            The underlying state backend and its files are <b>not</b> touched.
+          </>
+        }
+        typeToConfirmText={deleteTarget?.name}
+        confirmLabel="Delete source"
+        loading={deleteMutation.isPending}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          await deleteMutation.mutateAsync(deleteTarget.id)
+          setDeleteTarget(null)
+        }}
+      />
     </Box>
   )
 }
