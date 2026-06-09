@@ -1,0 +1,131 @@
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "State Manager",
+    "tagline": "Analyze, edit, and move Terraform state across every backend."
+  },
+  "nav": {
+    "groups": {
+      "main": "State",
+      "administration": "Administration"
+    },
+    "dashboard": "Home",
+    "dashboardTooltip": "Overview and statistics",
+    "sources": "Sources",
+    "sourcesTooltip": "Connected state backends",
+    "drift": "Drift",
+    "driftTooltip": "Compare state to code and infrastructure",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "Test plan health against pinned versions",
+    "reports": "Reports",
+    "reportsTooltip": "Generate and download analyzer reports",
+    "transfer": "Transfer",
+    "transferTooltip": "Back up or migrate state between sources"
+  },
+  "common": {
+    "loading": "Loading…",
+    "error": "Something went wrong.",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "download": "Download",
+    "refresh": "Refresh",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "actions": "Actions",
+    "created": "Created",
+    "updated": "Updated",
+    "status": "Status",
+    "name": "Name",
+    "type": "Type",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "add": "Add",
+    "remove": "Remove",
+    "edit": "Edit",
+    "view": "View",
+    "copy": "Copy",
+    "copied": "Copied",
+    "required": "Required",
+    "optional": "Optional",
+    "detail": "Detail"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "language": "Language"
+  },
+  "about": {
+    "title": "About",
+    "version": "Version",
+    "buildDate": "Build date",
+    "description": "A web application to analyze, safely edit, and move Terraform state across existing backends — with CI-driven drift detection and version testing.",
+    "viewProject": "View project",
+    "backendVersion": "Backend version"
+  },
+  "help": {
+    "title": "Help",
+    "open": "Open help",
+    "close": "Close help",
+    "none": "No help is available for this page yet.",
+    "pages": {
+      "dashboard": {
+        "title": "Home",
+        "body": "A cross-source overview: total Resources Under Management (RUM), provider and resource breakdowns, Terraform version spread, and recent drift and version-lab activity."
+      },
+      "sources": {
+        "title": "Sources",
+        "body": "Connect to existing state backends (local, HCP/TFC, S3, GCS, Azure Blob, Git). Browse each source's state files, view analysis, inspect resources, and safely edit state with lock → backup → write → audit."
+      },
+      "drift": {
+        "title": "Drift",
+        "body": "Dispatch a Terraform plan through your CI (GitHub Actions or Azure DevOps) to compare state against code and live infrastructure. Results return via a signed one-shot callback and render as a per-resource diff."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "Test whether your Terraform code plans cleanly against a chosen Terraform version (and optional pinned provider versions / registry mirror) by dispatching init/plan to your CI."
+      },
+      "reports": {
+        "title": "Reports",
+        "body": "Generate an analyzer report for a state file — RUM, resource/provider/version breakdowns — and download it as Markdown, JSON, or CSV."
+      },
+      "transfer": {
+        "title": "Transfer",
+        "body": "Copy (backup) or move (migrate) a state file between sources. Migrate verifies serial/lineage/resource-count parity on the target and can optionally decommission the original after a type-to-confirm guard."
+      }
+    }
+  },
+  "commandPalette": {
+    "title": "Command palette",
+    "placeholder": "Search pages…",
+    "empty": "No results.",
+    "openButton": "Open command palette",
+    "hint": "Quick navigation (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "Navigation"
+    }
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation"
+  },
+  "error": {
+    "boundaryTitle": "Something went wrong",
+    "boundaryBody": "An unexpected error occurred while rendering this page.",
+    "reload": "Reload page"
+  },
+  "empty": {
+    "default": "Nothing here yet."
+  }
+}

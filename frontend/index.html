@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- nginx replaces __CSP_NONCE__ with the per-request nonce (sub_filter) so
+         emotion can inject styles under a strict Content-Security-Policy. -->
+    <meta name="csp-nonce" content="__CSP_NONCE__" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Terraform State Manager</title>
   </head>
