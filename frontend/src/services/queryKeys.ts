@@ -37,6 +37,13 @@ export const queryKeys = {
     all: ['pipelines'] as const,
     list: () => ['pipelines', 'list'] as const,
   },
+  ciSources: {
+    all: ['ci-sources'] as const,
+    list: () => ['ci-sources', 'list'] as const,
+    pipelines: (id: string) => ['ci-sources', id, 'pipelines'] as const,
+    repos: (id: string) => ['ci-sources', id, 'repos'] as const,
+    workflows: (id: string, repo: string) => ['ci-sources', id, 'repos', repo, 'workflows'] as const,
+  },
   drift: {
     all: ['drift'] as const,
     runs: () => ['drift', 'runs'] as const,

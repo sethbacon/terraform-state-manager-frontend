@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -26,10 +27,19 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import HubIcon from '@mui/icons-material/Hub'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { useTranslation } from 'react-i18next'
-import { api, type DriftRun, type PipelineConnection } from '../services/api'
+import {
+  api,
+  type CIPipelineRef,
+  type CIRepoRef,
+  type CISource,
+  type CIWorkflowRef,
+  type DriftRun,
+  type PipelineConnection,
+} from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
@@ -83,6 +93,7 @@ export default function DriftPage() {
   const canRun = hasScope('state:drift')
 
   const [addPipelineOpen, setAddPipelineOpen] = useState(false)
+  const [ciSourcesOpen, setCiSourcesOpen] = useState(false)
   const [newRunOpen, setNewRunOpen] = useState(false)
   const [workflowOpen, setWorkflowOpen] = useState(false)
   const [selectedRun, setSelectedRun] = useState<DriftRun | null>(null)
@@ -133,9 +144,14 @@ export default function DriftPage() {
           {t('pages.drift.pipelines')}
         </Typography>
         {canManage && (
-          <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
-            {t('actions.addPipeline')}
-          </Button>
+          <>
+            <Button size="small" startIcon={<HubIcon />} onClick={() => setCiSourcesOpen(true)} sx={{ mr: 1 }}>
+              CI sources
+            </Button>
+            <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
+              {t('actions.addPipeline')}
+            </Button>
+          </>
         )}
       </Stack>
       {pipelinesQuery.isLoading && <CircularProgress size={20} />}
@@ -209,6 +225,7 @@ export default function DriftPage() {
           setAddPipelineOpen(false)
         }}
       />
+      <CISourcesDialog open={ciSourcesOpen} onClose={() => setCiSourcesOpen(false)} />
       <NewRunDialog
         open={newRunOpen}
         onClose={() => setNewRunOpen(false)}
@@ -320,14 +337,63 @@ function AddPipelineDialog({
   onCreated: () => void
 }) {
   const [name, setName] = useState('')
+  const [sourceId, setSourceId] = useState('') // '' = manual entry
   const [provider, setProvider] = useState('github_actions')
   const [values, setValues] = useState<Record<string, string>>({})
   const [token, setToken] = useState('')
+  // Discovery selections (CI-source mode).
+  const [pipeline, setPipeline] = useState<CIPipelineRef | null>(null)
+  const [repo, setRepo] = useState<CIRepoRef | null>(null)
+  const [workflow, setWorkflow] = useState<CIWorkflowRef | null>(null)
+  const [ref, setRef] = useState('')
+
+  const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
+  const source = sourcesQuery.data?.find((s) => s.id === sourceId) ?? null
+
+  // What the selected source can dispatch to, fetched live through its credential.
+  const adoPipelinesQuery = useQuery({
+    queryKey: queryKeys.ciSources.pipelines(sourceId),
+    queryFn: () => api.listCISourcePipelines(sourceId),
+    enabled: open && source?.provider === 'azure_devops',
+  })
+  const reposQuery = useQuery({
+    queryKey: queryKeys.ciSources.repos(sourceId),
+    queryFn: () => api.listCISourceRepos(sourceId),
+    enabled: open && source?.provider === 'github_actions',
+  })
+  const workflowsQuery = useQuery({
+    queryKey: queryKeys.ciSources.workflows(sourceId, repo?.name ?? ''),
+    queryFn: () => api.listCISourceWorkflows(sourceId, repo?.name ?? ''),
+    enabled: open && source?.provider === 'github_actions' && Boolean(repo),
+  })
 
   const def = PROVIDERS.find((p) => p.value === provider) ?? PROVIDERS[0]
 
+  const resetSelections = () => {
+    setPipeline(null)
+    setRepo(null)
+    setWorkflow(null)
+    setRef('')
+  }
+
   const mutation = useMutation({
     mutationFn: () => {
+      if (source) {
+        // Built from a CI source: coordinates come from the selection; the
+        // credential stays on the source (resolved at dispatch via ci_source_id).
+        const config: Record<string, unknown> = { ci_source_id: source.id }
+        if (source.provider === 'azure_devops') {
+          config.organization = source.organization
+          config.project = source.project ?? ''
+          config.pipeline_id = String(pipeline?.id ?? '')
+        } else {
+          config.owner = source.organization
+          config.repo = repo?.name ?? ''
+          config.workflow_id = workflow?.file ?? ''
+        }
+        if (ref.trim()) config.ref = ref.trim()
+        return api.createPipeline({ name, provider: source.provider, config })
+      }
       const config: Record<string, unknown> = {}
       for (const f of def.fields) {
         const v = values[f.key]?.trim()
@@ -339,11 +405,15 @@ function AddPipelineDialog({
       setName('')
       setValues({})
       setToken('')
+      setSourceId('')
+      resetSelections()
       onCreated()
     },
   })
 
-  const valid = Boolean(name) && def.fields.filter((f) => !f.optional).every((f) => values[f.key]?.trim())
+  const valid = source
+    ? Boolean(name) && (source.provider === 'azure_devops' ? Boolean(pipeline) : Boolean(repo && workflow))
+    : Boolean(name) && def.fields.filter((f) => !f.optional).every((f) => values[f.key]?.trim())
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -353,38 +423,162 @@ function AddPipelineDialog({
           <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
           <TextField
             select
-            label="Provider"
-            value={provider}
+            label="CI source"
+            value={sourceId}
             onChange={(e) => {
-              setProvider(e.target.value)
-              setValues({})
+              setSourceId(e.target.value)
+              resetSelections()
             }}
+            helperText="Pick a configured CI source to choose from its pipelines or workflows, or enter coordinates manually."
             fullWidth
           >
-            {PROVIDERS.map((p) => (
-              <MenuItem key={p.value} value={p.value}>
-                {p.label}
+            <MenuItem value="">Manual entry</MenuItem>
+            {(sourcesQuery.data ?? []).map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.name} ({s.provider === 'azure_devops' ? `${s.organization}/${s.project ?? ''}` : s.organization})
               </MenuItem>
             ))}
           </TextField>
-          {def.fields.map((f) => (
-            <TextField
-              key={f.key}
-              label={f.optional ? `${f.label} (optional)` : f.label}
-              value={values[f.key] ?? ''}
-              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-              placeholder={f.placeholder}
-              fullWidth
+
+          {source && source.provider === 'azure_devops' && (
+            <Autocomplete
+              options={adoPipelinesQuery.data ?? []}
+              loading={adoPipelinesQuery.isLoading}
+              getOptionLabel={(p) => p.name}
+              value={pipeline}
+              onChange={(_, v) => {
+                setPipeline(v)
+                if (v && !name) setName(v.name)
+              }}
+              renderOption={(props, p) => (
+                <Box component="li" {...props} key={p.id} sx={{ display: 'flex', gap: 1 }}>
+                  <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                    {p.name}
+                  </Typography>
+                  {p.folder && p.folder !== '\\' && <Chip size="small" variant="outlined" label={p.folder} />}
+                </Box>
+              )}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Pipeline"
+                  helperText={
+                    adoPipelinesQuery.isError ? apiErr(adoPipelinesQuery.error) : 'Pipelines visible to this source'
+                  }
+                  error={adoPipelinesQuery.isError}
+                />
+              )}
             />
-          ))}
-          <TextField
-            label="API token / PAT"
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            helperText="Stored encrypted at rest"
-            fullWidth
-          />
+          )}
+
+          {source && source.provider === 'github_actions' && (
+            <>
+              <Autocomplete
+                options={reposQuery.data ?? []}
+                loading={reposQuery.isLoading}
+                getOptionLabel={(r) => r.name}
+                value={repo}
+                onChange={(_, v) => {
+                  setRepo(v)
+                  setWorkflow(null)
+                  setRef(v?.default_branch ?? '')
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Repository"
+                    helperText={reposQuery.isError ? apiErr(reposQuery.error) : 'Repositories visible to this source'}
+                    error={reposQuery.isError}
+                  />
+                )}
+              />
+              <Autocomplete
+                options={workflowsQuery.data ?? []}
+                loading={workflowsQuery.isLoading}
+                getOptionLabel={(w) => w.name}
+                value={workflow}
+                onChange={(_, v) => {
+                  setWorkflow(v)
+                  if (v && !name) setName(`${repo?.name} · ${v.name}`)
+                }}
+                disabled={!repo}
+                renderOption={(props, w) => (
+                  <Box component="li" {...props} key={w.id} sx={{ display: 'flex', gap: 1 }}>
+                    <Typography variant="body2" sx={{ flexGrow: 1 }}>
+                      {w.name}
+                    </Typography>
+                    <Chip size="small" variant="outlined" label={w.file} />
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Workflow"
+                    helperText={
+                      workflowsQuery.isError
+                        ? apiErr(workflowsQuery.error)
+                        : 'Active workflows in the selected repository'
+                    }
+                    error={workflowsQuery.isError}
+                  />
+                )}
+              />
+            </>
+          )}
+
+          {source && (
+            <>
+              <TextField
+                label="Default ref (optional)"
+                value={ref}
+                onChange={(e) => setRef(e.target.value)}
+                placeholder={source.provider === 'azure_devops' ? 'refs/heads/main' : 'main'}
+                fullWidth
+              />
+              <Typography variant="caption" color="text.secondary">
+                Credential inherited from the CI source — rotating its token covers this connection.
+              </Typography>
+            </>
+          )}
+
+          {!source && (
+            <>
+              <TextField
+                select
+                label="Provider"
+                value={provider}
+                onChange={(e) => {
+                  setProvider(e.target.value)
+                  setValues({})
+                }}
+                fullWidth
+              >
+                {PROVIDERS.map((p) => (
+                  <MenuItem key={p.value} value={p.value}>
+                    {p.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              {def.fields.map((f) => (
+                <TextField
+                  key={f.key}
+                  label={f.optional ? `${f.label} (optional)` : f.label}
+                  value={values[f.key] ?? ''}
+                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                  placeholder={f.placeholder}
+                  fullWidth
+                />
+              ))}
+              <TextField
+                label="API token / PAT"
+                type="password"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+                helperText="Stored encrypted at rest"
+                fullWidth
+              />
+            </>
+          )}
           {mutation.isError && <Alert severity="error">{apiErr(mutation.error)}</Alert>}
         </Stack>
       </DialogContent>
@@ -394,6 +588,135 @@ function AddPipelineDialog({
           Create
         </Button>
       </DialogActions>
+    </Dialog>
+  )
+}
+
+function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const queryClient = useQueryClient()
+  const [name, setName] = useState('')
+  const [provider, setProvider] = useState('github_actions')
+  const [organization, setOrganization] = useState('')
+  const [project, setProject] = useState('')
+  const [token, setToken] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<CISource | null>(null)
+
+  const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
+
+  const createMutation = useMutation({
+    mutationFn: () =>
+      api.createCISource({
+        name,
+        provider,
+        organization,
+        project: provider === 'azure_devops' ? project : undefined,
+        token,
+      }),
+    onSuccess: () => {
+      setName('')
+      setOrganization('')
+      setProject('')
+      setToken('')
+      queryClient.invalidateQueries({ queryKey: queryKeys.ciSources.all })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.deleteCISource(id),
+    onSuccess: () => {
+      setDeleteTarget(null)
+      queryClient.invalidateQueries({ queryKey: queryKeys.ciSources.all })
+    },
+  })
+
+  const valid =
+    Boolean(name.trim()) &&
+    Boolean(organization.trim()) &&
+    Boolean(token) &&
+    (provider !== 'azure_devops' || Boolean(project.trim()))
+
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>CI sources</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            Org-level CI credentials (an Azure DevOps org/project or a GitHub owner). Pipeline connections built from
+            a source pick from its pipelines or workflows and share its token.
+          </Typography>
+
+          {sourcesQuery.isLoading && <CircularProgress size={20} />}
+          {(sourcesQuery.data ?? []).map((s) => (
+            <Stack key={s.id} direction="row" alignItems="center" spacing={1}>
+              <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
+                {s.name}
+              </Typography>
+              <Chip size="small" label={s.provider === 'azure_devops' ? 'Azure DevOps' : 'GitHub'} />
+              <Chip
+                size="small"
+                variant="outlined"
+                label={s.provider === 'azure_devops' ? `${s.organization}/${s.project ?? ''}` : s.organization}
+              />
+              <IconButton size="small" aria-label="delete CI source" onClick={() => setDeleteTarget(s)}>
+                <DeleteIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+          ))}
+          {sourcesQuery.data && sourcesQuery.data.length === 0 && (
+            <Alert severity="info">No CI sources yet — add one below.</Alert>
+          )}
+
+          <Divider />
+
+          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField select label="Provider" value={provider} onChange={(e) => setProvider(e.target.value)} fullWidth>
+            <MenuItem value="github_actions">GitHub Actions</MenuItem>
+            <MenuItem value="azure_devops">Azure DevOps</MenuItem>
+          </TextField>
+          <TextField
+            label={provider === 'azure_devops' ? 'Organization' : 'Owner (org or user)'}
+            value={organization}
+            onChange={(e) => setOrganization(e.target.value)}
+            fullWidth
+          />
+          {provider === 'azure_devops' && (
+            <TextField label="Project" value={project} onChange={(e) => setProject(e.target.value)} fullWidth />
+          )}
+          <TextField
+            label="API token / PAT"
+            type="password"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            helperText="Stored encrypted at rest; shared by connections built from this source"
+            fullWidth
+          />
+          {createMutation.isError && <Alert severity="error">{apiErr(createMutation.error)}</Alert>}
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              disabled={!valid || createMutation.isPending}
+              onClick={() => createMutation.mutate()}
+            >
+              Add CI source
+            </Button>
+          </Box>
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete CI source"
+        description={`Delete "${deleteTarget?.name}"? Pipeline connections built from it will stop dispatching unless they carry their own token.`}
+        confirmLabel="Delete"
+        severity="error"
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteMutation.mutate(deleteTarget.id)
+        }}
+      />
     </Dialog>
   )
 }

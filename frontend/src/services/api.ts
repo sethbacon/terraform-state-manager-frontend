@@ -343,6 +343,33 @@ export interface CreatePipelineInput {
   token?: string
 }
 
+// CI sources: org-level CI credentials (ADO org/project or GitHub owner) that
+// pipeline connections can be created from by selection.
+export interface CISource {
+  id: string
+  name: string
+  provider: string
+  organization: string
+  project?: string | null
+  has_token: boolean
+  created_at: string
+  updated_at: string
+}
+export interface CIPipelineRef {
+  id: number
+  name: string
+  folder?: string
+}
+export interface CIRepoRef {
+  name: string
+  default_branch?: string
+}
+export interface CIWorkflowRef {
+  id: number
+  name: string
+  file: string
+}
+
 export interface DriftRun {
   id: string
   pipeline_connection_id: string | null
@@ -658,6 +685,29 @@ export const api = {
   deletePipeline: async (id: string): Promise<void> => {
     await apiClient.delete(`/api/v1/pipelines/${id}`)
   },
+  // CI sources + discovery
+  listCISources: async (): Promise<CISource[]> =>
+    (await apiClient.get<{ ci_sources: CISource[] }>('/api/v1/ci-sources')).data.ci_sources,
+  createCISource: async (input: {
+    name: string
+    provider: string
+    organization: string
+    project?: string
+    token: string
+  }): Promise<CISource> => (await apiClient.post<CISource>('/api/v1/ci-sources', input)).data,
+  deleteCISource: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/ci-sources/${id}`)
+  },
+  listCISourcePipelines: async (id: string): Promise<CIPipelineRef[]> =>
+    (await apiClient.get<{ pipelines: CIPipelineRef[] }>(`/api/v1/ci-sources/${id}/pipelines`)).data.pipelines,
+  listCISourceRepos: async (id: string): Promise<CIRepoRef[]> =>
+    (await apiClient.get<{ repos: CIRepoRef[] }>(`/api/v1/ci-sources/${id}/repos`)).data.repos,
+  listCISourceWorkflows: async (id: string, repo: string): Promise<CIWorkflowRef[]> =>
+    (
+      await apiClient.get<{ workflows: CIWorkflowRef[] }>(
+        `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/workflows`,
+      )
+    ).data.workflows,
   listDriftRuns: async (): Promise<DriftRun[]> =>
     (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
