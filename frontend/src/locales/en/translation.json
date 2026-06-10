@@ -151,6 +151,9 @@
     "newTransfer": "New transfer"
   },
   "pages": {
+    "apiDocs": {
+      "sections": "Sections"
+    },
     "admin": {
       "overview": "Identity management overview. Users, organizations, and role templates come from the shared identity service.",
       "users": "Users",

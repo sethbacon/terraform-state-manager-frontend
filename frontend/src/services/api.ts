@@ -13,7 +13,8 @@ export const apiClient = axios.create({
 })
 
 // Read a non-HttpOnly cookie by name (used for the CSRF double-submit token).
-function readCookie(name: string): string | null {
+// Exported for the Swagger UI request interceptor, which needs the same token.
+export function readCookie(name: string): string | null {
   const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`))
   return match ? decodeURIComponent(match[1]) : null
 }

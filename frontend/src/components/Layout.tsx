@@ -141,6 +141,18 @@ export default function Layout() {
           <ListItemText primary={t(homeItem.labelKey)} slotProps={navTextProps(homeActive)} />
         </ListItemButton>
 
+        {/* API docs — standalone, directly under Home */}
+        <ListItemButton
+          component={RouterLink}
+          to={apiDocsItem.path}
+          onClick={closeDrawerOnNav}
+          aria-current={apiDocsActive ? 'page' : undefined}
+          sx={navItemSx(apiDocsActive, 16)}
+        >
+          <ListItemIcon sx={{ color: apiDocsActive ? 'primary.main' : 'inherit' }}>{apiDocsItem.icon}</ListItemIcon>
+          <ListItemText primary={t(apiDocsItem.labelKey)} slotProps={navTextProps(apiDocsActive)} />
+        </ListItemButton>
+
         {visibleGroups.map((group) => (
           <Box key={group.key}>
             <ListItemButton onClick={() => toggleGroup(group.key)} dense sx={{ mt: 0.5 }}>
@@ -177,17 +189,6 @@ export default function Layout() {
           </Box>
         ))}
 
-        {/* API docs — standalone at the bottom */}
-        <ListItemButton
-          component={RouterLink}
-          to={apiDocsItem.path}
-          onClick={closeDrawerOnNav}
-          aria-current={apiDocsActive ? 'page' : undefined}
-          sx={{ mt: 0.5, ...navItemSx(apiDocsActive, 16) }}
-        >
-          <ListItemIcon sx={{ color: apiDocsActive ? 'primary.main' : 'inherit' }}>{apiDocsItem.icon}</ListItemIcon>
-          <ListItemText primary={t(apiDocsItem.labelKey)} slotProps={navTextProps(apiDocsActive)} />
-        </ListItemButton>
       </List>
     </Box>
   )

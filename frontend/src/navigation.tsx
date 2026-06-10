@@ -72,7 +72,7 @@ export const navGroups: NavGroup[] = [
   },
 ]
 
-// API docs — shown standalone at the bottom of the drawer (always visible).
+// API docs — shown standalone directly under Home (always visible).
 export const apiDocsItem: NavItem = {
   path: '/api-docs',
   labelKey: 'nav.apiDocs',
@@ -81,6 +81,6 @@ export const apiDocsItem: NavItem = {
   scope: null,
 }
 
-// Flattened list of every routable nav item (home + group items + api docs) for
+// Flattened list of every routable nav item (home + api docs + group items) for
 // the route table in App.tsx and the command palette.
-export const allNavItems: NavItem[] = [homeItem, ...navGroups.flatMap((g) => g.items), apiDocsItem]
+export const allNavItems: NavItem[] = [homeItem, apiDocsItem, ...navGroups.flatMap((g) => g.items)]
