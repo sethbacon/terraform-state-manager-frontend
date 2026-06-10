@@ -27,6 +27,7 @@ import {
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import HubIcon from '@mui/icons-material/Hub'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import DescriptionIcon from '@mui/icons-material/Description'
@@ -41,6 +42,7 @@ import {
   type PipelineConnection,
 } from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
+import DriftRepoWizard from '../components/DriftRepoWizard'
 import PageHeader from '../components/PageHeader'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { queryKeys } from '../services/queryKeys'
@@ -94,6 +96,7 @@ export default function DriftPage() {
 
   const [addPipelineOpen, setAddPipelineOpen] = useState(false)
   const [ciSourcesOpen, setCiSourcesOpen] = useState(false)
+  const [repoWizardOpen, setRepoWizardOpen] = useState(false)
   const [newRunOpen, setNewRunOpen] = useState(false)
   const [workflowOpen, setWorkflowOpen] = useState(false)
   const [selectedRun, setSelectedRun] = useState<DriftRun | null>(null)
@@ -145,6 +148,9 @@ export default function DriftPage() {
         </Typography>
         {canManage && (
           <>
+            <Button size="small" startIcon={<AutoFixHighIcon />} onClick={() => setRepoWizardOpen(true)} sx={{ mr: 1 }}>
+              Set up repo
+            </Button>
             <Button size="small" startIcon={<HubIcon />} onClick={() => setCiSourcesOpen(true)} sx={{ mr: 1 }}>
               CI sources
             </Button>
@@ -226,6 +232,11 @@ export default function DriftPage() {
         }}
       />
       <CISourcesDialog open={ciSourcesOpen} onClose={() => setCiSourcesOpen(false)} />
+      <DriftRepoWizard
+        open={repoWizardOpen}
+        onClose={() => setRepoWizardOpen(false)}
+        onCreated={() => queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.all })}
+      />
       <NewRunDialog
         open={newRunOpen}
         onClose={() => setNewRunOpen(false)}

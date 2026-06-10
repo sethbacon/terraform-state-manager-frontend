@@ -361,8 +361,19 @@ export interface CIPipelineRef {
   folder?: string
 }
 export interface CIRepoRef {
+  /** Repository id (Azure DevOps only — required by pipeline creation). */
+  id?: string
   name: string
   default_branch?: string
+}
+export interface CIServiceConnectionRef {
+  id: string
+  name: string
+  type?: string
+}
+export interface CallbackPreflight {
+  callback_base: string
+  likely_unreachable: boolean
 }
 export interface CIWorkflowRef {
   id: number
@@ -708,6 +719,22 @@ export const api = {
         `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/workflows`,
       )
     ).data.workflows,
+  listCISourceServiceConnections: async (id: string): Promise<CIServiceConnectionRef[]> =>
+    (await apiClient.get<{ service_connections: CIServiceConnectionRef[] }>(`/api/v1/ci-sources/${id}/service-connections`))
+      .data.service_connections,
+  createCISourcePipeline: async (
+    id: string,
+    repoId: string,
+    input: { name: string; yaml_path?: string },
+  ): Promise<CIPipelineRef> =>
+    (
+      await apiClient.post<{ pipeline: CIPipelineRef }>(
+        `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repoId)}/pipelines`,
+        input,
+      )
+    ).data.pipeline,
+  getCallbackPreflight: async (): Promise<CallbackPreflight> =>
+    (await apiClient.get<CallbackPreflight>('/api/v1/pipelines/callback-preflight')).data,
   listDriftRuns: async (): Promise<DriftRun[]> =>
     (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
