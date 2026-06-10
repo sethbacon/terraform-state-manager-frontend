@@ -1,7 +1,8 @@
-import { type ChangeEvent, useRef, useState } from 'react'
+import { type ChangeEvent, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   ButtonGroup,
@@ -347,6 +348,25 @@ function StateOpsDialog({
   const [address, setAddress] = useState('')
   const [to, setTo] = useState('')
 
+  // Resources in this state, so the address can be picked instead of typed.
+  // Same query key as the Resources tab, so it's usually already cached.
+  const resourcesQuery = useQuery({
+    queryKey: queryKeys.sources.resources(sourceId, stateKey),
+    queryFn: () => api.listStateResources(sourceId, stateKey),
+    enabled: open,
+  })
+
+  // Addresses in the exact form the backend parses: "[module.X.]type.name"
+  // (no prefix for the root module). Deduped; meta drives the option display.
+  const { addressOptions, addressMeta } = useMemo(() => {
+    const meta = new Map<string, { mode: string; instances: number; module: string }>()
+    for (const r of resourcesQuery.data ?? []) {
+      const addr = `${r.module === 'root' ? '' : `${r.module}.`}${r.type}.${r.name}`
+      if (!meta.has(addr)) meta.set(addr, { mode: r.mode, instances: r.instances, module: r.module })
+    }
+    return { addressOptions: [...meta.keys()], addressMeta: meta }
+  }, [resourcesQuery.data])
+
   const mutation = useMutation({
     mutationFn: () => api.stateOperation(sourceId, stateKey, op, address, op === 'mv' ? to : undefined),
     onSuccess: () => {
@@ -378,12 +398,33 @@ function StateOpsDialog({
             <MenuItem value="rm">Remove (terraform state rm)</MenuItem>
             <MenuItem value="mv">Move / rename (terraform state mv)</MenuItem>
           </TextField>
-          <TextField
-            label="Resource address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="aws_instance.web or module.vpc.aws_subnet.private"
-            fullWidth
+          <Autocomplete
+            freeSolo
+            options={addressOptions}
+            loading={resourcesQuery.isLoading}
+            groupBy={(option) => addressMeta.get(option)?.module ?? ''}
+            inputValue={address}
+            onInputChange={(_, v) => setAddress(v)}
+            renderOption={(props, option) => {
+              const meta = addressMeta.get(option)
+              return (
+                <Box component="li" {...props} key={option} sx={{ display: 'flex', gap: 1 }}>
+                  <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: 'break-all' }}>
+                    {option}
+                  </Typography>
+                  {meta?.mode === 'data' && <Chip size="small" label="data" />}
+                  {(meta?.instances ?? 0) > 1 && <Chip size="small" variant="outlined" label={`×${meta?.instances}`} />}
+                </Box>
+              )
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Resource address"
+                placeholder="aws_instance.web or module.vpc.aws_subnet.private"
+                fullWidth
+              />
+            )}
           />
           {op === 'mv' && (
             <TextField
