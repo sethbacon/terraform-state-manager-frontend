@@ -10,4 +10,8 @@ body,
 
 body {
   margin: 0;
+  /* Antialias Inter the way the registry does — it's designed to be rendered
+     smoothed, and without this it looks heavier/grainier on WebKit and macOS. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

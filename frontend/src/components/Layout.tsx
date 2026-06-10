@@ -111,6 +111,19 @@ export default function Layout() {
     setSettingsAnchor(null)
   }
 
+  // Active nav-item treatment mirroring the registry: a brand accent bar on the
+  // left, a faint brand-tinted background, a brand-coloured icon, and a bolder
+  // label. basePl is the inactive left padding (px); the 3px accent eats into it
+  // when active so the icon and label never shift horizontally.
+  const navItemSx = (active: boolean, basePl: number) => ({
+    borderLeft: active ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
+    bgcolor: active ? `${theme.palette.primary.main}14` : 'transparent',
+    pl: `${active ? basePl - 3 : basePl}px`,
+  })
+  const navTextProps = (active: boolean) => ({ primary: { sx: { fontWeight: active ? 600 : 400 } } })
+  const homeActive = location.pathname === homeItem.path
+  const apiDocsActive = location.pathname === apiDocsItem.path
+
   const drawerContent = (
     <Box sx={{ overflow: 'auto' }} role="navigation" aria-label={t('a11y.openNavigation')}>
       <List>
@@ -118,11 +131,12 @@ export default function Layout() {
         <ListItemButton
           component={RouterLink}
           to={homeItem.path}
-          selected={location.pathname === homeItem.path}
           onClick={closeDrawerOnNav}
+          aria-current={homeActive ? 'page' : undefined}
+          sx={navItemSx(homeActive, 16)}
         >
-          <ListItemIcon>{homeItem.icon}</ListItemIcon>
-          <ListItemText primary={t(homeItem.labelKey)} />
+          <ListItemIcon sx={{ color: homeActive ? 'primary.main' : 'inherit' }}>{homeItem.icon}</ListItemIcon>
+          <ListItemText primary={t(homeItem.labelKey)} slotProps={navTextProps(homeActive)} />
         </ListItemButton>
 
         {visibleGroups.map((group) => (
@@ -130,27 +144,32 @@ export default function Layout() {
             <ListItemButton onClick={() => toggleGroup(group.key)} dense sx={{ mt: 0.5 }}>
               <ListItemText
                 primary={t(group.labelKey)}
-                slotProps={{ primary: { variant: 'overline', color: 'text.secondary' } }}
+                slotProps={{ primary: { variant: 'overline', color: 'text.secondary', sx: { fontWeight: 600 } } }}
               />
               {openGroups[group.key] ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />}
             </ListItemButton>
             <Collapse in={openGroups[group.key]} timeout="auto" unmountOnExit>
               <List disablePadding>
-                {group.items.map((item) => (
-                  <ListItemButton
-                    key={item.path}
-                    component={RouterLink}
-                    to={item.path}
-                    selected={location.pathname === item.path}
-                    onClick={closeDrawerOnNav}
-                    sx={{ pl: 3 }}
-                  >
-                    <Tooltip title={item.tooltipKey ? t(item.tooltipKey) : ''} placement="right">
-                      <ListItemIcon>{item.icon}</ListItemIcon>
-                    </Tooltip>
-                    <ListItemText primary={t(item.labelKey)} />
-                  </ListItemButton>
-                ))}
+                {group.items.map((item) => {
+                  const active = location.pathname === item.path
+                  return (
+                    <ListItemButton
+                      key={item.path}
+                      component={RouterLink}
+                      to={item.path}
+                      onClick={closeDrawerOnNav}
+                      aria-current={active ? 'page' : undefined}
+                      sx={navItemSx(active, 24)}
+                    >
+                      <Tooltip title={item.tooltipKey ? t(item.tooltipKey) : ''} placement="right" arrow>
+                        <ListItemIcon sx={{ minWidth: 36, color: active ? 'primary.main' : 'inherit' }}>
+                          {item.icon}
+                        </ListItemIcon>
+                      </Tooltip>
+                      <ListItemText primary={t(item.labelKey)} slotProps={navTextProps(active)} />
+                    </ListItemButton>
+                  )
+                })}
               </List>
             </Collapse>
           </Box>
@@ -160,12 +179,12 @@ export default function Layout() {
         <ListItemButton
           component={RouterLink}
           to={apiDocsItem.path}
-          selected={location.pathname === apiDocsItem.path}
           onClick={closeDrawerOnNav}
-          sx={{ mt: 0.5 }}
+          aria-current={apiDocsActive ? 'page' : undefined}
+          sx={{ mt: 0.5, ...navItemSx(apiDocsActive, 16) }}
         >
-          <ListItemIcon>{apiDocsItem.icon}</ListItemIcon>
-          <ListItemText primary={t(apiDocsItem.labelKey)} />
+          <ListItemIcon sx={{ color: apiDocsActive ? 'primary.main' : 'inherit' }}>{apiDocsItem.icon}</ListItemIcon>
+          <ListItemText primary={t(apiDocsItem.labelKey)} slotProps={navTextProps(apiDocsActive)} />
         </ListItemButton>
       </List>
     </Box>
