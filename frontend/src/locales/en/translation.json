@@ -309,6 +309,10 @@
       "navigation": "Navigation"
     }
   },
+  "session": {
+    "expiresSoon": "Your session expires in {{minutes}} minutes. Refresh to stay signed in.",
+    "refresh": "Refresh session"
+  },
   "a11y": {
     "skipToContent": "Skip to main content",
     "openNavigation": "Open navigation",

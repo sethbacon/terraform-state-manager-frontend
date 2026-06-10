@@ -23,9 +23,13 @@ export interface AuthContextType {
   allowedScopes: string[]
   isAuthenticated: boolean
   isLoading: boolean
+  /** True once the session is within the expiry-warning window. */
+  sessionExpiresSoon: boolean
   login: (provider?: string) => void
   devLogin: () => Promise<void>
   ldapLogin: (username: string, password: string) => Promise<void>
   logout: () => void
+  /** Rotate the session cookie via POST /auth/refresh; logs out on failure. */
+  refreshSession: () => Promise<void>
   hasScope: (scope: string) => boolean
 }

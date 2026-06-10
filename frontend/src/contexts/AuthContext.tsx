@@ -1,7 +1,14 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
 import type { AuthContextType, MeResponse, User } from '../types/auth'
+
+/** How long before session expiry the warning Snackbar appears. */
+export const SESSION_WARNING_LEAD_MS = 2 * 60 * 1000
+
+// setTimeout delays beyond 2^31-1 ms overflow and fire immediately; skip
+// scheduling for sessions that long (the warning is pointless weeks out anyway).
+const MAX_TIMEOUT_MS = 2 ** 31 - 1
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
@@ -20,11 +27,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [allowedScopes, setAllowedScopes] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [sessionExpiresSoon, setSessionExpiresSoon] = useState(false)
+  const warnTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const applyMe = useCallback((me: MeResponse) => {
-    setUser(me.user)
-    setAllowedScopes(me.allowed_scopes ?? [])
+  // Arm the expiry-warning timer to fire SESSION_WARNING_LEAD_MS before the
+  // session lapses. The expiry comes from /me (session_expires_at) or from a
+  // refresh response (expires_in) — the cookie itself is HttpOnly and unreadable.
+  const scheduleSessionWarning = useCallback((expiresAt: Date) => {
+    if (warnTimer.current) clearTimeout(warnTimer.current)
+    setSessionExpiresSoon(false)
+    const delay = expiresAt.getTime() - Date.now() - SESSION_WARNING_LEAD_MS
+    if (delay > MAX_TIMEOUT_MS) return
+    if (delay <= 0) {
+      setSessionExpiresSoon(true)
+      return
+    }
+    warnTimer.current = setTimeout(() => setSessionExpiresSoon(true), delay)
   }, [])
+
+  useEffect(
+    () => () => {
+      if (warnTimer.current) clearTimeout(warnTimer.current)
+    },
+    [],
+  )
+
+  const applyMe = useCallback(
+    (me: MeResponse) => {
+      setUser(me.user)
+      setAllowedScopes(me.allowed_scopes ?? [])
+      if (me.session_expires_at) scheduleSessionWarning(new Date(me.session_expires_at))
+    },
+    [scheduleSessionWarning],
+  )
 
   const loadUser = useCallback(async () => {
     try {
@@ -60,11 +95,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   )
 
   const logout = useCallback(() => {
+    if (warnTimer.current) clearTimeout(warnTimer.current)
+    setSessionExpiresSoon(false)
     setUser(null)
     setAllowedScopes([])
     clearAuthStorage()
     api.logout()
   }, [])
+
+  // Rotate the session cookie before it lapses. On success the backend re-sets
+  // the HttpOnly cookie and returns the new TTL; on failure the session is
+  // unrecoverable, so sign out cleanly rather than letting requests start 401ing.
+  const refreshSession = useCallback(async () => {
+    try {
+      const { expires_in } = await api.refreshToken()
+      scheduleSessionWarning(new Date(Date.now() + expires_in * 1000))
+    } catch {
+      logout()
+    }
+  }, [scheduleSessionWarning, logout])
 
   const hasScope = useCallback((scope: string) => scopeSatisfied(allowedScopes, scope), [allowedScopes])
 
@@ -73,10 +122,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     allowedScopes,
     isAuthenticated: user !== null,
     isLoading,
+    sessionExpiresSoon,
     login,
     devLogin,
     ldapLogin,
     logout,
+    refreshSession,
     hasScope,
   }
 
