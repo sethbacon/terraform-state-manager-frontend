@@ -13,6 +13,8 @@ import BusinessIcon from '@mui/icons-material/Business'
 import BadgeIcon from '@mui/icons-material/Badge'
 import HistoryIcon from '@mui/icons-material/History'
 import VpnKeyIcon from '@mui/icons-material/VpnKey'
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
+import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 
 export interface NavItem {
@@ -57,20 +59,39 @@ export const navGroups: NavGroup[] = [
       { path: '/transfer', labelKey: 'nav.transfer', tooltipKey: 'nav.transferTooltip', icon: <SwapHorizIcon />, scope: 'state:transfer' },
     ],
   },
+  // Admin categories mirror the registry's sidebar: an Identity group for the
+  // who-can-do-what pages and a System group for operational concerns. The admin
+  // Dashboard renders standalone above these groups (see Layout).
   {
-    key: 'administration',
-    labelKey: 'nav.groups.administration',
+    key: 'identity',
+    labelKey: 'nav.groups.identity',
     items: [
-      { path: '/admin', labelKey: 'nav.admin.dashboard', tooltipKey: 'nav.admin.dashboardTooltip', icon: <DashboardCustomizeIcon />, scope: 'admin' },
-      { path: '/admin/users', labelKey: 'nav.admin.users', tooltipKey: 'nav.admin.usersTooltip', icon: <PeopleIcon />, scope: 'admin' },
       { path: '/admin/organizations', labelKey: 'nav.admin.organizations', tooltipKey: 'nav.admin.organizationsTooltip', icon: <BusinessIcon />, scope: 'admin' },
       { path: '/admin/roles', labelKey: 'nav.admin.roles', tooltipKey: 'nav.admin.rolesTooltip', icon: <BadgeIcon />, scope: 'admin' },
+      { path: '/admin/users', labelKey: 'nav.admin.users', tooltipKey: 'nav.admin.usersTooltip', icon: <PeopleIcon />, scope: 'admin' },
+      { path: '/admin/oidc', labelKey: 'nav.admin.oidcGroups', tooltipKey: 'nav.admin.oidcGroupsTooltip', icon: <ManageAccountsIcon />, scope: 'admin' },
+      { path: '/admin/mtls', labelKey: 'nav.admin.mtls', tooltipKey: 'nav.admin.mtlsTooltip', icon: <VerifiedUserIcon />, scope: 'admin' },
       { path: '/admin/sso', labelKey: 'nav.admin.sso', tooltipKey: 'nav.admin.ssoTooltip', icon: <VpnKeyIcon />, scope: 'admin' },
+    ],
+  },
+  {
+    key: 'system',
+    labelKey: 'nav.groups.system',
+    items: [
       { path: '/admin/notifications', labelKey: 'nav.admin.notifications', tooltipKey: 'nav.admin.notificationsTooltip', icon: <NotificationsIcon />, scope: 'admin' },
       { path: '/admin/audit-logs', labelKey: 'nav.admin.auditLogs', tooltipKey: 'nav.admin.auditLogsTooltip', icon: <HistoryIcon />, scope: 'admin' },
     ],
   },
 ]
+
+// Admin dashboard — standalone above the Identity group (registry pattern).
+export const adminDashboardItem: NavItem = {
+  path: '/admin',
+  labelKey: 'nav.admin.dashboard',
+  tooltipKey: 'nav.admin.dashboardTooltip',
+  icon: <DashboardCustomizeIcon />,
+  scope: 'admin',
+}
 
 // API docs — shown standalone directly under Home (always visible).
 export const apiDocsItem: NavItem = {
@@ -81,6 +102,11 @@ export const apiDocsItem: NavItem = {
   scope: null,
 }
 
-// Flattened list of every routable nav item (home + api docs + group items) for
-// the route table in App.tsx and the command palette.
-export const allNavItems: NavItem[] = [homeItem, apiDocsItem, ...navGroups.flatMap((g) => g.items)]
+// Flattened list of every routable nav item (home + api docs + admin dashboard +
+// group items) for the route table in App.tsx and the command palette.
+export const allNavItems: NavItem[] = [
+  homeItem,
+  apiDocsItem,
+  adminDashboardItem,
+  ...navGroups.flatMap((g) => g.items),
+]

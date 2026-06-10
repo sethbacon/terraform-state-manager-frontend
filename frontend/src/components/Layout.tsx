@@ -35,7 +35,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore'
 import CheckIcon from '@mui/icons-material/Check'
 import { useTranslation } from 'react-i18next'
 import i18n, { SUPPORTED_LANGUAGES } from '../i18n'
-import { homeItem, navGroups, apiDocsItem } from '../navigation'
+import { homeItem, navGroups, apiDocsItem, adminDashboardItem } from '../navigation'
 import { useThemeMode } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
 import { useHelp } from '../contexts/HelpContext'
@@ -125,6 +125,7 @@ export default function Layout() {
   const navTextProps = (active: boolean) => ({ primary: { sx: { fontWeight: active ? 600 : 400 } } })
   const homeActive = location.pathname === homeItem.path
   const apiDocsActive = location.pathname === apiDocsItem.path
+  const adminDashActive = location.pathname === adminDashboardItem.path
 
   const drawerContent = (
     <Box sx={{ overflow: 'auto' }} role="navigation" aria-label={t('a11y.openNavigation')}>
@@ -155,6 +156,26 @@ export default function Layout() {
 
         {visibleGroups.map((group) => (
           <Box key={group.key}>
+            {/* Admin Dashboard — standalone above the Identity group, like the
+                registry renders it without a group header. The Identity group is
+                scope-filtered, so this only appears for admins. */}
+            {group.key === 'identity' && (
+              <>
+                <Divider sx={{ my: 0.5 }} />
+                <ListItemButton
+                  component={RouterLink}
+                  to={adminDashboardItem.path}
+                  onClick={closeDrawerOnNav}
+                  aria-current={adminDashActive ? 'page' : undefined}
+                  sx={navItemSx(adminDashActive, 16)}
+                >
+                  <ListItemIcon sx={{ color: adminDashActive ? 'primary.main' : 'inherit' }}>
+                    {adminDashboardItem.icon}
+                  </ListItemIcon>
+                  <ListItemText primary={t(adminDashboardItem.labelKey)} slotProps={navTextProps(adminDashActive)} />
+                </ListItemButton>
+              </>
+            )}
             <ListItemButton onClick={() => toggleGroup(group.key)} dense sx={{ mt: 0.5 }}>
               <ListItemText
                 primary={t(group.labelKey)}

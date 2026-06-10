@@ -143,7 +143,9 @@ export interface DashboardOverview {
 export interface AdminUserMembership {
   organization_id?: string
   organization_name?: string
-  role_template_name?: string
+  role_template_id?: string | null
+  role_template_name?: string | null
+  role_template_display_name?: string | null
 }
 export interface AdminUser {
   id: string
@@ -161,6 +163,16 @@ export interface AdminOrganization {
   idp_name?: string | null
   created_at: string
 }
+export interface OrgMemberWithUser {
+  organization_id: string
+  user_id: string
+  role_template_id?: string | null
+  role_template_name?: string | null
+  role_template_display_name?: string | null
+  user_name: string
+  user_email: string
+  created_at: string
+}
 export interface RoleTemplate {
   id: string
   name: string
@@ -168,21 +180,65 @@ export interface RoleTemplate {
   description?: string | null
   scopes: string[]
   is_system: boolean
+  created_at: string
+  updated_at: string
 }
 export interface AuditLogEntry {
   id: string
   action: string
   resource_type?: string | null
   resource_id?: string | null
+  organization_id?: string | null
+  user_id?: string | null
+  metadata?: Record<string, unknown> | null
   ip_address?: string | null
   created_at: string
   user_email?: string | null
   user_name?: string | null
 }
+export interface AuditLogFilters {
+  page?: number
+  per_page?: number
+  action?: string
+  resource_type?: string
+  user_email?: string
+  start_date?: string
+  end_date?: string
+}
 export interface AdminStats {
   users: number
   organizations: number
   roles: number
+}
+export interface OIDCGroupMapping {
+  group: string
+  organization: string
+  role: string
+}
+export interface OIDCConfigResponse {
+  provider_type: string
+  issuer_url: string
+  client_id: string
+  is_active: boolean
+  group_claim_name: string
+  default_role: string
+  group_mappings: OIDCGroupMapping[]
+}
+export interface IdentityGroupMappings {
+  saml?: {
+    group_attribute_name: string
+    default_role: string
+    group_mappings: OIDCGroupMapping[]
+  }
+  ldap?: {
+    default_role: string
+    group_mappings: { group_dn: string; organization: string; role: string }[]
+  }
+}
+export interface MTLSConfigResponse {
+  enabled: boolean
+  client_ca_file: string
+  mappings: { subject: string; scopes: string[] }[]
 }
 
 export interface StateSource {
@@ -403,16 +459,72 @@ export const api = {
 
   // Identity management (admin scope)
   getAdminStats: async (): Promise<AdminStats> => (await apiClient.get<AdminStats>('/api/v1/admin/stats')).data,
-  listAdminUsers: async (): Promise<AdminUser[]> =>
-    (await apiClient.get<{ users: AdminUser[] }>('/api/v1/admin/users')).data.users,
+  listAdminUsers: async (params?: { page?: number; per_page?: number; q?: string }): Promise<{ users: AdminUser[]; total: number }> =>
+    (await apiClient.get<{ users: AdminUser[]; total: number }>('/api/v1/admin/users', { params })).data,
+  createAdminUser: async (input: { email: string; name: string }): Promise<AdminUser> =>
+    (await apiClient.post<AdminUser>('/api/v1/admin/users', input)).data,
+  updateAdminUser: async (id: string, input: { name: string }): Promise<AdminUser> =>
+    (await apiClient.put<AdminUser>(`/api/v1/admin/users/${id}`, input)).data,
+  deleteAdminUser: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/users/${id}`)
+  },
+  getAdminUserMemberships: async (id: string): Promise<AdminUserMembership[]> =>
+    (await apiClient.get<{ memberships: AdminUserMembership[] }>(`/api/v1/admin/users/${id}/memberships`)).data
+      .memberships,
+  // GDPR Articles 15/20 — returns the export blob plus its download filename.
+  exportAdminUserData: async (id: string): Promise<{ blob: Blob; filename: string }> => {
+    const res = await apiClient.get(`/api/v1/admin/users/${id}/export`, { responseType: 'blob' })
+    return { blob: res.data as Blob, filename: `user-data-${id}.json` }
+  },
+  // GDPR Article 17 — anonymize PII, revoke access.
+  eraseAdminUser: async (id: string): Promise<{ message?: string }> =>
+    (await apiClient.post<{ message?: string }>(`/api/v1/admin/users/${id}/erase`)).data,
   listAdminOrganizations: async (): Promise<AdminOrganization[]> =>
     (await apiClient.get<{ organizations: AdminOrganization[] }>('/api/v1/admin/organizations')).data.organizations,
+  createAdminOrganization: async (input: { name: string; display_name: string }): Promise<AdminOrganization> =>
+    (await apiClient.post<AdminOrganization>('/api/v1/admin/organizations', input)).data,
+  updateAdminOrganization: async (
+    id: string,
+    input: { name?: string; display_name?: string; idp_type?: string | null; idp_name?: string | null },
+  ): Promise<AdminOrganization> =>
+    (await apiClient.put<AdminOrganization>(`/api/v1/admin/organizations/${id}`, input)).data,
+  deleteAdminOrganization: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/organizations/${id}`)
+  },
+  listAdminOrgMembers: async (orgId: string): Promise<OrgMemberWithUser[]> =>
+    (await apiClient.get<{ members: OrgMemberWithUser[] }>(`/api/v1/admin/organizations/${orgId}/members`)).data
+      .members,
+  addAdminOrgMember: async (orgId: string, input: { user_id: string; role_template_id?: string }): Promise<void> => {
+    await apiClient.post(`/api/v1/admin/organizations/${orgId}/members`, input)
+  },
+  updateAdminOrgMember: async (
+    orgId: string,
+    userId: string,
+    input: { role_template_id?: string },
+  ): Promise<void> => {
+    await apiClient.put(`/api/v1/admin/organizations/${orgId}/members/${userId}`, input)
+  },
+  removeAdminOrgMember: async (orgId: string, userId: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/organizations/${orgId}/members/${userId}`)
+  },
   listAdminRoles: async (): Promise<RoleTemplate[]> =>
     (await apiClient.get<{ roles: RoleTemplate[] }>('/api/v1/admin/roles')).data.roles,
-  listAuditLogs: async (): Promise<AuditLogEntry[]> =>
-    (await apiClient.get<{ logs: AuditLogEntry[] }>('/api/v1/admin/audit-logs')).data.logs,
+  listAuditLogs: async (params?: AuditLogFilters): Promise<{ logs: AuditLogEntry[]; total: number }> =>
+    (await apiClient.get<{ logs: AuditLogEntry[]; total: number }>('/api/v1/admin/audit-logs', { params })).data,
   getSSOConfig: async (): Promise<SSOConfig> =>
     (await apiClient.get<SSOConfig>('/api/v1/admin/sso')).data,
+  getAdminOIDCConfig: async (): Promise<OIDCConfigResponse> =>
+    (await apiClient.get<OIDCConfigResponse>('/api/v1/admin/oidc/config')).data,
+  updateOIDCGroupMapping: async (input: {
+    group_claim_name: string
+    default_role: string
+    group_mappings: OIDCGroupMapping[]
+  }): Promise<OIDCConfigResponse> =>
+    (await apiClient.put<OIDCConfigResponse>('/api/v1/admin/oidc/group-mapping', input)).data,
+  getIdentityGroupMappings: async (): Promise<IdentityGroupMappings> =>
+    (await apiClient.get<IdentityGroupMappings>('/api/v1/admin/identity-group-mappings')).data,
+  getMTLSConfig: async (): Promise<MTLSConfigResponse> =>
+    (await apiClient.get<MTLSConfigResponse>('/api/v1/admin/mtls')).data,
 
   // Auth
   getProviders: async (): Promise<ProvidersInfo> => (await apiClient.get<ProvidersInfo>('/api/v1/auth/providers')).data,

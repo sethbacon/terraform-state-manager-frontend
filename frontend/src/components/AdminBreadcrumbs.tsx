@@ -15,6 +15,8 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   users: 'nav.admin.users',
   organizations: 'nav.admin.organizations',
   roles: 'nav.admin.roles',
+  oidc: 'nav.admin.oidcGroups',
+  mtls: 'nav.admin.mtls',
   sso: 'nav.admin.sso',
   notifications: 'nav.admin.notifications',
   'audit-logs': 'nav.admin.auditLogs',

@@ -10,11 +10,18 @@ export const queryKeys = {
   },
   admin: {
     stats: () => ['admin', 'stats'] as const,
-    users: () => ['admin', 'users'] as const,
+    usersAll: ['admin', 'users'] as const,
+    users: (params?: Record<string, unknown>) =>
+      params ? (['admin', 'users', params] as const) : (['admin', 'users'] as const),
     organizations: () => ['admin', 'organizations'] as const,
+    orgMembers: (orgId: string) => ['admin', 'organizations', orgId, 'members'] as const,
     roles: () => ['admin', 'roles'] as const,
-    auditLogs: () => ['admin', 'audit-logs'] as const,
+    auditLogs: (params?: Record<string, unknown>) =>
+      params ? (['admin', 'audit-logs', params] as const) : (['admin', 'audit-logs'] as const),
     sso: () => ['admin', 'sso'] as const,
+    oidcConfig: () => ['admin', 'oidc', 'config'] as const,
+    identityMappings: () => ['admin', 'identity-group-mappings'] as const,
+    mtls: () => ['admin', 'mtls'] as const,
     notifications: () => ['admin', 'notifications'] as const,
   },
   sources: {

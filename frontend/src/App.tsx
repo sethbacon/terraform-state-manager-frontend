@@ -28,6 +28,8 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage')
 const UsersPage = lazy(() => import('./pages/admin/UsersPage'))
 const OrganizationsPage = lazy(() => import('./pages/admin/OrganizationsPage'))
 const RolesPage = lazy(() => import('./pages/admin/RolesPage'))
+const GroupMappingsPage = lazy(() => import('./pages/admin/GroupMappingsPage'))
+const MTLSPage = lazy(() => import('./pages/admin/MTLSPage'))
 const SSOPage = lazy(() => import('./pages/admin/SSOPage'))
 const NotificationsPage = lazy(() => import('./pages/admin/NotificationsPage'))
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
@@ -45,6 +47,8 @@ const realPages: Record<string, ReactNode> = {
   '/admin/users': <UsersPage />,
   '/admin/organizations': <OrganizationsPage />,
   '/admin/roles': <RolesPage />,
+  '/admin/oidc': <GroupMappingsPage />,
+  '/admin/mtls': <MTLSPage />,
   '/admin/sso': <SSOPage />,
   '/admin/notifications': <NotificationsPage />,
   '/admin/audit-logs': <AuditLogPage />,

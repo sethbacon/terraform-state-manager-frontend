@@ -18,12 +18,11 @@ export default function AdminDashboardPage() {
       {q.isError && <Alert severity="error">{t('common.error')}</Alert>}
       {q.data && (
         <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', mb: 3 }}>
-          <DashboardCard label={t('pages.admin.users')} value={q.data.users} />
-          <DashboardCard label={t('pages.admin.organizations')} value={q.data.organizations} />
-          <DashboardCard label={t('pages.admin.roles')} value={q.data.roles} />
+          <DashboardCard label={t('pages.admin.users')} value={q.data.users} to="/admin/users" />
+          <DashboardCard label={t('pages.admin.organizations')} value={q.data.organizations} to="/admin/organizations" />
+          <DashboardCard label={t('pages.admin.roles')} value={q.data.roles} to="/admin/roles" />
         </Box>
       )}
-      <Alert severity="info">{t('pages.admin.providersNote')}</Alert>
     </Box>
   )
 }
