@@ -2,6 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import createCache from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
+// Inter is the theme's primary font family (see theme.ts); self-hosted via
+// @fontsource so it actually loads (no CDN, CSP-friendly) in the weights MUI uses.
+import '@fontsource/inter/400.css'
+import '@fontsource/inter/500.css'
+import '@fontsource/inter/600.css'
+import '@fontsource/inter/700.css'
 import App from './App'
 import './index.css'
 import './i18n'

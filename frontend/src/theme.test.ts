@@ -14,7 +14,7 @@ describe('createAppTheme', () => {
 
   it('disables transitions when reduced motion is requested', () => {
     const theme = createAppTheme('light', true)
-    expect(theme.transitions.create()).toBe('none')
+    expect(theme.transitions.create('opacity')).toBe('none')
     expect(theme.transitions.duration.standard).toBe(0)
   })
 
