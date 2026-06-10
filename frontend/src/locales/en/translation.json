@@ -126,11 +126,11 @@
       },
       "drift": {
         "title": "Drift",
-        "body": "Dispatch a Terraform plan through your CI (GitHub Actions or Azure DevOps) to compare state against code and live infrastructure. Results return via a signed one-shot callback and render as a per-resource diff."
+        "body": "Dispatch a Terraform plan through your CI (GitHub Actions or Azure DevOps) to compare state against code and live infrastructure. Results return via a signed one-shot callback and render as a per-resource diff. IMPORTANT: the connection must target a pipeline/workflow created from the TSM workflow template (Workflow template button) — it declares the parameters TSM dispatches with and posts results back. Regular CI pipelines reject the dispatch with an 'unexpected parameter' error. Tip: configure a CI source (CI sources button) to pick pipelines and workflows from your org instead of typing coordinates; leave the ref empty to run from the pipeline's default branch."
       },
       "versionLab": {
         "title": "Version Lab",
-        "body": "Test whether your Terraform code plans cleanly against a chosen Terraform version (and optional pinned provider versions / registry mirror) by dispatching init/plan to your CI."
+        "body": "Test whether your Terraform code plans cleanly against a chosen Terraform version (and optional pinned provider versions / registry mirror) by dispatching init/plan to your CI. Like drift, the connection must target a pipeline/workflow created from the TSM workflow template — regular CI pipelines reject the dispatched parameters."
       },
       "reports": {
         "title": "Reports",
