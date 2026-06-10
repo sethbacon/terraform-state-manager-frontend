@@ -342,21 +342,28 @@ export default function Layout() {
         id="main-content"
         sx={{
           flexGrow: 1,
+          // minWidth:0 lets the flex child shrink correctly on narrow viewports.
+          minWidth: 0,
           p: 3,
           transition: (th) => th.transitions.create('margin'),
           marginRight: { md: helpOpen ? `${HELP_PANEL_WIDTH}px` : 0 },
         }}
       >
         <Toolbar />
-        <Suspense
-          fallback={
-            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-              <CircularProgress aria-label={t('common.loading')} />
-            </Box>
-          }
-        >
-          <Outlet />
-        </Suspense>
+        {/* Cap content width like the registry's left-aligned <Container maxWidth="lg">
+            so tables/forms don't stretch edge-to-edge on wide monitors. API docs is
+            exempt (its two-column swagger layout uses the full width, as in the registry). */}
+        <Box sx={{ maxWidth: apiDocsActive ? 'none' : (th) => th.breakpoints.values.lg }}>
+          <Suspense
+            fallback={
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                <CircularProgress aria-label={t('common.loading')} />
+              </Box>
+            }
+          >
+            <Outlet />
+          </Suspense>
+        </Box>
       </Box>
 
       <HelpPanel />
