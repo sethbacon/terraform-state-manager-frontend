@@ -96,7 +96,7 @@ export default function ReportsPage() {
         >
           {(statesQuery.data ?? []).map((st) => (
             <MenuItem key={st.key} value={st.key}>
-              {st.key}
+              {st.name || st.key}
             </MenuItem>
           ))}
         </TextField>

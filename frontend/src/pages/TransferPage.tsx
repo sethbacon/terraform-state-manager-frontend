@@ -23,6 +23,15 @@ function apiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
 }
 
+// defaultTargetKey derives a friendly destination key for a transfer: the
+// ref's display name when it differs from the opaque key, with .tfstate
+// appended so file-based targets (which list only *.tfstate) can see it.
+function defaultTargetKey(refs: { key: string; name: string }[], key: string): string {
+  const ref = refs.find((r) => r.key === key)
+  const base = ref?.name || key
+  return base.endsWith('.tfstate') ? base : `${base}.tfstate`
+}
+
 export default function TransferPage() {
   const { t } = useTranslation()
   const { hasScope } = useAuth()
@@ -65,7 +74,9 @@ export default function TransferPage() {
   }
   const onPickState = (key: string) => {
     setStateKey(key)
-    if (!targetKey) setTargetKey(key)
+    // Default the destination to the friendly name, not the opaque key (HCP
+    // keys are workspace ids); file-based targets list only .tfstate files.
+    if (!targetKey) setTargetKey(defaultTargetKey(statesQuery.data ?? [], key))
   }
 
   // Decommission is destructive (empties the source), so require typing the exact
@@ -131,7 +142,7 @@ export default function TransferPage() {
             >
               {(statesQuery.data ?? []).map((st) => (
                 <MenuItem key={st.key} value={st.key}>
-                  {st.key}
+                  {st.name || st.key}
                 </MenuItem>
               ))}
             </TextField>

@@ -1,4 +1,4 @@
-import { type ChangeEvent, useMemo, useRef, useState } from 'react'
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Alert,
@@ -266,7 +266,11 @@ function StatesBrowser({
 
         <Box>
           {selectedKey ? (
-            <StateDetail sourceId={source.id} stateKey={selectedKey} />
+            <StateDetail
+              sourceId={source.id}
+              stateKey={selectedKey}
+              stateName={statesQuery.data?.find((st) => st.key === selectedKey)?.name ?? selectedKey}
+            />
           ) : (
             <Card variant="outlined">
               <CardContent>
@@ -280,7 +284,17 @@ function StatesBrowser({
   )
 }
 
-function StateDetail({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+function StateDetail({
+  sourceId,
+  stateKey,
+  stateName,
+}: {
+  sourceId: string
+  stateKey: string
+  /** Friendly display name (HCP keys are workspace ids); defaults to the key. */
+  stateName?: string
+}) {
+  const displayName = stateName ?? stateKey
   const { hasScope } = useAuth()
   const [tab, setTab] = useState(0)
   const [transferOpen, setTransferOpen] = useState(false)
@@ -326,8 +340,15 @@ function StateDetail({ sourceId, stateKey }: { sourceId: string; stateKey: strin
         onClose={() => setTransferOpen(false)}
         sourceId={sourceId}
         stateKey={stateKey}
+        stateName={displayName}
       />
-      <StateOpsDialog open={opsOpen} onClose={() => setOpsOpen(false)} sourceId={sourceId} stateKey={stateKey} />
+      <StateOpsDialog
+        open={opsOpen}
+        onClose={() => setOpsOpen(false)}
+        sourceId={sourceId}
+        stateKey={stateKey}
+        stateName={displayName}
+      />
     </>
   )
 }
@@ -337,11 +358,13 @@ function StateOpsDialog({
   onClose,
   sourceId,
   stateKey,
+  stateName,
 }: {
   open: boolean
   onClose: () => void
   sourceId: string
   stateKey: string
+  stateName?: string
 }) {
   const queryClient = useQueryClient()
   const [op, setOp] = useState<'rm' | 'mv'>('rm')
@@ -392,7 +415,8 @@ function StateOpsDialog({
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Structured edit of <b>{stateKey}</b>. The current version is backed up first and the change is audited.
+            Structured edit of <b>{stateName ?? stateKey}</b>. The current version is backed up first and the change
+            is audited.
           </Typography>
           <TextField select label="Operation" value={op} onChange={(e) => setOp(e.target.value as 'rm' | 'mv')} fullWidth>
             <MenuItem value="rm">Remove (terraform state rm)</MenuItem>
@@ -786,16 +810,27 @@ function TransferDialog({
   onClose,
   sourceId,
   stateKey,
+  stateName,
 }: {
   open: boolean
   onClose: () => void
   sourceId: string
   stateKey: string
+  stateName?: string
 }) {
+  // Destination defaults to the friendly name (HCP keys are workspace ids),
+  // with .tfstate appended so file-based targets list the result.
+  const friendly = stateName ?? stateKey
+  const defaultTarget = friendly.endsWith('.tfstate') ? friendly : `${friendly}.tfstate`
+  // Re-prime the destination when the dialog opens for a (possibly different)
+  // state — the component stays mounted across selection changes.
+  useEffect(() => {
+    if (open) setTargetKey(defaultTarget)
+  }, [open, defaultTarget])
   const queryClient = useQueryClient()
   const [mode, setMode] = useState<'backup' | 'migrate'>('backup')
   const [targetSourceId, setTargetSourceId] = useState('')
-  const [targetKey, setTargetKey] = useState(stateKey)
+  const [targetKey, setTargetKey] = useState(defaultTarget)
   const [decommission, setDecommission] = useState(false)
   const [result, setResult] = useState<TransferResult | null>(null)
 
@@ -836,7 +871,7 @@ function TransferDialog({
         ) : (
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              Copy <b>{stateKey}</b> to another source.
+              Copy <b>{stateName ?? stateKey}</b> to another source.
             </Typography>
             <TextField
               select
