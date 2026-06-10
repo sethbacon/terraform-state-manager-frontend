@@ -42,6 +42,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useHelp } from '../contexts/HelpContext'
 import HelpPanel, { HELP_PANEL_WIDTH } from './HelpPanel'
 import AboutModal from './AboutModal'
+import AdminBreadcrumbs from './AdminBreadcrumbs'
 import CommandPalette from './CommandPalette'
 
 const DRAWER_WIDTH = 240
@@ -354,6 +355,7 @@ export default function Layout() {
             so tables/forms don't stretch edge-to-edge on wide monitors. API docs is
             exempt (its two-column swagger layout uses the full width, as in the registry). */}
         <Box sx={{ maxWidth: apiDocsActive ? 'none' : (th) => th.breakpoints.values.lg }}>
+          <AdminBreadcrumbs />
           <Suspense
             fallback={
               <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>

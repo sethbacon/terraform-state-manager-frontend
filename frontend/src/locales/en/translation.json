@@ -313,7 +313,8 @@
     "skipToContent": "Skip to main content",
     "openNavigation": "Open navigation",
     "closeNavigation": "Close navigation",
-    "navigatedTo": "Navigated to {{title}}"
+    "navigatedTo": "Navigated to {{title}}",
+    "breadcrumbs": "Breadcrumb"
   },
   "errorBoundary": {
     "title": "Something went wrong",
