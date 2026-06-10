@@ -42,7 +42,7 @@ function Field({ label, value }: { label: string; value?: string | null }) {
 
 function Section({ title, enabled, children }: { title: string; enabled: boolean; children?: ReactNode }) {
   return (
-    <Card>
+    <Card variant="outlined">
       <CardContent>
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
           <Typography variant="h6">{title}</Typography>

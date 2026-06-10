@@ -28,6 +28,7 @@ import ScienceIcon from '@mui/icons-material/Science'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '../components/PageHeader'
+import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { api, type HealthRun, type PipelineConnection } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -108,7 +109,7 @@ export default function VersionLabPage() {
         </Alert>
       )}
 
-      {runsQuery.isLoading && <CircularProgress size={20} />}
+      {runsQuery.isLoading && <TableSkeleton rows={4} columns={6} />}
       {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">{t('pages.versionLab.noRuns')}</Alert>}
       {runsQuery.data && runsQuery.data.length > 0 && (
         <Table size="small">

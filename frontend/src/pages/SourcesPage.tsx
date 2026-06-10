@@ -45,6 +45,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
+import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
 
 function errMsg(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -115,7 +116,7 @@ export default function SourcesPage() {
         </Alert>
       )}
 
-      {sourcesQuery.isLoading && <CircularProgress aria-label={t('common.loading')} />}
+      {sourcesQuery.isLoading && <CardGridSkeleton count={6} minWidth={260} />}
       {sourcesQuery.isError && <Alert severity="error">Failed to load sources.</Alert>}
 
       {sourcesQuery.data && sourcesQuery.data.length === 0 && (
@@ -228,7 +229,7 @@ function StatesBrowser({
 
   return (
     <Box sx={{ mt: 4 }}>
-      <Typography variant="h5" sx={{ mb: 1 }}>
+      <Typography variant="h6" sx={{ mb: 1 }}>
         States in {source.name}
       </Typography>
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '320px 1fr' } }}>

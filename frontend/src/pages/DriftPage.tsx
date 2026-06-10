@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next'
 import { api, type DriftRun, type PipelineConnection } from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
+import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -167,7 +168,7 @@ export default function DriftPage() {
       <Typography variant="h6" sx={{ mb: 1 }}>
         Recent runs
       </Typography>
-      {runsQuery.isLoading && <CircularProgress size={20} />}
+      {runsQuery.isLoading && <TableSkeleton rows={4} columns={6} />}
       {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">No drift runs yet.</Alert>}
       {runsQuery.data && runsQuery.data.length > 0 && (
         <Card variant="outlined">
