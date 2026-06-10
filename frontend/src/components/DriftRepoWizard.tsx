@@ -11,6 +11,7 @@ import {
   DialogContent,
   DialogTitle,
   MenuItem,
+  Link,
   Paper,
   Stack,
   Step,
@@ -20,7 +21,7 @@ import {
   Typography,
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import { api, type CIRepoRef, type CIServiceConnectionRef } from '../services/api'
+import { api, type CIRepoRef, type CIServiceConnectionRef, type CIWorkflowSetupResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
 // DriftRepoWizard walks a repo from "has terraform" to "drift-enabled":
@@ -71,6 +72,7 @@ export default function DriftRepoWizard({
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
   const [ghWorkflowMissing, setGhWorkflowMissing] = useState(false)
+  const [setup, setSetup] = useState<CIWorkflowSetupResult | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
   const source = sourcesQuery.data?.find((s) => s.id === sourceId) ?? null
@@ -103,6 +105,35 @@ export default function DriftRepoWizard({
     enabled: open && Boolean(source),
   })
 
+  // Phase 2: commit the workflow via branch + PR through the provider API.
+  const setupMutation = useMutation({
+    mutationFn: () => api.setupCISourceWorkflow(sourceId, (isADO ? repo?.id : repo?.name) ?? '', template),
+    onSuccess: (res) => {
+      setSetup(res)
+      setError(null)
+    },
+    onError: (e: unknown) => setError(apiErr(e)),
+  })
+
+  // Poll the PR until it merges (or closes); 5s while open.
+  const prQuery = useQuery({
+    queryKey: ['ci-sources', sourceId, 'pr', setup?.pr_id ?? 0],
+    queryFn: () => api.getCISourcePRState(sourceId, (isADO ? repo?.id : repo?.name) ?? '', setup?.pr_id ?? 0),
+    enabled: open && Boolean(setup?.pr_id),
+    refetchInterval: (q) => (q.state.data?.state === 'open' ? 5000 : false),
+  })
+  const prState = prQuery.data?.state
+
+  // ADO idempotency: offer reuse when a pipeline with the chosen name exists.
+  const adoExistingQuery = useQuery({
+    queryKey: queryKeys.ciSources.pipelines(sourceId),
+    queryFn: () => api.listCISourcePipelines(sourceId),
+    enabled: open && isADO && step === 2,
+  })
+  const existingPipeline = isADO
+    ? (adoExistingQuery.data ?? []).find((p) => p.name === pipelineName.trim())
+    : undefined
+
   const template = useMemo(
     () =>
       customizeTemplate(
@@ -127,6 +158,7 @@ export default function DriftRepoWizard({
     setError(null)
     setDone(false)
     setGhWorkflowMissing(false)
+    setSetup(null)
   }
 
   const close = () => {
@@ -157,6 +189,29 @@ export default function DriftRepoWizard({
       setDone(true)
       setError(null)
       queryClient.invalidateQueries({ queryKey: queryKeys.ciSources.pipelines(sourceId) })
+      onCreated()
+    },
+    onError: (e: unknown) => setError(apiErr(e)),
+  })
+
+  // ADO idempotent path: connect to an already-existing pipeline definition.
+  const adoUseExisting = useMutation({
+    mutationFn: async () => {
+      if (!source || !existingPipeline) throw new Error('missing selection')
+      await api.createPipeline({
+        name: pipelineName,
+        provider: source.provider,
+        config: {
+          ci_source_id: source.id,
+          organization: source.organization,
+          project: source.project ?? '',
+          pipeline_id: String(existingPipeline.id),
+        },
+      })
+    },
+    onSuccess: () => {
+      setDone(true)
+      setError(null)
       onCreated()
     },
     onError: (e: unknown) => setError(apiErr(e)),
@@ -194,7 +249,7 @@ export default function DriftRepoWizard({
     },
   })
 
-  const creating = adoCreate.isPending || ghConnect.isPending
+  const creating = adoCreate.isPending || ghConnect.isPending || adoUseExisting.isPending
   const stepValid =
     step === 0 ? Boolean(source && repo) : step === 1 ? Boolean(templateQuery.data) : Boolean(pipelineName.trim())
 
@@ -309,7 +364,7 @@ export default function DriftRepoWizard({
             <Box>
               <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
                 <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-                  Commit this file to <code>{fileName}</code> on the default branch
+                  Commit this file to <code>{fileName}</code> on the default branch — manually, or via PR
                   {repo?.default_branch ? ` (${repo.default_branch.replace('refs/heads/', '')})` : ''}
                 </Typography>
                 <Button
@@ -322,6 +377,16 @@ export default function DriftRepoWizard({
                 >
                   {copied ? 'Copied' : 'Copy'}
                 </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  sx={{ ml: 1 }}
+                  disabled={!templateQuery.data || setupMutation.isPending || Boolean(setup)}
+                  startIcon={setupMutation.isPending ? <CircularProgress size={14} /> : undefined}
+                  onClick={() => setupMutation.mutate()}
+                >
+                  Commit via PR
+                </Button>
               </Stack>
               <Paper variant="outlined" sx={{ p: 1.5, maxHeight: 320, overflow: 'auto' }}>
                 {templateQuery.isLoading ? (
@@ -331,6 +396,33 @@ export default function DriftRepoWizard({
                 )}
               </Paper>
             </Box>
+            {setup?.status === 'exists' && (
+              <Alert severity="success">
+                The workflow file is already on the default branch — nothing to commit. Continue to create the
+                connection.
+              </Alert>
+            )}
+            {setup?.status === 'pr_created' && (
+              <Alert severity={prState === 'merged' ? 'success' : prState === 'closed' ? 'warning' : 'info'}>
+                {prState === 'merged' ? (
+                  <>Pull request merged — the workflow is on the default branch. Continue to create the connection.</>
+                ) : prState === 'closed' ? (
+                  <>The pull request was closed without merging. Re-run Commit via PR or commit manually.</>
+                ) : (
+                  <>
+                    Pull request opened from <code>{setup.branch}</code> —{' '}
+                    {setup.pr_url ? (
+                      <Link href={setup.pr_url} target="_blank" rel="noopener noreferrer">
+                        review and merge it
+                      </Link>
+                    ) : (
+                      'review and merge it'
+                    )}
+                    . Watching for the merge…
+                  </>
+                )}
+              </Alert>
+            )}
             <Alert severity="info">
               The pipeline needs cloud credentials to run terraform — wire a{' '}
               {isADO ? 'service connection / workload identity' : 'cloud OIDC role or repo secrets'} where the template
@@ -358,6 +450,19 @@ export default function DriftRepoWizard({
                 Once the file is merged to the default branch of <b>{repo?.name}</b>, GitHub registers the workflow
                 automatically — TSM then detects <code>tsm-drift.yml</code> and creates the connection.
               </Typography>
+            )}
+            {isADO && existingPipeline && !done && (
+              <Alert
+                severity="info"
+                action={
+                  <Button size="small" disabled={creating} onClick={() => adoUseExisting.mutate()}>
+                    Use existing
+                  </Button>
+                }
+              >
+                A pipeline named <b>{existingPipeline.name}</b> already exists in this project — connect to it
+                instead of creating a duplicate.
+              </Alert>
             )}
             {ghWorkflowMissing && (
               <Alert severity="warning">
@@ -393,7 +498,7 @@ export default function DriftRepoWizard({
             startIcon={creating ? <CircularProgress size={16} color="inherit" /> : undefined}
             onClick={() => (isADO ? adoCreate.mutate() : ghConnect.mutate())}
           >
-            {isADO ? 'Create pipeline & connection' : ghWorkflowMissing ? 'Check again' : 'Detect & connect'}
+            {isADO ? (existingPipeline ? 'Create anyway' : 'Create pipeline & connection') : ghWorkflowMissing ? 'Check again' : 'Detect & connect'}
           </Button>
         )}
       </DialogActions>

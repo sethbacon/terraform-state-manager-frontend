@@ -375,6 +375,12 @@ export interface CallbackPreflight {
   callback_base: string
   likely_unreachable: boolean
 }
+export interface CIWorkflowSetupResult {
+  status: 'exists' | 'pr_created'
+  branch?: string
+  pr_id?: number
+  pr_url?: string
+}
 export interface CIWorkflowRef {
   id: number
   name: string
@@ -735,6 +741,19 @@ export const api = {
     ).data.pipeline,
   getCallbackPreflight: async (): Promise<CallbackPreflight> =>
     (await apiClient.get<CallbackPreflight>('/api/v1/pipelines/callback-preflight')).data,
+  setupCISourceWorkflow: async (id: string, repo: string, content: string): Promise<CIWorkflowSetupResult> =>
+    (
+      await apiClient.post<CIWorkflowSetupResult>(
+        `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/workflow-setup`,
+        { content },
+      )
+    ).data,
+  getCISourcePRState: async (id: string, repo: string, pr: number): Promise<{ state: 'open' | 'merged' | 'closed' }> =>
+    (
+      await apiClient.get<{ state: 'open' | 'merged' | 'closed' }>(
+        `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/prs/${pr}`,
+      )
+    ).data,
   listDriftRuns: async (): Promise<DriftRun[]> =>
     (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
