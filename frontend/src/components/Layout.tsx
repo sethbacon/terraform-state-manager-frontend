@@ -329,7 +329,13 @@ export default function Layout() {
         }}
       >
         <Toolbar />
-        <Suspense fallback={<CircularProgress />}>
+        <Suspense
+          fallback={
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress aria-label={t('common.loading')} />
+            </Box>
+          }
+        >
           <Outlet />
         </Suspense>
       </Box>

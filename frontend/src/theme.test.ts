@@ -12,6 +12,13 @@ describe('createAppTheme', () => {
     expect(createAppTheme('dark').palette.mode).toBe('dark')
   })
 
+  it('uses the registry dark surfaces in dark mode only', () => {
+    expect(createAppTheme('dark').palette.background.default).toBe('#121212')
+    expect(createAppTheme('dark').palette.background.paper).toBe('#1e1e1e')
+    // Light mode keeps MUI's defaults (white paper).
+    expect(createAppTheme('light').palette.background.paper).toBe('#fff')
+  })
+
   it('disables transitions when reduced motion is requested', () => {
     const theme = createAppTheme('light', true)
     expect(theme.transitions.create('opacity')).toBe('none')

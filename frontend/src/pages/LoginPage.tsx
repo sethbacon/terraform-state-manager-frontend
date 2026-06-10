@@ -51,7 +51,7 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <Centered>
-        <CircularProgress />
+        <CircularProgress aria-label={t('common.loading')} />
       </Centered>
     )
   }

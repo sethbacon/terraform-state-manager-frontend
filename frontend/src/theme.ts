@@ -20,6 +20,10 @@ export function createAppTheme(mode: ThemeMode, prefersReducedMotion = false): T
       mode,
       primary: { main: BRAND_PRIMARY },
       secondary: { main: secondary },
+      // Match the registry's dark surfaces so the two apps share the same depth.
+      ...(mode === 'dark' && {
+        background: { default: '#121212', paper: '#1e1e1e' },
+      }),
     },
     typography: {
       fontFamily: ['Inter', 'Roboto', 'Helvetica', 'Arial', 'system-ui', 'sans-serif'].join(','),
@@ -52,8 +56,17 @@ export function createAppTheme(mode: ThemeMode, prefersReducedMotion = false): T
             backgroundColor: mode === 'dark' ? '#2d2d2d' : '#f5f5f5',
             color: mode === 'dark' ? '#e6e6e6' : '#1e1e1e',
           },
+          // Dark-mode scrollbars: scrollbarColor covers Firefox, the webkit
+          // pseudo-elements cover Chromium/WebKit so they don't stay light.
           body: {
             scrollbarColor: mode === 'dark' ? '#6b6b6b #2b2b2b' : undefined,
+            '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
+              backgroundColor: mode === 'dark' ? '#2b2b2b' : undefined,
+            },
+            '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
+              backgroundColor: mode === 'dark' ? '#6b6b6b' : undefined,
+              borderRadius: 8,
+            },
           },
         },
       },

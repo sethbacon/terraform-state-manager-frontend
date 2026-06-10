@@ -115,7 +115,7 @@ export default function SourcesPage() {
         </Alert>
       )}
 
-      {sourcesQuery.isLoading && <CircularProgress />}
+      {sourcesQuery.isLoading && <CircularProgress aria-label={t('common.loading')} />}
       {sourcesQuery.isError && <Alert severity="error">Failed to load sources.</Alert>}
 
       {sourcesQuery.data && sourcesQuery.data.length === 0 && (
