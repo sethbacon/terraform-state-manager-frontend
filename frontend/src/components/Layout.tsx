@@ -12,7 +12,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  ListSubheader,
   Menu,
   MenuItem,
   Toolbar,
@@ -23,8 +22,8 @@ import {
 } from '@mui/material'
 import { CircularProgress } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
-import LightModeIcon from '@mui/icons-material/LightMode'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
+import Brightness4Icon from '@mui/icons-material/Brightness4'
+import Brightness7Icon from '@mui/icons-material/Brightness7'
 import SettingsIcon from '@mui/icons-material/Settings'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import SearchIcon from '@mui/icons-material/Search'
@@ -56,11 +55,12 @@ export default function Layout() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { mode, toggle } = useThemeMode()
   const { user, logout, hasScope } = useAuth()
-  const { helpOpen, toggleHelp } = useHelp()
+  const { helpOpen, openHelp } = useHelp()
 
   const [mobileOpen, setMobileOpen] = useState(false)
   const [accountAnchor, setAccountAnchor] = useState<null | HTMLElement>(null)
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null)
+  const [supportAnchor, setSupportAnchor] = useState<null | HTMLElement>(null)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [paletteOpen, setPaletteOpen] = useState(false)
 
@@ -227,14 +227,13 @@ export default function Layout() {
           </Typography>
 
           <Tooltip title={t('commandPalette.hint')}>
-            <IconButton color="inherit" onClick={() => setPaletteOpen(true)} aria-label={t('commandPalette.openButton')}>
+            <IconButton
+              color="inherit"
+              onClick={() => setPaletteOpen(true)}
+              aria-label={t('commandPalette.openButton')}
+              sx={{ mr: 1 }}
+            >
               <SearchIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title={t('help.open')}>
-            <IconButton color="inherit" onClick={toggleHelp} aria-label={t('help.open')} aria-pressed={helpOpen}>
-              <HelpOutlineIcon />
             </IconButton>
           </Tooltip>
 
@@ -243,8 +242,24 @@ export default function Layout() {
               color="inherit"
               onClick={(e) => setSettingsAnchor(e.currentTarget)}
               aria-label={t('settings.title')}
+              aria-haspopup="true"
+              aria-controls={settingsAnchor ? 'settings-menu' : undefined}
+              sx={{ mr: 1 }}
             >
               <SettingsIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title={t('support.title')}>
+            <IconButton
+              color="inherit"
+              onClick={(e) => setSupportAnchor(e.currentTarget)}
+              aria-label={t('support.title')}
+              aria-haspopup="true"
+              aria-controls={supportAnchor ? 'support-menu' : undefined}
+              sx={{ mr: 1 }}
+            >
+              <HelpOutlineIcon />
             </IconButton>
           </Tooltip>
 
@@ -256,31 +271,59 @@ export default function Layout() {
         </Toolbar>
       </AppBar>
 
-      {/* Settings menu: theme + language */}
-      <Menu anchorEl={settingsAnchor} open={Boolean(settingsAnchor)} onClose={() => setSettingsAnchor(null)}>
-        <ListSubheader sx={{ bgcolor: 'transparent', lineHeight: '2.5em' }}>{t('settings.appearance')}</ListSubheader>
+      {/* Settings menu: theme + language (registry shape — support items live in their own menu) */}
+      <Menu
+        id="settings-menu"
+        anchorEl={settingsAnchor}
+        open={Boolean(settingsAnchor)}
+        onClose={() => setSettingsAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
         <MenuItem
           onClick={() => {
             toggle()
             setSettingsAnchor(null)
           }}
         >
-          <ListItemIcon>{mode === 'dark' ? <LightModeIcon fontSize="small" /> : <DarkModeIcon fontSize="small" />}</ListItemIcon>
+          <ListItemIcon>
+            {mode === 'dark' ? <Brightness7Icon fontSize="small" /> : <Brightness4Icon fontSize="small" />}
+          </ListItemIcon>
           {mode === 'dark' ? t('settings.themeLight') : t('settings.themeDark')}
         </MenuItem>
         <Divider />
-        <ListSubheader sx={{ bgcolor: 'transparent', lineHeight: '2.5em' }}>{t('settings.language')}</ListSubheader>
         {SUPPORTED_LANGUAGES.map((lng) => (
           <MenuItem key={lng.code} selected={i18n.language?.startsWith(lng.code)} onClick={() => changeLanguage(lng.code)}>
             <ListItemIcon>{i18n.language?.startsWith(lng.code) ? <CheckIcon fontSize="small" /> : null}</ListItemIcon>
             {lng.label}
           </MenuItem>
         ))}
-        <Divider />
+      </Menu>
+
+      {/* Support menu: context help + about */}
+      <Menu
+        id="support-menu"
+        anchorEl={supportAnchor}
+        open={Boolean(supportAnchor)}
+        onClose={() => setSupportAnchor(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
         <MenuItem
           onClick={() => {
+            setSupportAnchor(null)
+            openHelp()
+          }}
+        >
+          <ListItemIcon>
+            <HelpOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          {t('support.contextHelp')}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setSupportAnchor(null)
             setAboutOpen(true)
-            setSettingsAnchor(null)
           }}
         >
           <ListItemIcon>

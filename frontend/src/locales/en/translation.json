@@ -312,6 +312,10 @@
       "navigation": "Navigation"
     }
   },
+  "support": {
+    "title": "Support",
+    "contextHelp": "Context help"
+  },
   "session": {
     "expiresSoon": "Your session expires in {{minutes}} minutes. Refresh to stay signed in.",
     "refresh": "Refresh session"
