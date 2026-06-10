@@ -463,7 +463,9 @@ function AddPipelineDialog({
                   {...params}
                   label="Pipeline"
                   helperText={
-                    adoPipelinesQuery.isError ? apiErr(adoPipelinesQuery.error) : 'Pipelines visible to this source'
+                    adoPipelinesQuery.isError
+                      ? apiErr(adoPipelinesQuery.error)
+                      : 'Pick the pipeline created from the TSM workflow template (Workflow template button) — regular CI pipelines reject the dispatch parameters'
                   }
                   error={adoPipelinesQuery.isError}
                 />
@@ -517,7 +519,7 @@ function AddPipelineDialog({
                     helperText={
                       workflowsQuery.isError
                         ? apiErr(workflowsQuery.error)
-                        : 'Active workflows in the selected repository'
+                        : 'Pick the workflow created from the TSM workflow template (e.g. tsm-drift.yml) — other workflows reject the dispatch inputs'
                     }
                     error={workflowsQuery.isError}
                   />
