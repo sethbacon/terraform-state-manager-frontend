@@ -1,0 +1,7 @@
+# This directory is the writable demo-local source mount: runtime writes
+# (transfers, edits) land here and must not be committed. Track only the seeds.
+*
+!.gitignore
+!dev.tfstate
+!prod.tfstate
+!prod.backup.tfstate

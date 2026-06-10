@@ -762,11 +762,11 @@ function NewRunDialog({
             ))}
           </TextField>
           <TextField
-            label="Git ref"
+            label="Git ref (optional)"
             value={repoRef}
             onChange={(e) => setRepoRef(e.target.value)}
-            placeholder="main"
-            helperText="Branch/ref to run the plan from"
+            placeholder="pipeline default branch"
+            helperText="Leave empty to run from the pipeline's default branch; set only to plan a specific branch/ref"
             fullWidth
           />
           <TextField

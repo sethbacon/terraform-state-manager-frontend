@@ -34,7 +34,20 @@ import PageHeader from '../../components/PageHeader'
 import { api, type AuditLogEntry, type AuditLogFilters } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 
-const RESOURCE_TYPES = ['', 'user', 'organization', 'state', 'source', 'schedule', 'notification_channel']
+const RESOURCE_TYPES = [
+  '',
+  'user',
+  'organization',
+  'state',
+  'source',
+  'schedule',
+  'notification_channel',
+  'ci_source',
+  'pipeline_connection',
+  'drift_run',
+  'health_run',
+  'sso',
+]
 
 // Client-side export helpers (registry pattern): serialize the currently
 // filtered rows and trigger a browser download via a temporary blob URL.
