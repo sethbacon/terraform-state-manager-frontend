@@ -134,6 +134,7 @@ export default function SourcesPage() {
                   {s.name}
                 </Typography>
                 <Chip size="small" label={s.type} />
+                <StateCountChip sourceId={s.id} />
               </Stack>
               {typeof s.config?.base_path === 'string' && (
                 <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
@@ -214,6 +215,23 @@ export default function SourcesPage() {
         }}
       />
     </Box>
+  )
+}
+
+// Shares the StatesBrowser query key, so the count pre-warms the browse view.
+function StateCountChip({ sourceId }: { sourceId: string }) {
+  const { t } = useTranslation()
+  const statesQuery = useQuery({
+    queryKey: queryKeys.sources.states(sourceId),
+    queryFn: () => api.listStates(sourceId),
+  })
+  if (!statesQuery.data) return null
+  return (
+    <Chip
+      size="small"
+      variant="outlined"
+      label={t('pages.sources.stateCount', { count: statesQuery.data.length })}
+    />
   )
 }
 

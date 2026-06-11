@@ -396,6 +396,8 @@
       "deleteBody": "Remove the source <1>{{name}}</1>? This disconnects it from the State Manager. The underlying state backend and its files are <3>not</3> touched.",
       "deleteConfirmLabel": "Delete source",
       "statesIn": "States in {{name}}",
+      "stateCount_one": "{{count}} state",
+      "stateCount_other": "{{count}} states",
       "listFailed": "Failed to list states.",
       "noStateFiles": "No .tfstate files found.",
       "filterStates": "Filter {{count}} states…",

@@ -96,12 +96,18 @@ beforeEach(() => {
 })
 
 describe('SourcesPage', () => {
-  it('lists source cards with type chips and config hints', async () => {
+  it('lists source cards with type chips, config hints, and state counts', async () => {
+    // Per-source state lists prove each card counts its own source.
+    mocked.listStates.mockImplementation(
+      async (id: string) => (id === 's1' ? states : states.slice(0, 1)) as never,
+    )
     renderPage()
     expect(await screen.findByText('demo-local')).toBeInTheDocument()
     expect(screen.getByText('/data/states')).toBeInTheDocument()
     expect(screen.getByText('local')).toBeInTheDocument()
     expect(screen.getByText('s3')).toBeInTheDocument()
+    expect(await screen.findByText('2 states')).toBeInTheDocument()
+    expect(await screen.findByText('1 state')).toBeInTheDocument()
   })
 
   it('shows empty and error states', async () => {
