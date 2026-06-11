@@ -752,6 +752,13 @@ function OutputsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
   )
 }
 
+// Module paths and instance keys contain no spaces; add zero-width break
+// points after dots and before brackets so wrapped lines split between
+// segments (module. / nat_shared_use1) instead of mid-word.
+function breakableSegments(s: string): string {
+  return s.replace(/\./g, '.\u200b').replace(/\[/g, '\u200b[')
+}
+
 function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
   const { t } = useTranslation()
   const [filter, setFilter] = useState('')
@@ -781,24 +788,26 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
         onChange={(e) => setFilter(e.target.value)}
         fullWidth
       />
-      <Table size="small">
+      <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell>{t('pages.sources.module')}</TableCell>
-            <TableCell>{t('common.type')}</TableCell>
-            <TableCell>{t('common.name')}</TableCell>
-            <TableCell>{t('common.provider')}</TableCell>
-            <TableCell>{t('pages.sources.mode')}</TableCell>
-            <TableCell align="right">{t('pages.sources.instances')}</TableCell>
+            <TableCell sx={{ width: '24%' }}>{t('pages.sources.module')}</TableCell>
+            <TableCell sx={{ width: '26%' }}>{t('common.type')}</TableCell>
+            <TableCell sx={{ width: '20%' }}>{t('common.name')}</TableCell>
+            <TableCell sx={{ width: '14%' }}>{t('common.provider')}</TableCell>
+            <TableCell sx={{ width: '8%' }}>{t('pages.sources.mode')}</TableCell>
+            <TableCell align="right" sx={{ width: '8%' }}>
+              {t('pages.sources.instances')}
+            </TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((r, i) => (
             <TableRow key={`${r.module}/${r.type}.${r.name}-${i}`}>
-              <TableCell sx={{ wordBreak: 'break-all' }}>{r.module}</TableCell>
-              <TableCell>{r.type}</TableCell>
-              <TableCell>{r.name}</TableCell>
-              <TableCell>{r.provider}</TableCell>
+              <TableCell sx={{ overflowWrap: 'anywhere' }}>{breakableSegments(r.module)}</TableCell>
+              <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.type}</TableCell>
+              <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.name}</TableCell>
+              <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.provider}</TableCell>
               <TableCell>{r.mode}</TableCell>
               <TableCell align="right">{r.instances}</TableCell>
             </TableRow>
