@@ -16,6 +16,7 @@ import {
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '../components/PageHeader'
+import TargetBackendHint from '../components/TargetBackendHint'
 import { api, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -178,6 +179,7 @@ export default function TransferPage() {
               helperText={t('pages.transfer.targetKeyHelp')}
               fullWidth
             />
+            <TargetBackendHint type={(sourcesQuery.data ?? []).find((s) => s.id === targetSourceId)?.type} />
             {sameTarget && <Alert severity="warning">{t('pages.transfer.sameTarget')}</Alert>}
 
             {mode === 'migrate' && (

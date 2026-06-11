@@ -857,6 +857,8 @@
       "modeMigrate": "Migrate (copy + verify parity)",
       "targetSource": "Target source",
       "targetKey": "Target key",
+      "hcpTargetHint": "HCP target: the key is the workspace NAME — a missing workspace is created in the organization automatically. Overwriting an existing workspace requires the state's serial to advance and its lineage to match; the workspace is locked during the write.",
+      "gitTargetHint": "Git target: the write is committed to the configured branch and pushed directly (never force-pushed) — the branch must accept direct pushes. Keys must end in .tfstate.",
       "targetKeyHelp": "Destination path/key within the target source",
       "sameTarget": "Target must differ from the source state.",
       "decommissionLabel": "Decommission source after a verified migrate (empties the original; backed up first)",

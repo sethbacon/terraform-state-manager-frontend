@@ -409,6 +409,39 @@ describe('SourcesPage', () => {
     )
   })
 
+  it('shows backend-specific guidance when targeting hcp or git', async () => {
+    mocked.listSources.mockResolvedValue([
+      ...sources,
+      { id: 's3hcp', name: 'cloud', type: 'hcp', config: { organization: 'acme' } },
+      { id: 's4git', name: 'repo', type: 'git', config: { repo_url: 'https://example.com/r.git' } },
+    ] as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.transfer') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    // HCP target -> workspace-creation hint.
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: /cloud/ }))
+    expect(
+      await within(dialog).findByText(i18n.t('pages.transfer.hcpTargetHint') as string),
+    ).toBeInTheDocument()
+
+    // Git target -> push hint.
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: /repo/ }))
+    expect(
+      await within(dialog).findByText(i18n.t('pages.transfer.gitTargetHint') as string),
+    ).toBeInTheDocument()
+
+    // Plain targets show no hint.
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: /archive/ }))
+    expect(
+      within(dialog).queryByText(i18n.t('pages.transfer.hcpTargetHint') as string),
+    ).not.toBeInTheDocument()
+  })
+
   it('runs an in-page backup transfer from the state detail', async () => {
     mocked.backupToSource.mockResolvedValue({ mode: 'backup', status: 'success', verified: true } as Awaited<
       ReturnType<typeof api.backupToSource>

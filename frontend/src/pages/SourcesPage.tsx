@@ -50,6 +50,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
 import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
+import TargetBackendHint from '../components/TargetBackendHint'
 
 function errMsg(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -1204,6 +1205,7 @@ function TransferDialog({
               helperText={t('pages.transfer.targetKeyHelp')}
               fullWidth
             />
+            <TargetBackendHint type={sourcesQuery.data?.find((s) => s.id === targetSourceId)?.type} />
             {mode === 'migrate' && (
               <FormControlLabel
                 control={<Checkbox checked={decommission} onChange={(e) => setDecommission(e.target.checked)} />}
