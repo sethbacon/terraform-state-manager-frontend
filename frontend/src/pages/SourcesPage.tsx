@@ -228,6 +228,13 @@ function StatesBrowser({
     queryFn: () => api.listStates(source.id),
   })
 
+  // Type-to-filter for long listings (e.g. HCP orgs with many workspaces).
+  const [stateFilter, setStateFilter] = useState('')
+  const allStates = statesQuery.data ?? []
+  const visibleStates = stateFilter
+    ? allStates.filter((st) => (st.name || st.key).toLowerCase().includes(stateFilter.toLowerCase()))
+    : allStates
+
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h6" sx={{ mb: 1 }}>
@@ -246,8 +253,26 @@ function StatesBrowser({
               <Typography color="text.secondary">No `.tfstate` files found.</Typography>
             </Box>
           )}
-          <List dense disablePadding>
-            {statesQuery.data?.map((st) => (
+          {allStates.length > 8 && (
+            <Box sx={{ p: 1 }}>
+              <TextField
+                size="small"
+                placeholder={`Filter ${allStates.length} states…`}
+                value={stateFilter}
+                onChange={(e) => setStateFilter(e.target.value)}
+                fullWidth
+              />
+            </Box>
+          )}
+          {stateFilter && visibleStates.length === 0 && (
+            <Box sx={{ p: 2 }}>
+              <Typography color="text.secondary" variant="body2">
+                No states match “{stateFilter}”.
+              </Typography>
+            </Box>
+          )}
+          <List dense disablePadding sx={{ maxHeight: 480, overflow: 'auto' }}>
+            {visibleStates.map((st) => (
               <ListItemButton
                 key={st.key}
                 selected={selectedKey === st.key}

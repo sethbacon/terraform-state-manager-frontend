@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import {
+  Autocomplete,
   Alert,
   Box,
   Button,
@@ -85,21 +86,22 @@ export default function ReportsPage() {
             </MenuItem>
           ))}
         </TextField>
-        <TextField
-          select
-          label={t('pages.reports.stateFile')}
-          value={stateKey}
-          onChange={(e) => setStateKey(e.target.value)}
-          fullWidth
+        <Autocomplete
+          options={statesQuery.data ?? []}
+          loading={statesQuery.isLoading}
+          getOptionLabel={(st) => st.name || st.key}
+          value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
+          onChange={(_, v) => setStateKey(v?.key ?? '')}
           disabled={!sourceId || statesQuery.isLoading}
-          helperText={sourceId && statesQuery.data?.length === 0 ? t('pages.reports.noStates') : ' '}
-        >
-          {(statesQuery.data ?? []).map((st) => (
-            <MenuItem key={st.key} value={st.key}>
-              {st.name || st.key}
-            </MenuItem>
-          ))}
-        </TextField>
+          fullWidth
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label={t('pages.reports.stateFile')}
+              helperText={sourceId && statesQuery.data?.length === 0 ? t('pages.reports.noStates') : ' '}
+            />
+          )}
+        />
       </Stack>
 
       {!sourceId && <Alert severity="info">{t('pages.reports.chooseSource')}</Alert>}

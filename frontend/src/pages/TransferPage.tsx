@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  Autocomplete,
   Alert,
   Box,
   Button,
@@ -131,21 +132,22 @@ export default function TransferPage() {
                 </MenuItem>
               ))}
             </TextField>
-            <TextField
-              select
-              label="State file"
-              value={stateKey}
-              onChange={(e) => onPickState(e.target.value)}
-              fullWidth
+            <Autocomplete
+              options={statesQuery.data ?? []}
+              loading={statesQuery.isLoading}
+              getOptionLabel={(st) => st.name || st.key}
+              value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
+              onChange={(_, v) => onPickState(v?.key ?? '')}
               disabled={!sourceId || statesQuery.isLoading}
-              helperText={sourceId && statesQuery.data?.length === 0 ? 'No state files in this source' : ' '}
-            >
-              {(statesQuery.data ?? []).map((st) => (
-                <MenuItem key={st.key} value={st.key}>
-                  {st.name || st.key}
-                </MenuItem>
-              ))}
-            </TextField>
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="State file"
+                  helperText={sourceId && statesQuery.data?.length === 0 ? 'No state files in this source' : ' '}
+                />
+              )}
+            />
 
             <Typography variant="subtitle2" color="text.secondary" sx={{ pt: 1 }}>
               {t('pages.transfer.destination')}
