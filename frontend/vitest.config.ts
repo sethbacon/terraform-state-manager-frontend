@@ -28,11 +28,11 @@ export default defineConfig({
         // Ratchet floor — raise with every change that touches an area.
         // Campaign target: 80/85/85/80.
         // History: 0.5/40/25/0.5 (bootstrap) → 25/80/80/25 (2026-06-10)
-        // → 42/85/80/42 (F1 query-page suites, 2026-06-11).
-        statements: 42,
+        // → 42/85/80/42 (F1) → 58/85/80/58 (F2 admin CRUD, 2026-06-11).
+        statements: 58,
         branches: 85,
         functions: 80,
-        lines: 42,
+        lines: 58,
       },
     },
   },
