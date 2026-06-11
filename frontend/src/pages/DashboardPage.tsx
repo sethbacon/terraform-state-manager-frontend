@@ -7,6 +7,7 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   CircularProgress,
   Divider,
   IconButton,
@@ -99,9 +100,17 @@ export default function DashboardPage() {
 
       {q.data && q.data.sources > 0 && (
         <>
+          {q.data.states_listed > q.data.states && (
+            <Alert severity="info" sx={{ mb: 2 }}>
+              {t('pages.dashboard.syncPartial', {
+                stored: q.data.states,
+                listed: q.data.states_listed,
+              })}
+            </Alert>
+          )}
           {q.data.source_errors > 0 && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              {t('pages.dashboard.sourceErrors', { count: q.data.source_errors })}
+              {t('pages.dashboard.syncErrors', { count: q.data.source_errors })}
             </Alert>
           )}
 
@@ -113,6 +122,53 @@ export default function DashboardPage() {
             <DashboardCard label={t('pages.dashboard.sources')} value={q.data.sources} />
             <DashboardCard label={t('pages.dashboard.states')} value={q.data.states} />
           </Box>
+
+          {q.data.sync.length > 0 && (
+            <Card variant="outlined" sx={{ mb: 3 }} data-testid="sync-status-panel">
+              <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
+                <Typography variant="overline" color="text.secondary">
+                  {t('pages.dashboard.syncStatus')}
+                </Typography>
+                <Stack spacing={0.5}>
+                  {q.data.sync.map((s) => (
+                    <Stack key={s.source_id} direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {s.name}
+                      </Typography>
+                      <Chip size="small" variant="outlined" label={s.type} />
+                      {s.synced ? (
+                        <>
+                          <Typography variant="caption" color="text.secondary">
+                            {t('pages.dashboard.syncStates', {
+                              stored: s.states_stored ?? 0,
+                              listed: s.states_listed ?? 0,
+                            })}
+                          </Typography>
+                          {s.last_sync_at && (
+                            <Typography variant="caption" color="text.secondary">
+                              {t('pages.dashboard.syncedAt', {
+                                time: new Date(s.last_sync_at).toLocaleTimeString(),
+                              })}
+                            </Typography>
+                          )}
+                          {(s.read_errors ?? 0) > 0 && (
+                            <Chip size="small" color="warning" label={t('pages.dashboard.syncReadErrors', { count: s.read_errors })} />
+                          )}
+                          {s.last_error && (
+                            <Typography variant="caption" color="error" sx={{ wordBreak: 'break-all' }}>
+                              {s.last_error}
+                            </Typography>
+                          )}
+                        </>
+                      ) : (
+                        <Chip size="small" color="info" variant="outlined" label={t('pages.dashboard.syncPending')} />
+                      )}
+                    </Stack>
+                  ))}
+                </Stack>
+              </CardContent>
+            </Card>
+          )}
 
           <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
             <ChartCard title={t('pages.dashboard.providerDistribution')}>

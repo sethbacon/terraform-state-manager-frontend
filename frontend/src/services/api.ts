@@ -127,9 +127,24 @@ export interface Count {
   count: number
 }
 
+export interface SourceSyncInfo {
+  source_id: string
+  name: string
+  type: string
+  /** False until the source's first sync cycle has completed. */
+  synced: boolean
+  last_sync_at?: string
+  states_listed?: number
+  states_stored?: number
+  read_errors?: number
+  last_error?: string
+}
+
 export interface DashboardOverview {
   sources: number
   states: number
+  /** States visible in the backends' listings (>= states while a sync is catching up). */
+  states_listed: number
   rum: number
   managed_resources: number
   data_sources: number
@@ -138,6 +153,7 @@ export interface DashboardOverview {
   resource_types: Count[]
   terraform_versions: Count[]
   source_errors: number
+  sync: SourceSyncInfo[]
   refreshed_at?: string
 }
 
