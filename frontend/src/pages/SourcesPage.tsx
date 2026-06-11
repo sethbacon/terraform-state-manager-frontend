@@ -925,7 +925,20 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
       ) : (
         <Box
           component="pre"
-          sx={{ m: 0, p: 2, maxHeight: 480, overflow: 'auto', fontSize: 12, bgcolor: 'action.hover', borderRadius: 1, whiteSpace: 'pre' }}
+          sx={{
+            m: 0,
+            p: 2,
+            maxHeight: 480,
+            overflow: 'auto',
+            fontSize: 12,
+            bgcolor: 'action.hover',
+            borderRadius: 1,
+            // pre-wrap + anywhere: huge single-line attributes (inline IAM
+            // policy JSON) wrap inside the panel instead of side-scrolling
+            // the whole page; indentation and newlines are preserved.
+            whiteSpace: 'pre-wrap',
+            overflowWrap: 'anywhere',
+          }}
         >
           {pretty}
         </Box>
