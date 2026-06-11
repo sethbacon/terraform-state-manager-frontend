@@ -21,6 +21,7 @@ import {
   Typography,
 } from '@mui/material'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import { Trans, useTranslation } from 'react-i18next'
 import { api, type CIRepoRef, type CIServiceConnectionRef, type CIWorkflowSetupResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
@@ -30,7 +31,7 @@ import { queryKeys } from '../services/queryKeys'
 // the committed workflow — and create the pipeline connection automatically.
 // Phase 1: the commit itself stays manual (no repo write scopes needed).
 
-const STEPS = ['Source & repository', 'Workflow file', 'Create & connect']
+const STEP_KEYS = ['source', 'workflow', 'connect'] as const
 
 function apiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -61,6 +62,7 @@ export default function DriftRepoWizard({
   onClose: () => void
   onCreated: () => void
 }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [step, setStep] = useState(0)
   const [sourceId, setSourceId] = useState('')
@@ -263,33 +265,34 @@ export default function DriftRepoWizard({
 
   return (
     <Dialog open={open} onClose={close} fullWidth maxWidth="md">
-      <DialogTitle>Set up drift for a repository</DialogTitle>
+      <DialogTitle>{t('pages.drift.wizard.title')}</DialogTitle>
       <DialogContent>
         <Stepper activeStep={step} sx={{ my: 2 }}>
-          {STEPS.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
+          {STEP_KEYS.map((k) => (
+            <Step key={k}>
+              <StepLabel>{t(`pages.drift.wizard.steps.${k}`)}</StepLabel>
             </Step>
           ))}
         </Stepper>
 
         {preflightQuery.data?.likely_unreachable && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            The CI callback URL is <b>{preflightQuery.data.callback_base || 'not configured'}</b> — hosted CI agents
-            cannot reach a local/private address, so runs would never report results. Use a self-hosted agent that can
-            reach this host, or expose a tunnel and set <code>TSM_SERVER_CALLBACK_URL</code>.
+            <Trans
+              i18nKey="pages.drift.wizard.preflight"
+              values={{ base: preflightQuery.data.callback_base || t('pages.drift.wizard.preflightUnset') }}
+              components={{ 1: <b />, 3: <code /> }}
+            />
           </Alert>
         )}
 
         {step === 0 && (
           <Stack spacing={2}>
             <Typography variant="body2" color="text.secondary">
-              Pick the CI source and the repository containing your Terraform. The wizard generates the TSM drift
-              workflow for it, then creates the pipeline connection.
+              {t('pages.drift.wizard.intro')}
             </Typography>
             <TextField
               select
-              label="CI source"
+              label={t('pages.drift.ciSource')}
               value={sourceId}
               onChange={(e) => {
                 setSourceId(e.target.value)
@@ -298,8 +301,8 @@ export default function DriftRepoWizard({
               }}
               helperText={
                 sourcesQuery.data && sourcesQuery.data.length === 0
-                  ? 'No CI sources configured yet — add one via the CI sources button on the Drift page first.'
-                  : 'The org-level credential used to browse and create.'
+                  ? t('pages.drift.wizard.noSourcesHelp')
+                  : t('pages.drift.wizard.sourceHelp')
               }
               fullWidth
             >
@@ -319,8 +322,8 @@ export default function DriftRepoWizard({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Repository"
-                    helperText={reposQuery.isError ? apiErr(reposQuery.error) : 'Repository containing the Terraform'}
+                    label={t('pages.drift.repository')}
+                    helperText={reposQuery.isError ? apiErr(reposQuery.error) : t('pages.drift.wizard.repoHelp')}
                     error={reposQuery.isError}
                   />
                 )}
@@ -333,10 +336,10 @@ export default function DriftRepoWizard({
           <Stack spacing={2}>
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
-                label="Terraform working directory"
+                label={t('pages.drift.wizard.workingDir')}
                 value={workingDir}
                 onChange={(e) => setWorkingDir(e.target.value)}
-                helperText="Relative to the repo root"
+                helperText={t('pages.drift.wizard.workingDirHelp')}
                 sx={{ flex: 1 }}
               />
               {isADO && (
@@ -350,11 +353,11 @@ export default function DriftRepoWizard({
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      label="Service connection (optional)"
+                      label={t('pages.drift.wizard.serviceConnection')}
                       helperText={
                         scQuery.isError
-                          ? 'Could not list service connections (PAT may lack the scope) — referenced by name in the YAML guidance only.'
-                          : 'Named in the generated YAML credential guidance'
+                          ? t('pages.drift.wizard.serviceConnectionErr')
+                          : t('pages.drift.wizard.serviceConnectionHelp')
                       }
                     />
                   )}
@@ -364,8 +367,14 @@ export default function DriftRepoWizard({
             <Box>
               <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
                 <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-                  Commit this file to <code>{fileName}</code> on the default branch — manually, or via PR
-                  {repo?.default_branch ? ` (${repo.default_branch.replace('refs/heads/', '')})` : ''}
+                  <Trans
+                    i18nKey="pages.drift.wizard.commitHeading"
+                    values={{
+                      file: fileName,
+                      branch: repo?.default_branch ? ` (${repo.default_branch.replace('refs/heads/', '')})` : '',
+                    }}
+                    components={{ 1: <code /> }}
+                  />
                 </Typography>
                 <Button
                   size="small"
@@ -375,7 +384,7 @@ export default function DriftRepoWizard({
                     setCopied(true)
                   }}
                 >
-                  {copied ? 'Copied' : 'Copy'}
+                  {copied ? t('pages.drift.wizard.copied') : t('pages.drift.wizard.copy')}
                 </Button>
                 <Button
                   size="small"
@@ -385,7 +394,7 @@ export default function DriftRepoWizard({
                   startIcon={setupMutation.isPending ? <CircularProgress size={14} /> : undefined}
                   onClick={() => setupMutation.mutate()}
                 >
-                  Commit via PR
+                  {t('pages.drift.wizard.commitViaPR')}
                 </Button>
               </Stack>
               <Paper variant="outlined" sx={{ p: 1.5, maxHeight: 320, overflow: 'auto' }}>
@@ -398,35 +407,29 @@ export default function DriftRepoWizard({
             </Box>
             {setup?.status === 'exists' && (
               <Alert severity="success">
-                The workflow file is already on the default branch — nothing to commit. Continue to create the
-                connection.
+                {t('pages.drift.wizard.setupExists')}
               </Alert>
             )}
             {setup?.status === 'pr_created' && (
               <Alert severity={prState === 'merged' ? 'success' : prState === 'closed' ? 'warning' : 'info'}>
                 {prState === 'merged' ? (
-                  <>Pull request merged — the workflow is on the default branch. Continue to create the connection.</>
+                  <>{t('pages.drift.wizard.prMerged')}</>
                 ) : prState === 'closed' ? (
-                  <>The pull request was closed without merging. Re-run Commit via PR or commit manually.</>
+                  <>{t('pages.drift.wizard.prClosed')}</>
                 ) : (
-                  <>
-                    Pull request opened from <code>{setup.branch}</code> —{' '}
-                    {setup.pr_url ? (
-                      <Link href={setup.pr_url} target="_blank" rel="noopener noreferrer">
-                        review and merge it
-                      </Link>
-                    ) : (
-                      'review and merge it'
-                    )}
-                    . Watching for the merge…
-                  </>
+                  <Trans
+                    i18nKey="pages.drift.wizard.prOpen"
+                    values={{ branch: setup.branch }}
+                    components={{
+                      1: <code />,
+                      3: setup.pr_url ? <Link href={setup.pr_url} target="_blank" rel="noopener noreferrer" /> : <span />,
+                    }}
+                  />
                 )}
               </Alert>
             )}
             <Alert severity="info">
-              The pipeline needs cloud credentials to run terraform — wire a{' '}
-              {isADO ? 'service connection / workload identity' : 'cloud OIDC role or repo secrets'} where the template
-              indicates. Credentials stay in CI, never in TSM.
+              {isADO ? t('pages.drift.wizard.credsInfoAdo') : t('pages.drift.wizard.credsInfoGh')}
             </Alert>
           </Stack>
         )}
@@ -434,21 +437,26 @@ export default function DriftRepoWizard({
         {step === 2 && source && (
           <Stack spacing={2}>
             <TextField
-              label={isADO ? 'Pipeline name' : 'Connection name'}
+              label={isADO ? t('pages.drift.wizard.pipelineName') : t('pages.drift.wizard.connectionName')}
               value={pipelineName}
               onChange={(e) => setPipelineName(e.target.value)}
               fullWidth
             />
             {isADO ? (
               <Typography variant="body2" color="text.secondary">
-                Once the file is committed, TSM creates the Azure DevOps pipeline definition pointing at{' '}
-                <code>/{fileName}</code> in <b>{repo?.name}</b> and the pipeline connection in one step. Note: the
-                first run may require a one-time resource authorization in Azure DevOps (service connection access).
+                <Trans
+                  i18nKey="pages.drift.wizard.adoConnectDesc"
+                  values={{ path: `/${fileName}`, repo: repo?.name }}
+                  components={{ 1: <code />, 3: <b /> }}
+                />
               </Typography>
             ) : (
               <Typography variant="body2" color="text.secondary">
-                Once the file is merged to the default branch of <b>{repo?.name}</b>, GitHub registers the workflow
-                automatically — TSM then detects <code>tsm-drift.yml</code> and creates the connection.
+                <Trans
+                  i18nKey="pages.drift.wizard.ghConnectDesc"
+                  values={{ repo: repo?.name }}
+                  components={{ 1: <b />, 3: <code /> }}
+                />
               </Typography>
             )}
             {isADO && existingPipeline && !done && (
@@ -456,39 +464,45 @@ export default function DriftRepoWizard({
                 severity="info"
                 action={
                   <Button size="small" disabled={creating} onClick={() => adoUseExisting.mutate()}>
-                    Use existing
+                    {t('pages.drift.wizard.useExisting')}
                   </Button>
                 }
               >
-                A pipeline named <b>{existingPipeline.name}</b> already exists in this project — connect to it
-                instead of creating a duplicate.
+                <Trans
+                  i18nKey="pages.drift.wizard.existingPipeline"
+                  values={{ name: existingPipeline.name }}
+                  components={{ 1: <b /> }}
+                />
               </Alert>
             )}
             {ghWorkflowMissing && (
               <Alert severity="warning">
-                Workflow <code>tsm-drift.yml</code> not found in {repo?.name} yet. Commit it to the default branch,
-                give GitHub a few seconds, and check again.
+                <Trans
+                  i18nKey="pages.drift.wizard.ghMissing"
+                  values={{ repo: repo?.name }}
+                  components={{ 1: <code /> }}
+                />
               </Alert>
             )}
             {error && <Alert severity="error">{error}</Alert>}
             {done && (
               <Alert severity="success">
-                Pipeline connection <b>{pipelineName}</b> created — you can dispatch drift runs against it now.
+                <Trans i18nKey="pages.drift.wizard.done" values={{ name: pipelineName }} components={{ 1: <b /> }} />
               </Alert>
             )}
           </Stack>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={close}>{done ? 'Close' : 'Cancel'}</Button>
+        <Button onClick={close}>{done ? t('common.close') : t('common.cancel')}</Button>
         {step > 0 && !done && (
           <Button onClick={() => setStep((s) => s - 1)} disabled={creating}>
-            Back
+            {t('common.back')}
           </Button>
         )}
         {step < 2 && (
           <Button variant="contained" onClick={next} disabled={!stepValid}>
-            Next
+            {t('common.next')}
           </Button>
         )}
         {step === 2 && !done && (
@@ -498,7 +512,13 @@ export default function DriftRepoWizard({
             startIcon={creating ? <CircularProgress size={16} color="inherit" /> : undefined}
             onClick={() => (isADO ? adoCreate.mutate() : ghConnect.mutate())}
           >
-            {isADO ? (existingPipeline ? 'Create anyway' : 'Create pipeline & connection') : ghWorkflowMissing ? 'Check again' : 'Detect & connect'}
+            {isADO
+              ? existingPipeline
+                ? t('pages.drift.wizard.createAnyway')
+                : t('pages.drift.wizard.createBoth')
+              : ghWorkflowMissing
+                ? t('pages.drift.wizard.checkAgain')
+                : t('pages.drift.wizard.detectConnect')}
           </Button>
         )}
       </DialogActions>

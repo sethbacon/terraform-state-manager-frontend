@@ -79,7 +79,12 @@
     "copied": "Copied",
     "required": "Required",
     "optional": "Optional",
-    "detail": "Detail"
+    "detail": "Detail",
+    "apply": "Apply",
+    "create": "Create",
+    "filter": "Filter",
+    "ref": "Ref",
+    "provider": "Provider"
   },
   "settings": {
     "title": "Settings",
@@ -108,7 +113,10 @@
   },
   "auth": {
     "account": "Account",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "insufficientTitle": "Insufficient permissions",
+    "insufficientBody": "You don't have the required access ({{scope}}) to view this page.",
+    "completingSignIn": "Completing sign-in…"
   },
   "help": {
     "title": "Help",
@@ -118,31 +126,227 @@
     "pages": {
       "dashboard": {
         "title": "Home",
-        "body": "A cross-source overview: total Resources Under Management (RUM), provider and resource breakdowns, Terraform version spread, and recent drift and version-lab activity."
+        "body": "A cross-source overview of your Terraform estate: total Resources Under Management (RUM), provider and resource-type breakdowns, and the Terraform version spread.",
+        "sections": [
+          {
+            "h": "Reading the numbers",
+            "p": "RUM counts managed resource instances (count/for_each expansions included); data sources are tracked separately. Cards link to the pages where you can act."
+          },
+          {
+            "h": "Partial data",
+            "p": "Aggregation runs under a time budget with bounded concurrency. If a source is slow or unreachable (large HCP orgs, rate limits), the page renders what completed and the banner reports how many sources were skipped."
+          }
+        ]
       },
       "sources": {
         "title": "Sources",
-        "body": "Connect to existing state backends (local, HCP/TFC, S3, GCS, Azure Blob, Git). Browse each source's state files, view analysis, inspect resources, and safely edit state with lock → backup → write → audit."
+        "body": "Connect existing state backends and work with their state files — nothing is migrated to use TSM; it reads the backends you already have.",
+        "sections": [
+          {
+            "h": "Backends",
+            "p": "Local directories, HCP Terraform / Terraform Enterprise, S3, Azure Blob, GCS, Git, Consul, PostgreSQL, Kubernetes secrets, and the generic http backend. Credentials are encrypted at rest and never returned by the API."
+          },
+          {
+            "h": "Browsing",
+            "p": "Pick a source to list its states (type to filter long lists — HCP workspaces show their names). Tabs show analysis, per-resource inventory, raw JSON, and backups."
+          },
+          {
+            "h": "Editing safely",
+            "p": "Raw edits and state operations (rm / mv) follow lock → backup → write → audit. Every write captures a restorable backup first, and the Backups tab can revert."
+          },
+          {
+            "h": "Upload analysis",
+            "p": "Analyze an uploaded .tfstate ad hoc without connecting a source — nothing is stored."
+          }
+        ]
       },
       "drift": {
         "title": "Drift",
-        "body": "Dispatch a Terraform plan through your CI (GitHub Actions or Azure DevOps) to compare state against code and live infrastructure. Results return via a signed one-shot callback and render as a per-resource diff. IMPORTANT: the connection must target a pipeline/workflow created from the TSM workflow template (Workflow template button) — it declares the parameters TSM dispatches with and posts results back. Regular CI pipelines reject the dispatch with an 'unexpected parameter' error. Tip: configure a CI source (CI sources button) to pick pipelines and workflows from your org instead of typing coordinates; leave the ref empty to run from the pipeline's default branch."
+        "body": "Dispatch a terraform plan through your CI to compare state against code and live infrastructure. Results return via a signed one-shot callback and render as a per-resource diff.",
+        "sections": [
+          {
+            "h": "CI sources",
+            "p": "Store an org-level credential once (ADO org/project or GitHub owner). Pipeline connections built from a source pick from its real pipelines/repos/workflows and share its token — rotate the PAT in one place."
+          },
+          {
+            "h": "Set up repo (wizard)",
+            "p": "The wizard takes a repo from zero to drift-enabled: pick source + repo, customize the workflow template, commit it manually or via an automated branch + PR (write-scoped PAT), then create the pipeline definition and connection in one step."
+          },
+          {
+            "h": "The workflow template matters",
+            "p": "Dispatch targets must be created from the TSM workflow template — it declares the parameters TSM sends and posts results back. Regular CI pipelines reject the dispatch with an 'unexpected parameter' error."
+          },
+          {
+            "h": "Refs and callbacks",
+            "p": "Leave the ref empty to run from the pipeline's default branch. The CI job must be able to reach the TSM callback URL — hosted agents cannot reach a localhost deployment; use a tunnel (TSM_SERVER_CALLBACK_URL) or a self-hosted agent."
+          }
+        ]
       },
       "versionLab": {
         "title": "Version Lab",
-        "body": "Test whether your Terraform code plans cleanly against a chosen Terraform version (and optional pinned provider versions / registry mirror) by dispatching init/plan to your CI. Like drift, the connection must target a pipeline/workflow created from the TSM workflow template — regular CI pipelines reject the dispatched parameters."
+        "body": "Test whether your Terraform code plans cleanly against a pinned Terraform version — and optionally pinned provider/module versions or a registry mirror — by dispatching init/plan to CI.",
+        "sections": [
+          {
+            "h": "Same plumbing as drift",
+            "p": "Runs dispatch through the same pipeline connections and must target a pipeline created from the version-health workflow template (Workflow template button)."
+          },
+          {
+            "h": "Reading results",
+            "p": "init ✓/✗ and plan ✓/✗ show which phase failed; healthy means both passed with the pinned versions. Use this before upgrading Terraform or providers across your estate."
+          }
+        ]
       },
       "reports": {
         "title": "Reports",
-        "body": "Generate an analyzer report for a state file — RUM, resource/provider/version breakdowns — and download it as Markdown, JSON, or CSV."
+        "body": "Generate an analyzer report for any state file — RUM, resource, provider, and version breakdowns — and download it as Markdown, JSON, or CSV.",
+        "sections": [
+          {
+            "h": "Tip",
+            "p": "Report generation is audited. The same exports are available from a state's detail view on the Sources page (MD/JSON/CSV buttons)."
+          }
+        ]
       },
       "transfer": {
         "title": "Transfer",
-        "body": "Copy (backup) or move (migrate) a state file between sources. Migrate verifies serial/lineage/resource-count parity on the target and can optionally decommission the original after a type-to-confirm guard."
+        "body": "Copy (backup) or move (migrate) a state file between sources — e.g. local to S3, or HCP to a new backend.",
+        "sections": [
+          {
+            "h": "Verification",
+            "p": "Migrate verifies serial, lineage, and resource-count parity on the target after the copy. A failed verification leaves the source untouched and is flagged."
+          },
+          {
+            "h": "Decommission",
+            "p": "Optionally empty the original after a verified migrate. It requires type-to-confirm, and a backup of the source is captured first so the operation is recoverable."
+          },
+          {
+            "h": "Naming",
+            "p": "Destinations default to the state's friendly name with .tfstate appended — file-based targets only list *.tfstate files."
+          }
+        ]
       },
       "apiDocs": {
         "title": "API Docs",
-        "body": "Interactive OpenAPI documentation for the backend, generated from handler annotations. Raw spec:"
+        "body": "Interactive OpenAPI documentation generated from the backend's handler annotations. Raw spec:",
+        "sections": [
+          {
+            "h": "Try it out",
+            "p": "Requests run with your session cookie; mutations carry the CSRF token automatically. The Sections rail tracks scrolling and jumps between tag groups."
+          }
+        ]
+      },
+      "schedules": {
+        "title": "Schedules",
+        "body": "Cron-driven recurring drift runs. Each schedule dispatches its configured drift target on a cadence and records the last outcome.",
+        "sections": [
+          {
+            "h": "Cadence",
+            "p": "Standard 5-field cron expressions, or the shorthands daily, weekly, and every <duration> (minimum 1 minute). Next-run is computed server-side."
+          },
+          {
+            "h": "Targets",
+            "p": "A schedule points at a pipeline connection plus optional source/state/ref/working-dir — the same inputs as a manual drift run. Run now triggers it immediately without disturbing the cadence."
+          },
+          {
+            "h": "Alerting",
+            "p": "Pair schedules with notification channels (Administration → Notifications) to get webhook/Slack alerts on drift or failures."
+          }
+        ]
+      },
+      "admin": {
+        "title": "Admin",
+        "body": "Identity management overview — user, organization, and role counts from the shared identity service. Cards link to the management pages."
+      },
+      "adminUsers": {
+        "title": "Users",
+        "body": "Manage user accounts: search, create, rename, delete, and manage per-organization role memberships from the edit dialog.",
+        "sections": [
+          {
+            "h": "Membership chips",
+            "p": "Each chip is an organization membership colored by role template. Tooltips show the full org/role."
+          },
+          {
+            "h": "GDPR actions",
+            "p": "Export downloads everything attributed to a user (profile, memberships, audit entries). Erase anonymizes PII, clears the IdP subject so re-login cannot resurrect the account, and revokes memberships — audit history stays, attributed to an anonymized id. Erase requires typing the user's email."
+          },
+          {
+            "h": "IdP-managed roles",
+            "p": "Memberships granted via group mappings are reconciled at each login — manual changes to those organizations will be overwritten or revoked to match the IdP."
+          }
+        ]
+      },
+      "adminOrganizations": {
+        "title": "Organizations",
+        "body": "Create and manage organizations, their IdP bindings, and their members.",
+        "sections": [
+          {
+            "h": "IdP binding",
+            "p": "Binding an organization to oidc/saml/ldap (optionally a named IdP) restricts which provider's logins may map into it."
+          },
+          {
+            "h": "Members",
+            "p": "View members opens the roster: add users (with an optional role template), change roles inline, or remove members."
+          }
+        ]
+      },
+      "adminRoles": {
+        "title": "Roles",
+        "body": "The role templates and the permission scopes they grant. System roles (viewer, analyst, operator, editor, admin) are predefined.",
+        "sections": [
+          {
+            "h": "Scopes",
+            "p": "The reference table explains every scope. Expand a role to see its scopes and a category-by-category breakdown — admin grants everything."
+          }
+        ]
+      },
+      "adminOidc": {
+        "title": "OIDC Groups",
+        "body": "Map IdP groups to organization roles. These mappings are runtime-editable and take effect on the next login.",
+        "sections": [
+          {
+            "h": "Precedence",
+            "p": "Saved settings here override the file configuration entirely (including an empty mapping list). The group claim name falls back to the file config, then 'groups'."
+          },
+          {
+            "h": "Deprovisioning",
+            "p": "Organizations referenced by any mapping are IdP-authoritative: losing the group revokes the membership at next login. Unmapped organizations are never touched, and the default role applies only on first login."
+          },
+          {
+            "h": "SAML / LDAP",
+            "p": "Their mappings are shown read-only — they are configured in the server config file but reconcile with the same deprovisioning semantics."
+          }
+        ]
+      },
+      "adminMtls": {
+        "title": "mTLS Certificates",
+        "body": "Read-only view of mutual-TLS client-certificate authentication: whether it is enabled, the client CA, and certificate-subject → scope mappings (configured in the server config file)."
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "Read-only aggregate of every identity provider: OIDC, SAML (per-IdP), LDAP, mTLS, and the SCIM provisioning toggle — enabled state, key configuration, and group mappings. Secrets are never shown."
+      },
+      "adminNotifications": {
+        "title": "Notifications",
+        "body": "Webhook and Slack channels fired on drift-detected and run-failed events.",
+        "sections": [
+          {
+            "h": "Security",
+            "p": "Destination URLs are stored encrypted and never returned — the form shows only whether a destination exists; leaving it blank on edit keeps the current one. Use Test to send a sample message."
+          }
+        ]
+      },
+      "adminAudit": {
+        "title": "Audit Log",
+        "body": "Every mutation across the app lands here with actor and IP attribution: identity changes, source/state/backup/transfer operations, report generation, run dispatches, schedules, notification channels, and CI integrations.",
+        "sections": [
+          {
+            "h": "Semantics",
+            "p": "Only successful actions are recorded; failed attempts return errors but do not log. GDPR-erased users keep their history under an anonymized identifier."
+          },
+          {
+            "h": "Filters & export",
+            "p": "Filter by date range, resource type, action (partial match), or user email. Export downloads the filtered set as CSV or JSON (capped at 1000 rows). Click a row for full detail including metadata."
+          }
+        ]
       }
     }
   },
@@ -182,17 +386,379 @@
     },
     "sources": {
       "empty": "No sources connected yet. Add one to browse and analyze its state.",
-      "uploadAnalyze": "Analyze an uploaded state file"
+      "uploadAnalyze": "Analyze an uploaded state file",
+      "loadFailed": "Failed to load sources.",
+      "deleteSourceAria": "delete source",
+      "browseStates": "Browse states",
+      "analysisTitle": "Analysis — {{name}}",
+      "deleteTitle": "Delete source",
+      "deleteBody": "Remove the source <1>{{name}}</1>? This disconnects it from the State Manager. The underlying state backend and its files are <3>not</3> touched.",
+      "deleteConfirmLabel": "Delete source",
+      "statesIn": "States in {{name}}",
+      "listFailed": "Failed to list states.",
+      "noStateFiles": "No .tfstate files found.",
+      "filterStates": "Filter {{count}} states…",
+      "noStatesMatch": "No states match “{{filter}}”.",
+      "selectState": "Select a state to view its analysis.",
+      "tabAnalysis": "Analysis",
+      "tabResources": "Resources",
+      "tabRaw": "Raw",
+      "tabBackups": "Backups",
+      "exportReportAria": "export report",
+      "stateOps": "State ops",
+      "transfer": "Transfer",
+      "stateOpTitle": "State operation",
+      "stateOpDesc": "Structured edit of <1>{{name}}</1>. The current version is backed up first and the change is audited.",
+      "operation": "Operation",
+      "opRemove": "Remove (terraform state rm)",
+      "opMove": "Move / rename (terraform state mv)",
+      "resourceAddress": "Resource address",
+      "newAddress": "New address",
+      "analyzeFailed": "Failed to analyze this state file.",
+      "resourcesFailed": "Failed to load resources.",
+      "filterResources": "Filter by type, name, module, or provider…",
+      "module": "Module",
+      "mode": "Mode",
+      "instances": "Instances",
+      "rawFailed": "Failed to load raw state.",
+      "edit": "Edit",
+      "save": "Save",
+      "notValidJson": "Not valid JSON",
+      "saveHelp": "On save, the current version is backed up, the change is validated, and the edit is audited.",
+      "overwriteTitle": "Overwrite state?",
+      "overwriteBody": "The current version of <1>{{name}}</1> will be backed up, then replaced. You can revert from the Backups tab.",
+      "overwrite": "Overwrite",
+      "backupsFailed": "Failed to load backups.",
+      "noBackups": "No backups yet — one is captured automatically before each edit or restore.",
+      "serialHeader": "Serial",
+      "action": "Action",
+      "restore": "Restore",
+      "rum": "RUM",
+      "managed": "Managed",
+      "dataSources": "Data sources",
+      "totalInstances": "Total instances",
+      "terraform": "Terraform",
+      "serial": "Serial",
+      "topResourceTypes": "Top resource types",
+      "providers": "Providers",
+      "count": "Count",
+      "transferTitle": "Transfer state",
+      "copyTo": "Copy <1>{{name}}</1> to another source.",
+      "addSourceTitle": "Add state source",
+      "type": "Type",
+      "uploadError": "Could not analyze that file — is it a valid Terraform state JSON?",
+      "types": {
+        "local": "Local directory",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3 (or S3-compatible)",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Git repository",
+        "consul": "Consul KV",
+        "pg": "PostgreSQL backend",
+        "kubernetes": "Kubernetes secrets",
+        "http": "HTTP backend"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "Base path",
+            "helper": "Directory scanned for .tfstate files"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "Organization"
+          },
+          "hostname": {
+            "label": "Hostname"
+          },
+          "token": {
+            "label": "API token",
+            "helper": "Stored encrypted at rest"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "Bucket"
+          },
+          "region": {
+            "label": "Region"
+          },
+          "prefix": {
+            "label": "Key prefix"
+          },
+          "endpoint": {
+            "label": "Endpoint (S3-compatible)"
+          },
+          "access_key_id": {
+            "label": "Access key ID"
+          },
+          "secret_access_key": {
+            "label": "Secret access key"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "Storage account"
+          },
+          "container": {
+            "label": "Container"
+          },
+          "prefix": {
+            "label": "Blob prefix"
+          },
+          "account_key": {
+            "label": "Account key",
+            "helper": "Stored encrypted at rest"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "Bucket"
+          },
+          "prefix": {
+            "label": "Object prefix"
+          },
+          "credentials_json": {
+            "label": "Service account JSON",
+            "helper": "Paste the key JSON, or leave blank to use Application Default Credentials"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "Repository URL"
+          },
+          "ref": {
+            "label": "Branch"
+          },
+          "prefix": {
+            "label": "Path prefix"
+          },
+          "username": {
+            "label": "Username"
+          },
+          "token": {
+            "label": "Token",
+            "helper": "For private repos; stored encrypted"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "Address"
+          },
+          "scheme": {
+            "label": "Scheme"
+          },
+          "path": {
+            "label": "KV path prefix"
+          },
+          "datacenter": {
+            "label": "Datacenter"
+          },
+          "token": {
+            "label": "ACL token",
+            "helper": "Stored encrypted at rest"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "Connection string",
+            "helper": "Stored encrypted at rest"
+          },
+          "schema_name": {
+            "label": "Schema"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "API server URL"
+          },
+          "namespace": {
+            "label": "Namespace"
+          },
+          "labels": {
+            "label": "Label selector"
+          },
+          "ca_cert": {
+            "label": "Cluster CA (PEM)"
+          },
+          "token": {
+            "label": "Bearer token",
+            "helper": "Stored encrypted at rest"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "State URL"
+          },
+          "lock_address": {
+            "label": "Lock URL",
+            "helper": "Enables native LOCK/UNLOCK locking"
+          },
+          "unlock_address": {
+            "label": "Unlock URL"
+          },
+          "update_method": {
+            "label": "Update method"
+          },
+          "username": {
+            "label": "Username"
+          },
+          "password": {
+            "label": "Password",
+            "helper": "Stored encrypted at rest"
+          }
+        }
+      },
+      "optionalField": "{{label}} (optional)",
+      "createFailed": "Failed to create source."
     },
     "drift": {
       "pipelines": "Pipeline connections",
       "noPipelines": "No pipeline connections yet. Add one to dispatch drift runs.",
       "noRuns": "No drift runs yet.",
-      "runs": "Drift runs"
+      "runs": "Drift runs",
+      "statusFailed": "failed",
+      "statusDriftDetected": "drift detected",
+      "statusNoDrift": "no drift",
+      "recentRuns": "Recent runs",
+      "dir": "Dir",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "Set up repo",
+      "ciSources": "CI sources",
+      "deletePipelineTitle": "Delete pipeline connection",
+      "deletePipelineBody": "Remove the pipeline connection <1>{{name}}</1>? Drift and version-lab runs will no longer be able to dispatch through it.",
+      "runDetailTitle": "Drift run",
+      "defaultRef": "default ref",
+      "pending": "pending",
+      "addedChangedDestroyed": "{{added}} added / {{changed}} changed / {{destroyed}} destroyed",
+      "resource": "Resource",
+      "change": "Change",
+      "noResourceDrift": "No per-resource drift was reported.",
+      "noDetailsYet": "No details yet — the run has not reported results.",
+      "addPipelineTitle": "Add pipeline connection",
+      "ciSource": "CI source",
+      "ciSourceHelp": "Pick a configured CI source to choose from its pipelines or workflows, or enter coordinates manually.",
+      "manualEntry": "Manual entry",
+      "pipeline": "Pipeline",
+      "pipelineHelp": "Pick the pipeline created from the TSM workflow template (Workflow template button) — regular CI pipelines reject the dispatch parameters",
+      "repository": "Repository",
+      "repositoryHelp": "Repositories visible to this source",
+      "workflow": "Workflow",
+      "workflowHelp": "Pick the workflow created from the TSM workflow template (e.g. tsm-drift.yml) — other workflows reject the dispatch inputs",
+      "defaultRefOptional": "Default ref (optional)",
+      "credentialInherited": "Credential inherited from the CI source — rotating its token covers this connection.",
+      "apiToken": "API token / PAT",
+      "tokenHelp": "Stored encrypted at rest",
+      "ciSourcesTitle": "CI sources",
+      "ciSourcesDesc": "Org-level CI credentials (an Azure DevOps org/project or a GitHub owner). Pipeline connections built from a source pick from its pipelines or workflows and share its token.",
+      "noCiSources": "No CI sources yet — add one below.",
+      "ownerLabel": "Owner (org or user)",
+      "organization": "Organization",
+      "project": "Project",
+      "sourceTokenHelp": "Stored encrypted at rest; shared by connections built from this source",
+      "addCiSource": "Add CI source",
+      "deleteCiSourceTitle": "Delete CI source",
+      "deleteCiSourceBody": "Delete \"{{name}}\"? Pipeline connections built from it will stop dispatching unless they carry their own token.",
+      "newRunTitle": "New drift run",
+      "gitRefOptional": "Git ref (optional)",
+      "gitRefHelp": "Leave empty to run from the pipeline's default branch; set only to plan a specific branch/ref",
+      "workingDir": "Working directory",
+      "dispatch": "Dispatch",
+      "workflowTemplateTitle": "Drift workflow template",
+      "placeholderPipelineDefault": "pipeline default branch",
+      "wizard": {
+        "title": "Set up drift for a repository",
+        "steps": {
+          "source": "Source & repository",
+          "workflow": "Workflow file",
+          "connect": "Create & connect"
+        },
+        "preflight": "The CI callback URL is <1>{{base}}</1> — hosted CI agents cannot reach a local/private address, so runs would never report results. Use a self-hosted agent that can reach this host, or expose a tunnel and set <3>TSM_SERVER_CALLBACK_URL</3>.",
+        "preflightUnset": "not configured",
+        "intro": "Pick the CI source and the repository containing your Terraform. The wizard generates the TSM drift workflow for it, then creates the pipeline connection.",
+        "noSourcesHelp": "No CI sources configured yet — add one via the CI sources button on the Drift page first.",
+        "sourceHelp": "The org-level credential used to browse and create.",
+        "repoHelp": "Repository containing the Terraform",
+        "workingDir": "Terraform working directory",
+        "workingDirHelp": "Relative to the repo root",
+        "serviceConnection": "Service connection (optional)",
+        "serviceConnectionErr": "Could not list service connections (PAT may lack the scope) — referenced by name in the YAML guidance only.",
+        "serviceConnectionHelp": "Named in the generated YAML credential guidance",
+        "commitHeading": "Commit this file to <1>{{file}}</1> on the default branch{{branch}} — manually, or via PR",
+        "copy": "Copy",
+        "copied": "Copied",
+        "commitViaPR": "Commit via PR",
+        "setupExists": "The workflow file is already on the default branch — nothing to commit. Continue to create the connection.",
+        "prMerged": "Pull request merged — the workflow is on the default branch. Continue to create the connection.",
+        "prClosed": "The pull request was closed without merging. Re-run Commit via PR or commit manually.",
+        "prOpen": "Pull request opened from <1>{{branch}}</1> — <3>review and merge it</3>. Watching for the merge…",
+        "credsInfoAdo": "The pipeline needs cloud credentials to run terraform — wire a service connection / workload identity where the template indicates. Credentials stay in CI, never in TSM.",
+        "credsInfoGh": "The pipeline needs cloud credentials to run terraform — wire a cloud OIDC role or repo secrets where the template indicates. Credentials stay in CI, never in TSM.",
+        "pipelineName": "Pipeline name",
+        "connectionName": "Connection name",
+        "adoConnectDesc": "Once the file is committed, TSM creates the Azure DevOps pipeline definition pointing at <1>{{path}}</1> in <3>{{repo}}</3> and the pipeline connection in one step. Note: the first run may require a one-time resource authorization in Azure DevOps (service connection access).",
+        "ghConnectDesc": "Once the file is merged to the default branch of <1>{{repo}}</1>, GitHub registers the workflow automatically — TSM then detects <3>tsm-drift.yml</3> and creates the connection.",
+        "ghMissing": "Workflow <1>tsm-drift.yml</1> not found in {{repo}} yet. Commit it to the default branch, give GitHub a few seconds, and check again.",
+        "done": "Pipeline connection <1>{{name}}</1> created — you can dispatch drift runs against it now.",
+        "existingPipeline": "A pipeline named <1>{{name}}</1> already exists in this project — connect to it instead of creating a duplicate.",
+        "useExisting": "Use existing",
+        "createAnyway": "Create anyway",
+        "createBoth": "Create pipeline & connection",
+        "checkAgain": "Check again",
+        "detectConnect": "Detect & connect"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "Owner"
+          },
+          "repo": {
+            "label": "Repository"
+          },
+          "workflow_id": {
+            "label": "Workflow file or id"
+          },
+          "ref": {
+            "label": "Default ref"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "Organization"
+          },
+          "project": {
+            "label": "Project"
+          },
+          "pipeline_id": {
+            "label": "Pipeline id"
+          },
+          "ref": {
+            "label": "Default ref"
+          }
+        }
+      }
     },
     "versionLab": {
       "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",
-      "noRuns": "No health runs yet."
+      "noRuns": "No health runs yet.",
+      "terraform": "Terraform",
+      "checks": "Checks",
+      "statusDispatchFailed": "dispatch failed",
+      "statusHealthy": "healthy",
+      "statusUnhealthy": "unhealthy",
+      "newRunTitle": "New version-health run",
+      "pipeline": "Pipeline",
+      "gitRef": "Git ref",
+      "workingDir": "Working directory",
+      "terraformVersion": "Terraform version",
+      "registryHost": "Registry mirror host (optional)",
+      "registryHostHelp": "Pulls providers from this registry network mirror",
+      "providerVersions": "Provider versions (optional)",
+      "moduleVersions": "Module versions (optional)",
+      "dispatch": "Dispatch",
+      "workflowTitle": "Version-health workflow template"
     },
     "schedules": {
       "title": "Schedules",
@@ -244,12 +810,32 @@
       "source": "Source",
       "stateFile": "State file",
       "chooseSource": "Choose a source and a state file to preview and export its report.",
-      "noStates": "No state files in this source"
+      "noStates": "No state files in this source",
+      "topResourceTypes": "Top resource types",
+      "providers": "Providers",
+      "count": "Count"
     },
     "transfer": {
       "needScope": "You need the state:transfer scope to run transfers.",
       "source": "Source",
-      "destination": "Destination"
+      "destination": "Destination",
+      "stateFile": "State file",
+      "noStatesInSource": "No state files in this source",
+      "mode": "Mode",
+      "modeBackup": "Backup (copy)",
+      "modeMigrate": "Migrate (copy + verify parity)",
+      "targetSource": "Target source",
+      "targetKey": "Target key",
+      "targetKeyHelp": "Destination path/key within the target source",
+      "sameTarget": "Target must differ from the source state.",
+      "decommissionLabel": "Decommission source after a verified migrate (empties the original; backed up first)",
+      "confirmDecommission": "Type the source state key to confirm decommission",
+      "newTransfer": "New transfer",
+      "runBackup": "Backup",
+      "runMigrate": "Migrate",
+      "runMigrateDecommission": "Migrate & decommission",
+      "verified": "verified: {{value}}",
+      "sourceDecommissioned": "source decommissioned"
     },
     "login": {
       "signIn": "Sign in",

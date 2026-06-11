@@ -147,8 +147,8 @@ export default function ReportsPage() {
                 ))}
               </Box>
               <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
-                <BreakdownTable title="Top resource types" rows={a.resource_types.slice(0, 10)} />
-                <BreakdownTable title="Providers" rows={a.providers} />
+                <BreakdownTable title={t('pages.reports.topResourceTypes')} rows={a.resource_types.slice(0, 10)} />
+                <BreakdownTable title={t('pages.reports.providers')} rows={a.providers} />
               </Box>
             </>
           )}
@@ -159,6 +159,7 @@ export default function ReportsPage() {
 }
 
 function BreakdownTable({ title, rows }: { title: string; rows: { key: string; count: number }[] }) {
+  const { t } = useTranslation()
   return (
     <Card variant="outlined">
       <CardContent>
@@ -174,8 +175,8 @@ function BreakdownTable({ title, rows }: { title: string; rows: { key: string; c
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell align="right">Count</TableCell>
+                <TableCell>{t('common.name')}</TableCell>
+                <TableCell align="right">{t('pages.reports.count')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

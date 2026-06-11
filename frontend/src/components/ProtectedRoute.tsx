@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { Box, CircularProgress, Typography } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../contexts/AuthContext'
 
 interface ProtectedRouteProps {
@@ -13,6 +14,7 @@ interface ProtectedRouteProps {
  * a required scope. Unauthenticated users are redirected to /login.
  */
 export default function ProtectedRoute({ children, requiredScope }: ProtectedRouteProps) {
+  const { t } = useTranslation()
   const { isAuthenticated, isLoading, hasScope } = useAuth()
 
   if (isLoading) {
@@ -30,10 +32,8 @@ export default function ProtectedRoute({ children, requiredScope }: ProtectedRou
   if (requiredScope && !hasScope(requiredScope)) {
     return (
       <Box sx={{ p: 4 }}>
-        <Typography variant="h6">Insufficient permissions</Typography>
-        <Typography color="text.secondary">
-          You don't have the required access ({requiredScope}) to view this page.
-        </Typography>
+        <Typography variant="h6">{t('auth.insufficientTitle')}</Typography>
+        <Typography color="text.secondary">{t('auth.insufficientBody', { scope: requiredScope })}</Typography>
       </Box>
     )
   }

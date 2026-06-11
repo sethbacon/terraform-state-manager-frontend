@@ -7,23 +7,28 @@ import { useHelp } from '../contexts/HelpContext'
 export const HELP_PANEL_WIDTH = 320
 
 // Map a route to its help content key under i18n `help.pages.<key>`.
+const HELP_KEYS: Record<string, string> = {
+  '/': 'dashboard',
+  '/sources': 'sources',
+  '/drift': 'drift',
+  '/version-lab': 'versionLab',
+  '/schedules': 'schedules',
+  '/reports': 'reports',
+  '/transfer': 'transfer',
+  '/api-docs': 'apiDocs',
+  '/admin': 'admin',
+  '/admin/users': 'adminUsers',
+  '/admin/organizations': 'adminOrganizations',
+  '/admin/roles': 'adminRoles',
+  '/admin/oidc': 'adminOidc',
+  '/admin/mtls': 'adminMtls',
+  '/admin/sso': 'adminSso',
+  '/admin/notifications': 'adminNotifications',
+  '/admin/audit-logs': 'adminAudit',
+}
+
 function helpKeyForPath(pathname: string): string {
-  switch (pathname) {
-    case '/':
-      return 'dashboard'
-    case '/sources':
-      return 'sources'
-    case '/drift':
-      return 'drift'
-    case '/version-lab':
-      return 'versionLab'
-    case '/reports':
-      return 'reports'
-    case '/transfer':
-      return 'transfer'
-    default:
-      return ''
-  }
+  return HELP_KEYS[pathname] ?? ''
 }
 
 const HelpPanel = () => {
@@ -36,6 +41,10 @@ const HelpPanel = () => {
   const key = helpKeyForPath(pathname)
   const title = (key ? t(`help.pages.${key}.title`) : t('help.title')) as string
   const body = (key ? t(`help.pages.${key}.body`) : t('help.none')) as string
+  // Optional deeper sections: [{ h, p }] under help.pages.<key>.sections.
+  const sections = key
+    ? (t(`help.pages.${key}.sections`, { returnObjects: true, defaultValue: [] }) as { h: string; p: string }[])
+    : []
 
   return (
     <Drawer
@@ -66,6 +75,17 @@ const HelpPanel = () => {
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
           {body}
         </Typography>
+        {Array.isArray(sections) &&
+          sections.map((sec, i) => (
+            <Box key={i} sx={{ mt: 2 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                {sec.h}
+              </Typography>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                {sec.p}
+              </Typography>
+            </Box>
+          ))}
       </Box>
     </Drawer>
   )

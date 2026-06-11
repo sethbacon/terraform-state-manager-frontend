@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 
 /**
  * CallbackPage is the SPA landing page after the OIDC backend callback sets the
@@ -9,6 +10,7 @@ import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material'
  * AuthProvider resolves the now-authenticated user via /me.
  */
 export default function CallbackPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [error, setError] = useState<string | null>(null)
@@ -36,7 +38,7 @@ export default function CallbackPage() {
       ) : (
         <Stack spacing={2} alignItems="center">
           <CircularProgress />
-          <Typography color="text.secondary">Completing sign-in…</Typography>
+          <Typography color="text.secondary">{t('auth.completingSignIn')}</Typography>
         </Stack>
       )}
     </Box>

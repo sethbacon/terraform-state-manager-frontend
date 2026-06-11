@@ -43,7 +43,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import { api, type AnalysisResult, type StateSource, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
 import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
@@ -83,7 +83,7 @@ export default function SourcesPage() {
         const res = await api.analyzeUpload(await file.text())
         setUploadResult({ key: file.name, size: file.size, analysis: res.analysis })
       } catch {
-        setUploadError('Could not analyze that file — is it a valid Terraform state JSON?')
+        setUploadError(t('pages.sources.uploadError'))
       }
     }
     if (fileInputRef.current) fileInputRef.current.value = ''
@@ -118,7 +118,7 @@ export default function SourcesPage() {
       )}
 
       {sourcesQuery.isLoading && <CardGridSkeleton count={6} minWidth={260} />}
-      {sourcesQuery.isError && <Alert severity="error">Failed to load sources.</Alert>}
+      {sourcesQuery.isError && <Alert severity="error">{t('pages.sources.loadFailed')}</Alert>}
 
       {sourcesQuery.data && sourcesQuery.data.length === 0 && (
         <Alert severity="info">{t('pages.sources.empty')}</Alert>
@@ -149,12 +149,12 @@ export default function SourcesPage() {
                   setSelectedKey(null)
                 }}
               >
-                Browse states
+                {t('pages.sources.browseStates')}
               </Button>
               <Box sx={{ flexGrow: 1 }} />
               <IconButton
                 size="small"
-                aria-label="delete source"
+                aria-label={t('pages.sources.deleteSourceAria')}
                 onClick={() => setDeleteTarget(s)}
                 disabled={deleteMutation.isPending}
               >
@@ -183,26 +183,29 @@ export default function SourcesPage() {
       />
 
       <Dialog open={Boolean(uploadResult)} onClose={() => setUploadResult(null)} fullWidth maxWidth="md">
-        <DialogTitle>Analysis — {uploadResult?.key}</DialogTitle>
+        <DialogTitle>{t('pages.sources.analysisTitle', { name: uploadResult?.key })}</DialogTitle>
         <DialogContent>{uploadResult && <AnalysisView result={uploadResult} />}</DialogContent>
         <DialogActions>
-          <Button onClick={() => setUploadResult(null)}>Close</Button>
+          <Button onClick={() => setUploadResult(null)}>{t('common.close')}</Button>
         </DialogActions>
       </Dialog>
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
-        title="Delete source"
+        title={t('pages.sources.deleteTitle')}
         severity="error"
         description={
           <>
-            Remove the source <b>{deleteTarget?.name}</b>? This disconnects it from the State Manager.
-            The underlying state backend and its files are <b>not</b> touched.
+            <Trans
+              i18nKey="pages.sources.deleteBody"
+              values={{ name: deleteTarget?.name }}
+              components={{ 1: <b />, 3: <b /> }}
+            />
           </>
         }
         typeToConfirmText={deleteTarget?.name}
-        confirmLabel="Delete source"
+        confirmLabel={t('pages.sources.deleteConfirmLabel')}
         loading={deleteMutation.isPending}
         onConfirm={async () => {
           if (!deleteTarget) return
@@ -228,6 +231,7 @@ function StatesBrowser({
     queryFn: () => api.listStates(source.id),
   })
 
+  const { t } = useTranslation()
   // Type-to-filter for long listings (e.g. HCP orgs with many workspaces).
   const [stateFilter, setStateFilter] = useState('')
   const allStates = statesQuery.data ?? []
@@ -238,7 +242,7 @@ function StatesBrowser({
   return (
     <Box sx={{ mt: 4 }}>
       <Typography variant="h6" sx={{ mb: 1 }}>
-        States in {source.name}
+        {t('pages.sources.statesIn', { name: source.name })}
       </Typography>
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '320px 1fr' } }}>
         <Card variant="outlined">
@@ -247,17 +251,17 @@ function StatesBrowser({
               <CircularProgress size={20} />
             </Box>
           )}
-          {statesQuery.isError && <Alert severity="error">Failed to list states.</Alert>}
+          {statesQuery.isError && <Alert severity="error">{t('pages.sources.listFailed')}</Alert>}
           {statesQuery.data && statesQuery.data.length === 0 && (
             <Box sx={{ p: 2 }}>
-              <Typography color="text.secondary">No `.tfstate` files found.</Typography>
+              <Typography color="text.secondary">{t('pages.sources.noStateFiles')}</Typography>
             </Box>
           )}
           {allStates.length > 8 && (
             <Box sx={{ p: 1 }}>
               <TextField
                 size="small"
-                placeholder={`Filter ${allStates.length} states…`}
+                placeholder={t('pages.sources.filterStates', { count: allStates.length })}
                 value={stateFilter}
                 onChange={(e) => setStateFilter(e.target.value)}
                 fullWidth
@@ -267,7 +271,7 @@ function StatesBrowser({
           {stateFilter && visibleStates.length === 0 && (
             <Box sx={{ p: 2 }}>
               <Typography color="text.secondary" variant="body2">
-                No states match “{stateFilter}”.
+                {t('pages.sources.noStatesMatch', { filter: stateFilter })}
               </Typography>
             </Box>
           )}
@@ -299,7 +303,7 @@ function StatesBrowser({
           ) : (
             <Card variant="outlined">
               <CardContent>
-                <Typography color="text.secondary">Select a state to view its analysis.</Typography>
+                <Typography color="text.secondary">{t('pages.sources.selectState')}</Typography>
               </CardContent>
             </Card>
           )}
@@ -320,6 +324,7 @@ function StateDetail({
   stateName?: string
 }) {
   const displayName = stateName ?? stateKey
+  const { t } = useTranslation()
   const { hasScope } = useAuth()
   const [tab, setTab] = useState(0)
   const [transferOpen, setTransferOpen] = useState(false)
@@ -329,22 +334,22 @@ function StateDetail({
       <Card variant="outlined">
         <Stack direction="row" alignItems="center" sx={{ px: 2, pt: 1, flexWrap: 'wrap', gap: 1 }}>
           <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ flexGrow: 1, minHeight: 0 }}>
-            <Tab label="Analysis" />
-            <Tab label="Resources" />
-            <Tab label="Raw" />
-            <Tab label="Backups" />
+            <Tab label={t('pages.sources.tabAnalysis')} />
+            <Tab label={t('pages.sources.tabResources')} />
+            <Tab label={t('pages.sources.tabRaw')} />
+            <Tab label={t('pages.sources.tabBackups')} />
           </Tabs>
           {hasScope('state:write') && (
             <Button size="small" variant="outlined" onClick={() => setOpsOpen(true)}>
-              State ops
+              {t('pages.sources.stateOps')}
             </Button>
           )}
           {hasScope('state:transfer') && (
             <Button size="small" variant="outlined" startIcon={<SwapHorizIcon />} onClick={() => setTransferOpen(true)}>
-              Transfer
+              {t('pages.sources.transfer')}
             </Button>
           )}
-          <ButtonGroup size="small" variant="outlined" aria-label="export report">
+          <ButtonGroup size="small" variant="outlined" aria-label={t('pages.sources.exportReportAria')}>
             <Button startIcon={<DownloadIcon />} onClick={() => api.downloadReport(sourceId, stateKey, 'md')}>
               MD
             </Button>
@@ -391,6 +396,7 @@ function StateOpsDialog({
   stateKey: string
   stateName?: string
 }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [op, setOp] = useState<'rm' | 'mv'>('rm')
   const [address, setAddress] = useState('')
@@ -436,16 +442,19 @@ function StateOpsDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>State operation</DialogTitle>
+      <DialogTitle>{t('pages.sources.stateOpTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Structured edit of <b>{stateName ?? stateKey}</b>. The current version is backed up first and the change
-            is audited.
+            <Trans
+              i18nKey="pages.sources.stateOpDesc"
+              values={{ name: stateName ?? stateKey }}
+              components={{ 1: <b /> }}
+            />
           </Typography>
-          <TextField select label="Operation" value={op} onChange={(e) => setOp(e.target.value as 'rm' | 'mv')} fullWidth>
-            <MenuItem value="rm">Remove (terraform state rm)</MenuItem>
-            <MenuItem value="mv">Move / rename (terraform state mv)</MenuItem>
+          <TextField select label={t('pages.sources.operation')} value={op} onChange={(e) => setOp(e.target.value as 'rm' | 'mv')} fullWidth>
+            <MenuItem value="rm">{t('pages.sources.opRemove')}</MenuItem>
+            <MenuItem value="mv">{t('pages.sources.opMove')}</MenuItem>
           </TextField>
           <Autocomplete
             freeSolo
@@ -469,7 +478,7 @@ function StateOpsDialog({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Resource address"
+                label={t('pages.sources.resourceAddress')}
                 placeholder="aws_instance.web or module.vpc.aws_subnet.private"
                 fullWidth
               />
@@ -477,7 +486,7 @@ function StateOpsDialog({
           />
           {op === 'mv' && (
             <TextField
-              label="New address"
+              label={t('pages.sources.newAddress')}
               value={to}
               onChange={(e) => setTo(e.target.value)}
               placeholder="aws_instance.web2"
@@ -498,23 +507,25 @@ function StateOpsDialog({
 }
 
 function AnalysisTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
   const q = useQuery({
     queryKey: queryKeys.sources.analysis(sourceId, stateKey),
     queryFn: () => api.analyzeState(sourceId, stateKey),
   })
   if (q.isLoading) return <CircularProgress />
-  if (q.isError || !q.data) return <Alert severity="error">Failed to analyze this state file.</Alert>
+  if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.analyzeFailed')}</Alert>
   return <AnalysisView result={q.data} />
 }
 
 function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
   const [filter, setFilter] = useState('')
   const q = useQuery({
     queryKey: queryKeys.sources.resources(sourceId, stateKey),
     queryFn: () => api.listStateResources(sourceId, stateKey),
   })
   if (q.isLoading) return <CircularProgress />
-  if (q.isError || !q.data) return <Alert severity="error">Failed to load resources.</Alert>
+  if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.resourcesFailed')}</Alert>
 
   const f = filter.toLowerCase()
   const rows = q.data.filter(
@@ -530,7 +541,7 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
     <Stack spacing={1}>
       <TextField
         size="small"
-        placeholder="Filter by type, name, module, or provider…"
+        placeholder={t('pages.sources.filterResources')}
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         fullWidth
@@ -538,12 +549,12 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Module</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Name</TableCell>
-            <TableCell>Provider</TableCell>
-            <TableCell>Mode</TableCell>
-            <TableCell align="right">Instances</TableCell>
+            <TableCell>{t('pages.sources.module')}</TableCell>
+            <TableCell>{t('common.type')}</TableCell>
+            <TableCell>{t('common.name')}</TableCell>
+            <TableCell>{t('common.provider')}</TableCell>
+            <TableCell>{t('pages.sources.mode')}</TableCell>
+            <TableCell align="right">{t('pages.sources.instances')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -569,6 +580,7 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
 }
 
 function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const { hasScope } = useAuth()
   const canEdit = hasScope('state:write')
@@ -602,7 +614,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
   })
 
   if (q.isLoading) return <CircularProgress />
-  if (q.isError || q.data === undefined) return <Alert severity="error">Failed to load raw state.</Alert>
+  if (q.isError || q.data === undefined) return <Alert severity="error">{t('pages.sources.rawFailed')}</Alert>
 
   let pretty = q.data
   try {
@@ -631,16 +643,16 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
               setEditing(true)
             }}
           >
-            Edit
+            {t('common.edit')}
           </Button>
         )}
         {editing && (
           <Stack direction="row" spacing={1}>
             <Button size="small" onClick={() => setEditing(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button size="small" variant="contained" disabled={!draftValid} onClick={() => setConfirmOpen(true)}>
-              Save
+              {t('common.save')}
             </Button>
           </Stack>
         )}
@@ -655,9 +667,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
             onChange={(e) => setDraft(e.target.value)}
             error={!draftValid}
             helperText={
-              !draftValid
-                ? 'Not valid JSON'
-                : 'On save, the current version is backed up, the change is validated, and the edit is audited.'
+              !draftValid ? t('pages.sources.notValidJson') : t('pages.sources.saveHelp')
             }
             sx={{ '& textarea': { fontFamily: 'monospace', fontSize: 12 } }}
             fullWidth
@@ -674,17 +684,16 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
       )}
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>Overwrite state?</DialogTitle>
+        <DialogTitle>{t('pages.sources.overwriteTitle')}</DialogTitle>
         <DialogContent>
           <Typography>
-            The current version of <b>{stateKey}</b> will be backed up, then replaced. You can revert from the
-            Backups tab.
+            <Trans i18nKey="pages.sources.overwriteBody" values={{ name: stateKey }} components={{ 1: <b /> }} />
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)}>Cancel</Button>
+          <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
           <Button color="warning" variant="contained" disabled={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
-            Overwrite
+            {t('pages.sources.overwrite')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -693,6 +702,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
 }
 
 function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const { hasScope } = useAuth()
   const canEdit = hasScope('state:write')
@@ -717,11 +727,11 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
   })
 
   if (q.isLoading) return <CircularProgress />
-  if (q.isError || !q.data) return <Alert severity="error">Failed to load backups.</Alert>
+  if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.backupsFailed')}</Alert>
   if (q.data.length === 0) {
     return (
       <Typography color="text.secondary">
-        No backups yet — one is captured automatically before each edit or restore.
+        {t('pages.sources.noBackups')}
       </Typography>
     )
   }
@@ -732,10 +742,10 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Created</TableCell>
-            <TableCell align="right">Serial</TableCell>
+            <TableCell>{t('common.created')}</TableCell>
+            <TableCell align="right">{t('pages.sources.serialHeader')}</TableCell>
             <TableCell>By</TableCell>
-            <TableCell align="right">Action</TableCell>
+            <TableCell align="right">{t('pages.sources.action')}</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -750,7 +760,7 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
                   disabled={!canEdit || restoreMutation.isPending}
                   onClick={() => restoreMutation.mutate(b.id)}
                 >
-                  Restore
+                  {t('pages.sources.restore')}
                 </Button>
               </TableCell>
             </TableRow>
@@ -763,13 +773,14 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
 
 function AnalysisView({ result }: { result: AnalysisResult }) {
   const a = result.analysis
+  const { t } = useTranslation()
   const stats: { label: string; value: string | number }[] = [
-    { label: 'RUM', value: a.rum },
-    { label: 'Managed', value: a.managed_resources },
-    { label: 'Data sources', value: a.data_sources },
-    { label: 'Total instances', value: a.total_resources },
-    { label: 'Terraform', value: a.terraform_version || '—' },
-    { label: 'Serial', value: a.serial },
+    { label: t('pages.sources.rum'), value: a.rum },
+    { label: t('pages.sources.managed'), value: a.managed_resources },
+    { label: t('pages.sources.dataSources'), value: a.data_sources },
+    { label: t('pages.sources.totalInstances'), value: a.total_resources },
+    { label: t('pages.sources.terraform'), value: a.terraform_version || '—' },
+    { label: t('pages.sources.serial'), value: a.serial },
   ]
 
   return (
@@ -788,14 +799,15 @@ function AnalysisView({ result }: { result: AnalysisResult }) {
       </Box>
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
-        <BreakdownTable title="Top resource types" rows={a.resource_types.slice(0, 10)} />
-        <BreakdownTable title="Providers" rows={a.providers} />
+        <BreakdownTable title={t('pages.sources.topResourceTypes')} rows={a.resource_types.slice(0, 10)} />
+        <BreakdownTable title={t('pages.sources.providers')} rows={a.providers} />
       </Box>
     </Stack>
   )
 }
 
 function BreakdownTable({ title, rows }: { title: string; rows: { key: string; count: number }[] }) {
+  const { t } = useTranslation()
   return (
     <Card variant="outlined">
       <CardContent>
@@ -805,14 +817,14 @@ function BreakdownTable({ title, rows }: { title: string; rows: { key: string; c
         <Divider sx={{ mb: 1 }} />
         {rows.length === 0 ? (
           <Typography color="text.secondary" variant="body2">
-            None
+            {t('common.none')}
           </Typography>
         ) : (
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell align="right">Count</TableCell>
+                <TableCell>{t('common.name')}</TableCell>
+                <TableCell align="right">{t('pages.sources.count')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -843,6 +855,7 @@ function TransferDialog({
   stateKey: string
   stateName?: string
 }) {
+  const { t } = useTranslation()
   // Destination defaults to the friendly name (HCP keys are workspace ids),
   // with .tfstate appended so file-based targets list the result.
   const friendly = stateName ?? stateKey
@@ -884,7 +897,7 @@ function TransferDialog({
 
   return (
     <Dialog open={open} onClose={close} fullWidth maxWidth="sm">
-      <DialogTitle>Transfer state</DialogTitle>
+      <DialogTitle>{t('pages.sources.transferTitle')}</DialogTitle>
       <DialogContent>
         {result ? (
           <Alert severity={severity}>
@@ -896,21 +909,21 @@ function TransferDialog({
         ) : (
           <Stack spacing={2} sx={{ mt: 1 }}>
             <Typography variant="body2" color="text.secondary">
-              Copy <b>{stateName ?? stateKey}</b> to another source.
+              <Trans i18nKey="pages.sources.copyTo" values={{ name: stateName ?? stateKey }} components={{ 1: <b /> }} />
             </Typography>
             <TextField
               select
-              label="Mode"
+              label={t('pages.transfer.mode')}
               value={mode}
               onChange={(e) => setMode(e.target.value as 'backup' | 'migrate')}
               fullWidth
             >
-              <MenuItem value="backup">Backup (copy)</MenuItem>
-              <MenuItem value="migrate">Migrate (copy + verify parity)</MenuItem>
+              <MenuItem value="backup">{t('pages.transfer.modeBackup')}</MenuItem>
+              <MenuItem value="migrate">{t('pages.transfer.modeMigrate')}</MenuItem>
             </TextField>
             <TextField
               select
-              label="Target source"
+              label={t('pages.transfer.targetSource')}
               value={targetSourceId}
               onChange={(e) => setTargetSourceId(e.target.value)}
               fullWidth
@@ -922,16 +935,16 @@ function TransferDialog({
               ))}
             </TextField>
             <TextField
-              label="Target key"
+              label={t('pages.transfer.targetKey')}
               value={targetKey}
               onChange={(e) => setTargetKey(e.target.value)}
-              helperText="Destination path/key within the target source"
+              helperText={t('pages.transfer.targetKeyHelp')}
               fullWidth
             />
             {mode === 'migrate' && (
               <FormControlLabel
                 control={<Checkbox checked={decommission} onChange={(e) => setDecommission(e.target.checked)} />}
-                label="Decommission source after a verified migrate (empties the original; backed up first)"
+                label={t('pages.transfer.decommissionLabel')}
               />
             )}
             {mutation.isError && <Alert severity="error">{errMsg(mutation.error)}</Alert>}
@@ -1086,6 +1099,7 @@ function AddSourceDialog({
   onClose: () => void
   onCreated: () => void
 }) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [type, setType] = useState('local')
   const [values, setValues] = useState<Record<string, string>>({})
@@ -1124,13 +1138,13 @@ function AddSourceDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add state source</DialogTitle>
+      <DialogTitle>{t('pages.sources.addSourceTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField label={t('common.name')} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
           <TextField
             select
-            label="Type"
+            label={t('pages.sources.type')}
             value={type}
             onChange={(e) => {
               setType(e.target.value)
@@ -1138,30 +1152,33 @@ function AddSourceDialog({
             }}
             fullWidth
           >
-            {SOURCE_TYPES.map((t) => (
-              <MenuItem key={t.value} value={t.value}>
-                {t.label}
+            {SOURCE_TYPES.map((st) => (
+              <MenuItem key={st.value} value={st.value}>
+                {t(`pages.sources.types.${st.value}`, st.label)}
               </MenuItem>
             ))}
           </TextField>
 
-          {def.fields.map((f) => (
-            <TextField
-              key={f.key}
-              label={f.optional ? `${f.label} (optional)` : f.label}
-              type={f.secret ? 'password' : 'text'}
-              value={values[f.key] ?? ''}
-              onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-              placeholder={f.placeholder}
-              helperText={f.helper}
-              fullWidth
-            />
-          ))}
+          {def.fields.map((f) => {
+            const label = t(`pages.sources.fields.${type}.${f.key}.label`, f.label)
+            return (
+              <TextField
+                key={f.key}
+                label={f.optional ? t('pages.sources.optionalField', { label }) : label}
+                type={f.secret ? 'password' : 'text'}
+                value={values[f.key] ?? ''}
+                onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                placeholder={f.placeholder}
+                helperText={f.helper ? t(`pages.sources.fields.${type}.${f.key}.helper`, f.helper) : undefined}
+                fullWidth
+              />
+            )
+          })}
 
           {createMutation.isError && (
             <Alert severity="error">
               {(createMutation.error as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-                'Failed to create source.'}
+                t('pages.sources.createFailed')}
             </Alert>
           )}
         </Stack>

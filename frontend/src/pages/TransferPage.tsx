@@ -110,13 +110,15 @@ export default function TransferPage() {
           <Stack spacing={2}>
             <Alert severity={severity}>
               <b>{result.mode}</b> — {result.status}
-              {result.verified != null ? ` · verified: ${result.verified ? 'yes' : 'no'}` : ''}
-              {result.decommissioned ? ' · source decommissioned' : ''}
+              {result.verified != null
+                ? ` · ${t('pages.transfer.verified', { value: result.verified ? t('common.yes') : t('common.no') })}`
+                : ''}
+              {result.decommissioned ? ` · ${t('pages.transfer.sourceDecommissioned')}` : ''}
               {result.detail ? ` — ${result.detail}` : ''}
             </Alert>
             <Box>
               <Button variant="outlined" onClick={reset}>
-                New transfer
+                {t('pages.transfer.newTransfer')}
               </Button>
             </Box>
           </Stack>
@@ -125,7 +127,7 @@ export default function TransferPage() {
             <Typography variant="subtitle2" color="text.secondary">
               {t('pages.transfer.source')}
             </Typography>
-            <TextField select label="Source" value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
+            <TextField select label={t('pages.transfer.source')} value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
               {(sourcesQuery.data ?? []).map((s) => (
                 <MenuItem key={s.id} value={s.id}>
                   {s.name} ({s.type})
@@ -143,8 +145,8 @@ export default function TransferPage() {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="State file"
-                  helperText={sourceId && statesQuery.data?.length === 0 ? 'No state files in this source' : ' '}
+                  label={t('pages.transfer.stateFile')}
+                  helperText={sourceId && statesQuery.data?.length === 0 ? t('pages.transfer.noStatesInSource') : ' '}
                 />
               )}
             />
@@ -152,13 +154,13 @@ export default function TransferPage() {
             <Typography variant="subtitle2" color="text.secondary" sx={{ pt: 1 }}>
               {t('pages.transfer.destination')}
             </Typography>
-            <TextField select label="Mode" value={mode} onChange={(e) => setMode(e.target.value as 'backup' | 'migrate')} fullWidth>
-              <MenuItem value="backup">Backup (copy)</MenuItem>
-              <MenuItem value="migrate">Migrate (copy + verify parity)</MenuItem>
+            <TextField select label={t('pages.transfer.mode')} value={mode} onChange={(e) => setMode(e.target.value as 'backup' | 'migrate')} fullWidth>
+              <MenuItem value="backup">{t('pages.transfer.modeBackup')}</MenuItem>
+              <MenuItem value="migrate">{t('pages.transfer.modeMigrate')}</MenuItem>
             </TextField>
             <TextField
               select
-              label="Target source"
+              label={t('pages.transfer.targetSource')}
               value={targetSourceId}
               onChange={(e) => setTargetSourceId(e.target.value)}
               fullWidth
@@ -170,23 +172,23 @@ export default function TransferPage() {
               ))}
             </TextField>
             <TextField
-              label="Target key"
+              label={t('pages.transfer.targetKey')}
               value={targetKey}
               onChange={(e) => setTargetKey(e.target.value)}
-              helperText="Destination path/key within the target source"
+              helperText={t('pages.transfer.targetKeyHelp')}
               fullWidth
             />
-            {sameTarget && <Alert severity="warning">Target must differ from the source state.</Alert>}
+            {sameTarget && <Alert severity="warning">{t('pages.transfer.sameTarget')}</Alert>}
 
             {mode === 'migrate' && (
               <Box>
                 <FormControlLabel
                   control={<Checkbox checked={decommission} onChange={(e) => setDecommission(e.target.checked)} />}
-                  label="Decommission source after a verified migrate (empties the original; backed up first)"
+                  label={t('pages.transfer.decommissionLabel')}
                 />
                 {decommission && (
                   <TextField
-                    label="Type the source state key to confirm decommission"
+                    label={t('pages.transfer.confirmDecommission')}
                     value={confirmKey}
                     onChange={(e) => setConfirmKey(e.target.value)}
                     placeholder={stateKey}
@@ -208,7 +210,11 @@ export default function TransferPage() {
                 startIcon={mutation.isPending ? <CircularProgress size={16} /> : <SwapHorizIcon />}
                 onClick={() => mutation.mutate()}
               >
-                {mode === 'backup' ? 'Backup' : decommission ? 'Migrate & decommission' : 'Migrate'}
+                {mode === 'backup'
+                  ? t('pages.transfer.runBackup')
+                  : decommission
+                    ? t('pages.transfer.runMigrateDecommission')
+                    : t('pages.transfer.runMigrate')}
               </Button>
             </Box>
           </Stack>

@@ -42,14 +42,14 @@ const PROVIDER_LABELS = [
   { value: 'azure_devops', label: 'Azure DevOps' },
 ]
 
-function statusChip(run: HealthRun) {
-  if (run.status === 'failed') return <Chip size="small" color="error" label="dispatch failed" />
+function statusChip(run: HealthRun, t: (k: string) => string) {
+  if (run.status === 'failed') return <Chip size="small" color="error" label={t('pages.versionLab.statusDispatchFailed')} />
   if (run.status === 'dispatched' || run.status === 'running')
     return <Chip size="small" color="info" label={run.status} />
   return run.success ? (
-    <Chip size="small" color="success" label="healthy" />
+    <Chip size="small" color="success" label={t('pages.versionLab.statusHealthy')} />
   ) : (
-    <Chip size="small" color="warning" label="unhealthy" />
+    <Chip size="small" color="warning" label={t('pages.versionLab.statusUnhealthy')} />
   )
 }
 
@@ -115,18 +115,18 @@ export default function VersionLabPage() {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Status</TableCell>
-              <TableCell>Terraform</TableCell>
-              <TableCell>Checks</TableCell>
-              <TableCell>Ref</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell>Detail</TableCell>
+              <TableCell>{t('common.status')}</TableCell>
+              <TableCell>{t('pages.versionLab.terraform')}</TableCell>
+              <TableCell>{t('pages.versionLab.checks')}</TableCell>
+              <TableCell>{t('common.ref')}</TableCell>
+              <TableCell>{t('common.created')}</TableCell>
+              <TableCell>{t('common.detail')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {runsQuery.data.map((r) => (
               <TableRow key={r.id}>
-                <TableCell>{statusChip(r)}</TableCell>
+                <TableCell>{statusChip(r, t)}</TableCell>
                 <TableCell>{r.terraform_version || 'latest'}</TableCell>
                 <TableCell>
                   {okText('init', r.init_ok)}
@@ -166,6 +166,7 @@ function NewHealthRunDialog({
   pipelines: PipelineConnection[]
   onCreated: () => void
 }) {
+  const { t } = useTranslation()
   const [pipelineId, setPipelineId] = useState('')
   const [repoRef, setRepoRef] = useState('')
   const [workingDir, setWorkingDir] = useState('.')
@@ -205,41 +206,41 @@ function NewHealthRunDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>New version-health run</DialogTitle>
+      <DialogTitle>{t('pages.versionLab.newRunTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField select label="Pipeline" value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
+          <TextField select label={t('pages.versionLab.pipeline')} value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
             {pipelines.map((p) => (
               <MenuItem key={p.id} value={p.id}>
                 {p.name} ({p.provider})
               </MenuItem>
             ))}
           </TextField>
-          <TextField label="Git ref" value={repoRef} onChange={(e) => setRepoRef(e.target.value)} placeholder="main" fullWidth />
-          <TextField label="Working directory" value={workingDir} onChange={(e) => setWorkingDir(e.target.value)} fullWidth />
+          <TextField label={t('pages.versionLab.gitRef')} value={repoRef} onChange={(e) => setRepoRef(e.target.value)} placeholder="main" fullWidth />
+          <TextField label={t('pages.versionLab.workingDir')} value={workingDir} onChange={(e) => setWorkingDir(e.target.value)} fullWidth />
           <TextField
-            label="Terraform version"
+            label={t('pages.versionLab.terraformVersion')}
             value={tfVersion}
             onChange={(e) => setTfVersion(e.target.value)}
             placeholder="1.9.5 (blank = latest)"
             fullWidth
           />
           <TextField
-            label="Registry mirror host (optional)"
+            label={t('pages.versionLab.registryHost')}
             value={registryHost}
             onChange={(e) => setRegistryHost(e.target.value)}
             placeholder="registry.example.com"
-            helperText="Pulls providers from this registry network mirror"
+            helperText={t('pages.versionLab.registryHostHelp')}
             fullWidth
           />
 
           <Box>
             <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
               <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-                Provider versions (optional)
+                {t('pages.versionLab.providerVersions')}
               </Typography>
               <Button size="small" startIcon={<AddIcon />} onClick={() => setProviders((p) => [...p, { name: '', version: '' }])}>
-                Add
+                {t('common.add')}
               </Button>
             </Stack>
             <Stack spacing={1}>
@@ -272,10 +273,10 @@ function NewHealthRunDialog({
           <Box>
             <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
               <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
-                Module versions (optional)
+                {t('pages.versionLab.moduleVersions')}
               </Typography>
               <Button size="small" startIcon={<AddIcon />} onClick={() => setModules((m) => [...m, { name: '', version: '' }])}>
-                Add
+                {t('common.add')}
               </Button>
             </Stack>
             <Stack spacing={1}>
@@ -307,9 +308,9 @@ function NewHealthRunDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" disabled={!pipelineId || mutation.isPending} onClick={() => mutation.mutate()}>
-          Dispatch
+          {t('pages.versionLab.dispatch')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -317,6 +318,7 @@ function NewHealthRunDialog({
 }
 
 function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation()
   const [provider, setProvider] = useState('github_actions')
   const q = useQuery({
     queryKey: ['health', 'workflow', provider],
@@ -326,12 +328,12 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Version-health workflow template</DialogTitle>
+      <DialogTitle>{t('pages.versionLab.workflowTitle')}</DialogTitle>
       <DialogContent>
         <TextField
           select
           size="small"
-          label="Provider"
+          label={t('common.provider')}
           value={provider}
           onChange={(e) => setProvider(e.target.value)}
           sx={{ mb: 2, mt: 1, minWidth: 220 }}
@@ -355,7 +357,7 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
     </Dialog>
   )

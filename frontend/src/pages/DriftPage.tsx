@@ -31,7 +31,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import HubIcon from '@mui/icons-material/Hub'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import DescriptionIcon from '@mui/icons-material/Description'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import {
   api,
   type CIPipelineRef,
@@ -75,15 +75,15 @@ const PROVIDERS: { value: string; label: string; fields: { key: string; label: s
   },
 ]
 
-function statusChip(run: DriftRun) {
-  if (run.status === 'failed') return <Chip size="small" color="error" label="failed" />
+function statusChip(run: DriftRun, t: (k: string) => string) {
+  if (run.status === 'failed') return <Chip size="small" color="error" label={t('pages.drift.statusFailed')} />
   if (run.status === 'dispatched' || run.status === 'running')
     return <Chip size="small" color="info" label={run.status} />
   // completed
   return run.drifted ? (
-    <Chip size="small" color="warning" label="drift detected" />
+    <Chip size="small" color="warning" label={t('pages.drift.statusDriftDetected')} />
   ) : (
-    <Chip size="small" color="success" label="no drift" />
+    <Chip size="small" color="success" label={t('pages.drift.statusNoDrift')} />
   )
 }
 
@@ -149,10 +149,10 @@ export default function DriftPage() {
         {canManage && (
           <>
             <Button size="small" startIcon={<AutoFixHighIcon />} onClick={() => setRepoWizardOpen(true)} sx={{ mr: 1 }}>
-              Set up repo
+              {t('pages.drift.setUpRepo')}
             </Button>
             <Button size="small" startIcon={<HubIcon />} onClick={() => setCiSourcesOpen(true)} sx={{ mr: 1 }}>
-              CI sources
+              {t('pages.drift.ciSources')}
             </Button>
             <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
               {t('actions.addPipeline')}
@@ -188,27 +188,27 @@ export default function DriftPage() {
 
       {/* Drift runs */}
       <Typography variant="h6" sx={{ mb: 1 }}>
-        Recent runs
+        {t('pages.drift.recentRuns')}
       </Typography>
       {runsQuery.isLoading && <TableSkeleton rows={4} columns={6} />}
-      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">No drift runs yet.</Alert>}
+      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">{t('pages.drift.noRuns')}</Alert>}
       {runsQuery.data && runsQuery.data.length > 0 && (
         <Card variant="outlined">
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Status</TableCell>
-                <TableCell>Ref</TableCell>
-                <TableCell>Dir</TableCell>
+                <TableCell>{t('common.status')}</TableCell>
+                <TableCell>{t('common.ref')}</TableCell>
+                <TableCell>{t('pages.drift.dir')}</TableCell>
                 <TableCell align="right">+ / ~ / -</TableCell>
-                <TableCell>Created</TableCell>
-                <TableCell>Detail</TableCell>
+                <TableCell>{t('common.created')}</TableCell>
+                <TableCell>{t('common.detail')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {runsQuery.data.map((r) => (
                 <TableRow key={r.id} hover sx={{ cursor: 'pointer' }} onClick={() => setSelectedRun(r)}>
-                  <TableCell>{statusChip(r)}</TableCell>
+                  <TableCell>{statusChip(r, t)}</TableCell>
                   <TableCell>{r.repo_ref || '—'}</TableCell>
                   <TableCell>{r.working_dir || '.'}</TableCell>
                   <TableCell align="right">
@@ -252,15 +252,14 @@ export default function DriftPage() {
       <ConfirmDialog
         open={Boolean(deletePipelineTarget)}
         onClose={() => setDeletePipelineTarget(null)}
-        title="Delete pipeline connection"
+        title={t('pages.drift.deletePipelineTitle')}
         severity="error"
         description={
           <>
-            Remove the pipeline connection <b>{deletePipelineTarget?.name}</b>? Drift and version-lab
-            runs will no longer be able to dispatch through it.
+            <Trans i18nKey="pages.drift.deletePipelineBody" values={{ name: deletePipelineTarget?.name }} components={{ 1: <b /> }} />
           </>
         }
-        confirmLabel="Delete"
+        confirmLabel={t('common.delete')}
         loading={deletePipeline.isPending}
         onConfirm={async () => {
           if (!deletePipelineTarget) return
@@ -280,19 +279,24 @@ function actionColor(actions: string[]): 'success' | 'warning' | 'error' | 'defa
 }
 
 function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose: () => void }) {
+  const { t } = useTranslation()
   return (
     <Dialog open={Boolean(run)} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Drift run</DialogTitle>
+      <DialogTitle>{t('pages.drift.runDetailTitle')}</DialogTitle>
       <DialogContent>
         {run && (
           <Stack spacing={2}>
             <Box>
-              {statusChip(run)}
+              {statusChip(run, t)}
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {run.repo_ref || 'default ref'} · {run.working_dir || '.'} ·{' '}
+                {run.repo_ref || t('pages.drift.defaultRef')} · {run.working_dir || '.'} ·{' '}
                 {run.added != null
-                  ? `${run.added} added / ${run.changed} changed / ${run.destroyed} destroyed`
-                  : 'pending'}
+                  ? t('pages.drift.addedChangedDestroyed', {
+                      added: run.added,
+                      changed: run.changed,
+                      destroyed: run.destroyed,
+                    })
+                  : t('pages.drift.pending')}
               </Typography>
               {run.detail && (
                 <Typography variant="caption" color="text.secondary">
@@ -304,8 +308,8 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Resource</TableCell>
-                    <TableCell>Change</TableCell>
+                    <TableCell>{t('pages.drift.resource')}</TableCell>
+                    <TableCell>{t('pages.drift.change')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -323,16 +327,14 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
               </Table>
             ) : (
               <Typography color="text.secondary">
-                {run.status === 'completed'
-                  ? 'No per-resource drift was reported.'
-                  : 'No details yet — the run has not reported results.'}
+                {run.status === 'completed' ? t('pages.drift.noResourceDrift') : t('pages.drift.noDetailsYet')}
               </Typography>
             )}
           </Stack>
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
     </Dialog>
   )
@@ -347,6 +349,7 @@ function AddPipelineDialog({
   onClose: () => void
   onCreated: () => void
 }) {
+  const { t } = useTranslation()
   const [name, setName] = useState('')
   const [sourceId, setSourceId] = useState('') // '' = manual entry
   const [provider, setProvider] = useState('github_actions')
@@ -428,22 +431,22 @@ function AddPipelineDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Add pipeline connection</DialogTitle>
+      <DialogTitle>{t('pages.drift.addPipelineTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField label={t('common.name')} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
           <TextField
             select
-            label="CI source"
+            label={t('pages.drift.ciSource')}
             value={sourceId}
             onChange={(e) => {
               setSourceId(e.target.value)
               resetSelections()
             }}
-            helperText="Pick a configured CI source to choose from its pipelines or workflows, or enter coordinates manually."
+            helperText={t('pages.drift.ciSourceHelp')}
             fullWidth
           >
-            <MenuItem value="">Manual entry</MenuItem>
+            <MenuItem value="">{t('pages.drift.manualEntry')}</MenuItem>
             {(sourcesQuery.data ?? []).map((s) => (
               <MenuItem key={s.id} value={s.id}>
                 {s.name} ({s.provider === 'azure_devops' ? `${s.organization}/${s.project ?? ''}` : s.organization})
@@ -472,12 +475,8 @@ function AddPipelineDialog({
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Pipeline"
-                  helperText={
-                    adoPipelinesQuery.isError
-                      ? apiErr(adoPipelinesQuery.error)
-                      : 'Pick the pipeline created from the TSM workflow template (Workflow template button) — regular CI pipelines reject the dispatch parameters'
-                  }
+                  label={t('pages.drift.pipeline')}
+                  helperText={adoPipelinesQuery.isError ? apiErr(adoPipelinesQuery.error) : t('pages.drift.pipelineHelp')}
                   error={adoPipelinesQuery.isError}
                 />
               )}
@@ -499,8 +498,8 @@ function AddPipelineDialog({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Repository"
-                    helperText={reposQuery.isError ? apiErr(reposQuery.error) : 'Repositories visible to this source'}
+                    label={t('pages.drift.repository')}
+                    helperText={reposQuery.isError ? apiErr(reposQuery.error) : t('pages.drift.repositoryHelp')}
                     error={reposQuery.isError}
                   />
                 )}
@@ -526,12 +525,8 @@ function AddPipelineDialog({
                 renderInput={(params) => (
                   <TextField
                     {...params}
-                    label="Workflow"
-                    helperText={
-                      workflowsQuery.isError
-                        ? apiErr(workflowsQuery.error)
-                        : 'Pick the workflow created from the TSM workflow template (e.g. tsm-drift.yml) — other workflows reject the dispatch inputs'
-                    }
+                    label={t('pages.drift.workflow')}
+                    helperText={workflowsQuery.isError ? apiErr(workflowsQuery.error) : t('pages.drift.workflowHelp')}
                     error={workflowsQuery.isError}
                   />
                 )}
@@ -542,14 +537,14 @@ function AddPipelineDialog({
           {source && (
             <>
               <TextField
-                label="Default ref (optional)"
+                label={t('pages.drift.defaultRefOptional')}
                 value={ref}
                 onChange={(e) => setRef(e.target.value)}
                 placeholder={source.provider === 'azure_devops' ? 'refs/heads/main' : 'main'}
                 fullWidth
               />
               <Typography variant="caption" color="text.secondary">
-                Credential inherited from the CI source — rotating its token covers this connection.
+                {t('pages.drift.credentialInherited')}
               </Typography>
             </>
           )}
@@ -558,7 +553,7 @@ function AddPipelineDialog({
             <>
               <TextField
                 select
-                label="Provider"
+                label={t('common.provider')}
                 value={provider}
                 onChange={(e) => {
                   setProvider(e.target.value)
@@ -572,22 +567,25 @@ function AddPipelineDialog({
                   </MenuItem>
                 ))}
               </TextField>
-              {def.fields.map((f) => (
-                <TextField
-                  key={f.key}
-                  label={f.optional ? `${f.label} (optional)` : f.label}
-                  value={values[f.key] ?? ''}
-                  onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
-                  placeholder={f.placeholder}
-                  fullWidth
-                />
-              ))}
+              {def.fields.map((f) => {
+                const label = t(`pages.drift.fields.${provider}.${f.key}.label`, f.label)
+                return (
+                  <TextField
+                    key={f.key}
+                    label={f.optional ? t('pages.sources.optionalField', { label }) : label}
+                    value={values[f.key] ?? ''}
+                    onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
+                    fullWidth
+                  />
+                )
+              })}
               <TextField
-                label="API token / PAT"
+                label={t('pages.drift.apiToken')}
                 type="password"
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
-                helperText="Stored encrypted at rest"
+                helperText={t('pages.drift.tokenHelp')}
                 fullWidth
               />
             </>
@@ -596,9 +594,9 @@ function AddPipelineDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" disabled={!valid || mutation.isPending} onClick={() => mutation.mutate()}>
-          Create
+          {t('common.create')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -606,6 +604,7 @@ function AddPipelineDialog({
 }
 
 function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [name, setName] = useState('')
   const [provider, setProvider] = useState('github_actions')
@@ -650,12 +649,11 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>CI sources</DialogTitle>
+      <DialogTitle>{t('pages.drift.ciSourcesTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Org-level CI credentials (an Azure DevOps org/project or a GitHub owner). Pipeline connections built from
-            a source pick from its pipelines or workflows and share its token.
+            {t('pages.drift.ciSourcesDesc')}
           </Typography>
 
           {sourcesQuery.isLoading && <CircularProgress size={20} />}
@@ -676,31 +674,31 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
             </Stack>
           ))}
           {sourcesQuery.data && sourcesQuery.data.length === 0 && (
-            <Alert severity="info">No CI sources yet — add one below.</Alert>
+            <Alert severity="info">{t('pages.drift.noCiSources')}</Alert>
           )}
 
           <Divider />
 
-          <TextField label="Name" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
-          <TextField select label="Provider" value={provider} onChange={(e) => setProvider(e.target.value)} fullWidth>
+          <TextField label={t('common.name')} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField select label={t('common.provider')} value={provider} onChange={(e) => setProvider(e.target.value)} fullWidth>
             <MenuItem value="github_actions">GitHub Actions</MenuItem>
             <MenuItem value="azure_devops">Azure DevOps</MenuItem>
           </TextField>
           <TextField
-            label={provider === 'azure_devops' ? 'Organization' : 'Owner (org or user)'}
+            label={provider === 'azure_devops' ? t('pages.drift.organization') : t('pages.drift.ownerLabel')}
             value={organization}
             onChange={(e) => setOrganization(e.target.value)}
             fullWidth
           />
           {provider === 'azure_devops' && (
-            <TextField label="Project" value={project} onChange={(e) => setProject(e.target.value)} fullWidth />
+            <TextField label={t('pages.drift.project')} value={project} onChange={(e) => setProject(e.target.value)} fullWidth />
           )}
           <TextField
-            label="API token / PAT"
+            label={t('pages.drift.apiToken')}
             type="password"
             value={token}
             onChange={(e) => setToken(e.target.value)}
-            helperText="Stored encrypted at rest; shared by connections built from this source"
+            helperText={t('pages.drift.sourceTokenHelp')}
             fullWidth
           />
           {createMutation.isError && <Alert severity="error">{apiErr(createMutation.error)}</Alert>}
@@ -711,19 +709,19 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
               disabled={!valid || createMutation.isPending}
               onClick={() => createMutation.mutate()}
             >
-              Add CI source
+              {t('pages.drift.addCiSource')}
             </Button>
           </Box>
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title="Delete CI source"
-        description={`Delete "${deleteTarget?.name}"? Pipeline connections built from it will stop dispatching unless they carry their own token.`}
-        confirmLabel="Delete"
+        title={t('pages.drift.deleteCiSourceTitle')}
+        description={t('pages.drift.deleteCiSourceBody', { name: deleteTarget?.name })}
+        confirmLabel={t('common.delete')}
         severity="error"
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => {
@@ -745,6 +743,7 @@ function NewRunDialog({
   pipelines: PipelineConnection[]
   onCreated: () => void
 }) {
+  const { t } = useTranslation()
   const [pipelineId, setPipelineId] = useState('')
   const [repoRef, setRepoRef] = useState('')
   const [workingDir, setWorkingDir] = useState('.')
@@ -764,10 +763,10 @@ function NewRunDialog({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>New drift run</DialogTitle>
+      <DialogTitle>{t('pages.drift.newRunTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField select label="Pipeline" value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
+          <TextField select label={t('pages.drift.pipeline')} value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
             {pipelines.map((p) => (
               <MenuItem key={p.id} value={p.id}>
                 {p.name} ({p.provider})
@@ -775,15 +774,15 @@ function NewRunDialog({
             ))}
           </TextField>
           <TextField
-            label="Git ref (optional)"
+            label={t('pages.drift.gitRefOptional')}
             value={repoRef}
             onChange={(e) => setRepoRef(e.target.value)}
-            placeholder="pipeline default branch"
-            helperText="Leave empty to run from the pipeline's default branch; set only to plan a specific branch/ref"
+            placeholder={t('pages.drift.placeholderPipelineDefault')}
+            helperText={t('pages.drift.gitRefHelp')}
             fullWidth
           />
           <TextField
-            label="Working directory"
+            label={t('pages.drift.workingDir')}
             value={workingDir}
             onChange={(e) => setWorkingDir(e.target.value)}
             fullWidth
@@ -792,9 +791,9 @@ function NewRunDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" disabled={!pipelineId || mutation.isPending} onClick={() => mutation.mutate()}>
-          Dispatch
+          {t('pages.drift.dispatch')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -802,6 +801,7 @@ function NewRunDialog({
 }
 
 function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation()
   const [provider, setProvider] = useState('github_actions')
   const q = useQuery({
     queryKey: ['drift', 'workflow', provider],
@@ -811,12 +811,12 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Drift workflow template</DialogTitle>
+      <DialogTitle>{t('pages.drift.workflowTemplateTitle')}</DialogTitle>
       <DialogContent>
         <TextField
           select
           size="small"
-          label="Provider"
+          label={t('common.provider')}
           value={provider}
           onChange={(e) => setProvider(e.target.value)}
           sx={{ mb: 2, mt: 1, minWidth: 220 }}
@@ -840,7 +840,7 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
         )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Close</Button>
+        <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
     </Dialog>
   )
