@@ -741,11 +741,15 @@ export const api = {
     ).data.pipeline,
   getCallbackPreflight: async (): Promise<CallbackPreflight> =>
     (await apiClient.get<CallbackPreflight>('/api/v1/pipelines/callback-preflight')).data,
-  setupCISourceWorkflow: async (id: string, repo: string, content: string): Promise<CIWorkflowSetupResult> =>
+  setupCISourceWorkflow: async (
+    id: string,
+    repo: string,
+    files: { kind: 'drift' | 'versionlab'; content: string }[],
+  ): Promise<CIWorkflowSetupResult> =>
     (
       await apiClient.post<CIWorkflowSetupResult>(
         `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/workflow-setup`,
-        { content },
+        { files },
       )
     ).data,
   getCISourcePRState: async (id: string, repo: string, pr: number): Promise<{ state: 'open' | 'merged' | 'closed' }> =>

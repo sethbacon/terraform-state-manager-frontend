@@ -5,11 +5,13 @@ import {
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   MenuItem,
   Link,
   Paper,
@@ -75,6 +77,9 @@ export default function DriftRepoWizard({
   const [done, setDone] = useState(false)
   const [ghWorkflowMissing, setGhWorkflowMissing] = useState(false)
   const [setup, setSetup] = useState<CIWorkflowSetupResult | null>(null)
+  const [includeVersionLab, setIncludeVersionLab] = useState(false)
+  const [dispatchFirstRun, setDispatchFirstRun] = useState(true)
+  const [firstRun, setFirstRun] = useState<'dispatched' | string | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
   const source = sourcesQuery.data?.find((s) => s.id === sourceId) ?? null
@@ -106,10 +111,19 @@ export default function DriftRepoWizard({
     queryFn: () => api.getDriftWorkflow(source?.provider ?? 'github_actions'),
     enabled: open && Boolean(source),
   })
+  const healthTemplateQuery = useQuery({
+    queryKey: ['health', 'workflow', source?.provider ?? ''],
+    queryFn: () => api.getHealthWorkflow(source?.provider ?? 'github_actions'),
+    enabled: open && Boolean(source) && includeVersionLab,
+  })
 
   // Phase 2: commit the workflow via branch + PR through the provider API.
   const setupMutation = useMutation({
-    mutationFn: () => api.setupCISourceWorkflow(sourceId, (isADO ? repo?.id : repo?.name) ?? '', template),
+    mutationFn: () => {
+      const files: { kind: 'drift' | 'versionlab'; content: string }[] = [{ kind: 'drift', content: template }]
+      if (includeVersionLab) files.push({ kind: 'versionlab', content: healthTemplate })
+      return api.setupCISourceWorkflow(sourceId, (isADO ? repo?.id : repo?.name) ?? '', files)
+    },
     onSuccess: (res) => {
       setSetup(res)
       setError(null)
@@ -147,7 +161,19 @@ export default function DriftRepoWizard({
     [templateQuery.data, source?.provider, workingDir, serviceConnection],
   )
 
+  const healthTemplate = useMemo(
+    () =>
+      customizeTemplate(
+        healthTemplateQuery.data ?? '',
+        source?.provider ?? '',
+        workingDir.trim() || '.',
+        serviceConnection?.name ?? '',
+      ),
+    [healthTemplateQuery.data, source?.provider, workingDir, serviceConnection],
+  )
+
   const fileName = isADO ? 'azure-pipelines-tsm-drift.yml' : '.github/workflows/tsm-drift.yml'
+  const healthFileName = isADO ? 'azure-pipelines-tsm-health.yml' : '.github/workflows/tsm-health.yml'
 
   const reset = () => {
     setStep(0)
@@ -161,11 +187,25 @@ export default function DriftRepoWizard({
     setDone(false)
     setGhWorkflowMissing(false)
     setSetup(null)
+    setIncludeVersionLab(false)
+    setDispatchFirstRun(true)
+    setFirstRun(null)
   }
 
   const close = () => {
     reset()
     onClose()
+  }
+
+  // Optionally dispatch a first drift run against the new connection.
+  const maybeFirstRun = async (connectionId: string) => {
+    if (!dispatchFirstRun) return
+    try {
+      await api.createDriftRun({ pipeline_connection_id: connectionId })
+      setFirstRun('dispatched')
+    } catch (e) {
+      setFirstRun(apiErr(e))
+    }
   }
 
   // ADO: create the pipeline definition, then the TSM connection.
@@ -176,7 +216,7 @@ export default function DriftRepoWizard({
         name: pipelineName,
         yaml_path: '/' + fileName,
       })
-      await api.createPipeline({
+      const conn = await api.createPipeline({
         name: pipelineName,
         provider: source.provider,
         config: {
@@ -186,6 +226,24 @@ export default function DriftRepoWizard({
           pipeline_id: String(created.id),
         },
       })
+      if (includeVersionLab) {
+        const vlName = `${pipelineName} · ${t('pages.drift.wizard.versionLabSuffix')}`
+        const vl = await api.createCISourcePipeline(source.id, repo.id, {
+          name: vlName,
+          yaml_path: '/' + healthFileName,
+        })
+        await api.createPipeline({
+          name: vlName,
+          provider: source.provider,
+          config: {
+            ci_source_id: source.id,
+            organization: source.organization,
+            project: source.project ?? '',
+            pipeline_id: String(vl.id),
+          },
+        })
+      }
+      await maybeFirstRun(conn.id)
     },
     onSuccess: () => {
       setDone(true)
@@ -200,7 +258,7 @@ export default function DriftRepoWizard({
   const adoUseExisting = useMutation({
     mutationFn: async () => {
       if (!source || !existingPipeline) throw new Error('missing selection')
-      await api.createPipeline({
+      const conn = await api.createPipeline({
         name: pipelineName,
         provider: source.provider,
         config: {
@@ -210,6 +268,7 @@ export default function DriftRepoWizard({
           pipeline_id: String(existingPipeline.id),
         },
       })
+      await maybeFirstRun(conn.id)
     },
     onSuccess: () => {
       setDone(true)
@@ -230,7 +289,7 @@ export default function DriftRepoWizard({
         throw new Error('workflow not found')
       }
       setGhWorkflowMissing(false)
-      await api.createPipeline({
+      const conn = await api.createPipeline({
         name: pipelineName,
         provider: source.provider,
         config: {
@@ -240,6 +299,22 @@ export default function DriftRepoWizard({
           workflow_id: wf.file,
         },
       })
+      if (includeVersionLab) {
+        const health = workflows.find((w) => w.file === 'tsm-health.yml')
+        if (health) {
+          await api.createPipeline({
+            name: `${pipelineName} · ${t('pages.drift.wizard.versionLabSuffix')}`,
+            provider: source.provider,
+            config: {
+              ci_source_id: source.id,
+              owner: source.organization,
+              repo: repo.name,
+              workflow_id: health.file,
+            },
+          })
+        }
+      }
+      await maybeFirstRun(conn.id)
     },
     onSuccess: () => {
       setDone(true)
@@ -364,6 +439,17 @@ export default function DriftRepoWizard({
                 />
               )}
             </Stack>
+            <FormControlLabel
+              control={
+                <Checkbox checked={includeVersionLab} onChange={(e) => setIncludeVersionLab(e.target.checked)} />
+              }
+              label={t('pages.drift.wizard.includeVersionLab')}
+            />
+            {includeVersionLab && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+                {t('pages.drift.wizard.includeVersionLabHelp')}
+              </Typography>
+            )}
             <Box>
               <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
                 <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
@@ -405,6 +491,29 @@ export default function DriftRepoWizard({
                 )}
               </Paper>
             </Box>
+            {includeVersionLab && (
+              <Box>
+                <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
+                  <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
+                    {t('pages.drift.wizard.versionLabFile')} — <code>{healthFileName}</code>
+                  </Typography>
+                  <Button
+                    size="small"
+                    startIcon={<ContentCopyIcon />}
+                    onClick={() => void navigator.clipboard.writeText(healthTemplate)}
+                  >
+                    {t('pages.drift.wizard.copy')}
+                  </Button>
+                </Stack>
+                <Paper variant="outlined" sx={{ p: 1.5, maxHeight: 240, overflow: 'auto' }}>
+                  {healthTemplateQuery.isLoading ? (
+                    <CircularProgress size={20} />
+                  ) : (
+                    <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre' }}>{healthTemplate}</pre>
+                  )}
+                </Paper>
+              </Box>
+            )}
             {setup?.status === 'exists' && (
               <Alert severity="success">
                 {t('pages.drift.wizard.setupExists')}
@@ -484,11 +593,23 @@ export default function DriftRepoWizard({
                 />
               </Alert>
             )}
+            <FormControlLabel
+              control={
+                <Checkbox checked={dispatchFirstRun} onChange={(e) => setDispatchFirstRun(e.target.checked)} />
+              }
+              label={t('pages.drift.wizard.dispatchFirstRun')}
+            />
             {error && <Alert severity="error">{error}</Alert>}
             {done && (
               <Alert severity="success">
                 <Trans i18nKey="pages.drift.wizard.done" values={{ name: pipelineName }} components={{ 1: <b /> }} />
               </Alert>
+            )}
+            {done && firstRun === 'dispatched' && (
+              <Alert severity="info">{t('pages.drift.wizard.firstRunDispatched')}</Alert>
+            )}
+            {done && firstRun && firstRun !== 'dispatched' && (
+              <Alert severity="warning">{t('pages.drift.wizard.firstRunFailed', { error: firstRun })}</Alert>
             )}
           </Stack>
         )}

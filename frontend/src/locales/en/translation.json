@@ -707,7 +707,15 @@
         "createAnyway": "Create anyway",
         "createBoth": "Create pipeline & connection",
         "checkAgain": "Check again",
-        "detectConnect": "Detect & connect"
+        "detectConnect": "Detect & connect",
+        "includeVersionLab": "Also set up the Version Lab workflow",
+        "includeVersionLabHelp": "Commits tsm-health.yml alongside the drift workflow and creates a second pipeline connection for version testing.",
+        "driftFile": "Drift workflow",
+        "versionLabFile": "Version Lab workflow",
+        "dispatchFirstRun": "Dispatch a first drift run after connecting",
+        "firstRunDispatched": "First drift run dispatched — watch it on this page.",
+        "firstRunFailed": "Connection created, but the first run failed to dispatch: {{error}}",
+        "versionLabSuffix": "Version Lab"
       },
       "fields": {
         "github_actions": {
