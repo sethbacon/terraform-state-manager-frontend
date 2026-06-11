@@ -235,7 +235,11 @@ export default function DriftPage() {
       <DriftRepoWizard
         open={repoWizardOpen}
         onClose={() => setRepoWizardOpen(false)}
-        onCreated={() => queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.all })}
+        onCreated={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.pipelines.all })
+          // The wizard may have dispatched a first run — surface it in the table.
+          queryClient.invalidateQueries({ queryKey: queryKeys.drift.all })
+        }}
       />
       <NewRunDialog
         open={newRunOpen}

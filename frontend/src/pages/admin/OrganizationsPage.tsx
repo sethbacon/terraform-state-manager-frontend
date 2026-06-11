@@ -74,7 +74,11 @@ export default function OrganizationsPage() {
   const rolesQuery = useQuery({ queryKey: queryKeys.admin.roles(), queryFn: api.listAdminRoles })
   const roleTemplates: RoleTemplate[] = rolesQuery.data ?? []
 
-  const invalidateOrgs = () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.organizations() })
+  const invalidateOrgs = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.organizations() })
+    // Admin dashboard counters include organizations.
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.stats() })
+  }
 
   const handleOpenDialog = (org?: AdminOrganization) => {
     if (org) {

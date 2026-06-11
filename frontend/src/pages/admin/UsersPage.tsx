@@ -81,7 +81,11 @@ export default function UsersPage() {
   const organizations: AdminOrganization[] = orgsQuery.data ?? []
   const roleTemplates: RoleTemplate[] = rolesQuery.data ?? []
 
-  const invalidateUsers = () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.usersAll })
+  const invalidateUsers = () => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.usersAll })
+    // Admin dashboard counters include users.
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.stats() })
+  }
 
   const handleOpenDialog = (user?: AdminUser) => {
     if (user) {

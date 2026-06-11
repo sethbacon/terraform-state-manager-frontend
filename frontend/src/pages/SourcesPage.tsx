@@ -431,6 +431,8 @@ function StateOpsDialog({
         queryKeys.sources.analysis(sourceId, stateKey),
         queryKeys.sources.resources(sourceId, stateKey),
         queryKeys.sources.backups(sourceId, stateKey),
+        // The browse panel's list shows size/serial-affected metadata too.
+        queryKeys.sources.states(sourceId),
       ]) {
         queryClient.invalidateQueries({ queryKey: key })
       }
@@ -599,6 +601,8 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
       queryKeys.sources.analysis(sourceId, stateKey),
       queryKeys.sources.resources(sourceId, stateKey),
       queryKeys.sources.backups(sourceId, stateKey),
+      // The browse panel's list shows size/serial-affected metadata too.
+      queryKeys.sources.states(sourceId),
     ]) {
       queryClient.invalidateQueries({ queryKey: key })
     }
@@ -720,6 +724,8 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
         queryKeys.sources.analysis(sourceId, stateKey),
         queryKeys.sources.resources(sourceId, stateKey),
         queryKeys.sources.backups(sourceId, stateKey),
+        // The browse panel's list shows size/serial-affected metadata too.
+        queryKeys.sources.states(sourceId),
       ]) {
         queryClient.invalidateQueries({ queryKey: key })
       }
