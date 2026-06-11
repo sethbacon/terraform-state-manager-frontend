@@ -320,7 +320,7 @@ describe('SourcesPage', () => {
     await openStateDetail()
 
     for (const format of ['MD', 'JSON', 'CSV']) {
-      fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.download') as string }))
+      fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.export') as string }))
       fireEvent.click(await screen.findByRole('menuitem', { name: format }))
       await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
     }

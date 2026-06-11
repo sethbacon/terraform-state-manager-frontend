@@ -420,7 +420,7 @@
       "tabResources": "Resources",
       "tabOutputs": "Outputs",
       "tabRaw": "Raw",
-      "download": "Download",
+      "export": "Export",
       "outputsFailed": "Failed to load outputs.",
       "noOutputs": "This state declares no root-module outputs.",
       "outputName": "Name",

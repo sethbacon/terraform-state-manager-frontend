@@ -532,7 +532,7 @@ function StateDetail({
             startIcon={<DownloadIcon />}
             onClick={(e) => setDownloadAnchor(e.currentTarget)}
           >
-            {t('pages.sources.download')}
+            {t('pages.sources.export')}
           </Button>
           <Menu anchorEl={downloadAnchor} open={Boolean(downloadAnchor)} onClose={() => setDownloadAnchor(null)}>
             {(['md', 'json', 'csv'] as const).map((format) => (
