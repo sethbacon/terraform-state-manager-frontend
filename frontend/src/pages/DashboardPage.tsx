@@ -125,7 +125,6 @@ export default function DashboardPage() {
                     cx="50%"
                     cy="50%"
                     outerRadius={90}
-                    label={(e: { key: string }) => e.key}
                   >
                     {q.data.providers.slice(0, 8).map((_, i) => (
                       <Cell key={i} fill={palette[i % palette.length]} />
