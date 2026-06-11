@@ -32,10 +32,13 @@ import {
   TableRow,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
 import DownloadIcon from '@mui/icons-material/Download'
 import StorageIcon from '@mui/icons-material/Storage'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
@@ -59,6 +62,7 @@ export default function SourcesPage() {
   const [selectedSource, setSelectedSource] = useState<StateSource | null>(null)
   const [selectedKey, setSelectedKey] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<StateSource | null>(null)
+  const [editTarget, setEditTarget] = useState<StateSource | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
 
@@ -145,7 +149,7 @@ export default function SourcesPage() {
                 </Typography>
               )}
             </CardContent>
-            <CardActions>
+            <CardActions sx={{ flexWrap: 'wrap' }}>
               <Button
                 size="small"
                 onClick={() => {
@@ -156,6 +160,14 @@ export default function SourcesPage() {
                 {t('pages.sources.browseStates')}
               </Button>
               <Box sx={{ flexGrow: 1 }} />
+              <TestConnectionAction sourceId={s.id} />
+              <IconButton
+                size="small"
+                aria-label={t('pages.sources.editSourceAria')}
+                onClick={() => setEditTarget(s)}
+              >
+                <EditIcon fontSize="small" />
+              </IconButton>
               <IconButton
                 size="small"
                 aria-label={t('pages.sources.deleteSourceAria')}
@@ -183,6 +195,15 @@ export default function SourcesPage() {
         onCreated={() => {
           queryClient.invalidateQueries({ queryKey: queryKeys.sources.all })
           setAddOpen(false)
+        }}
+      />
+
+      <EditSourceDialog
+        source={editTarget}
+        onClose={() => setEditTarget(null)}
+        onSaved={() => {
+          queryClient.invalidateQueries({ queryKey: queryKeys.sources.all })
+          setEditTarget(null)
         }}
       />
 
@@ -218,6 +239,138 @@ export default function SourcesPage() {
         }}
       />
     </Box>
+  )
+}
+
+// Test-connection action with an inline outcome chip: connects to the backend
+// and lists its states without persisting anything.
+function TestConnectionAction({ sourceId }: { sourceId: string }) {
+  const { t } = useTranslation()
+  const m = useMutation({ mutationFn: () => api.testSource(sourceId) })
+  return (
+    <>
+      {m.isSuccess && (
+        <Chip
+          size="small"
+          color="success"
+          variant="outlined"
+          label={t('pages.sources.testOk', { count: m.data.states ?? 0 })}
+        />
+      )}
+      {m.isError && (
+        <Tooltip title={errMsg(m.error)}>
+          <Chip size="small" color="error" variant="outlined" label={t('pages.sources.testFailed')} />
+        </Tooltip>
+      )}
+      <Tooltip title={t('pages.sources.testConnection')}>
+        <span>
+          <IconButton
+            size="small"
+            aria-label={t('pages.sources.testConnection')}
+            onClick={() => m.mutate()}
+            disabled={m.isPending}
+          >
+            {m.isPending ? <CircularProgress size={16} /> : <PlayCircleOutlineIcon fontSize="small" />}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </>
+  )
+}
+
+// Edit dialog: same field definitions as Add, but the type is immutable and
+// credential fields left blank keep the stored secret.
+function EditSourceDialog({
+  source,
+  onClose,
+  onSaved,
+}: {
+  source: StateSource | null
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const { t } = useTranslation()
+  const [name, setName] = useState('')
+  const [values, setValues] = useState<Record<string, string>>({})
+
+  const type = source?.type ?? 'local'
+  const def = SOURCE_TYPES.find((st) => st.value === type) ?? SOURCE_TYPES[0]
+
+  useEffect(() => {
+    if (!source) return
+    setName(source.name)
+    const initial: Record<string, string> = {}
+    for (const [k, v] of Object.entries(source.config ?? {})) {
+      if (typeof v === 'string') initial[k] = v
+    }
+    setValues(initial)
+  }, [source])
+
+  const saveMutation = useMutation({
+    mutationFn: () => {
+      const config: Record<string, unknown> = {}
+      const credentials: Record<string, unknown> = {}
+      for (const f of def.fields) {
+        const v = values[f.key]?.trim()
+        if (!v) continue
+        if (f.credential) credentials[f.key] = v
+        else config[f.key] = v
+      }
+      return api.updateSource(source!.id, {
+        name,
+        config,
+        ...(Object.keys(credentials).length ? { credentials } : {}),
+      })
+    },
+    onSuccess: onSaved,
+  })
+
+  // Credential fields may stay blank on edit (the stored secret is kept).
+  const valid =
+    Boolean(name) && def.fields.filter((f) => !f.optional && !f.credential).every((f) => values[f.key]?.trim())
+
+  return (
+    <Dialog open={Boolean(source)} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{t('pages.sources.editSourceTitle', { name: source?.name })}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <TextField label={t('common.name')} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+          <TextField select label={t('pages.sources.type')} value={type} disabled fullWidth>
+            <MenuItem value={type}>{t(`pages.sources.types.${type}`, def.label)}</MenuItem>
+          </TextField>
+
+          {def.fields.map((f) => {
+            const label = t(`pages.sources.fields.${type}.${f.key}.label`, f.label)
+            return (
+              <TextField
+                key={f.key}
+                label={f.optional || f.credential ? t('pages.sources.optionalField', { label }) : label}
+                type={f.secret ? 'password' : 'text'}
+                value={values[f.key] ?? ''}
+                onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))}
+                placeholder={f.placeholder}
+                helperText={
+                  f.credential
+                    ? t('pages.sources.keepCredentialHelper')
+                    : f.helper
+                      ? t(`pages.sources.fields.${type}.${f.key}.helper`, f.helper)
+                      : undefined
+                }
+                fullWidth
+              />
+            )
+          })}
+
+          {saveMutation.isError && <Alert severity="error">{errMsg(saveMutation.error)}</Alert>}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button variant="contained" onClick={() => saveMutation.mutate()} disabled={!valid || saveMutation.isPending}>
+          {t('common.save')}
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 

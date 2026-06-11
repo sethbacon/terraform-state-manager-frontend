@@ -24,6 +24,8 @@ vi.mock('../services/api', async (importOriginal) => {
       listBackups: vi.fn(),
       restoreBackup: vi.fn(),
       downloadReport: vi.fn(),
+      updateSource: vi.fn(),
+      testSource: vi.fn(),
       stateOperation: vi.fn(),
       backupToSource: vi.fn(),
       migrateToSource: vi.fn(),
@@ -152,6 +154,78 @@ describe('SourcesPage', () => {
     const input = container.querySelector('input[type="file"]') as HTMLInputElement
     fireEvent.change(input, { target: { files: [new File(['x'], 'bad.tfstate')] } })
     expect(await screen.findByText(i18n.t('pages.sources.uploadError') as string)).toBeInTheDocument()
+  })
+
+  it('edits a source with type locked and blank credentials kept', async () => {
+    mocked.updateSource.mockResolvedValue({} as never)
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getAllByLabelText(i18n.t('pages.sources.editSourceAria') as string)[0])
+    const dialog = await screen.findByRole('dialog')
+    // Prefilled from the source, type immutable.
+    const nameField = within(dialog).getByLabelText(i18n.t('common.name') as string) as HTMLInputElement
+    expect(nameField.value).toBe('demo-local')
+    expect(within(dialog).getByLabelText(i18n.t('pages.sources.type') as string)).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+
+    fireEvent.change(nameField, { target: { value: 'renamed-local' } })
+    fireEvent.change(within(dialog).getByLabelText(/Base path/i), {
+      target: { value: '/data/other' },
+    })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.save') as string }))
+
+    await waitFor(() =>
+      expect(mocked.updateSource).toHaveBeenCalledWith('s1', {
+        name: 'renamed-local',
+        config: { base_path: '/data/other' },
+      }),
+    )
+  })
+
+  it('includes credentials on edit only when entered', async () => {
+    mocked.listSources.mockResolvedValue([
+      { id: 's9', name: 'bucket-src', type: 's3', config: { bucket: 'tf-states', region: 'eu-west-1' } },
+    ] as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    mocked.updateSource.mockResolvedValue({} as never)
+    renderPage()
+    await screen.findByText('bucket-src')
+
+    fireEvent.click(screen.getByLabelText(i18n.t('pages.sources.editSourceAria') as string))
+    const dialog = await screen.findByRole('dialog')
+    const secret = within(dialog).getByLabelText(/Secret access key/i)
+    fireEvent.change(secret, { target: { value: 'shh' } })
+    fireEvent.change(within(dialog).getByLabelText(/Access key ID/i), { target: { value: 'AKIA' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.save') as string }))
+
+    await waitFor(() =>
+      expect(mocked.updateSource).toHaveBeenCalledWith('s9', {
+        name: 'bucket-src',
+        config: { bucket: 'tf-states', region: 'eu-west-1' },
+        credentials: { access_key_id: 'AKIA', secret_access_key: 'shh' },
+      }),
+    )
+  })
+
+  it('tests a connection and shows the outcome chip', async () => {
+    mocked.testSource.mockResolvedValue({ status: 'ok', states: 3 } as Awaited<
+      ReturnType<typeof api.testSource>
+    >)
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getAllByRole('button', { name: i18n.t('pages.sources.testConnection') as string })[0])
+    expect(
+      await screen.findByText(i18n.t('pages.sources.testOk', { count: 3 }) as string),
+    ).toBeInTheDocument()
+    expect(mocked.testSource).toHaveBeenCalledWith('s1')
+
+    // Failure path on the other card.
+    mocked.testSource.mockRejectedValue({ response: { data: { error: 'access denied' } } })
+    fireEvent.click(screen.getAllByRole('button', { name: i18n.t('pages.sources.testConnection') as string })[1])
+    expect(await screen.findByText(i18n.t('pages.sources.testFailed') as string)).toBeInTheDocument()
   })
 
   it('deletes a source behind type-to-confirm', async () => {

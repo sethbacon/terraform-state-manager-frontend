@@ -318,6 +318,19 @@ export interface CreateSourceInput {
   credentials?: Record<string, unknown>
 }
 
+export interface UpdateSourceInput {
+  name: string
+  config: Record<string, unknown>
+  /** Omit to keep the stored credentials; the type cannot change. */
+  credentials?: Record<string, unknown>
+}
+
+export interface SourceTestResult {
+  status: 'ok' | 'failed'
+  states?: number
+  error?: string
+}
+
 export interface ResourceSummary {
   module: string
   mode: string
@@ -620,6 +633,10 @@ export const api = {
   // State sources (Phase 1 read plane)
   listSources: async (): Promise<StateSource[]> =>
     (await apiClient.get<{ sources: StateSource[] }>('/api/v1/sources')).data.sources,
+  updateSource: async (id: string, input: UpdateSourceInput): Promise<StateSource> =>
+    (await apiClient.put<StateSource>(`/api/v1/sources/${id}`, input)).data,
+  testSource: async (id: string): Promise<SourceTestResult> =>
+    (await apiClient.post<SourceTestResult>(`/api/v1/sources/${id}/test`)).data,
   createSource: async (input: CreateSourceInput): Promise<StateSource> =>
     (await apiClient.post<StateSource>('/api/v1/sources', input)).data,
   deleteSource: async (id: string): Promise<void> => {
