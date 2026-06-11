@@ -30,6 +30,7 @@ export const queryKeys = {
     states: (id: string) => ['sources', id, 'states'] as const,
     analysis: (id: string, key: string) => ['sources', id, 'analysis', key] as const,
     resources: (id: string, key: string) => ['sources', id, 'resources', key] as const,
+    outputs: (id: string, key: string) => ['sources', id, 'outputs', key] as const,
     raw: (id: string, key: string) => ['sources', id, 'raw', key] as const,
     backups: (id: string, key: string) => ['sources', id, 'backups', key] as const,
   },

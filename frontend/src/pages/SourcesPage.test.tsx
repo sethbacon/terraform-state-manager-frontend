@@ -18,6 +18,7 @@ vi.mock('../services/api', async (importOriginal) => {
       listStates: vi.fn(),
       analyzeState: vi.fn(),
       listStateResources: vi.fn(),
+      listStateOutputs: vi.fn(),
       getRawState: vi.fn(),
       editState: vi.fn(),
       listBackups: vi.fn(),
@@ -240,16 +241,42 @@ describe('SourcesPage', () => {
     await waitFor(() => expect(mocked.restoreBackup).toHaveBeenCalledWith('s1', 'b1', 'app.tfstate'))
   })
 
-  it('downloads reports in each format', async () => {
+  it('downloads reports in each format from the download menu', async () => {
     mocked.downloadReport.mockResolvedValue(undefined)
     await openStateDetail()
 
-    fireEvent.click(screen.getByRole('button', { name: 'MD' }))
-    fireEvent.click(screen.getByRole('button', { name: 'JSON' }))
-    fireEvent.click(screen.getByRole('button', { name: 'CSV' }))
+    for (const format of ['MD', 'JSON', 'CSV']) {
+      fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.download') as string }))
+      fireEvent.click(await screen.findByRole('menuitem', { name: format }))
+      await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
+    }
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'md')
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'json')
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'csv')
+  })
+
+  it('renders the outputs tab with sensitive values redacted', async () => {
+    mocked.listStateOutputs.mockResolvedValue([
+      { name: 'vpc_id', type: 'string', sensitive: false, value: 'vpc-123' },
+      { name: 'subnet_ids', type: 'list', sensitive: false, value: ['a', 'b'] },
+      { name: 'db_password', type: 'string', sensitive: true },
+    ] as Awaited<ReturnType<typeof api.listStateOutputs>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabOutputs') as string }))
+    expect(await screen.findByText('vpc_id')).toBeInTheDocument()
+    expect(screen.getByText('"vpc-123"')).toBeInTheDocument()
+    expect(screen.getByText('["a","b"]')).toBeInTheDocument()
+    expect(screen.getByText('db_password')).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.sources.sensitiveValue') as string)).toBeInTheDocument()
+    expect(mocked.listStateOutputs).toHaveBeenCalledWith('s1', 'app.tfstate')
+  })
+
+  it('shows the outputs empty state', async () => {
+    mocked.listStateOutputs.mockResolvedValue([] as Awaited<ReturnType<typeof api.listStateOutputs>>)
+    await openStateDetail()
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabOutputs') as string }))
+    expect(await screen.findByText(i18n.t('pages.sources.noOutputs') as string)).toBeInTheDocument()
   })
 
   it('hides write/transfer actions without their scopes', async () => {

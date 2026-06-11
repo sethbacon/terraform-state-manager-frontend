@@ -269,6 +269,14 @@ export interface StateSource {
   updated_at: string
 }
 
+export interface OutputSummary {
+  name: string
+  type: string
+  sensitive: boolean
+  /** Absent when sensitive: the backend redacts the value server-side. */
+  value?: unknown
+}
+
 export interface StateRef {
   key: string
   name: string
@@ -624,6 +632,9 @@ export const api = {
   listStateResources: async (id: string, key: string): Promise<ResourceSummary[]> =>
     (await apiClient.get<{ resources: ResourceSummary[] }>(`/api/v1/sources/${id}/state/resources`, { params: { key } }))
       .data.resources,
+  listStateOutputs: async (id: string, key: string): Promise<OutputSummary[]> =>
+    (await apiClient.get<{ outputs: OutputSummary[] }>(`/api/v1/sources/${id}/state/outputs`, { params: { key } }))
+      .data.outputs,
   getRawState: async (id: string, key: string): Promise<string> =>
     (
       await apiClient.get<string>(`/api/v1/sources/${id}/state/raw`, {

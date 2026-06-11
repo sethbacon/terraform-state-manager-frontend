@@ -5,7 +5,6 @@ import {
   Autocomplete,
   Box,
   Button,
-  ButtonGroup,
   Card,
   CardActions,
   CardContent,
@@ -22,6 +21,7 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Menu,
   MenuItem,
   Stack,
   Tab,
@@ -351,6 +351,7 @@ function StateDetail({
   const [tab, setTab] = useState(0)
   const [transferOpen, setTransferOpen] = useState(false)
   const [opsOpen, setOpsOpen] = useState(false)
+  const [downloadAnchor, setDownloadAnchor] = useState<null | HTMLElement>(null)
   return (
     <>
       <Card variant="outlined">
@@ -358,6 +359,7 @@ function StateDetail({
           <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ flexGrow: 1, minHeight: 0 }}>
             <Tab label={t('pages.sources.tabAnalysis')} />
             <Tab label={t('pages.sources.tabResources')} />
+            <Tab label={t('pages.sources.tabOutputs')} />
             <Tab label={t('pages.sources.tabRaw')} />
             <Tab label={t('pages.sources.tabBackups')} />
           </Tabs>
@@ -371,20 +373,35 @@ function StateDetail({
               {t('pages.sources.transfer')}
             </Button>
           )}
-          <ButtonGroup size="small" variant="outlined" aria-label={t('pages.sources.exportReportAria')}>
-            <Button startIcon={<DownloadIcon />} onClick={() => api.downloadReport(sourceId, stateKey, 'md')}>
-              MD
-            </Button>
-            <Button onClick={() => api.downloadReport(sourceId, stateKey, 'json')}>JSON</Button>
-            <Button onClick={() => api.downloadReport(sourceId, stateKey, 'csv')}>CSV</Button>
-          </ButtonGroup>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            onClick={(e) => setDownloadAnchor(e.currentTarget)}
+          >
+            {t('pages.sources.download')}
+          </Button>
+          <Menu anchorEl={downloadAnchor} open={Boolean(downloadAnchor)} onClose={() => setDownloadAnchor(null)}>
+            {(['md', 'json', 'csv'] as const).map((format) => (
+              <MenuItem
+                key={format}
+                onClick={() => {
+                  void api.downloadReport(sourceId, stateKey, format)
+                  setDownloadAnchor(null)
+                }}
+              >
+                {format.toUpperCase()}
+              </MenuItem>
+            ))}
+          </Menu>
         </Stack>
         <Divider />
         <CardContent>
           {tab === 0 && <AnalysisTab sourceId={sourceId} stateKey={stateKey} />}
           {tab === 1 && <ResourcesTab sourceId={sourceId} stateKey={stateKey} />}
-          {tab === 2 && <RawTab sourceId={sourceId} stateKey={stateKey} />}
-          {tab === 3 && <BackupsTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 2 && <OutputsTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 3 && <RawTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 4 && <BackupsTab sourceId={sourceId} stateKey={stateKey} />}
         </CardContent>
       </Card>
       <TransferDialog
@@ -539,6 +556,47 @@ function AnalysisTab({ sourceId, stateKey }: { sourceId: string; stateKey: strin
   if (q.isLoading) return <CircularProgress />
   if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.analyzeFailed')}</Alert>
   return <AnalysisView result={q.data} />
+}
+
+function OutputsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
+  const q = useQuery({
+    queryKey: queryKeys.sources.outputs(sourceId, stateKey),
+    queryFn: () => api.listStateOutputs(sourceId, stateKey),
+  })
+  if (q.isLoading) return <CircularProgress />
+  if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.outputsFailed')}</Alert>
+  if (q.data.length === 0) {
+    return <Typography color="text.secondary">{t('pages.sources.noOutputs')}</Typography>
+  }
+  return (
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ fontWeight: 600 }}>{t('pages.sources.outputName')}</TableCell>
+          <TableCell sx={{ fontWeight: 600 }}>{t('pages.sources.outputType')}</TableCell>
+          <TableCell sx={{ fontWeight: 600 }}>{t('pages.sources.outputValue')}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {q.data.map((o) => (
+          <TableRow key={o.name}>
+            <TableCell sx={{ fontFamily: 'monospace' }}>{o.name}</TableCell>
+            <TableCell>
+              <Chip size="small" variant="outlined" label={o.type || '—'} />
+            </TableCell>
+            <TableCell sx={{ fontFamily: 'monospace', wordBreak: 'break-all', maxWidth: 480 }}>
+              {o.sensitive ? (
+                <Chip size="small" color="warning" label={t('pages.sources.sensitiveValue')} />
+              ) : (
+                JSON.stringify(o.value)
+              )}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  )
 }
 
 function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
