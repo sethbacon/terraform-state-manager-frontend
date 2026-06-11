@@ -417,10 +417,11 @@ export default function Layout() {
         }}
       >
         <Toolbar />
-        {/* Cap content width like the registry's left-aligned <Container maxWidth="lg">
-            so tables/forms don't stretch edge-to-edge on wide monitors. API docs is
-            exempt (its two-column swagger layout uses the full width, as in the registry). */}
-        <Box sx={{ maxWidth: apiDocsActive ? 'none' : (th) => th.breakpoints.values.lg }}>
+        {/* Cap content width (left-aligned, registry-style) so forms don't stretch
+            edge-to-edge — but at xl: the data-dense tables (sources states browser,
+            audit log) earn the room on modern monitors. API docs is exempt (its
+            two-column swagger layout uses the full width, as in the registry). */}
+        <Box sx={{ maxWidth: apiDocsActive ? 'none' : (th) => th.breakpoints.values.xl }}>
           <AdminBreadcrumbs />
           <Suspense
             fallback={

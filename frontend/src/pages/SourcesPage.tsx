@@ -756,7 +756,7 @@ function OutputsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
 // points after dots and before brackets so wrapped lines split between
 // segments (module. / nat_shared_use1) instead of mid-word.
 function breakableSegments(s: string): string {
-  return s.replace(/\./g, '.\u200b').replace(/\[/g, '\u200b[')
+  return s.replace(/\./g, '.\u200b').replace(/\//g, '/\u200b').replace(/\[/g, '\u200b[')
 }
 
 function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
@@ -791,12 +791,12 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
       <Table size="small" sx={{ tableLayout: 'fixed' }}>
         <TableHead>
           <TableRow>
-            <TableCell sx={{ width: '24%' }}>{t('pages.sources.module')}</TableCell>
-            <TableCell sx={{ width: '26%' }}>{t('common.type')}</TableCell>
+            <TableCell sx={{ width: '22%' }}>{t('pages.sources.module')}</TableCell>
+            <TableCell sx={{ width: '24%' }}>{t('common.type')}</TableCell>
             <TableCell sx={{ width: '20%' }}>{t('common.name')}</TableCell>
-            <TableCell sx={{ width: '14%' }}>{t('common.provider')}</TableCell>
-            <TableCell sx={{ width: '8%' }}>{t('pages.sources.mode')}</TableCell>
-            <TableCell align="right" sx={{ width: '8%' }}>
+            <TableCell sx={{ width: '16%' }}>{t('common.provider')}</TableCell>
+            <TableCell sx={{ width: '9%' }}>{t('pages.sources.mode')}</TableCell>
+            <TableCell align="right" sx={{ width: '9%', pr: 2 }}>
               {t('pages.sources.instances')}
             </TableCell>
           </TableRow>
@@ -807,9 +807,11 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
               <TableCell sx={{ overflowWrap: 'anywhere' }}>{breakableSegments(r.module)}</TableCell>
               <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.type}</TableCell>
               <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.name}</TableCell>
-              <TableCell sx={{ overflowWrap: 'anywhere' }}>{r.provider}</TableCell>
+              <TableCell sx={{ overflowWrap: 'anywhere' }}>{breakableSegments(r.provider)}</TableCell>
               <TableCell>{r.mode}</TableCell>
-              <TableCell align="right">{r.instances}</TableCell>
+              <TableCell align="right" sx={{ pr: 2 }}>
+                {r.instances}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
