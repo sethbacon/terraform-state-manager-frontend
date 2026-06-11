@@ -509,7 +509,7 @@ function StateDetail({
     <>
       <Card variant="outlined">
         <Stack direction="row" alignItems="center" sx={{ px: 2, pt: 1, flexWrap: 'wrap', gap: 1 }}>
-          <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ flexGrow: 1, minHeight: 0 }}>
+          <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ minHeight: 0 }}>
             <Tab label={t('pages.sources.tabAnalysis')} />
             <Tab label={t('pages.sources.tabResources')} />
             <Tab label={t('pages.sources.tabOutputs')} />
