@@ -117,23 +117,26 @@ export default function SourcesPage() {
         </Alert>
       )}
 
-      {sourcesQuery.isLoading && <CardGridSkeleton count={6} minWidth={260} />}
+      {sourcesQuery.isLoading && <CardGridSkeleton count={6} minWidth={320} />}
       {sourcesQuery.isError && <Alert severity="error">{t('pages.sources.loadFailed')}</Alert>}
 
       {sourcesQuery.data && sourcesQuery.data.length === 0 && (
         <Alert severity="info">{t('pages.sources.empty')}</Alert>
       )}
 
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
         {sourcesQuery.data?.map((s) => (
           <Card key={s.id} variant="outlined">
             <CardContent>
               <Stack direction="row" spacing={1} alignItems="center">
                 <StorageIcon color="action" />
-                <Typography variant="h6" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
+                <Typography
+                  variant="h6"
+                  sx={{ flexGrow: 1, wordBreak: 'break-word', fontSize: '1.05rem', fontWeight: 600 }}
+                >
                   {s.name}
                 </Typography>
-                <Chip size="small" label={s.type} />
+                <Chip size="small" color="primary" label={s.type} />
                 <StateCountChip sourceId={s.id} />
               </Stack>
               {typeof s.config?.base_path === 'string' && (
@@ -230,6 +233,7 @@ function StateCountChip({ sourceId }: { sourceId: string }) {
     <Chip
       size="small"
       variant="outlined"
+      color="info"
       label={t('pages.sources.stateCount', { count: statesQuery.data.length })}
     />
   )

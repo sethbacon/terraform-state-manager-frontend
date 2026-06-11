@@ -108,6 +108,9 @@ describe('SourcesPage', () => {
     expect(screen.getByText('s3')).toBeInTheDocument()
     expect(await screen.findByText('2 states')).toBeInTheDocument()
     expect(await screen.findByText('1 state')).toBeInTheDocument()
+    // Chips are colored: type = filled primary, count = outlined info.
+    expect(screen.getByText('local').closest('.MuiChip-root')).toHaveClass('MuiChip-colorPrimary')
+    expect(screen.getByText('2 states').closest('.MuiChip-root')).toHaveClass('MuiChip-colorInfo')
   })
 
   it('shows empty and error states', async () => {
