@@ -382,7 +382,8 @@
       "terraformVersions": "Terraform versions",
       "sourceErrors": "{{count}} source(s) could not be read and were skipped.",
       "empty": "No state yet. Connect a source to see your fleet's metrics here.",
-      "goToSources": "Add a source"
+      "goToSources": "Add a source",
+      "asOf": "Data as of {{time}}"
     },
     "sources": {
       "empty": "No sources connected yet. Add one to browse and analyze its state.",

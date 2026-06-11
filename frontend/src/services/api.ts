@@ -138,6 +138,7 @@ export interface DashboardOverview {
   resource_types: Count[]
   terraform_versions: Count[]
   source_errors: number
+  refreshed_at?: string
 }
 
 export interface AdminUserMembership {
@@ -498,8 +499,12 @@ export interface CreateHealthRunInput {
 export const api = {
   getVersion: async (): Promise<VersionInfo> => (await apiClient.get<VersionInfo>('/api/v1/version')).data,
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
-  getDashboardOverview: async (): Promise<DashboardOverview> =>
-    (await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview')).data,
+  getDashboardOverview: async (refresh = false): Promise<DashboardOverview> =>
+    (
+      await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview', {
+        params: refresh ? { refresh: 'true' } : undefined,
+      })
+    ).data,
 
   // Identity management (admin scope)
   getAdminStats: async (): Promise<AdminStats> => (await apiClient.get<AdminStats>('/api/v1/admin/stats')).data,

@@ -1,7 +1,21 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Alert, Box, Card, CardContent, Divider, Typography, useTheme } from '@mui/material'
+import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import StorageIcon from '@mui/icons-material/Storage'
 import {
   Bar,
@@ -25,7 +39,18 @@ export default function DashboardPage() {
   const { t } = useTranslation()
   const theme = useTheme()
   const navigate = useNavigate()
-  const q = useQuery({ queryKey: queryKeys.dashboard.overview(), queryFn: api.getDashboardOverview })
+  const queryClient = useQueryClient()
+  const q = useQuery({ queryKey: queryKeys.dashboard.overview(), queryFn: () => api.getDashboardOverview() })
+  const [refreshing, setRefreshing] = useState(false)
+  const forceRefresh = async () => {
+    setRefreshing(true)
+    try {
+      const fresh = await api.getDashboardOverview(true)
+      queryClient.setQueryData(queryKeys.dashboard.overview(), fresh)
+    } finally {
+      setRefreshing(false)
+    }
+  }
 
   const palette = [
     theme.palette.primary.main,
@@ -40,7 +65,26 @@ export default function DashboardPage() {
 
   return (
     <Box>
-      <PageHeader title={t('nav.dashboard')} description={t('help.pages.dashboard.body')} />
+      <PageHeader
+        title={t('nav.dashboard')}
+        description={t('help.pages.dashboard.body')}
+        actions={
+          <Stack direction="row" spacing={1} alignItems="center">
+            {q.data?.refreshed_at && (
+              <Typography variant="caption" color="text.secondary">
+                {t('pages.dashboard.asOf', { time: new Date(q.data.refreshed_at).toLocaleTimeString() })}
+              </Typography>
+            )}
+            <Tooltip title={t('common.refresh')}>
+              <span>
+                <IconButton size="small" onClick={forceRefresh} disabled={refreshing} aria-label={t('common.refresh')}>
+                  {refreshing ? <CircularProgress size={18} /> : <RefreshIcon fontSize="small" />}
+                </IconButton>
+              </span>
+            </Tooltip>
+          </Stack>
+        }
+      />
 
       {q.isLoading && <CardGridSkeleton count={6} />}
       {q.isError && <Alert severity="error">{t('common.error')}</Alert>}
