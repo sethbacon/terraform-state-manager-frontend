@@ -126,8 +126,8 @@ export default function SourcesPage() {
 
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))' }}>
         {sourcesQuery.data?.map((s) => (
-          <Card key={s.id} variant="outlined">
-            <CardContent>
+          <Card key={s.id} variant="outlined" sx={{ display: 'flex', flexDirection: 'column' }}>
+            <CardContent sx={{ flexGrow: 1 }}>
               <Stack direction="row" spacing={1} alignItems="center">
                 <StorageIcon color="action" />
                 <Typography
