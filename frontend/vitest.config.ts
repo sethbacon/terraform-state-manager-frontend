@@ -26,13 +26,15 @@ export default defineConfig({
       ],
       thresholds: {
         // Ratchet floor — raise with every change that touches an area.
-        // Campaign target: 80/85/85/80.
+        // Campaign target 80/85/85/80 (registry-FE parity) REACHED:
+        // actuals 95.9/85.6/85.9/95.9 on 2026-06-11.
         // History: 0.5/40/25/0.5 (bootstrap) → 25/80/80/25 (2026-06-10)
-        // → 42/85/80/42 (F1) → 58/85/80/58 (F2 admin CRUD, 2026-06-11).
-        statements: 58,
+        // → 42/85/80/42 (F1) → 58/85/80/58 (F2 admin CRUD)
+        // → 80/85/85/80 (F3+F4 giants + app shell, 2026-06-11).
+        statements: 80,
         branches: 85,
-        functions: 80,
-        lines: 58,
+        functions: 85,
+        lines: 80,
       },
     },
   },
