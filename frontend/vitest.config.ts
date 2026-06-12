@@ -10,6 +10,9 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: './src/setupTests.ts',
     globals: true,
+    // Registry parity: heavy MUI dialog renders exceed the 5s default on
+    // shared CI runners (first Actions run timed out two gapfill tests).
+    testTimeout: 15_000,
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     coverage: {
       provider: 'v8',
