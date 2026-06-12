@@ -452,6 +452,25 @@ export interface CreateDriftRunInput {
   working_dir?: string
 }
 
+// One snapshot from the append-only per-state analysis history (statesync
+// appends a row whenever it observes the state changed).
+export interface StateAnalysisSnapshot {
+  source_id: string
+  state_key: string
+  version_marker: string
+  size: number
+  terraform_version: string
+  serial: number
+  lineage: string
+  rum: number
+  managed_resources: number
+  data_sources: number
+  total_resources: number
+  providers: Record<string, number> | null
+  resource_types: Record<string, number> | null
+  analyzed_at: string
+}
+
 export interface DriftRecord {
   id: string
   source_id: string | null
@@ -680,6 +699,12 @@ export const api = {
   listStateOutputs: async (id: string, key: string): Promise<OutputSummary[]> =>
     (await apiClient.get<{ outputs: OutputSummary[] }>(`/api/v1/sources/${id}/state/outputs`, { params: { key } }))
       .data.outputs,
+  getStateHistory: async (id: string, key: string): Promise<StateAnalysisSnapshot[]> =>
+    (
+      await apiClient.get<{ history: StateAnalysisSnapshot[] }>(`/api/v1/sources/${id}/state/history`, {
+        params: { key },
+      })
+    ).data.history,
   getRawState: async (id: string, key: string): Promise<string> =>
     (
       await apiClient.get<string>(`/api/v1/sources/${id}/state/raw`, {

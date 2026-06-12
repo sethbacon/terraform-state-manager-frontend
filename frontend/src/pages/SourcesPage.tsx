@@ -49,6 +49,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Trans, useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
+import StateHistoryTab from '../components/StateHistoryTab'
 import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
 import TargetBackendHint from '../components/TargetBackendHint'
 
@@ -514,6 +515,7 @@ function StateDetail({
             <Tab label={t('pages.sources.tabAnalysis')} />
             <Tab label={t('pages.sources.tabResources')} />
             <Tab label={t('pages.sources.tabOutputs')} />
+            <Tab label={t('pages.sources.tabHistory')} />
             <Tab label={t('pages.sources.tabRaw')} />
             <Tab label={t('pages.sources.tabBackups')} />
           </Tabs>
@@ -554,8 +556,9 @@ function StateDetail({
           {tab === 0 && <AnalysisTab sourceId={sourceId} stateKey={stateKey} />}
           {tab === 1 && <ResourcesTab sourceId={sourceId} stateKey={stateKey} />}
           {tab === 2 && <OutputsTab sourceId={sourceId} stateKey={stateKey} />}
-          {tab === 3 && <RawTab sourceId={sourceId} stateKey={stateKey} />}
-          {tab === 4 && <BackupsTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 3 && <StateHistoryTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 4 && <RawTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 5 && <BackupsTab sourceId={sourceId} stateKey={stateKey} />}
         </CardContent>
       </Card>
       <TransferDialog

@@ -635,7 +635,18 @@
         }
       },
       "optionalField": "{{label}} (optional)",
-      "createFailed": "Failed to create source."
+      "createFailed": "Failed to create source.",
+      "tabHistory": "History",
+      "historyEmpty": "No history yet. Snapshots accrue as the sync service observes this state change.",
+      "historyError": "Failed to load analysis history.",
+      "historyRum": "RUM",
+      "historyResources": "Resources",
+      "historySnapshots_one": "{{count}} snapshot",
+      "historySnapshots_other": "{{count}} snapshots",
+      "historyAnalyzedAt": "Observed",
+      "historySerial": "Serial",
+      "historyTfVersion": "Terraform",
+      "historySize": "Size"
     },
     "drift": {
       "pipelines": "Pipeline connections",

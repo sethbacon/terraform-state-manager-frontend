@@ -33,6 +33,7 @@ export const queryKeys = {
     outputs: (id: string, key: string) => ['sources', id, 'outputs', key] as const,
     raw: (id: string, key: string) => ['sources', id, 'raw', key] as const,
     backups: (id: string, key: string) => ['sources', id, 'backups', key] as const,
+    history: (id: string, key: string) => ['sources', id, 'history', key] as const,
   },
   pipelines: {
     all: ['pipelines'] as const,
