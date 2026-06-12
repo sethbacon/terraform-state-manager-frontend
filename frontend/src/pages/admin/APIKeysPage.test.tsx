@@ -2,12 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import APIKeysPage from './APIKeysPage'
-import { api, type APIKey } from '../services/api'
-import { useAuth } from '../contexts/AuthContext'
-import i18n from '../i18n'
+import { api, type APIKey } from '../../services/api'
+import { useAuth } from '../../contexts/AuthContext'
+import i18n from '../../i18n'
 
-vi.mock('../services/api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../services/api')>()
+vi.mock('../../services/api', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/api')>()
   return {
     ...actual,
     api: {
@@ -19,7 +19,7 @@ vi.mock('../services/api', async (importOriginal) => {
     },
   }
 })
-vi.mock('../contexts/AuthContext', () => ({ useAuth: vi.fn() }))
+vi.mock('../../contexts/AuthContext', () => ({ useAuth: vi.fn() }))
 
 const mocked = vi.mocked(api)
 const mockedUseAuth = vi.mocked(useAuth)

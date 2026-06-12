@@ -44,7 +44,7 @@ test('transfer page renders', async ({ loggedInPage: page }) => {
 })
 
 test('api keys page renders', async ({ loggedInPage: page }) => {
-  await page.goto('/apikeys')
+  await page.goto('/admin/apikeys')
   await expect(page.getByRole('heading', { name: 'API keys' })).toBeVisible()
 })
 

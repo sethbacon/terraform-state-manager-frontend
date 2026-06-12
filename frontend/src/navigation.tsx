@@ -58,9 +58,6 @@ export const navGroups: NavGroup[] = [
       { path: '/schedules', labelKey: 'nav.schedules', tooltipKey: 'nav.schedulesTooltip', icon: <ScheduleIcon />, scope: 'sources:manage' },
       { path: '/reports', labelKey: 'nav.reports', tooltipKey: 'nav.reportsTooltip', icon: <AssessmentIcon />, scope: 'state:read' },
       { path: '/transfer', labelKey: 'nav.transfer', tooltipKey: 'nav.transferTooltip', icon: <SwapHorizIcon />, scope: 'state:transfer' },
-      // Self-service (registry model): every authenticated user manages their
-      // own keys; admins see everyone's on the same page.
-      { path: '/apikeys', labelKey: 'nav.apiKeys', tooltipKey: 'nav.apiKeysTooltip', icon: <KeyIcon />, scope: null },
     ],
   },
   // Admin categories mirror the registry's sidebar: an Identity group for the
@@ -76,6 +73,9 @@ export const navGroups: NavGroup[] = [
       { path: '/admin/oidc', labelKey: 'nav.admin.oidcGroups', tooltipKey: 'nav.admin.oidcGroupsTooltip', icon: <ManageAccountsIcon />, scope: 'admin' },
       { path: '/admin/mtls', labelKey: 'nav.admin.mtls', tooltipKey: 'nav.admin.mtlsTooltip', icon: <VerifiedUserIcon />, scope: 'admin' },
       { path: '/admin/sso', labelKey: 'nav.admin.sso', tooltipKey: 'nav.admin.ssoTooltip', icon: <VpnKeyIcon />, scope: 'admin' },
+      // Registry placement: API keys live under Identity. scope null —
+      // self-service (everyone manages their own keys; admins see all).
+      { path: '/admin/apikeys', labelKey: 'nav.admin.apiKeys', tooltipKey: 'nav.admin.apiKeysTooltip', icon: <KeyIcon />, scope: null },
     ],
   },
   {

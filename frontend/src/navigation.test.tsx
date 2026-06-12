@@ -31,6 +31,12 @@ describe('navigation config', () => {
 
   it('gates admin routes behind the admin scope and core pages behind read scopes', () => {
     for (const item of allNavItems.filter((i) => i.path.startsWith('/admin'))) {
+      if (item.path === '/admin/apikeys') {
+        // Registry placement: API keys sit under Identity but are
+        // self-service — every authenticated user manages their own keys.
+        expect(item.scope, item.path).toBeNull()
+        continue
+      }
       expect(item.scope, item.path).toBe('admin')
     }
     expect(homeItem.scope).toBeNull()

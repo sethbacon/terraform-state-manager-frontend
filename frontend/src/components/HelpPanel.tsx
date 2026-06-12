@@ -23,6 +23,7 @@ const HELP_KEYS: Record<string, string> = {
   '/admin/oidc': 'adminOidc',
   '/admin/mtls': 'adminMtls',
   '/admin/sso': 'adminSso',
+  '/admin/apikeys': 'adminApiKeys',
   '/admin/notifications': 'adminNotifications',
   '/admin/audit-logs': 'adminAudit',
 }

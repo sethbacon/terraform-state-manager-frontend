@@ -65,7 +65,7 @@ test('api key lifecycle: create in UI -> authenticate with it -> delete', async 
     }
   }
 
-  await page.goto('/apikeys')
+  await page.goto('/admin/apikeys')
   await page.getByRole('button', { name: 'Create key' }).click()
   const dialog = page.getByRole('dialog')
   await dialog.getByLabel('Name', { exact: false }).first().fill(keyName)

@@ -44,10 +44,10 @@
       "oidcGroups": "OIDC Groups",
       "oidcGroupsTooltip": "Map IdP groups to organizations and roles",
       "mtls": "mTLS Certificates",
-      "mtlsTooltip": "Client-certificate subject to scope mappings"
-    },
-    "apiKeys": "API keys",
-    "apiKeysTooltip": "Create and manage API keys for CI and scripts"
+      "mtlsTooltip": "Client-certificate subject to scope mappings",
+      "apiKeys": "API keys",
+      "apiKeysTooltip": "Create and manage API keys for CI and scripts"
+    }
   },
   "common": {
     "loading": "Loading…",
@@ -349,6 +349,10 @@
             "p": "Filter by date range, resource type, action (partial match), or user email. Export downloads the filtered set as CSV or JSON (capped at 1000 rows). Click a row for full detail including metadata."
           }
         ]
+      },
+      "adminApiKeys": {
+        "title": "API keys",
+        "body": "Self-service Bearer credentials (tsm_…) for CI pipelines and scripts — drift ingest, state reads, anything the API offers. Everyone manages their own keys; admins see all keys. A key may only carry scopes its creator holds. The secret is shown exactly once at creation; rotation can keep the old key valid for up to 72 hours while consumers switch over."
       }
     }
   },
