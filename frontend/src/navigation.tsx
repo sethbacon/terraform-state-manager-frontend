@@ -7,6 +7,7 @@ import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import ApiIcon from '@mui/icons-material/Api'
+import KeyIcon from '@mui/icons-material/Key'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 import PeopleIcon from '@mui/icons-material/People'
 import BusinessIcon from '@mui/icons-material/Business'
@@ -57,6 +58,9 @@ export const navGroups: NavGroup[] = [
       { path: '/schedules', labelKey: 'nav.schedules', tooltipKey: 'nav.schedulesTooltip', icon: <ScheduleIcon />, scope: 'sources:manage' },
       { path: '/reports', labelKey: 'nav.reports', tooltipKey: 'nav.reportsTooltip', icon: <AssessmentIcon />, scope: 'state:read' },
       { path: '/transfer', labelKey: 'nav.transfer', tooltipKey: 'nav.transferTooltip', icon: <SwapHorizIcon />, scope: 'state:transfer' },
+      // Self-service (registry model): every authenticated user manages their
+      // own keys; admins see everyone's on the same page.
+      { path: '/apikeys', labelKey: 'nav.apiKeys', tooltipKey: 'nav.apiKeysTooltip', icon: <KeyIcon />, scope: null },
     ],
   },
   // Admin categories mirror the registry's sidebar: an Identity group for the

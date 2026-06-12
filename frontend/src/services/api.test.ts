@@ -416,6 +416,39 @@ describe('pipelines + CI sources', () => {
     expect(get).toHaveBeenCalledWith('/api/v1/pipelines/callback-preflight')
   })
 
+  it('drift records, state history, and API keys', async () => {
+    get.mockReturnValue(ok({ records: [], counts: {} }))
+    await api.listDriftRecords(['open', 'acknowledged'])
+    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', { params: { status: 'open,acknowledged' } })
+    await api.listDriftRecords()
+    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', { params: undefined })
+
+    post.mockReturnValue(ok({ id: 'rec1' }))
+    await api.acknowledgeDriftRecord('rec1', 'expected')
+    expect(post).toHaveBeenCalledWith('/api/v1/drift/records/rec1/acknowledge', { note: 'expected' })
+    await api.resolveDriftRecord('rec1')
+    expect(post).toHaveBeenCalledWith('/api/v1/drift/records/rec1/resolve')
+
+    get.mockReturnValue(ok({ history: [] }))
+    await api.getStateHistory('s1', 'app.tfstate')
+    expect(get).toHaveBeenCalledWith('/api/v1/sources/s1/state/history', { params: { key: 'app.tfstate' } })
+
+    get.mockReturnValue(ok({ keys: [] }))
+    await api.listAPIKeys()
+    expect(get).toHaveBeenCalledWith('/api/v1/apikeys')
+    post.mockReturnValue(ok({ key: 'tsm_x', api_key: { id: 'k1' } }))
+    await api.createAPIKey({ name: 'k', scopes: ['state:read'] })
+    expect(post).toHaveBeenCalledWith('/api/v1/apikeys', { name: 'k', scopes: ['state:read'] })
+    await api.rotateAPIKey('k1', 24)
+    expect(post).toHaveBeenCalledWith('/api/v1/apikeys/k1/rotate', { grace_period_hours: 24 })
+    put.mockReturnValue(ok({ id: 'k1' }))
+    await api.updateAPIKey('k1', { name: 'r', scopes: ['state:read'] })
+    expect(put).toHaveBeenCalledWith('/api/v1/apikeys/k1', { name: 'r', scopes: ['state:read'] })
+    del.mockReturnValue(ok(undefined))
+    await api.deleteAPIKey('k1')
+    expect(del).toHaveBeenCalledWith('/api/v1/apikeys/k1')
+  })
+
   it('drift + health runs and workflow templates', async () => {
     get.mockReturnValue(ok({ runs: [] }))
     await api.listDriftRuns()

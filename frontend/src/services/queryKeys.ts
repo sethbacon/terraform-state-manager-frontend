@@ -53,6 +53,10 @@ export const queryKeys = {
     runs: () => ['drift', 'runs'] as const,
     records: (statuses?: string[]) => ['drift', 'records', ...(statuses ?? [])] as const,
   },
+  apiKeys: {
+    all: ['apiKeys'] as const,
+    list: () => ['apiKeys', 'list'] as const,
+  },
   schedules: {
     all: ['schedules'] as const,
     list: () => ['schedules', 'list'] as const,

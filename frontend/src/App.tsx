@@ -23,6 +23,7 @@ const VersionLabPage = lazy(() => import('./pages/VersionLabPage'))
 const SchedulesPage = lazy(() => import('./pages/SchedulesPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const TransferPage = lazy(() => import('./pages/TransferPage'))
+const APIKeysPage = lazy(() => import('./pages/APIKeysPage'))
 const ApiDocumentation = lazy(() => import('./pages/ApiDocumentation'))
 const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage'))
 const UsersPage = lazy(() => import('./pages/admin/UsersPage'))
@@ -42,6 +43,7 @@ const realPages: Record<string, ReactNode> = {
   '/schedules': <SchedulesPage />,
   '/reports': <ReportsPage />,
   '/transfer': <TransferPage />,
+  '/apikeys': <APIKeysPage />,
   '/api-docs': <ApiDocumentation />,
   '/admin': <AdminDashboardPage />,
   '/admin/users': <UsersPage />,

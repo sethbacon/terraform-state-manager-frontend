@@ -452,6 +452,34 @@ export interface CreateDriftRunInput {
   working_dir?: string
 }
 
+// APIKey is a stored key (never the secret; key_prefix identifies it).
+export interface APIKey {
+  id: string
+  user_id?: string
+  organization_id: string
+  name: string
+  description?: string
+  key_prefix: string
+  scopes: string[]
+  expires_at?: string
+  last_used_at?: string
+  created_at: string
+  user_name?: string
+}
+
+export interface APIKeyInput {
+  name: string
+  description?: string
+  scopes: string[]
+  expires_at?: string // RFC3339; omit for never
+}
+
+// CreateAPIKeyResponse carries the plaintext secret — shown exactly once.
+export interface CreateAPIKeyResponse {
+  key: string
+  api_key: APIKey
+}
+
 // One snapshot from the append-only per-state analysis history (statesync
 // appends a row whenever it observes the state changed).
 export interface StateAnalysisSnapshot {
@@ -887,6 +915,23 @@ export const api = {
   },
   runSchedule: async (id: string): Promise<Schedule> =>
     (await apiClient.post<Schedule>(`/api/v1/schedules/${id}/run`)).data,
+
+  // API keys (self-service; admins see all)
+  listAPIKeys: async (): Promise<APIKey[]> =>
+    (await apiClient.get<{ keys: APIKey[] }>('/api/v1/apikeys')).data.keys,
+  createAPIKey: async (input: APIKeyInput): Promise<CreateAPIKeyResponse> =>
+    (await apiClient.post<CreateAPIKeyResponse>('/api/v1/apikeys', input)).data,
+  updateAPIKey: async (id: string, input: APIKeyInput): Promise<APIKey> =>
+    (await apiClient.put<APIKey>(`/api/v1/apikeys/${id}`, input)).data,
+  deleteAPIKey: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/apikeys/${id}`)
+  },
+  rotateAPIKey: async (id: string, gracePeriodHours: number): Promise<CreateAPIKeyResponse> =>
+    (
+      await apiClient.post<CreateAPIKeyResponse>(`/api/v1/apikeys/${id}/rotate`, {
+        grace_period_hours: gracePeriodHours,
+      })
+    ).data,
 
   // Notification channels (admin)
   listNotificationChannels: async (): Promise<NotificationChannel[]> =>
