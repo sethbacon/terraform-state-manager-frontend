@@ -29,6 +29,10 @@ vi.mock('../services/api', async (importOriginal) => {
       setupCISourceWorkflow: vi.fn(),
       getCISourcePRState: vi.fn(),
       createCISourcePipeline: vi.fn(),
+      listSources: vi.fn(),
+      listDriftRecords: vi.fn(),
+      acknowledgeDriftRecord: vi.fn(),
+      resolveDriftRecord: vi.fn(),
     },
   }
 })
@@ -137,6 +141,8 @@ beforeEach(() => {
   mocked.getCallbackPreflight.mockResolvedValue({ likely_unreachable: false } as Awaited<
     ReturnType<typeof api.getCallbackPreflight>
   >)
+  mocked.listSources.mockResolvedValue([])
+  mocked.listDriftRecords.mockResolvedValue({ records: [], counts: {} })
 })
 
 describe('DriftPage', () => {

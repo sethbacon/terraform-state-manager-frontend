@@ -406,7 +406,7 @@
       "editSourceTitle": "Edit {{name}}",
       "keepCredentialHelper": "Leave blank to keep the current credential.",
       "testConnection": "Test connection",
-      "testOk": "OK \u00b7 {{count}} states",
+      "testOk": "OK · {{count}} states",
       "testFailed": "Connection failed",
       "statesIn": "States in {{name}}",
       "stateCount_one": "{{count}} state",
@@ -769,7 +769,28 @@
             "label": "Default ref"
           }
         }
-      }
+      },
+      "recordsTitle": "Drift records",
+      "recordsFilter": "Record filter",
+      "recordsActive": "Active",
+      "recordsAll": "All",
+      "recordOpen": "Open",
+      "recordAcknowledged": "Acknowledged",
+      "recordResolved": "Resolved",
+      "recordSeverity": "Severity",
+      "recordState": "Source / state",
+      "recordDetections": "Detections",
+      "recordFirstDetected": "First detected",
+      "recordLastDetected": "Last detected",
+      "noActiveRecords": "No active drift — every state matches its code.",
+      "noRecords": "No drift records yet. Records appear when a drift run or ingest reports changes.",
+      "acknowledge": "Acknowledge",
+      "resolve": "Resolve",
+      "acknowledgeTitle": "Acknowledge drift",
+      "acknowledgeBody": "Mark this drift as seen. The record stays acknowledged across re-detections and auto-resolves when a clean run is reported.",
+      "ackNoteLabel": "Note (optional)",
+      "ackedBy": "Acknowledged by {{actor}}",
+      "recordDetailTitle": "Drift record"
     },
     "versionLab": {
       "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",

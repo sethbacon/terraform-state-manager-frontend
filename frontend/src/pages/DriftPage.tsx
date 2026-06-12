@@ -42,6 +42,7 @@ import {
   type PipelineConnection,
 } from '../services/api'
 import ConfirmDialog from '../components/ConfirmDialog'
+import DriftRecordsSection from '../components/DriftRecordsSection'
 import DriftRepoWizard from '../components/DriftRepoWizard'
 import PageHeader from '../components/PageHeader'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
@@ -104,6 +105,10 @@ export default function DriftPage() {
 
   const pipelinesQuery = useQuery({ queryKey: queryKeys.pipelines.list(), queryFn: api.listPipelines })
 
+  // Source names label drift records (records key off source_id + state_key).
+  const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
+  const sourceNames = Object.fromEntries((sourcesQuery.data ?? []).map((s) => [s.id, s.name]))
+
   const runsQuery = useQuery({
     queryKey: queryKeys.drift.runs(),
     queryFn: api.listDriftRuns,
@@ -140,6 +145,9 @@ export default function DriftPage() {
           </Stack>
         }
       />
+
+      {/* Drift records: the durable, acknowledgeable signal (runs are the mechanism) */}
+      <DriftRecordsSection sourceNames={sourceNames} />
 
       {/* Pipeline connections */}
       <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>

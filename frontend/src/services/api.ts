@@ -452,6 +452,34 @@ export interface CreateDriftRunInput {
   working_dir?: string
 }
 
+export interface DriftRecord {
+  id: string
+  source_id: string | null
+  state_key: string
+  pipeline_connection_id: string | null
+  last_run_id: string | null
+  origin: 'run' | 'ingest'
+  severity: 'critical' | 'warning'
+  added: number
+  changed: number
+  destroyed: number
+  summary?: { address: string; actions: string[] }[]
+  status: 'open' | 'acknowledged' | 'resolved'
+  acknowledged_by: string
+  acknowledged_at: string | null
+  ack_note: string
+  resolved_at: string | null
+  external_ref?: string
+  detections: number
+  first_detected_at: string
+  last_detected_at: string
+}
+
+export interface DriftRecordsResponse {
+  records: DriftRecord[]
+  counts: Record<string, number>
+}
+
 export interface ScheduleTargetConfig {
   pipeline_connection_id: string
   source_id?: string
@@ -811,6 +839,16 @@ export const api = {
     (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
     (await apiClient.post<DriftRun>('/api/v1/drift/runs', input)).data,
+  listDriftRecords: async (statuses?: string[]): Promise<DriftRecordsResponse> =>
+    (
+      await apiClient.get<DriftRecordsResponse>('/api/v1/drift/records', {
+        params: statuses?.length ? { status: statuses.join(',') } : undefined,
+      })
+    ).data,
+  acknowledgeDriftRecord: async (id: string, note: string): Promise<DriftRecord> =>
+    (await apiClient.post<DriftRecord>(`/api/v1/drift/records/${id}/acknowledge`, { note })).data,
+  resolveDriftRecord: async (id: string): Promise<DriftRecord> =>
+    (await apiClient.post<DriftRecord>(`/api/v1/drift/records/${id}/resolve`)).data,
 
   // Schedules
   listSchedules: async (): Promise<Schedule[]> =>
