@@ -1,0 +1,11 @@
+{
+  "name": "tsm-e2e",
+  "private": true,
+  "description": "Thin Playwright smoke pack run against the local dev compose stack (frontend :3001). Not PR-gated: run on demand and before UAT/releases.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
