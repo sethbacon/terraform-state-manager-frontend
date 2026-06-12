@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v0.5.0...v1.0.0) (2026-06-12)
+
+
+### chore
+
+* release 1.0.0 ([3c3234b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3c3234b94249085e924127ddb91ce6abce2c7d6f))
+
 ## [0.5.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v0.4.0...v0.5.0) (2026-06-12)
 
 
