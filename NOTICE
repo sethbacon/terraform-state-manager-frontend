@@ -1,0 +1,59 @@
+Terraform State Manager — Frontend
+Copyright 2026 Terraform State Manager Contributors
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full license text.
+
+---
+
+This software incorporates components from the following third-party projects.
+Their licenses are reproduced below or linked where the license text is
+available in the upstream project repository.
+
+---
+
+## React ecosystem (MIT License)
+
+  react, react-dom            Copyright (c) Meta Platforms, Inc.
+  react-router-dom            Copyright (c) Remix Software Inc.
+  @mui/material, @mui/icons-material
+                              Copyright (c) Material-UI SAS
+  @emotion/react, @emotion/styled, @emotion/cache
+                              Copyright (c) Emotion team and contributors
+  @tanstack/react-query       Copyright (c) Tanner Linsley
+  axios                       Copyright (c) Matt Zabriskie and collaborators
+  recharts                    Copyright (c) Recharts Group
+  cmdk                        Copyright (c) Paco Coursey
+  i18next, react-i18next, i18next-browser-languagedetector
+                              Copyright (c) i18next contributors
+
+  All of the above are licensed under the MIT License; full texts are available
+  in the respective upstream repositories referenced in frontend/package.json.
+
+## swagger-ui-react (Apache License 2.0)
+
+  swagger-ui-react
+  Copyright (c) SmartBear Software
+  Licensed under the Apache License, Version 2.0
+  https://github.com/swagger-api/swagger-ui/blob/master/LICENSE
+
+## Inter typeface (SIL Open Font License 1.1)
+
+  @fontsource/inter (packaging: MIT License — Fontsource)
+  The bundled Inter font is copyright (c) Rasmus Andersson and licensed under
+  the SIL Open Font License, Version 1.1.
+  https://github.com/rsms/inter/blob/master/LICENSE.txt
+
+## Development and test tooling
+
+  vite (MIT, Copyright (c) Evan You), typescript (Apache-2.0, Microsoft),
+  vitest and Testing Library packages (MIT), Playwright (Apache-2.0, Microsoft),
+  and ESLint packages (MIT) are used at build/test time only and are not
+  distributed with the application bundle.
+
+## All other transitive dependencies
+
+  The remaining transitive dependencies are licensed under the Apache License 2.0,
+  MIT License, BSD 3-Clause License, or ISC License. Full license texts are
+  available in the respective upstream repositories referenced in
+  frontend/package.json.
