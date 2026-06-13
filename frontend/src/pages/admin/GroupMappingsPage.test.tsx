@@ -102,7 +102,7 @@ describe('GroupMappingsPage', () => {
     // Pick the role first; the autocomplete popup interferes with later
     // combobox queries if it still holds focus.
     // The role select offers the system role names directly.
-    fireEvent.mouseDown(within(dialog).getAllByRole('combobox').at(-1)!)
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox').slice(-1)[0]!)
     fireEvent.click(await screen.findByRole('option', { name: 'operator' }))
 
     const orgBox = within(dialog).getByLabelText(new RegExp(`^${i18n.t('admin.oidcSettings.labelOrganization')}`))
