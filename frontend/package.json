@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "lint": "eslint . --max-warnings 0",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "visualize": "VITE_ANALYZE=true vite build"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
@@ -52,6 +54,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
     "happy-dom": "^20.10.2",
+    "rollup-plugin-visualizer": "^7.0.1",
     "typescript": "^6.0.3",
     "vite": "^8.0.16",
     "vitest": "^4.1.8"
