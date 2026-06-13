@@ -1,0 +1,14 @@
+# Keep the build hermetic: never copy host build artifacts into the image.
+# Without this, `COPY . .` overwrites the container's `npm ci` with the host's
+# node_modules (whatever versions happen to be installed locally).
+node_modules
+dist
+coverage
+.vitest-reports
+.git
+.gitignore
+.dockerignore
+Dockerfile
+*.log
+.env
+.env.*
