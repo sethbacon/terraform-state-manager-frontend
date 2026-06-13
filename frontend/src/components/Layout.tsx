@@ -44,6 +44,7 @@ import AboutModal from './AboutModal'
 import AdminBreadcrumbs from './AdminBreadcrumbs'
 import CommandPalette from './CommandPalette'
 import SessionExpiryWarning from './SessionExpiryWarning'
+import { SuiteSwitcher } from './SuiteSwitcher'
 
 const DRAWER_WIDTH = 240
 const GROUPS_STORAGE_KEY = 'tsm-nav-groups-open'
@@ -247,6 +248,7 @@ export default function Layout() {
             {t('app.name')}
           </Typography>
 
+          <SuiteSwitcher />
           <Tooltip title={t('commandPalette.hint')}>
             <IconButton
               color="inherit"
