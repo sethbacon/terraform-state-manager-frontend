@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.0.1...v1.1.0) (2026-06-13)
+
+
+### Features
+
+* add suite app-switcher ([#73](https://github.com/sethbacon/terraform-state-manager-frontend/issues/73)) ([317ffec](https://github.com/sethbacon/terraform-state-manager-frontend/commit/317ffec505c07b2aee04c778a5005d3f9ab89ef7))
+* upgrade MUI to v9 ([#65](https://github.com/sethbacon/terraform-state-manager-frontend/issues/65)) ([d483895](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d483895ccc5694452c8a1cd38f3ff2de685a351e))
+
+
+### Bug Fixes
+
+* harden frontend image and add CSP headers ([#67](https://github.com/sethbacon/terraform-state-manager-frontend/issues/67)) ([8f6f15d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8f6f15dd82a1139cc1b1b3d8e85832f42d746398))
+
 ## [1.0.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.0.0...v1.0.1) (2026-06-12)
 
 
