@@ -89,7 +89,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Stack direction="row" alignItems="center" sx={{ mb: 1 }} spacing={1}>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }} spacing={1}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {t('pages.drift.recordsTitle')}
         </Typography>
@@ -219,7 +219,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
         <DialogContent>
           {detail && (
             <Stack spacing={1}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                 {recordStatusChip(detail.status, t)}
                 <Chip
                   size="small"

@@ -14,7 +14,7 @@ interface PlaceholderPageProps {
 export default function PlaceholderPage({ title, phase, description }: PlaceholderPageProps) {
   return (
     <Box>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={1.5} sx={{ mb: 2, alignItems: 'center' }}>
         <Typography variant="h4">{title}</Typography>
         {phase && <Chip label={phase} color="primary" variant="outlined" size="small" />}
       </Stack>

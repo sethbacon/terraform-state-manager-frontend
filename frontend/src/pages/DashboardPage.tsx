@@ -70,7 +70,7 @@ export default function DashboardPage() {
         title={t('nav.dashboard')}
         description={t('help.pages.dashboard.body')}
         actions={
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             {q.data?.refreshed_at && (
               <Typography variant="caption" color="text.secondary">
                 {t('pages.dashboard.asOf', { time: new Date(q.data.refreshed_at).toLocaleTimeString() })}
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                 </Typography>
                 <Stack spacing={0.5}>
                   {q.data.sync.map((s) => (
-                    <Stack key={s.source_id} direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <Stack key={s.source_id} direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         {s.name}
                       </Typography>

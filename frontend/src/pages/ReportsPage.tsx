@@ -108,7 +108,7 @@ export default function ReportsPage() {
 
       {sourceId && stateKey && (
         <Stack spacing={2}>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
             {FORMATS.map((f) => (
               <Button
                 key={f.value}

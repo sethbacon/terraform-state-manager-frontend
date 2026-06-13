@@ -244,7 +244,7 @@ function SecretDialog({ secret, onClose }: { secret: string; onClose: () => void
         <Alert severity="warning" sx={{ mb: 2 }}>
           {t('pages.apiKeys.secretWarning')}
         </Alert>
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <TextField fullWidth value={secret} slotProps={{ htmlInput: { readOnly: true, 'aria-label': 'api key' } }} />
           <Tooltip title={copied ? t('common.copied') : t('common.copy')}>
             <IconButton
