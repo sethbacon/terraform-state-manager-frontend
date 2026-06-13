@@ -29,15 +29,16 @@ export default defineConfig({
       ],
       thresholds: {
         // Ratchet floor — raise with every change that touches an area.
-        // Campaign target 80/85/85/80 (registry-FE parity) REACHED:
-        // actuals 95.9/85.6/85.9/95.9 on 2026-06-11.
-        // History: 0.5/40/25/0.5 (bootstrap) → 25/80/80/25 (2026-06-10)
-        // → 42/85/80/42 (F1) → 58/85/80/58 (F2 admin CRUD)
-        // → 80/85/85/80 (F3+F4 giants + app shell, 2026-06-11).
-        statements: 80,
-        branches: 85,
-        functions: 85,
-        lines: 80,
+        // Recalibrated 2026-06-13 for the vitest 3->4 bump: vitest 4's v8
+        // coverage remapper reports different totals for the SAME (all-green,
+        // 363/363) suite — actuals fell from 96.3/85.8/86.1/96.3 (vitest 3) to
+        // 88.3/82.2/84.5/90.5 (vitest 4) with no test changes. Floors set just
+        // under the new actuals; still stricter than the registry FE (80/70/70/80).
+        // Prior peak (vitest 3): 80/85/85/80 (F3+F4, 2026-06-11).
+        statements: 85,
+        branches: 80,
+        functions: 82,
+        lines: 88,
       },
     },
   },
