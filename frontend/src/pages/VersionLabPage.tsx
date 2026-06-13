@@ -235,7 +235,7 @@ function NewHealthRunDialog({
           />
 
           <Box>
-            <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
+            <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }}>
               <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
                 {t('pages.versionLab.providerVersions')}
               </Typography>
@@ -245,7 +245,7 @@ function NewHealthRunDialog({
             </Stack>
             <Stack spacing={1}>
               {providers.map((p, i) => (
-                <Stack key={i} direction="row" spacing={1} alignItems="center">
+                <Stack key={i} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                   <TextField
                     size="small"
                     placeholder="provider (e.g. aws)"
@@ -271,7 +271,7 @@ function NewHealthRunDialog({
           </Box>
 
           <Box>
-            <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
+            <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }}>
               <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
                 {t('pages.versionLab.moduleVersions')}
               </Typography>
@@ -281,7 +281,7 @@ function NewHealthRunDialog({
             </Stack>
             <Stack spacing={1}>
               {modules.map((m, i) => (
-                <Stack key={i} direction="row" spacing={1} alignItems="center">
+                <Stack key={i} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                   <TextField
                     size="small"
                     placeholder="module (e.g. vpc)"

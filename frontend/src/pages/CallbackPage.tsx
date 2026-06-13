@@ -36,7 +36,7 @@ export default function CallbackPage() {
       {error ? (
         <Alert severity="error">{error}</Alert>
       ) : (
-        <Stack spacing={2} alignItems="center">
+        <Stack spacing={2} sx={{ alignItems: 'center' }}>
           <CircularProgress />
           <Typography color="text.secondary">{t('auth.completingSignIn')}</Typography>
         </Stack>

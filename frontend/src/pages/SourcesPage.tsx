@@ -38,7 +38,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
-import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline'
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
 import DownloadIcon from '@mui/icons-material/Download'
 import StorageIcon from '@mui/icons-material/Storage'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
@@ -134,7 +134,7 @@ export default function SourcesPage() {
         {sourcesQuery.data?.map((s) => (
           <Card key={s.id} variant="outlined" sx={{ display: 'flex', flexDirection: 'column' }}>
             <CardContent sx={{ flexGrow: 1 }}>
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
                 <StorageIcon color="action" />
                 <Typography
                   variant="h6"
@@ -510,7 +510,7 @@ function StateDetail({
   return (
     <>
       <Card variant="outlined">
-        <Stack direction="row" alignItems="center" sx={{ px: 2, pt: 1, flexWrap: 'wrap', gap: 1 }}>
+        <Stack direction="row" sx={{ px: 2, pt: 1, flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
           <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ minHeight: 0 }}>
             <Tab label={t('pages.sources.tabAnalysis')} />
             <Tab label={t('pages.sources.tabResources')} />
@@ -884,7 +884,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
 
   return (
     <Stack spacing={1}>
-      <Stack direction="row" alignItems="center">
+      <Stack direction="row" sx={{ alignItems: 'center' }}>
         <Box sx={{ flexGrow: 1 }} />
         {canEdit && !editing && (
           <Button

@@ -451,7 +451,7 @@ export default function DriftRepoWizard({
               </Typography>
             )}
             <Box>
-              <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
+              <Stack direction="row" sx={{ mb: 0.5, alignItems: 'center' }}>
                 <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
                   <Trans
                     i18nKey="pages.drift.wizard.commitHeading"
@@ -493,7 +493,7 @@ export default function DriftRepoWizard({
             </Box>
             {includeVersionLab && (
               <Box>
-                <Stack direction="row" alignItems="center" sx={{ mb: 0.5 }}>
+                <Stack direction="row" sx={{ mb: 0.5, alignItems: 'center' }}>
                   <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
                     {t('pages.drift.wizard.versionLabFile')} — <code>{healthFileName}</code>
                   </Typography>

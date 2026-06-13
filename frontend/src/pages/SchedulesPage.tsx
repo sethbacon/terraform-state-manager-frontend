@@ -136,7 +136,7 @@ export default function SchedulesPage() {
                     size="small"
                     checked={s.enabled}
                     onChange={(e) => toggleMutation.mutate({ s, enabled: e.target.checked })}
-                    inputProps={{ 'aria-label': t('pages.schedules.enabled') }}
+                    slotProps={{ input: { 'aria-label': t('pages.schedules.enabled') } }}
                   />
                 </TableCell>
                 <TableCell>

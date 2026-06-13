@@ -150,7 +150,7 @@ export default function DriftPage() {
       <DriftRecordsSection sourceNames={sourceNames} />
 
       {/* Pipeline connections */}
-      <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }}>
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {t('pages.drift.pipelines')}
         </Typography>
@@ -178,7 +178,7 @@ export default function DriftPage() {
         {pipelinesQuery.data?.map((p) => (
           <Card key={p.id} variant="outlined">
             <CardContent>
-              <Stack direction="row" alignItems="center">
+              <Stack direction="row" sx={{ alignItems: 'center' }}>
                 <Typography variant="subtitle1" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
                   {p.name}
                 </Typography>
@@ -670,7 +670,7 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
 
           {sourcesQuery.isLoading && <CircularProgress size={20} />}
           {(sourcesQuery.data ?? []).map((s) => (
-            <Stack key={s.id} direction="row" alignItems="center" spacing={1}>
+            <Stack key={s.id} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
               <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
                 {s.name}
               </Typography>

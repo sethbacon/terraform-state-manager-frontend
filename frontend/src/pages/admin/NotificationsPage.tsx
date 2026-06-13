@@ -115,7 +115,7 @@ export default function NotificationsPage() {
                 <TableCell>{ch.name}</TableCell>
                 <TableCell>{ch.type}</TableCell>
                 <TableCell>
-                  <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                  <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
                     {ch.events.length === 0 ? (
                       <Chip size="small" variant="outlined" label={t('pages.notifications.allEvents')} />
                     ) : (
@@ -130,7 +130,7 @@ export default function NotificationsPage() {
                     size="small"
                     checked={ch.enabled}
                     onChange={(e) => toggleMutation.mutate({ ch, enabled: e.target.checked })}
-                    inputProps={{ 'aria-label': t('pages.schedules.enabled') }}
+                    slotProps={{ input: { 'aria-label': t('pages.schedules.enabled') } }}
                   />
                 </TableCell>
                 <TableCell>

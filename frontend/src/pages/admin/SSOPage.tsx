@@ -44,7 +44,7 @@ function Section({ title, enabled, children }: { title: string; enabled: boolean
   return (
     <Card variant="outlined">
       <CardContent>
-        <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
+        <Stack direction="row" spacing={1.5} sx={{ mb: 1.5, alignItems: 'center' }}>
           <Typography variant="h6">{title}</Typography>
           <StatusChip enabled={enabled} />
         </Stack>
@@ -106,12 +106,12 @@ export default function SSOPage() {
             <Field label={t('pages.sso.acsUrl')} value={q.data.saml.acs_url} />
             <Field label={t('pages.sso.groupAttribute')} value={q.data.saml.group_attribute_name} />
             <Field label={t('pages.sso.defaultRole')} value={q.data.saml.default_role} />
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
               <Typography variant="body2" color="text.secondary">{t('pages.sso.idpInitiated')}:</Typography>
               <Chip size="small" variant="outlined" label={q.data.saml.allow_idp_initiated ? t('common.yes') : t('common.no')} />
             </Stack>
             {q.data.saml.idps.length > 0 && (
-              <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap alignItems="center">
+              <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', alignItems: 'center' }}>
                 <Typography variant="body2" color="text.secondary">{t('pages.sso.idps')}:</Typography>
                 {q.data.saml.idps.map((name) => (
                   <Chip key={name} size="small" variant="outlined" label={name} />
@@ -151,7 +151,7 @@ export default function SSOPage() {
                     <TableRow key={i}>
                       <TableCell sx={{ fontFamily: 'monospace' }}>{m.subject}</TableCell>
                       <TableCell>
-                        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+                        <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
                           {m.scopes.map((s) => (
                             <Chip key={s} size="small" variant="outlined" label={s} />
                           ))}
