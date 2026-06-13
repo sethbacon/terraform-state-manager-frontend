@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { visualizer } from 'rollup-plugin-visualizer'
 import path from 'path'
 import pkg from './package.json'
 
@@ -9,7 +10,9 @@ const proxyTarget = process.env.VITE_PROXY_TARGET ?? 'http://localhost:8080'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  // The bundle visualizer only loads for `npm run visualize` (VITE_ANALYZE=true);
+  // normal builds skip it (Vite filters out falsy plugins).
+  plugins: [react(), process.env.VITE_ANALYZE ? visualizer({ filename: 'dist/stats.html', gzipSize: true }) : null],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
   },
