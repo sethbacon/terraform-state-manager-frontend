@@ -105,6 +105,31 @@ describe('SourcesPage secondary paths', () => {
     expect(mocked.editState).not.toHaveBeenCalled()
   })
 
+  it('lists captured module provenance with a constraint-only marker', async () => {
+    mocked.listStateModules.mockResolvedValue([
+      {
+        source_id: 's1',
+        state_key: 'app.tfstate',
+        module_source: 'terraform-aws-modules/vpc/aws',
+        module_version: null,
+        registry_host: 'registry.terraform.io',
+        observed_at: '2026-06-14',
+      },
+    ] as never)
+    await openDetail()
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabModules') as string }))
+    // registry_host renders as plain text (module_source goes through breakableSegments).
+    expect(await screen.findByText('registry.terraform.io')).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.sources.constraintOnly') as string)).toBeInTheDocument()
+  })
+
+  it('shows the empty state when no module provenance is captured', async () => {
+    mocked.listStateModules.mockResolvedValue([] as never)
+    await openDetail()
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabModules') as string }))
+    expect(await screen.findByText(i18n.t('pages.sources.noModules') as string)).toBeInTheDocument()
+  })
+
   it('runs an in-page migrate with decommission and shows verification results', async () => {
     mocked.migrateToSource.mockResolvedValue({
       mode: 'migrate',

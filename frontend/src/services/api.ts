@@ -340,6 +340,18 @@ export interface ResourceSummary {
   instances: number
 }
 
+// StateModule is one registry module a state calls, captured from an ingested
+// plan. module_version is null when only a version constraint is known (no
+// lockfile); registry_host is the host the cross-app join keys on.
+export interface StateModule {
+  source_id: string
+  state_key: string
+  module_source: string
+  module_version: string | null
+  registry_host: string
+  observed_at: string
+}
+
 export type ReportFormat = 'json' | 'md' | 'csv'
 
 export interface Backup {
@@ -724,6 +736,9 @@ export const api = {
   listStateResources: async (id: string, key: string): Promise<ResourceSummary[]> =>
     (await apiClient.get<{ resources: ResourceSummary[] }>(`/api/v1/sources/${id}/state/resources`, { params: { key } }))
       .data.resources,
+  listStateModules: async (id: string, key?: string): Promise<StateModule[]> =>
+    (await apiClient.get<{ modules: StateModule[] }>(`/api/v1/sources/${id}/modules`, { params: key ? { key } : {} }))
+      .data.modules,
   listStateOutputs: async (id: string, key: string): Promise<OutputSummary[]> =>
     (await apiClient.get<{ outputs: OutputSummary[] }>(`/api/v1/sources/${id}/state/outputs`, { params: { key } }))
       .data.outputs,

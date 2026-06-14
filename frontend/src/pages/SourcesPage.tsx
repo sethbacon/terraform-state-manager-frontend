@@ -518,6 +518,7 @@ function StateDetail({
             <Tab label={t('pages.sources.tabHistory')} />
             <Tab label={t('pages.sources.tabRaw')} />
             <Tab label={t('pages.sources.tabBackups')} />
+            <Tab label={t('pages.sources.tabModules')} />
           </Tabs>
           {hasScope('state:write') && (
             <Button size="small" variant="outlined" onClick={() => setOpsOpen(true)}>
@@ -559,6 +560,7 @@ function StateDetail({
           {tab === 3 && <StateHistoryTab sourceId={sourceId} stateKey={stateKey} />}
           {tab === 4 && <RawTab sourceId={sourceId} stateKey={stateKey} />}
           {tab === 5 && <BackupsTab sourceId={sourceId} stateKey={stateKey} />}
+          {tab === 6 && <ModulesTab sourceId={sourceId} stateKey={stateKey} />}
         </CardContent>
       </Card>
       <TransferDialog
@@ -826,6 +828,53 @@ function ResourcesTab({ sourceId, stateKey }: { sourceId: string; stateKey: stri
         </Typography>
       )}
     </Stack>
+  )
+}
+
+// ModulesTab lists the registry modules a state calls, captured from ingested
+// plans. Empty is normal (capture only happens on plan push-ingest). A locked
+// version is shown when known; otherwise a "constraint only" marker, since TSM
+// has no lockfile to resolve the exact version.
+function ModulesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
+  const { t } = useTranslation()
+  const q = useQuery({
+    queryKey: queryKeys.sources.modules(sourceId, stateKey),
+    queryFn: () => api.listStateModules(sourceId, stateKey),
+  })
+  if (q.isLoading) return <CircularProgress />
+  if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.modulesFailed')}</Alert>
+  if (q.data.length === 0) {
+    return (
+      <Typography color="text.secondary" variant="body2">
+        {t('pages.sources.noModules')}
+      </Typography>
+    )
+  }
+  return (
+    <Table size="small" sx={{ tableLayout: 'fixed' }}>
+      <TableHead>
+        <TableRow>
+          <TableCell sx={{ width: '46%' }}>{t('pages.sources.moduleSource')}</TableCell>
+          <TableCell sx={{ width: '24%' }}>{t('pages.sources.moduleVersion')}</TableCell>
+          <TableCell sx={{ width: '30%' }}>{t('pages.sources.registryHost')}</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {q.data.map((m, i) => (
+          <TableRow key={`${m.registry_host}/${m.module_source}-${i}`}>
+            <TableCell sx={{ overflowWrap: 'anywhere' }}>{breakableSegments(m.module_source)}</TableCell>
+            <TableCell>
+              {m.module_version ? (
+                m.module_version
+              ) : (
+                <Chip size="small" variant="outlined" label={t('pages.sources.constraintOnly')} />
+              )}
+            </TableCell>
+            <TableCell sx={{ overflowWrap: 'anywhere' }}>{m.registry_host}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
 }
 
