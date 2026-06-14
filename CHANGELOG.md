@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.1.0...v1.2.0) (2026-06-14)
+
+
+### Features
+
+* **suite:** note possible re-auth when opening the sibling app ([#74](https://github.com/sethbacon/terraform-state-manager-frontend/issues/74)) ([c0152bd](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c0152bd89af0761e6bf22b943a301fcfd6c2baa3))
+
 ## [1.1.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.0.1...v1.1.0) (2026-06-13)
 
 
