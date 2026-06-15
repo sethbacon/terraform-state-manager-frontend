@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Alert,
@@ -32,9 +32,21 @@ import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { api, type HealthRun, type PipelineConnection } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
+import { useSuite } from '../hooks/useSuite'
 
 function apiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
+}
+
+// hostOf extracts the bare host (incl. any non-default port) from a URL,
+// returning '' on a malformed value. Used to suggest the registry host from the
+// connected sibling's public URL.
+function hostOf(rawURL: string): string {
+  try {
+    return new URL(rawURL).host
+  } catch {
+    return ''
+  }
 }
 
 const PROVIDER_LABELS = [
@@ -174,6 +186,16 @@ function NewHealthRunDialog({
   const [registryHost, setRegistryHost] = useState('')
   const [providers, setProviders] = useState<{ name: string; version: string }[]>([])
   const [modules, setModules] = useState<{ name: string; version: string }[]>([])
+
+  // Auto-fill the registry host from the connected sibling registry (suite mode):
+  // its public/web host — the same identity that appears in module source
+  // addresses and that composes the provider mirror URL. Only fills an untouched
+  // (empty) field, so it never clobbers a manual entry or re-fills after a clear.
+  const { sibling, active: suiteActive } = useSuite()
+  const suggestedHost = suiteActive && sibling?.publicUrl ? hostOf(sibling.publicUrl) : ''
+  useEffect(() => {
+    if (suggestedHost) setRegistryHost((prev) => prev || suggestedHost)
+  }, [suggestedHost])
 
   const toMap = (rows: { name: string; version: string }[]) => {
     const m: Record<string, string> = {}
