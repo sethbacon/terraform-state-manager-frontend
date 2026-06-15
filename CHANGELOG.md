@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.2.0...v1.3.0) (2026-06-15)
+
+
+### Features
+
+* add a "Modules in use" tab to state detail ([#76](https://github.com/sethbacon/terraform-state-manager-frontend/issues/76)) ([3cca100](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3cca100afabe118c7b3c5af91d889877ebe9b764))
+* **health-lab:** auto-fill registry host from the connected registry ([#78](https://github.com/sethbacon/terraform-state-manager-frontend/issues/78)) ([af5b027](https://github.com/sethbacon/terraform-state-manager-frontend/commit/af5b0276e5b342a4eff5948f3243af790973368b))
+
 ## [1.2.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.1.0...v1.2.0) (2026-06-14)
 
 
