@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import VersionLabPage from './VersionLabPage'
 import { api } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import { useSuite } from '../hooks/useSuite'
 import i18n from '../i18n'
 
 vi.mock('../services/api', async (importOriginal) => {
@@ -19,9 +20,11 @@ vi.mock('../services/api', async (importOriginal) => {
   }
 })
 vi.mock('../contexts/AuthContext', () => ({ useAuth: vi.fn() }))
+vi.mock('../hooks/useSuite', () => ({ useSuite: vi.fn() }))
 
 const mocked = vi.mocked(api)
 const mockedUseAuth = vi.mocked(useAuth)
+const mockedUseSuite = vi.mocked(useSuite)
 type AuthShape = ReturnType<typeof useAuth>
 
 const pipelines = [{ id: 'p1', name: 'health-ci', provider: 'github_actions', config: {}, created_at: '', updated_at: '' }]
@@ -78,6 +81,7 @@ function renderPage() {
 beforeEach(() => {
   vi.clearAllMocks()
   mockedUseAuth.mockReturnValue({ hasScope: () => true } as unknown as AuthShape)
+  mockedUseSuite.mockReturnValue({ sibling: null, active: false } as ReturnType<typeof useSuite>)
   mocked.listPipelines.mockResolvedValue(pipelines as Awaited<ReturnType<typeof api.listPipelines>>)
   mocked.listHealthRuns.mockResolvedValue(runs as Awaited<ReturnType<typeof api.listHealthRuns>>)
 })
@@ -153,5 +157,28 @@ describe('VersionLabPage', () => {
     fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.workflowTemplate') as string }))
     expect(await screen.findByText(/yaml: tsm-health/)).toBeInTheDocument()
     expect(mocked.getHealthWorkflow).toHaveBeenCalled()
+  })
+
+  it('auto-fills the registry host from a connected sibling registry', async () => {
+    mockedUseSuite.mockReturnValue({
+      sibling: { app: 'terraform-registry', state: 'active', publicUrl: 'https://registry.example.com' },
+      active: true,
+    } as ReturnType<typeof useSuite>)
+    renderPage()
+    await screen.findByText('1.9.5')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newHealthRun') as string }))
+    // Label is "Registry host (optional)"; match the prefix to avoid escaping the parens.
+    const field = (await screen.findByLabelText(/registry host/i)) as HTMLInputElement
+    await waitFor(() => expect(field.value).toBe('registry.example.com'))
+  })
+
+  it('leaves the registry host empty when standalone (no sibling)', async () => {
+    renderPage() // beforeEach default: sibling null, active false
+    await screen.findByText('1.9.5')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newHealthRun') as string }))
+    const field = (await screen.findByLabelText(/registry host/i)) as HTMLInputElement
+    expect(field.value).toBe('')
   })
 })
