@@ -43,7 +43,13 @@ import DownloadIcon from '@mui/icons-material/Download'
 import StorageIcon from '@mui/icons-material/Storage'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
-import { api, type AnalysisResult, type StateSource, type TransferResult } from '../services/api'
+import {
+  api,
+  type AnalysisResult,
+  type ModuleFreshness,
+  type StateSource,
+  type TransferResult,
+} from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 import { Trans, useTranslation } from 'react-i18next'
@@ -841,6 +847,15 @@ function ModulesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
     queryKey: queryKeys.sources.modules(sourceId, stateKey),
     queryFn: () => api.listStateModules(sourceId, stateKey),
   })
+  // Freshness is a SECONDARY, best-effort query comparing each locked version to
+  // the sibling registry's latest. retry:false so an absent endpoint (older
+  // backend) or a standalone deploy (all "no_registry") never blocks or throws —
+  // the table renders fully from listStateModules regardless of this query.
+  const freshnessQuery = useQuery({
+    queryKey: queryKeys.sources.modulesFreshness(sourceId, stateKey),
+    queryFn: () => api.listStateModuleFreshness(sourceId, stateKey),
+    retry: false,
+  })
   if (q.isLoading) return <CircularProgress />
   if (q.isError || !q.data) return <Alert severity="error">{t('pages.sources.modulesFailed')}</Alert>
   if (q.data.length === 0) {
@@ -850,13 +865,30 @@ function ModulesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
       </Typography>
     )
   }
+  const freshness = new Map(
+    (freshnessQuery.data ?? []).map((f) => [`${f.registry_host} ${f.module_source}`, f]),
+  )
+  // Render the freshness badge, or nothing when there is nothing meaningful to
+  // show: constraint_only is already conveyed by the version column, and
+  // no_registry (standalone / a different registry) stays blank for a clean table.
+  const freshnessChip = (f?: ModuleFreshness) => {
+    if (!f) return null
+    if (f.status === 'behind')
+      return <Chip size="small" color="warning" label={`${f.current} → ${f.latest}`} />
+    if (f.status === 'up_to_date')
+      return <Chip size="small" color="success" label={t('pages.sources.moduleUpToDate')} />
+    if (f.status === 'unknown')
+      return <Chip size="small" variant="outlined" label={t('pages.sources.moduleUnknown')} />
+    return null
+  }
   return (
     <Table size="small" sx={{ tableLayout: 'fixed' }}>
       <TableHead>
         <TableRow>
-          <TableCell sx={{ width: '46%' }}>{t('pages.sources.moduleSource')}</TableCell>
-          <TableCell sx={{ width: '24%' }}>{t('pages.sources.moduleVersion')}</TableCell>
-          <TableCell sx={{ width: '30%' }}>{t('pages.sources.registryHost')}</TableCell>
+          <TableCell sx={{ width: '38%' }}>{t('pages.sources.moduleSource')}</TableCell>
+          <TableCell sx={{ width: '22%' }}>{t('pages.sources.moduleVersion')}</TableCell>
+          <TableCell sx={{ width: '24%' }}>{t('pages.sources.registryHost')}</TableCell>
+          <TableCell sx={{ width: '16%' }}>{t('pages.sources.moduleStatus')}</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
@@ -871,6 +903,7 @@ function ModulesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
               )}
             </TableCell>
             <TableCell sx={{ overflowWrap: 'anywhere' }}>{m.registry_host}</TableCell>
+            <TableCell>{freshnessChip(freshness.get(`${m.registry_host} ${m.module_source}`))}</TableCell>
           </TableRow>
         ))}
       </TableBody>
