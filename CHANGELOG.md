@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.3.0...v1.4.0) (2026-06-16)
+
+
+### Features
+
+* **setup:** first-run setup wizard frontend ([#81](https://github.com/sethbacon/terraform-state-manager-frontend/issues/81)) ([03d936b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/03d936b2c9727d34d63776e7d3dee79d9c2594fd))
+
 ## [1.3.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.2.0...v1.3.0) (2026-06-15)
 
 
