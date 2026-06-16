@@ -13,6 +13,7 @@ import PlaceholderPage from './components/PlaceholderPage'
 import DashboardPage from './pages/DashboardPage'
 import LoginPage from './pages/LoginPage'
 import CallbackPage from './pages/CallbackPage'
+import SetupWizardPage from './pages/SetupWizardPage'
 import { allNavItems } from './navigation'
 
 // Heavy domain pages are code-split (lazy) to keep the initial bundle small;
@@ -75,6 +76,7 @@ export default function App() {
                   <Routes>
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/auth/callback" element={<CallbackPage />} />
+                    <Route path="/setup" element={<SetupWizardPage />} />
                     <Route
                       element={
                         <ProtectedRoute>
