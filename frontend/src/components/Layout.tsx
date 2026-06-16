@@ -244,11 +244,11 @@ export default function Layout() {
               <MenuIcon />
             </IconButton>
           )}
+          <SuiteSwitcher />
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {t('app.name')}
           </Typography>
 
-          <SuiteSwitcher />
           <Tooltip title={t('commandPalette.hint')}>
             <IconButton
               color="inherit"
