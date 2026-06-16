@@ -352,6 +352,19 @@ export interface StateModule {
   observed_at: string
 }
 
+// ModuleFreshness reports, per captured module, how the locked version compares
+// to the latest version the sibling registry publishes. Kept separate from
+// StateModule (which stays stable). status drives the freshness badge:
+//   up_to_date | behind | constraint_only (no locked version) |
+//   no_registry (no active sibling, or a different registry) | unknown.
+export interface ModuleFreshness {
+  module_source: string
+  registry_host: string
+  current: string | null
+  latest: string | null
+  status: 'up_to_date' | 'behind' | 'constraint_only' | 'no_registry' | 'unknown'
+}
+
 export type ReportFormat = 'json' | 'md' | 'csv'
 
 export interface Backup {
@@ -739,6 +752,12 @@ export const api = {
   listStateModules: async (id: string, key?: string): Promise<StateModule[]> =>
     (await apiClient.get<{ modules: StateModule[] }>(`/api/v1/sources/${id}/modules`, { params: key ? { key } : {} }))
       .data.modules,
+  listStateModuleFreshness: async (id: string, key?: string): Promise<ModuleFreshness[]> =>
+    (
+      await apiClient.get<{ modules: ModuleFreshness[] }>(`/api/v1/sources/${id}/modules/freshness`, {
+        params: key ? { key } : {},
+      })
+    ).data.modules,
   listStateOutputs: async (id: string, key: string): Promise<OutputSummary[]> =>
     (await apiClient.get<{ outputs: OutputSummary[] }>(`/api/v1/sources/${id}/state/outputs`, { params: { key } }))
       .data.outputs,
