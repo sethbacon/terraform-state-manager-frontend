@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.4.0...v1.4.1) (2026-06-16)
+
+
+### Bug Fixes
+
+* **csp:** make the per-request nonce reach emotion so styles aren't blocked ([#84](https://github.com/sethbacon/terraform-state-manager-frontend/issues/84)) ([816f3d7](https://github.com/sethbacon/terraform-state-manager-frontend/commit/816f3d71392e424586889c1b59f19788967f3e1d))
+
 ## [1.4.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.3.0...v1.4.0) (2026-06-16)
 
 
