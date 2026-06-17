@@ -6,7 +6,7 @@ import ScienceIcon from '@mui/icons-material/Science'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import ScheduleIcon from '@mui/icons-material/Schedule'
-import ApiIcon from '@mui/icons-material/Api'
+import DescriptionIcon from '@mui/icons-material/Description'
 import KeyIcon from '@mui/icons-material/Key'
 import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
 import PeopleIcon from '@mui/icons-material/People'
@@ -102,7 +102,7 @@ export const apiDocsItem: NavItem = {
   path: '/api-docs',
   labelKey: 'nav.apiDocs',
   tooltipKey: 'nav.apiDocsTooltip',
-  icon: <ApiIcon />,
+  icon: <DescriptionIcon />,
   scope: null,
 }
 
