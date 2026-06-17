@@ -115,7 +115,7 @@
   },
   "auth": {
     "account": "Account",
-    "signOut": "Sign out",
+    "signOut": "Logout",
     "insufficientTitle": "Insufficient permissions",
     "insufficientBody": "You don't have the required access ({{scope}}) to view this page.",
     "completingSignIn": "Completing sign-in…"
@@ -921,13 +921,23 @@
     "login": {
       "signIn": "Sign in",
       "signInWith": "Sign in with {{provider}}",
+      "signInWithSSO": "Sign in with SSO",
+      "signInWithAzureAD": "Sign in with Azure AD",
+      "signInWithLdap": "Sign in with LDAP",
       "devLogin": "Dev Login (Admin)",
-      "subtitle": "Sign in to manage your Terraform state.",
-      "noProviders": "No login providers are configured.",
-      "or": "or",
+      "devModeNotice": "Development mode - Click below to login without OAuth",
+      "devLoginFailed": "Dev login failed. Check server logs.",
+      "subtitle": "Sign in to continue",
+      "noProviders": "No SSO providers configured. Contact your administrator.",
+      "or": "OR",
+      "orUseProductionAuth": "OR USE PRODUCTION AUTH",
+      "orSignInWithLdap": "OR SIGN IN WITH LDAP",
+      "loadingProviders": "Loading sign-in providers",
       "username": "Username",
       "password": "Password",
-      "ldapError": "Invalid username or password."
+      "ldapError": "Invalid username or password.",
+      "ssoInfo": "This application uses single sign-on for authentication.",
+      "ssoContact": "Contact your administrator if you need access."
     },
     "sso": {
       "title": "SSO / Identity",
