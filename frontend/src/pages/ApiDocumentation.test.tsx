@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
+import { ThemeProvider, createTheme } from '@mui/material/styles'
 import i18n from '../i18n'
 
 // Mock swagger-ui-react (registry pattern): capture the props ApiDocumentation
@@ -67,5 +68,44 @@ describe('ApiDocumentation', () => {
 
     // Clicking a section entry scrolls to it (no crash without a target node).
     fireEvent.click(screen.getByText('Drift'))
+  })
+
+  // Regression: the dependency sweep (MUI v9 / Vite 8) changed Swagger UI's CSS
+  // injection order, so override rules that lacked `!important` lost the cascade
+  // — the info header leaked back in and the scheme bar showed an unthemed
+  // white band. These assertions lock in the `!important` on the rules that
+  // regressed so they win regardless of stylesheet load order.
+  const swaggerStyleContent = (): string =>
+    Array.from(document.querySelectorAll('style'))
+      .map((el) => el.textContent ?? '')
+      .find((css) => css.includes('.swagger-ui .information-container')) ?? ''
+
+  it('hides the Swagger info header and topbar with !important', () => {
+    render(<ApiDocumentation />)
+    const css = swaggerStyleContent()
+    expect(css).toContain('.swagger-ui .information-container { display: none !important; }')
+    expect(css).toContain('.swagger-ui .topbar { display: none !important; }')
+  })
+
+  it('themes the scheme container background with !important in light mode', () => {
+    render(
+      <ThemeProvider theme={createTheme({ palette: { mode: 'light' } })}>
+        <ApiDocumentation />
+      </ThemeProvider>,
+    )
+    expect(swaggerStyleContent()).toContain(
+      '.swagger-ui .scheme-container { background: #fafafa !important;',
+    )
+  })
+
+  it('themes the scheme container background with !important in dark mode', () => {
+    render(
+      <ThemeProvider theme={createTheme({ palette: { mode: 'dark' } })}>
+        <ApiDocumentation />
+      </ThemeProvider>,
+    )
+    expect(swaggerStyleContent()).toContain(
+      '.swagger-ui .scheme-container { background: #1e1e1e !important;',
+    )
   })
 })
