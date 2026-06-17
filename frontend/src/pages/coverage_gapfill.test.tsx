@@ -45,6 +45,7 @@ beforeEach(() => {
   mocked.listSources.mockResolvedValue(sources as never)
   mocked.listStates.mockResolvedValue(states as never)
   mocked.listStateResources.mockResolvedValue(resources as never)
+  mocked.listStateModuleFreshness.mockResolvedValue([] as never)
   mocked.analyzeState.mockResolvedValue({
     key: 'app.tfstate',
     size: 1,
@@ -121,6 +122,32 @@ describe('SourcesPage secondary paths', () => {
     // registry_host renders as plain text (module_source goes through breakableSegments).
     expect(await screen.findByText('registry.terraform.io')).toBeInTheDocument()
     expect(screen.getByText(i18n.t('pages.sources.constraintOnly') as string)).toBeInTheDocument()
+  })
+
+  it('renders freshness badges (behind, up-to-date, unknown) against the registry', async () => {
+    const mod = (source: string, version: string) => ({
+      source_id: 's1',
+      state_key: 'app.tfstate',
+      module_source: source,
+      module_version: version,
+      registry_host: 'app.terraform.io',
+      observed_at: '2026-06-14',
+    })
+    mocked.listStateModules.mockResolvedValue([
+      mod('acme/vpc/aws', '5.3.0'),
+      mod('acme/db/aws', '2.0.0'),
+      mod('acme/dns/aws', '1.0.0'),
+    ] as never)
+    mocked.listStateModuleFreshness.mockResolvedValue([
+      { module_source: 'acme/vpc/aws', registry_host: 'app.terraform.io', current: '5.3.0', latest: '5.7.1', status: 'behind' },
+      { module_source: 'acme/db/aws', registry_host: 'app.terraform.io', current: '2.0.0', latest: '2.0.0', status: 'up_to_date' },
+      { module_source: 'acme/dns/aws', registry_host: 'app.terraform.io', current: '1.0.0', latest: null, status: 'unknown' },
+    ] as never)
+    await openDetail()
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabModules') as string }))
+    expect(await screen.findByText('5.3.0 → 5.7.1')).toBeInTheDocument() // behind: current → latest
+    expect(screen.getByText(i18n.t('pages.sources.moduleUpToDate') as string)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.sources.moduleUnknown') as string)).toBeInTheDocument()
   })
 
   it('shows the empty state when no module provenance is captured', async () => {
