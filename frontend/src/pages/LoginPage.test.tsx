@@ -28,6 +28,13 @@ function authState(overrides: Record<string, unknown> = {}) {
   } as unknown as AuthShape
 }
 
+// Typed access to a mocked auth method without sprinkling casts through the tests.
+function authFn(state: AuthShape, key: 'login' | 'devLogin' | 'ldapLogin') {
+  return (state as unknown as Record<string, ReturnType<typeof vi.fn>>)[key]
+}
+
+const label = (key: string, opts?: Record<string, unknown>) => i18n.t(key, opts) as string
+
 function renderLogin() {
   return render(
     <MemoryRouter initialEntries={['/login']}>
@@ -57,6 +64,13 @@ describe('LoginPage', () => {
     expect(screen.getByText('home page')).toBeInTheDocument()
   })
 
+  it('shows a skeleton while providers load', () => {
+    mockedUseAuth.mockReturnValue(authState())
+    mockedApi.getProviders.mockReturnValue(new Promise(() => {})) // never resolves
+    renderLogin()
+    expect(screen.getByTestId('provider-loading')).toBeInTheDocument()
+  })
+
   it('renders an SSO button per provider and starts the right flow', async () => {
     const state = authState()
     mockedUseAuth.mockReturnValue(state)
@@ -69,16 +83,34 @@ describe('LoginPage', () => {
     })
     renderLogin()
 
-    const oidcBtn = await screen.findByRole('button', {
-      name: i18n.t('pages.login.signInWith', { provider: 'Keycloak' }) as string,
-    })
+    // OIDC renders as the generic "Sign in with SSO" label, not the provider name.
+    const oidcBtn = await screen.findByRole('button', { name: label('pages.login.signInWithSSO') })
     fireEvent.click(oidcBtn)
-    expect((state as unknown as { login: ReturnType<typeof vi.fn> }).login).toHaveBeenCalledWith('oidc')
+    expect(authFn(state, 'login')).toHaveBeenCalledWith('oidc')
 
-    fireEvent.click(
-      screen.getByRole('button', { name: i18n.t('pages.login.signInWith', { provider: 'Okta' }) as string }),
-    )
-    expect((state as unknown as { login: ReturnType<typeof vi.fn> }).login).toHaveBeenCalledWith('saml:okta')
+    // SAML keeps the provider name and targets the IdP by id.
+    fireEvent.click(screen.getByRole('button', { name: label('pages.login.signInWith', { provider: 'Okta' }) }))
+    expect(authFn(state, 'login')).toHaveBeenCalledWith('saml:okta')
+  })
+
+  it('labels Azure AD distinctly and shows an OR divider between providers', async () => {
+    const state = authState()
+    mockedUseAuth.mockReturnValue(state)
+    mockedApi.getProviders.mockResolvedValue({
+      providers: [
+        { type: 'oidc', name: 'Keycloak' },
+        { type: 'azuread', name: 'Microsoft' },
+      ],
+      dev_mode: false,
+    })
+    renderLogin()
+
+    const azureBtn = await screen.findByRole('button', { name: label('pages.login.signInWithAzureAD') })
+    expect(screen.getByRole('button', { name: label('pages.login.signInWithSSO') })).toBeInTheDocument()
+    expect(screen.getByText(label('pages.login.or'))).toBeInTheDocument()
+
+    fireEvent.click(azureBtn)
+    expect(authFn(state, 'login')).toHaveBeenCalledWith('azuread')
   })
 
   it('submits LDAP credentials and surfaces failures', async () => {
@@ -90,33 +122,70 @@ describe('LoginPage', () => {
     })
     renderLogin()
 
-    const username = await screen.findByLabelText(new RegExp(i18n.t('pages.login.username') as string))
+    const username = await screen.findByLabelText(new RegExp(label('pages.login.username')))
     fireEvent.change(username, { target: { value: 'alice' } })
-    fireEvent.change(screen.getByLabelText(new RegExp(i18n.t('pages.login.password') as string)), {
+    fireEvent.change(screen.getByLabelText(new RegExp(label('pages.login.password'))), {
       target: { value: 'secret' },
     })
-    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.login.signIn') as string }))
+    fireEvent.click(screen.getByRole('button', { name: label('pages.login.signIn') }))
 
     await waitFor(() => expect(ldapLogin).toHaveBeenCalledWith('alice', 'secret'))
-    expect(await screen.findByText(i18n.t('pages.login.ldapError') as string)).toBeInTheDocument()
+    expect(await screen.findByText(label('pages.login.ldapError'))).toBeInTheDocument()
+  })
+
+  it('shows an LDAP divider and form alongside SSO', async () => {
+    mockedUseAuth.mockReturnValue(authState())
+    mockedApi.getProviders.mockResolvedValue({
+      providers: [
+        { type: 'oidc', name: 'Keycloak' },
+        { type: 'ldap', name: 'Corporate LDAP' },
+      ],
+      dev_mode: false,
+    })
+    renderLogin()
+
+    expect(await screen.findByRole('button', { name: label('pages.login.signInWithSSO') })).toBeInTheDocument()
+    expect(screen.getByText(label('pages.login.orSignInWithLdap'))).toBeInTheDocument()
+    expect(screen.getByLabelText(new RegExp(label('pages.login.username')))).toBeInTheDocument()
   })
 
   it('explains when no providers are configured', async () => {
     mockedUseAuth.mockReturnValue(authState())
     renderLogin()
-    expect(await screen.findByText(i18n.t('pages.login.noProviders') as string)).toBeInTheDocument()
+    const alert = await screen.findByTestId('no-providers-alert')
+    expect(alert).toHaveTextContent(label('pages.login.noProviders'))
   })
 
-  it('offers the dev login in dev mode', async () => {
+  it('shows the single sign-on info footer', async () => {
+    mockedUseAuth.mockReturnValue(authState())
+    renderLogin()
+    expect(await screen.findByText(/single sign-on for authentication/i)).toBeInTheDocument()
+  })
+
+  it('offers the dev login in dev mode and shows the production-auth divider with providers', async () => {
     const state = authState()
     mockedUseAuth.mockReturnValue(state)
+    mockedApi.getProviders.mockResolvedValue({
+      providers: [{ type: 'oidc', name: 'Keycloak' }],
+      dev_mode: true,
+    })
+    renderLogin()
+
+    const devBtn = await screen.findByRole('button', { name: label('pages.login.devLogin') })
+    expect(screen.getByText(label('pages.login.orUseProductionAuth'))).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: label('pages.login.signInWithSSO') })).toBeInTheDocument()
+
+    fireEvent.click(devBtn)
+    await waitFor(() => expect(authFn(state, 'devLogin')).toHaveBeenCalled())
+  })
+
+  it('surfaces dev login failures', async () => {
+    const devLogin = vi.fn().mockRejectedValue(new Error('boom'))
+    mockedUseAuth.mockReturnValue(authState({ devLogin }))
     mockedApi.getProviders.mockResolvedValue({ providers: [], dev_mode: true })
     renderLogin()
 
-    const devBtn = await screen.findByRole('button', { name: i18n.t('pages.login.devLogin') as string })
-    fireEvent.click(devBtn)
-    await waitFor(() =>
-      expect((state as unknown as { devLogin: ReturnType<typeof vi.fn> }).devLogin).toHaveBeenCalled(),
-    )
+    fireEvent.click(await screen.findByRole('button', { name: label('pages.login.devLogin') }))
+    expect(await screen.findByText(label('pages.login.devLoginFailed'))).toBeInTheDocument()
   })
 })
