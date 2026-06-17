@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.4.1...v1.5.0) (2026-06-17)
+
+
+### Features
+
+* **suite:** module freshness badges in the "Modules in use" tab (P2-5) ([#88](https://github.com/sethbacon/terraform-state-manager-frontend/issues/88)) ([385da6c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/385da6c6ba758a8ce62c9669474edeb49e3d0081))
+
+
+### Bug Fixes
+
+* restore Swagger UI info-header hiding and dark scheme theming ([#89](https://github.com/sethbacon/terraform-state-manager-frontend/issues/89)) ([d10f380](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d10f3802a4f299a96f68f3c5c6633ed4e3c599e8))
+* **switcher:** reuse one sibling tab + move the icon left of the nav title ([#86](https://github.com/sethbacon/terraform-state-manager-frontend/issues/86)) ([847d0b0](https://github.com/sethbacon/terraform-state-manager-frontend/commit/847d0b049c69750d26c08318803228e3dc63ad4c))
+
 ## [1.4.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.4.0...v1.4.1) (2026-06-16)
 
 
