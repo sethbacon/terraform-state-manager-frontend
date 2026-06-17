@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.6.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.5.0...v1.6.0) (2026-06-17)
+
+
+### Features
+
+* **login:** match the registry login form and use "Logout" wording ([#90](https://github.com/sethbacon/terraform-state-manager-frontend/issues/90)) ([ad17be9](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ad17be9a730dc903ba7d781298e19a60f075f1e0))
+
+
+### Bug Fixes
+
+* **api-docs:** apply CSP nonce to Swagger UI override styles ([#92](https://github.com/sethbacon/terraform-state-manager-frontend/issues/92)) ([c65963b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c65963b61a6ecb46f206bba7e4976cbb3faf0515))
+
 ## [1.5.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.4.1...v1.5.0) (2026-06-17)
 
 
