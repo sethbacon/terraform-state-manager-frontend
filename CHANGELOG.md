@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.6.0...v1.6.1) (2026-06-17)
+
+
+### Bug Fixes
+
+* **nav:** use the document icon for API Docs to match the registry ([#93](https://github.com/sethbacon/terraform-state-manager-frontend/issues/93)) ([32f4ba5](https://github.com/sethbacon/terraform-state-manager-frontend/commit/32f4ba5b767c0a08f5c8e5dd33ae7266f8109007))
+
 ## [1.6.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.5.0...v1.6.0) (2026-06-17)
 
 
