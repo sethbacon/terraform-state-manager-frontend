@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.9.0...v1.10.0) (2026-06-18)
+
+
+### Features
+
+* CI templates admin page + editable drift wizard preview ([#109](https://github.com/sethbacon/terraform-state-manager-frontend/issues/109)) ([75447f2](https://github.com/sethbacon/terraform-state-manager-frontend/commit/75447f22fcc39f079f2d2c09c7e0d403513f979a))
+* **reports:** dynamic state-file query, filter, and export ([#108](https://github.com/sethbacon/terraform-state-manager-frontend/issues/108)) ([54c8457](https://github.com/sethbacon/terraform-state-manager-frontend/commit/54c84575768ab62470bf3b7b7402381f4417b57f))
+
 ## [1.9.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.8.0...v1.9.0) (2026-06-18)
 
 
