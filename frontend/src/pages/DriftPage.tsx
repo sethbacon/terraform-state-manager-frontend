@@ -627,14 +627,18 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
   const [tenantId, setTenantId] = useState('')
   const [clientId, setClientId] = useState('')
   const [clientSecret, setClientSecret] = useState('')
+  const [githubAppId, setGithubAppId] = useState('')
+  const [githubInstallationId, setGithubInstallationId] = useState('')
+  const [appPrivateKey, setAppPrivateKey] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<CISource | null>(null)
   // Per-source verify result keyed by source id.
   const [verifyResult, setVerifyResult] = useState<Record<string, { ok: boolean; error?: string }>>({})
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
 
-  // App-registration auth is Azure DevOps-only in this first cut.
-  const appAuth = provider === 'azure_devops' && authMethod === 'app'
+  // App auth: an Entra app registration for Azure DevOps, a GitHub App for GitHub.
+  const adoApp = provider === 'azure_devops' && authMethod === 'app'
+  const ghApp = provider === 'github_actions' && authMethod === 'app'
 
   const resetForm = () => {
     setName('')
@@ -644,6 +648,9 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
     setTenantId('')
     setClientId('')
     setClientSecret('')
+    setGithubAppId('')
+    setGithubInstallationId('')
+    setAppPrivateKey('')
   }
 
   const createMutation = useMutation({
@@ -653,10 +660,16 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
         provider,
         organization,
         project: provider === 'azure_devops' ? project : undefined,
-        auth_method: appAuth ? 'app' : 'pat',
-        ...(appAuth
+        auth_method: authMethod,
+        ...(adoApp
           ? { tenant_id: tenantId, client_id: clientId, client_secret: clientSecret }
-          : { token }),
+          : ghApp
+            ? {
+                github_app_id: githubAppId,
+                github_installation_id: githubInstallationId,
+                app_private_key: appPrivateKey,
+              }
+            : { token }),
       }),
     onSuccess: () => {
       resetForm()
@@ -682,9 +695,11 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
     Boolean(name.trim()) &&
     Boolean(organization.trim()) &&
     (provider !== 'azure_devops' || Boolean(project.trim())) &&
-    (appAuth
+    (adoApp
       ? Boolean(tenantId.trim()) && Boolean(clientId.trim()) && Boolean(clientSecret)
-      : Boolean(token))
+      : ghApp
+        ? Boolean(githubAppId.trim()) && Boolean(githubInstallationId.trim()) && Boolean(appPrivateKey.trim())
+        : Boolean(token))
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -752,19 +767,17 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
           {provider === 'azure_devops' && (
             <TextField label={t('pages.drift.project')} value={project} onChange={(e) => setProject(e.target.value)} fullWidth />
           )}
-          {provider === 'azure_devops' && (
-            <TextField
-              select
-              label={t('pages.drift.authMethod')}
-              value={authMethod}
-              onChange={(e) => setAuthMethod(e.target.value as 'pat' | 'app')}
-              fullWidth
-            >
-              <MenuItem value="pat">{t('pages.drift.authMethodPat')}</MenuItem>
-              <MenuItem value="app">{t('pages.drift.authMethodApp')}</MenuItem>
-            </TextField>
-          )}
-          {appAuth ? (
+          <TextField
+            select
+            label={t('pages.drift.authMethod')}
+            value={authMethod}
+            onChange={(e) => setAuthMethod(e.target.value as 'pat' | 'app')}
+            fullWidth
+          >
+            <MenuItem value="pat">{t('pages.drift.authMethodPat')}</MenuItem>
+            <MenuItem value="app">{t('pages.drift.authMethodApp')}</MenuItem>
+          </TextField>
+          {adoApp ? (
             <>
               <Typography variant="caption" color="text.secondary">
                 {t('pages.drift.appAuthHelp')}
@@ -787,6 +800,33 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
                 value={clientSecret}
                 onChange={(e) => setClientSecret(e.target.value)}
                 helperText={t('pages.drift.clientSecretHelp')}
+                fullWidth
+              />
+            </>
+          ) : ghApp ? (
+            <>
+              <Typography variant="caption" color="text.secondary">
+                {t('pages.drift.githubAppHelp')}
+              </Typography>
+              <TextField
+                label={t('pages.drift.githubAppId')}
+                value={githubAppId}
+                onChange={(e) => setGithubAppId(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={t('pages.drift.githubInstallationId')}
+                value={githubInstallationId}
+                onChange={(e) => setGithubInstallationId(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={t('pages.drift.appPrivateKey')}
+                value={appPrivateKey}
+                onChange={(e) => setAppPrivateKey(e.target.value)}
+                helperText={t('pages.drift.appPrivateKeyHelp')}
+                multiline
+                minRows={3}
                 fullWidth
               />
             </>
