@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.7.1...v1.8.0) (2026-06-18)
+
+
+### Features
+
+* **dashboard:** drill into state files by Terraform version ([#104](https://github.com/sethbacon/terraform-state-manager-frontend/issues/104)) ([a87d9b0](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a87d9b0bde3b735572e311a4cd9bebdcdaa515e2))
+
 ## [1.7.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.7.0...v1.7.1) (2026-06-18)
 
 
