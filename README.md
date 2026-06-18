@@ -4,7 +4,7 @@ React TypeScript SPA for the [Terraform State Manager](https://github.com/sethba
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19+-61DAFB?logo=react)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/sethbacon/04a5fcc9b19b7b263059a3c62f5481bc/raw/frontend-coverage.json)](https://github.com/sethbacon/terraform-state-manager-frontend/actions/workflows/ci.yml)
 
 This repository contains the frontend UI, the Playwright E2E smoke pack, and the local development Docker Compose stack. The backend API, database, and production deployment infrastructure live in **[terraform-state-manager-backend](https://github.com/sethbacon/terraform-state-manager-backend)**. The app deliberately shares the look-and-feel, theme tokens, and shell structure of the sibling [terraform-registry-frontend](https://github.com/sethbacon/terraform-registry-frontend) so the two products feel like one suite.
@@ -34,7 +34,7 @@ This repository contains the frontend UI, the Playwright E2E smoke pack, and the
 ```bash
 cd frontend
 npm install
-npm run dev          # http://localhost:3000 (Vite proxies /api, /health, /swagger to :8080)
+npm run dev          # http://localhost:3000 (Vite proxies /api, /health, /ready, /swagger to :8080)
 npm run build        # type-check + production build to dist/
 npm test             # unit tests (vitest)
 ```
@@ -57,12 +57,23 @@ Keycloak boots slowly on first run; if `docker compose up` exits non-zero, wait 
 
 | Component | Technology |
 |-----------|------------|
-| Framework | React 19, TypeScript 5.9, Vite 6 |
-| UI        | MUI 7, recharts |
+| Framework | React 19, TypeScript 6, Vite 8 |
+| UI        | MUI 9, recharts |
 | Data      | TanStack React Query, axios |
 | i18n      | i18next (10 locales, DeepL pipeline) |
 | Testing   | vitest + Testing Library (happy-dom), Playwright |
-| Serving   | nginx (SPA fallback; proxies `/api`, `/scim`, `/health`, `/ready`, `/swagger` to the backend) |
+| Serving   | nginx (SPA fallback; proxies `/api`, `/health`, `/ready`, `/swagger` to the backend) |
+
+## Configuration
+
+The frontend reads two build-time environment variables (both optional):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `VITE_PROXY_TARGET` | `http://localhost:8080` | Backend target for the Vite dev-server proxy (`npm run dev`); override when the backend runs elsewhere (e.g. the Compose stack). |
+| `VITE_ANALYZE` | _(unset)_ | When set (e.g. `npm run visualize`), emits a bundle treemap to `dist/stats.html`. |
+
+In production, API requests are proxied by nginx (see the Serving row above), so no API-URL variable is needed.
 
 ## Repository Layout
 
@@ -95,7 +106,7 @@ npx playwright test    # expects the Compose stack on http://localhost:3001 with
 
 ## CI Pipeline
 
-Lint, typecheck, unit tests (coverage-gated), and build run on every PR; pushes to `main` additionally publish the coverage badge. Conventional Commits + release-please drive versioning; tagged releases build and publish the Docker image.
+Lint, typecheck, unit tests (coverage-gated), and build run on every PR; pushes to `main` additionally publish the coverage badge. PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/) — enforced by the `Conventional PR Title` check (`.github/workflows/pr-checks.yml`). Conventional Commits + release-please drive versioning; tagged releases build and publish the Docker image.
 
 ## History
 

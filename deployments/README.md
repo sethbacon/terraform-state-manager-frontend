@@ -44,6 +44,8 @@ Tear down with `make oidc-down` (add `ARGS=-v` to drop the Postgres volume).
 > The backend runs OIDC discovery at startup and restarts until Keycloak is ready
 > (~30s on first boot), so a few early backend restarts are expected.
 
-> Note: a stray root-owned `keycloak/` directory may exist here from an earlier
-> run; it is unused by this compose file and can be removed with
-> `sudo rm -rf keycloak`.
+> Note: an earlier compose run could leave a stray root-owned `keycloak/`
+> directory in this `deployments/` folder (a leftover bind-mount target). It is
+> unused by the current compose file. If you need to remove it, do so from inside
+> `deployments/` and name the full path so the command can't be mis-targeted:
+> `sudo rm -rf "$(pwd)/keycloak"` (run from `deployments/`).

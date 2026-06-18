@@ -19,6 +19,7 @@ vi.mock('../services/api', async (importOriginal) => {
       getDriftWorkflow: vi.fn(),
       listCISources: vi.fn(),
       createCISource: vi.fn(),
+      verifyCISource: vi.fn(),
       deleteCISource: vi.fn(),
       listCISourcePipelines: vi.fn(),
       listCISourceRepos: vi.fn(),
@@ -117,7 +118,10 @@ const ciSources = [
     provider: 'azure_devops',
     organization: 'corp',
     project: 'Platform',
+    auth_method: 'pat',
     has_token: true,
+    has_client_secret: false,
+    has_app_private_key: false,
     created_at: '',
     updated_at: '',
   },
@@ -259,6 +263,111 @@ describe('DriftPage', () => {
     fireEvent.click(within(dialog).getByLabelText('delete CI source'))
     fireEvent.click(await screen.findByTestId('confirm-dialog-confirm'))
     await waitFor(() => expect(mocked.deleteCISource.mock.calls[0]?.[0]).toBe('c1'))
+  })
+
+  it('adds an ADO source with Entra app-registration auth and verifies it', async () => {
+    mocked.createCISource.mockResolvedValue(ciSources[0] as Awaited<ReturnType<typeof api.createCISource>>)
+    mocked.verifyCISource.mockResolvedValue({ ok: true })
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.ciSources') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'corp-app' },
+    })
+    // Provider → Azure DevOps (combobox 0).
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: /Azure DevOps/ }))
+    fireEvent.change(await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.organization')}`)), {
+      target: { value: 'corp' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.drift.project')}`)), {
+      target: { value: 'Platform' },
+    })
+    // Auth method → App registration (combobox 1).
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.drift.authMethodApp') as string }))
+    fireEvent.change(await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.tenantId')}`)), {
+      target: { value: 'the-tenant' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.drift.clientId')}`)), {
+      target: { value: 'the-client' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.drift.clientSecret')}`)), {
+      target: { value: 'the-secret' },
+    })
+    const addBtn = within(dialog)
+      .getAllByRole('button')
+      .find((b) => !(b as HTMLButtonElement).disabled && /add/i.test(b.textContent ?? ''))!
+    fireEvent.click(addBtn)
+    await waitFor(() =>
+      expect(mocked.createCISource).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'corp-app',
+          provider: 'azure_devops',
+          auth_method: 'app',
+          tenant_id: 'the-tenant',
+          client_id: 'the-client',
+          client_secret: 'the-secret',
+        }),
+      ),
+    )
+    // The app payload must not carry a PAT token.
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('token')
+
+    // Test connection on the existing source.
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.testConnection') as string }))
+    await waitFor(() => expect(mocked.verifyCISource).toHaveBeenCalledWith('c1'))
+    expect(await within(dialog).findByText(i18n.t('pages.drift.testConnectionOk') as string)).toBeInTheDocument()
+  })
+
+  it('adds a GitHub source with GitHub App auth (no PAT in the payload)', async () => {
+    mocked.createCISource.mockResolvedValue(ciSources[0] as Awaited<ReturnType<typeof api.createCISource>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.ciSources') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'corp-ghapp' },
+    })
+    // Provider stays GitHub Actions (default). Owner field.
+    fireEvent.change(within(dialog).getByLabelText(/^Owner/), {
+      target: { value: 'corp' },
+    })
+    // Auth method → App registration (combobox 1; provider is combobox 0).
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.drift.authMethodApp') as string }))
+    fireEvent.change(await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.githubAppId')}`)), {
+      target: { value: 'app-123' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.drift.githubInstallationId')}`)), {
+      target: { value: 'inst-9' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(/^Private key/), {
+      target: { value: '-----BEGIN RSA PRIVATE KEY-----\nMII...\n-----END RSA PRIVATE KEY-----' },
+    })
+    const addBtn = within(dialog)
+      .getAllByRole('button')
+      .find((b) => !(b as HTMLButtonElement).disabled && /add/i.test(b.textContent ?? ''))!
+    fireEvent.click(addBtn)
+    await waitFor(() =>
+      expect(mocked.createCISource).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'corp-ghapp',
+          provider: 'github_actions',
+          auth_method: 'app',
+          github_app_id: 'app-123',
+          github_installation_id: 'inst-9',
+          app_private_key: expect.stringContaining('BEGIN RSA PRIVATE KEY'),
+        }),
+      ),
+    )
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('token')
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('client_secret')
   })
 
   it('adds a pipeline from a CI source with the ADO pipeline picker', async () => {
