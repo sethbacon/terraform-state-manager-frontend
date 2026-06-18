@@ -386,6 +386,7 @@
       "providerDistribution": "Provider distribution",
       "topResourceTypes": "Top resource types",
       "terraformVersions": "Terraform versions",
+      "count": "Count: {{value}}",
       "syncPartial": "Analyzed {{stored}} of {{listed}} state files so far — sync in progress; totals will grow as it completes.",
       "syncErrors_one": "{{count}} source reported errors on its last sync; its numbers may be incomplete.",
       "syncErrors_other": "{{count}} sources reported errors on their last sync; their numbers may be incomplete.",
