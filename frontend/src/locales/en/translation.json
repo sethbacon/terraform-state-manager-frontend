@@ -200,11 +200,11 @@
       },
       "reports": {
         "title": "Reports",
-        "body": "Generate an analyzer report for any state file — RUM, resource, provider, and version breakdowns — and download it as Markdown, JSON, or CSV.",
+        "body": "Filter analyzed state files across every source — by Terraform version, provider, resource type, size, and resource counts — then export the matches as Markdown, JSON, or CSV.",
         "sections": [
           {
             "h": "Tip",
-            "p": "Report generation is audited. The same exports are available from a state's detail view on the Sources page (MD/JSON/CSV buttons)."
+            "p": "Exports are audited. To report on a single state file in depth, open its detail view on the Sources page (MD/JSON/CSV buttons)."
           }
         ]
       },
@@ -917,13 +917,45 @@
       }
     },
     "reports": {
-      "source": "Source",
-      "stateFile": "State file",
-      "chooseSource": "Choose a source and a state file to preview and export its report.",
-      "noStates": "No state files in this source",
-      "topResourceTypes": "Top resource types",
-      "providers": "Providers",
-      "count": "Count"
+      "description": "Filter analyzed state files across all sources, then export the matches as Markdown, JSON, or CSV.",
+      "filters": "Filters",
+      "advanced": "Advanced filters",
+      "sources": "Sources",
+      "allSources": "All sources",
+      "searchKey": "State key contains",
+      "version": "Terraform version",
+      "versionOpAria": "Version comparison",
+      "provider": "Provider",
+      "resourceType": "Resource type",
+      "reset": "Reset filters",
+      "min": "Min",
+      "max": "Max",
+      "rumRange": "RUM",
+      "managedRange": "Managed resources",
+      "dataRange": "Data sources",
+      "totalRange": "Total instances",
+      "sizeRange": "Size (bytes)",
+      "matched": "Matched",
+      "rum": "RUM",
+      "managed": "Managed",
+      "dataSources": "Data sources",
+      "totalInstances": "Total instances",
+      "results": "Results",
+      "truncated": "Showing the first {{shown}} of {{total}} matches — refine the filters or export for the full set.",
+      "empty": "No state files match these filters.",
+      "loadFailed": "Failed to load matching state files.",
+      "export": "Export",
+      "exportError": "Export failed.",
+      "colSource": "Source",
+      "colState": "State file",
+      "colVersion": "Terraform",
+      "colRum": "RUM",
+      "colManaged": "Managed",
+      "colData": "Data",
+      "colTotal": "Total",
+      "colSize": "Size",
+      "colAnalyzed": "Analyzed",
+      "unknownVersion": "unknown"
     },
     "transfer": {
       "needScope": "You need the state:transfer scope to run transfers.",

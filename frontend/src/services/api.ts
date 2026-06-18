@@ -379,6 +379,63 @@ export interface ModuleFreshness {
 
 export type ReportFormat = 'json' | 'md' | 'csv'
 
+/**
+ * Filters for the Reports state query and export. Every field is optional and
+ * the set is AND-combined server-side; the same filters drive both the live
+ * preview and the export so they always agree.
+ */
+export interface ReportFilters {
+  sourceIds?: string[]
+  q?: string
+  version?: string
+  op?: VersionFilterOp
+  provider?: string
+  resourceType?: string
+  rumMin?: number
+  rumMax?: number
+  managedMin?: number
+  managedMax?: number
+  dataMin?: number
+  dataMax?: number
+  totalMin?: number
+  totalMax?: number
+  sizeMin?: number
+  sizeMax?: number
+}
+
+/** One analyzed state file in the Reports table (scalar columns + deep-link identity). */
+export interface ReportStateRow {
+  source_id: string
+  source_name: string
+  source_type: string
+  state_key: string
+  terraform_version: string
+  serial: number
+  size: number
+  rum: number
+  managed_resources: number
+  data_sources: number
+  total_resources: number
+  analyzed_at: string
+}
+
+/** Totals across the full filter match (independent of the preview row cap). */
+export interface ReportSummary {
+  matched: number
+  rum: number
+  managed_resources: number
+  data_sources: number
+  total_resources: number
+}
+
+export interface ReportStatesResult {
+  total: number
+  /** True when more states matched than the preview returned; export for the full set. */
+  truncated: boolean
+  summary: ReportSummary
+  states: ReportStateRow[]
+}
+
 export interface Backup {
   id: string
   source_id: string
@@ -653,6 +710,37 @@ export interface CreateHealthRunInput {
   registry_host?: string
 }
 
+/**
+ * Serializes Reports filters into query params shared by the preview and export
+ * requests. Exported for unit testing the mapping (repeatable source_id, the
+ * version/op pairing, and only-set numeric bounds).
+ */
+export function reportFilterParams(f: ReportFilters): URLSearchParams {
+  const p = new URLSearchParams()
+  for (const id of f.sourceIds ?? []) p.append('source_id', id)
+  if (f.q) p.set('q', f.q)
+  if (f.version) {
+    p.set('version', f.version)
+    if (f.op) p.set('op', f.op)
+  }
+  if (f.provider) p.set('provider', f.provider)
+  if (f.resourceType) p.set('resource_type', f.resourceType)
+  const num = (k: string, v?: number) => {
+    if (v !== undefined && v !== null && Number.isFinite(v)) p.set(k, String(v))
+  }
+  num('rum_min', f.rumMin)
+  num('rum_max', f.rumMax)
+  num('managed_min', f.managedMin)
+  num('managed_max', f.managedMax)
+  num('data_min', f.dataMin)
+  num('data_max', f.dataMax)
+  num('total_min', f.totalMin)
+  num('total_max', f.totalMax)
+  num('size_min', f.sizeMin)
+  num('size_max', f.sizeMax)
+  return p
+}
+
 export const api = {
   getVersion: async (): Promise<VersionInfo> => (await apiClient.get<VersionInfo>('/api/v1/version')).data,
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
@@ -810,6 +898,25 @@ export const api = {
     const disposition = res.headers['content-disposition'] as string | undefined
     const match = disposition?.match(/filename="?([^"]+)"?/)
     const filename = match ? match[1] : `analysis.${format}`
+    const url = URL.createObjectURL(res.data as Blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  },
+  // Reports: cross-fleet state query (live preview) and multi-format export.
+  listReportStates: async (filters: ReportFilters): Promise<ReportStatesResult> =>
+    (await apiClient.get<ReportStatesResult>('/api/v1/reports/states', { params: reportFilterParams(filters) })).data,
+  downloadStatesReport: async (filters: ReportFilters, format: ReportFormat): Promise<void> => {
+    const params = reportFilterParams(filters)
+    params.set('format', format)
+    const res = await apiClient.get('/api/v1/reports/states/export', { params, responseType: 'blob' })
+    const disposition = res.headers['content-disposition'] as string | undefined
+    const match = disposition?.match(/filename="?([^"]+)"?/)
+    const filename = match ? match[1] : `terraform-state-report.${format}`
     const url = URL.createObjectURL(res.data as Blob)
     const link = document.createElement('a')
     link.href = url
