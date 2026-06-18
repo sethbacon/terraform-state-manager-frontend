@@ -414,12 +414,15 @@ export interface CISource {
   provider: string
   organization: string
   project?: string | null
-  /** 'pat' (personal access token) or 'app' (Entra app registration, ADO only). */
+  /** 'pat' (personal access token) or 'app' (Entra app for ADO, GitHub App for GitHub). */
   auth_method: string
   has_token: boolean
   tenant_id?: string | null
   client_id?: string | null
   has_client_secret: boolean
+  github_app_id?: string | null
+  github_installation_id?: string | null
+  has_app_private_key: boolean
   created_at: string
   updated_at: string
 }
@@ -884,6 +887,9 @@ export const api = {
     tenant_id?: string
     client_id?: string
     client_secret?: string
+    github_app_id?: string
+    github_installation_id?: string
+    app_private_key?: string
   }): Promise<CISource> => (await apiClient.post<CISource>('/api/v1/ci-sources', input)).data,
   verifyCISource: async (id: string): Promise<{ ok: boolean; error?: string }> =>
     (await apiClient.post<{ ok: boolean; error?: string }>(`/api/v1/ci-sources/${id}/verify`, {})).data,
