@@ -478,6 +478,52 @@ describe('pipelines + CI sources', () => {
     expect(url).toBe('/api/v1/health-lab/workflow')
     expect(config.params).toEqual({ provider: 'github', profile: 'default' })
   })
+
+  it('CI workflow template CRUD hits the expected endpoints', async () => {
+    get.mockReturnValue(ok({ templates: [{ id: 't1' }] }))
+    expect(await api.listCITemplates()).toEqual([{ id: 't1' }])
+    expect(get).toHaveBeenCalledWith('/api/v1/admin/ci/templates')
+
+    post.mockReturnValue(ok({ id: 't2' }))
+    await api.createCITemplate({ provider: 'azure_devops', kind: 'drift', profile: 'p', name: 'n', content: 'c' })
+    expect(post).toHaveBeenCalledWith('/api/v1/admin/ci/templates', {
+      provider: 'azure_devops',
+      kind: 'drift',
+      profile: 'p',
+      name: 'n',
+      content: 'c',
+    })
+
+    put.mockReturnValue(ok({ id: 't2' }))
+    await api.updateCITemplate('t2', { name: 'n2', description: 'd', content: 'c2' })
+    expect(put).toHaveBeenCalledWith('/api/v1/admin/ci/templates/t2', { name: 'n2', description: 'd', content: 'c2' })
+
+    del.mockReturnValue(ok({}))
+    await api.deleteCITemplate('t2')
+    expect(del).toHaveBeenCalledWith('/api/v1/admin/ci/templates/t2')
+  })
+
+  it('report states query + multi-format export', async () => {
+    get.mockReturnValue(ok({ total: 0, truncated: false, summary: {}, states: [] }))
+    await api.listReportStates({ q: 'prod', sourceIds: ['a', 'b'] })
+    const listCall = get.mock.calls.slice(-1)[0] as [string, { params: URLSearchParams }]
+    expect(listCall[0]).toBe('/api/v1/reports/states')
+    expect(listCall[1].params.get('q')).toBe('prod')
+    expect(listCall[1].params.getAll('source_id')).toEqual(['a', 'b'])
+
+    const createObjectURL = vi.fn(() => 'blob:fake')
+    const revokeObjectURL = vi.fn()
+    vi.stubGlobal('URL', Object.assign(class extends URL {}, { createObjectURL, revokeObjectURL }))
+    get.mockReturnValue(ok(new Blob(['x']), { 'content-disposition': 'attachment; filename="states.csv"' }))
+    await api.downloadStatesReport({ q: 'p' }, 'csv')
+    const dlCall = get.mock.calls.slice(-1)[0] as [string, { params: URLSearchParams; responseType: string }]
+    expect(dlCall[0]).toBe('/api/v1/reports/states/export')
+    expect(dlCall[1].params.get('format')).toBe('csv')
+    expect(dlCall[1].responseType).toBe('blob')
+    expect(createObjectURL).toHaveBeenCalled()
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:fake')
+    vi.unstubAllGlobals()
+  })
 })
 
 describe('schedules + notifications', () => {

@@ -125,4 +125,49 @@ describe('ReportsPage', () => {
       expect(mocked.listReportStates).toHaveBeenCalledWith(expect.objectContaining({ q: 'prod' })),
     )
   })
+
+  it('sorts when column headers are clicked', async () => {
+    renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    // New key (numeric column) then a different key (string column), then flip it.
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('pages.reports.colManaged') as string) }))
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('pages.reports.colSource') as string) }))
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('pages.reports.colSource') as string) }))
+    // Rows still render after re-sorting.
+    expect(screen.getByText('dev/data.tfstate')).toBeInTheDocument()
+  })
+
+  it('applies version + operator + provider filters', async () => {
+    renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    fireEvent.change(screen.getByLabelText(i18n.t('pages.reports.version') as string), { target: { value: '1.5.0' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.dashboard.versionOpLte') as string }))
+    fireEvent.change(screen.getByLabelText(i18n.t('pages.reports.provider') as string), { target: { value: 'aws' } })
+    await waitFor(() =>
+      expect(mocked.listReportStates).toHaveBeenCalledWith(
+        expect.objectContaining({ version: '1.5.0', op: 'lte', provider: 'aws' }),
+      ),
+    )
+  })
+
+  it('expands advanced filters and applies a numeric range', async () => {
+    renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('pages.reports.advanced') as string) }))
+    const mins = screen.getAllByLabelText(i18n.t('pages.reports.min') as string)
+    fireEvent.change(mins[0], { target: { value: '10' } }) // rumMin (first NumberRange)
+    await waitFor(() =>
+      expect(mocked.listReportStates).toHaveBeenCalledWith(expect.objectContaining({ rumMin: 10 })),
+    )
+  })
+
+  it('resets the filters', async () => {
+    renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    const search = screen.getByLabelText(i18n.t('pages.reports.searchKey') as string) as HTMLInputElement
+    fireEvent.change(search, { target: { value: 'xyz' } })
+    expect(search.value).toBe('xyz')
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.reports.reset') as string }))
+    expect(search.value).toBe('')
+  })
 })
