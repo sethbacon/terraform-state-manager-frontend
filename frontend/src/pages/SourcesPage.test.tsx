@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import SourcesPage from './SourcesPage'
 import { api } from '../services/api'
@@ -76,7 +77,9 @@ function renderPage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <SourcesPage />
+      <MemoryRouter>
+        <SourcesPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }

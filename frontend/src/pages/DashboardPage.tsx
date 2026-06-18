@@ -10,14 +10,21 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  Drawer,
   IconButton,
+  List,
+  ListItemButton,
+  ListItemText,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
   useTheme,
 } from '@mui/material'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import StorageIcon from '@mui/icons-material/Storage'
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Bar,
   BarChart,
@@ -30,7 +37,7 @@ import {
   YAxis,
 } from 'recharts'
 import type { TooltipProps } from 'recharts'
-import { api, type Count } from '../services/api'
+import { api, type Count, type VersionFilterOp, type VersionStateRef } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import PageHeader from '../components/PageHeader'
 import DashboardCard from '../components/DashboardCard'
@@ -44,6 +51,10 @@ export default function DashboardPage() {
   const queryClient = useQueryClient()
   const q = useQuery({ queryKey: queryKeys.dashboard.overview(), queryFn: () => api.getDashboardOverview() })
   const [refreshing, setRefreshing] = useState(false)
+  // Click-a-version drill-down: the clicked Terraform version and the active
+  // comparison operator drive the side drawer listing the matching states.
+  const [versionFilter, setVersionFilter] = useState<string | null>(null)
+  const [versionOp, setVersionOp] = useState<VersionFilterOp>('eq')
   const forceRefresh = async () => {
     setRefreshing(true)
     try {
@@ -193,7 +204,14 @@ export default function DashboardPage() {
             </ChartCard>
 
             <ChartCard title={t('pages.dashboard.terraformVersions')}>
-              <CountBarChart data={q.data.terraform_versions} color={theme.palette.secondary.main} />
+              <CountBarChart
+                data={q.data.terraform_versions}
+                color={theme.palette.secondary.main}
+                onCategoryClick={(key) => {
+                  setVersionFilter(key)
+                  setVersionOp('eq')
+                }}
+              />
             </ChartCard>
 
             <ChartCard title={t('pages.dashboard.topResourceTypes')} span2>
@@ -202,6 +220,13 @@ export default function DashboardPage() {
           </Box>
         </>
       )}
+
+      <VersionStatesDrawer
+        version={versionFilter}
+        op={versionOp}
+        onOpChange={setVersionOp}
+        onClose={() => setVersionFilter(null)}
+      />
     </Box>
   )
 }
@@ -220,16 +245,44 @@ function ChartCard({ title, span2, children }: { title: string; span2?: boolean;
   )
 }
 
-function CountBarChart({ data, color }: { data: Count[]; color: string }) {
+function CountBarChart({
+  data,
+  color,
+  onCategoryClick,
+}: {
+  data: Count[]
+  color: string
+  /** When set, the chart's category axis (e.g. Terraform version) is clickable. */
+  onCategoryClick?: (key: string) => void
+}) {
+  const { t } = useTranslation()
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={data} layout="vertical" margin={{ left: 24 }}>
-        <XAxis type="number" allowDecimals={false} />
-        <YAxis type="category" dataKey="key" width={120} tick={{ fontSize: 12 }} />
-        <RTooltip content={<CountTooltip />} />
-        <Bar dataKey="count" fill={color} radius={[0, 4, 4, 0]} />
-      </BarChart>
-    </ResponsiveContainer>
+    <Box sx={{ cursor: onCategoryClick ? 'pointer' : 'default' }}>
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart
+          data={data}
+          layout="vertical"
+          margin={{ left: 24 }}
+          onClick={
+            onCategoryClick
+              ? (state: { activeLabel?: string }) => {
+                if (state?.activeLabel) onCategoryClick(state.activeLabel)
+              }
+              : undefined
+          }
+        >
+          <XAxis type="number" allowDecimals={false} />
+          <YAxis type="category" dataKey="key" width={120} tick={{ fontSize: 12 }} />
+          <RTooltip content={<CountTooltip />} />
+          <Bar dataKey="count" fill={color} radius={[0, 4, 4, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+      {onCategoryClick && (
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+          {t('pages.dashboard.versionChartHint')}
+        </Typography>
+      )}
+    </Box>
   )
 }
 
@@ -262,5 +315,142 @@ function CountTooltip({ active, payload }: TooltipProps<number, string>) {
         {t('pages.dashboard.count', { value: datum.count })}
       </Typography>
     </Box>
+  )
+}
+
+// The comparison operators offered in the drill-down drawer, in ascending order
+// so the toggle reads naturally (older → newer). Symbols are intentionally not
+// translated; the aria-label/tooltip carries the meaning.
+const VERSION_OPS: { op: VersionFilterOp; symbol: string; labelKey: string }[] = [
+  { op: 'eq', symbol: '=', labelKey: 'pages.dashboard.versionOpEq' },
+  { op: 'lte', symbol: '≤', labelKey: 'pages.dashboard.versionOpLte' },
+  { op: 'lt', symbol: '<', labelKey: 'pages.dashboard.versionOpLt' },
+  { op: 'gte', symbol: '≥', labelKey: 'pages.dashboard.versionOpGte' },
+  { op: 'gt', symbol: '>', labelKey: 'pages.dashboard.versionOpGt' },
+]
+
+// Range operators only make sense for real semantic versions; the "unknown"
+// bucket (and any non-semver label) supports exact match only.
+function isSemverish(v: string): boolean {
+  return /^v?\d+\.\d+/.test(v)
+}
+
+function symbolForOp(op: VersionFilterOp): string {
+  return VERSION_OPS.find((v) => v.op === op)?.symbol ?? '='
+}
+
+/**
+ * Side drawer listing the state files behind a clicked Terraform-version bar.
+ * The operator toggle broadens the exact match to a semver range (e.g. < 1.0.0);
+ * each row deep-links into the Sources page with that state preselected.
+ */
+function VersionStatesDrawer({
+  version,
+  op,
+  onOpChange,
+  onClose,
+}: {
+  version: string | null
+  op: VersionFilterOp
+  onOpChange: (op: VersionFilterOp) => void
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const navigate = useNavigate()
+  const rangeAllowed = version ? isSemverish(version) : false
+  const q = useQuery({
+    queryKey: queryKeys.dashboard.statesByVersion(version ?? '', op),
+    queryFn: () => api.listStatesByVersion(version as string, op),
+    enabled: Boolean(version),
+  })
+  const states = q.data ?? []
+
+  const openInSources = (s: VersionStateRef) => {
+    const params = new URLSearchParams({ source: s.source_id, state: s.state_key })
+    onClose()
+    navigate(`/sources?${params.toString()}`)
+  }
+
+  return (
+    <Drawer anchor="right" open={Boolean(version)} onClose={onClose}>
+      <Box
+        sx={{
+          width: { xs: 320, sm: 420 },
+          p: 2,
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1.5,
+        }}
+      >
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            {t('pages.dashboard.versionStatesTitle')}
+          </Typography>
+          <IconButton size="small" onClick={onClose} aria-label={t('common.close')}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Stack>
+
+        <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={op}
+            onChange={(_, v: VersionFilterOp | null) => {
+              if (v) onOpChange(v)
+            }}
+            aria-label={t('pages.dashboard.versionOpAria')}
+          >
+            {VERSION_OPS.map(({ op: o, symbol, labelKey }) => (
+              <Tooltip key={o} title={t(labelKey)}>
+                <span>
+                  <ToggleButton value={o} disabled={o !== 'eq' && !rangeAllowed} aria-label={t(labelKey)}>
+                    {symbol}
+                  </ToggleButton>
+                </span>
+              </Tooltip>
+            ))}
+          </ToggleButtonGroup>
+          <Chip
+            size="small"
+            variant="outlined"
+            sx={{ fontFamily: 'monospace' }}
+            label={`${symbolForOp(op)} ${version ?? ''}`}
+          />
+        </Stack>
+
+        {q.isLoading && <CircularProgress size={22} sx={{ mt: 2, alignSelf: 'center' }} />}
+        {q.isError && <Alert severity="error">{t('pages.dashboard.versionStatesError')}</Alert>}
+        {q.isSuccess && states.length === 0 && (
+          <Typography color="text.secondary" variant="body2" sx={{ mt: 2 }}>
+            {t('pages.dashboard.versionStatesEmpty')}
+          </Typography>
+        )}
+
+        {states.length > 0 && (
+          <>
+            <Typography variant="caption" color="text.secondary">
+              {t('pages.dashboard.versionStatesCount', { count: states.length })}
+            </Typography>
+            <List dense disablePadding sx={{ overflow: 'auto' }}>
+              {states.map((s) => (
+                <ListItemButton key={`${s.source_id}:${s.state_key}`} onClick={() => openInSources(s)}>
+                  <ListItemText
+                    primary={
+                      <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
+                        {s.state_key}
+                      </Typography>
+                    }
+                    secondary={`${s.source_name} · ${s.terraform_version || t('pages.dashboard.versionUnknown')
+                      } · ${t('pages.dashboard.versionStateRum', { count: s.rum })}`}
+                  />
+                </ListItemButton>
+              ))}
+            </List>
+          </>
+        )}
+      </Box>
+    </Drawer>
   )
 }

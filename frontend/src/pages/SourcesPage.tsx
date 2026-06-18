@@ -1,5 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSearchParams } from 'react-router-dom'
 import {
   Alert,
   Autocomplete,
@@ -73,6 +74,28 @@ export default function SourcesPage() {
   const [editTarget, setEditTarget] = useState<StateSource | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
+
+  // Deep link from the dashboard's version drill-down: ?source=<id>&state=<key>
+  // preselects that source and state once the source list has loaded. Applied
+  // once, then the params are cleared so later manual browsing isn't overridden.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const deepLinkApplied = useRef(false)
+  useEffect(() => {
+    if (deepLinkApplied.current) return
+    const sourceId = searchParams.get('source')
+    if (!sourceId || !sourcesQuery.data) return
+    const match = sourcesQuery.data.find((s) => s.id === sourceId)
+    if (!match) return
+    deepLinkApplied.current = true
+    setSelectedSource(match)
+    const stateKey = searchParams.get('state')
+    if (stateKey) setSelectedKey(stateKey)
+    setSearchParams({}, { replace: true })
+    // The states browser renders below the source grid; bring it into view.
+    requestAnimationFrame(() => {
+      document.getElementById('states-browser')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+    })
+  }, [searchParams, sourcesQuery.data, setSearchParams])
 
   const deleteMutation = useMutation({
     mutationFn: api.deleteSource,
@@ -423,7 +446,7 @@ function StatesBrowser({
     : allStates
 
   return (
-    <Box sx={{ mt: 4 }}>
+    <Box sx={{ mt: 4 }} id="states-browser">
       <Typography variant="h6" sx={{ mb: 1 }}>
         {t('pages.sources.statesIn', { name: source.name })}
       </Typography>

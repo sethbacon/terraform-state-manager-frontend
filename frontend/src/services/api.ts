@@ -157,6 +157,18 @@ export interface DashboardOverview {
   refreshed_at?: string
 }
 
+/** Comparison operators for the dashboard's click-a-version state drill-down. */
+export type VersionFilterOp = 'eq' | 'lt' | 'lte' | 'gt' | 'gte'
+
+/** One state file matching a Terraform-version filter, with enough identity to deep-link into Sources. */
+export interface VersionStateRef {
+  source_id: string
+  source_name: string
+  state_key: string
+  terraform_version: string
+  rum: number
+}
+
 export interface AdminUserMembership {
   organization_id?: string
   organization_name?: string
@@ -650,6 +662,13 @@ export const api = {
         params: refresh ? { refresh: 'true' } : undefined,
       })
     ).data,
+  // State files matching a Terraform version (op: eq default, or lt/lte/gt/gte for a semver range).
+  listStatesByVersion: async (version: string, op: VersionFilterOp = 'eq'): Promise<VersionStateRef[]> =>
+    (
+      await apiClient.get<{ states: VersionStateRef[] }>('/api/v1/dashboard/states-by-version', {
+        params: { version, op },
+      })
+    ).data.states,
 
   // Identity management (admin scope)
   getAdminStats: async (): Promise<AdminStats> => (await apiClient.get<AdminStats>('/api/v1/admin/stats')).data,
