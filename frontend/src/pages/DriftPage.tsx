@@ -622,10 +622,29 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
   const [provider, setProvider] = useState('github_actions')
   const [organization, setOrganization] = useState('')
   const [project, setProject] = useState('')
+  const [authMethod, setAuthMethod] = useState<'pat' | 'app'>('pat')
   const [token, setToken] = useState('')
+  const [tenantId, setTenantId] = useState('')
+  const [clientId, setClientId] = useState('')
+  const [clientSecret, setClientSecret] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<CISource | null>(null)
+  // Per-source verify result keyed by source id.
+  const [verifyResult, setVerifyResult] = useState<Record<string, { ok: boolean; error?: string }>>({})
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
+
+  // App-registration auth is Azure DevOps-only in this first cut.
+  const appAuth = provider === 'azure_devops' && authMethod === 'app'
+
+  const resetForm = () => {
+    setName('')
+    setOrganization('')
+    setProject('')
+    setToken('')
+    setTenantId('')
+    setClientId('')
+    setClientSecret('')
+  }
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -634,15 +653,21 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
         provider,
         organization,
         project: provider === 'azure_devops' ? project : undefined,
-        token,
+        auth_method: appAuth ? 'app' : 'pat',
+        ...(appAuth
+          ? { tenant_id: tenantId, client_id: clientId, client_secret: clientSecret }
+          : { token }),
       }),
     onSuccess: () => {
-      setName('')
-      setOrganization('')
-      setProject('')
-      setToken('')
+      resetForm()
       queryClient.invalidateQueries({ queryKey: queryKeys.ciSources.all })
     },
+  })
+
+  const verifyMutation = useMutation({
+    mutationFn: (id: string) => api.verifyCISource(id),
+    onSuccess: (res, id) => setVerifyResult((prev) => ({ ...prev, [id]: res })),
+    onError: (err, id) => setVerifyResult((prev) => ({ ...prev, [id]: { ok: false, error: apiErr(err) } })),
   })
 
   const deleteMutation = useMutation({
@@ -656,8 +681,10 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
   const valid =
     Boolean(name.trim()) &&
     Boolean(organization.trim()) &&
-    Boolean(token) &&
-    (provider !== 'azure_devops' || Boolean(project.trim()))
+    (provider !== 'azure_devops' || Boolean(project.trim())) &&
+    (appAuth
+      ? Boolean(tenantId.trim()) && Boolean(clientId.trim()) && Boolean(clientSecret)
+      : Boolean(token))
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -670,19 +697,39 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
 
           {sourcesQuery.isLoading && <CircularProgress size={20} />}
           {(sourcesQuery.data ?? []).map((s) => (
-            <Stack key={s.id} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-              <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
-                {s.name}
-              </Typography>
-              <Chip size="small" label={s.provider === 'azure_devops' ? 'Azure DevOps' : 'GitHub'} />
-              <Chip
-                size="small"
-                variant="outlined"
-                label={s.provider === 'azure_devops' ? `${s.organization}/${s.project ?? ''}` : s.organization}
-              />
-              <IconButton size="small" aria-label="delete CI source" onClick={() => setDeleteTarget(s)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
+            <Stack key={s.id} spacing={0.5}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                <Typography variant="body2" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
+                  {s.name}
+                </Typography>
+                <Chip size="small" label={s.provider === 'azure_devops' ? 'Azure DevOps' : 'GitHub'} />
+                {s.auth_method === 'app' && <Chip size="small" color="primary" variant="outlined" label="App" />}
+                <Chip
+                  size="small"
+                  variant="outlined"
+                  label={s.provider === 'azure_devops' ? `${s.organization}/${s.project ?? ''}` : s.organization}
+                />
+                <Button
+                  size="small"
+                  onClick={() => verifyMutation.mutate(s.id)}
+                  disabled={verifyMutation.isPending && verifyMutation.variables === s.id}
+                >
+                  {t('pages.drift.testConnection')}
+                </Button>
+                <IconButton size="small" aria-label="delete CI source" onClick={() => setDeleteTarget(s)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Stack>
+              {verifyResult[s.id] &&
+                (verifyResult[s.id].ok ? (
+                  <Alert severity="success" sx={{ py: 0 }}>
+                    {t('pages.drift.testConnectionOk')}
+                  </Alert>
+                ) : (
+                  <Alert severity="error" sx={{ py: 0 }}>
+                    {verifyResult[s.id].error}
+                  </Alert>
+                ))}
             </Stack>
           ))}
           {sourcesQuery.data && sourcesQuery.data.length === 0 && (
@@ -705,14 +752,54 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
           {provider === 'azure_devops' && (
             <TextField label={t('pages.drift.project')} value={project} onChange={(e) => setProject(e.target.value)} fullWidth />
           )}
-          <TextField
-            label={t('pages.drift.apiToken')}
-            type="password"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-            helperText={t('pages.drift.sourceTokenHelp')}
-            fullWidth
-          />
+          {provider === 'azure_devops' && (
+            <TextField
+              select
+              label={t('pages.drift.authMethod')}
+              value={authMethod}
+              onChange={(e) => setAuthMethod(e.target.value as 'pat' | 'app')}
+              fullWidth
+            >
+              <MenuItem value="pat">{t('pages.drift.authMethodPat')}</MenuItem>
+              <MenuItem value="app">{t('pages.drift.authMethodApp')}</MenuItem>
+            </TextField>
+          )}
+          {appAuth ? (
+            <>
+              <Typography variant="caption" color="text.secondary">
+                {t('pages.drift.appAuthHelp')}
+              </Typography>
+              <TextField
+                label={t('pages.drift.tenantId')}
+                value={tenantId}
+                onChange={(e) => setTenantId(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={t('pages.drift.clientId')}
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+                fullWidth
+              />
+              <TextField
+                label={t('pages.drift.clientSecret')}
+                type="password"
+                value={clientSecret}
+                onChange={(e) => setClientSecret(e.target.value)}
+                helperText={t('pages.drift.clientSecretHelp')}
+                fullWidth
+              />
+            </>
+          ) : (
+            <TextField
+              label={t('pages.drift.apiToken')}
+              type="password"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              helperText={t('pages.drift.sourceTokenHelp')}
+              fullWidth
+            />
+          )}
           {createMutation.isError && <Alert severity="error">{apiErr(createMutation.error)}</Alert>}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
