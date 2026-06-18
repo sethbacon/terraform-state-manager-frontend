@@ -7,6 +7,8 @@ export const queryKeys = {
   },
   dashboard: {
     overview: () => ['dashboard', 'overview'] as const,
+    statesByVersion: (version: string, op: string) =>
+      ['dashboard', 'states-by-version', version, op] as const,
   },
   admin: {
     stats: () => ['admin', 'stats'] as const,
