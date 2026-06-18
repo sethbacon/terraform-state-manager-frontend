@@ -279,7 +279,11 @@ describe('sources + state read plane', () => {
   it('downloadReport derives the filename from Content-Disposition and clicks a link', async () => {
     const createObjectURL = vi.fn(() => 'blob:fake')
     const revokeObjectURL = vi.fn()
-    vi.stubGlobal('URL', Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }))
+    // Subclass URL (rather than Object.create) so it stays constructable: the
+    // anchor's link.click() triggers happy-dom navigation that calls `new URL`
+    // on a microtask; a non-constructable stub leaks an unhandled TypeError that
+    // fails the run under --coverage.
+    vi.stubGlobal('URL', Object.assign(class extends URL { }, { createObjectURL, revokeObjectURL }))
 
     get.mockReturnValue(ok(new Blob(['x']), { 'content-disposition': 'attachment; filename="report.pdf"' }))
     await api.downloadReport('s1', 'k', 'pdf' as Parameters<typeof api.downloadReport>[2])
@@ -470,7 +474,7 @@ describe('pipelines + CI sources', () => {
     expect(config.responseType).toBe('text')
 
     expect(await api.getHealthWorkflow('github')).toBe('yaml: content')
-    ;[url, config] = get.mock.calls.slice(-1)[0] as [string, { params: unknown; responseType: string }]
+      ;[url, config] = get.mock.calls.slice(-1)[0] as [string, { params: unknown; responseType: string }]
     expect(url).toBe('/api/v1/health-lab/workflow')
     expect(config.params).toEqual({ provider: 'github', profile: 'default' })
   })
