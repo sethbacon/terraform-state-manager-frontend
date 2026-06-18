@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.8.0...v1.9.0) (2026-06-18)
+
+
+### Features
+
+* **dashboard:** export filtered version states as CSV ([#106](https://github.com/sethbacon/terraform-state-manager-frontend/issues/106)) ([6ac172e](https://github.com/sethbacon/terraform-state-manager-frontend/commit/6ac172eb5a10566d7a34b3d11f37bb761d2436a0))
+
 ## [1.8.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.7.1...v1.8.0) (2026-06-18)
 
 
