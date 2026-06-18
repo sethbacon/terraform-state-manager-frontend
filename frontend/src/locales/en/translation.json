@@ -393,6 +393,7 @@
       "versionStatesEmpty": "No state files match this version filter.",
       "versionStatesCount_one": "{{count}} state file",
       "versionStatesCount_other": "{{count}} state files",
+      "versionExportCsv": "Export CSV",
       "versionStateRum": "RUM {{count}}",
       "versionUnknown": "unknown",
       "versionOpAria": "Version comparison",

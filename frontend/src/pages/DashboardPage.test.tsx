@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DashboardPage from './DashboardPage'
+import { versionStatesToCsv } from './DashboardPage'
 import { api } from '../services/api'
 import i18n from '../i18n'
 
@@ -167,5 +168,32 @@ describe('DashboardPage', () => {
     mocked.getDashboardOverview.mockRejectedValue(new Error('boom'))
     renderPage()
     expect(await screen.findByText(i18n.t('common.error') as string)).toBeInTheDocument()
+  })
+})
+
+describe('versionStatesToCsv', () => {
+  it('emits a header row and one row per state in column order', () => {
+    const csv = versionStatesToCsv([
+      { source_id: 's1', source_name: 'prod', state_key: 'app.tfstate', terraform_version: '0.14.11', rum: 12 },
+      { source_id: 's2', source_name: 'dev', state_key: 'net.tfstate', terraform_version: '', rum: 0 },
+    ])
+    const lines = csv.split('\n')
+    expect(lines[0]).toBe('source_name,source_id,state_key,terraform_version,rum')
+    expect(lines[1]).toBe('"prod","s1","app.tfstate","0.14.11","12"')
+    // Empty version stays an empty quoted field; RUM 0 is preserved.
+    expect(lines[2]).toBe('"dev","s2","net.tfstate","","0"')
+    expect(lines).toHaveLength(3)
+  })
+
+  it('escapes embedded quotes and commas so fields stay intact', () => {
+    const csv = versionStatesToCsv([
+      { source_id: 'id,1', source_name: 'a"b', state_key: 'env/"prod",main', terraform_version: '1.5.7', rum: 3 },
+    ])
+    // Quotes are doubled; commas live safely inside the quoted fields.
+    expect(csv.split('\n')[1]).toBe('"a""b","id,1","env/""prod"",main","1.5.7","3"')
+  })
+
+  it('returns just the header when there are no states', () => {
+    expect(versionStatesToCsv([])).toBe('source_name,source_id,state_key,terraform_version,rum')
   })
 })
