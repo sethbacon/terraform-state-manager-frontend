@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Alert,
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
@@ -25,6 +26,7 @@ import {
 import RefreshIcon from '@mui/icons-material/Refresh'
 import StorageIcon from '@mui/icons-material/Storage'
 import CloseIcon from '@mui/icons-material/Close'
+import DownloadIcon from '@mui/icons-material/Download'
 import {
   Bar,
   BarChart,
@@ -339,6 +341,33 @@ function symbolForOp(op: VersionFilterOp): string {
   return VERSION_OPS.find((v) => v.op === op)?.symbol ?? '='
 }
 
+// Serialize the drawer's currently listed states to a CSV body. Exported for
+// unit testing; exportVersionStatesCSV wraps it with the browser download.
+export function versionStatesToCsv(states: VersionStateRef[]): string {
+  const header = ['source_name', 'source_id', 'state_key', 'terraform_version', 'rum']
+  const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
+  const rows = states.map((s) =>
+    [s.source_name, s.source_id, s.state_key, s.terraform_version, s.rum].map(esc).join(','),
+  )
+  return [header.join(','), ...rows].join('\n')
+}
+
+// Trigger a browser download of the listed states via a temporary blob URL
+// (same client-side pattern as the audit-log export). The filename carries the
+// active filter so multiple exports stay distinct.
+function exportVersionStatesCSV(states: VersionStateRef[], op: VersionFilterOp, version: string) {
+  const slug = `${op}-${version || 'unknown'}`.replace(/[^a-zA-Z0-9._-]+/g, '_')
+  const blob = new Blob([versionStatesToCsv(states)], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `state-files-${slug}.csv`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
 /**
  * Side drawer listing the state files behind a clicked Terraform-version bar.
  * The operator toggle broadens the exact match to a semver range (e.g. < 1.0.0);
@@ -430,9 +459,18 @@ function VersionStatesDrawer({
 
         {states.length > 0 && (
           <>
-            <Typography variant="caption" color="text.secondary">
-              {t('pages.dashboard.versionStatesCount', { count: states.length })}
-            </Typography>
+            <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ flexGrow: 1 }}>
+                {t('pages.dashboard.versionStatesCount', { count: states.length })}
+              </Typography>
+              <Button
+                size="small"
+                startIcon={<DownloadIcon fontSize="small" />}
+                onClick={() => exportVersionStatesCSV(states, op, version ?? '')}
+              >
+                {t('pages.dashboard.versionExportCsv')}
+              </Button>
+            </Stack>
             <List dense disablePadding sx={{ overflow: 'auto' }}>
               {states.map((s) => (
                 <ListItemButton key={`${s.source_id}:${s.state_key}`} onClick={() => openInSources(s)}>
