@@ -65,7 +65,7 @@ beforeEach(() => {
 
 describe('DashboardPage', () => {
   it('shows a skeleton while loading', () => {
-    mocked.getDashboardOverview.mockReturnValue(new Promise(() => {}))
+    mocked.getDashboardOverview.mockReturnValue(new Promise(() => { }))
     renderPage()
     expect(screen.getByTestId('card-grid-skeleton')).toBeInTheDocument()
   })

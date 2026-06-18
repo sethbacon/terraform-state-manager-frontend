@@ -35,6 +35,7 @@ const MTLSPage = lazy(() => import('./pages/admin/MTLSPage'))
 const SSOPage = lazy(() => import('./pages/admin/SSOPage'))
 const NotificationsPage = lazy(() => import('./pages/admin/NotificationsPage'))
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
+const CITemplatesPage = lazy(() => import('./pages/admin/CITemplatesPage'))
 
 // Routes backed by a real page (home is mounted separately at '/').
 const realPages: Record<string, ReactNode> = {
@@ -55,6 +56,7 @@ const realPages: Record<string, ReactNode> = {
   '/admin/sso': <SSOPage />,
   '/admin/notifications': <NotificationsPage />,
   '/admin/audit-logs': <AuditLogPage />,
+  '/admin/ci-templates': <CITemplatesPage />,
 }
 
 const queryClient = new QueryClient({

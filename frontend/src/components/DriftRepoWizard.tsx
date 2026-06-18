@@ -80,6 +80,8 @@ export default function DriftRepoWizard({
   const [includeVersionLab, setIncludeVersionLab] = useState(false)
   const [dispatchFirstRun, setDispatchFirstRun] = useState(true)
   const [firstRun, setFirstRun] = useState<'dispatched' | string | null>(null)
+  // Operator edits to the served drift template (null = use the auto-customized one).
+  const [editedDrift, setEditedDrift] = useState<string | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.ciSources.list(), queryFn: api.listCISources, enabled: open })
   const source = sourcesQuery.data?.find((s) => s.id === sourceId) ?? null
@@ -120,7 +122,7 @@ export default function DriftRepoWizard({
   // Phase 2: commit the workflow via branch + PR through the provider API.
   const setupMutation = useMutation({
     mutationFn: () => {
-      const files: { kind: 'drift' | 'versionlab'; content: string }[] = [{ kind: 'drift', content: template }]
+      const files: { kind: 'drift' | 'versionlab'; content: string }[] = [{ kind: 'drift', content: effectiveTemplate }]
       if (includeVersionLab) files.push({ kind: 'versionlab', content: healthTemplate })
       return api.setupCISourceWorkflow(sourceId, (isADO ? repo?.id : repo?.name) ?? '', files)
     },
@@ -161,6 +163,10 @@ export default function DriftRepoWizard({
     [templateQuery.data, source?.provider, workingDir, serviceConnection],
   )
 
+  // What is copied/committed: the operator's edit if they made one, else the
+  // auto-customized template. This is the "edit the template before commit" path.
+  const effectiveTemplate = editedDrift ?? template
+
   const healthTemplate = useMemo(
     () =>
       customizeTemplate(
@@ -190,6 +196,7 @@ export default function DriftRepoWizard({
     setIncludeVersionLab(false)
     setDispatchFirstRun(true)
     setFirstRun(null)
+    setEditedDrift(null)
   }
 
   const close = () => {
@@ -466,7 +473,7 @@ export default function DriftRepoWizard({
                   size="small"
                   startIcon={<ContentCopyIcon />}
                   onClick={() => {
-                    void navigator.clipboard.writeText(template)
+                    void navigator.clipboard.writeText(effectiveTemplate)
                     setCopied(true)
                   }}
                 >
@@ -483,13 +490,20 @@ export default function DriftRepoWizard({
                   {t('pages.drift.wizard.commitViaPR')}
                 </Button>
               </Stack>
-              <Paper variant="outlined" sx={{ p: 1.5, maxHeight: 320, overflow: 'auto' }}>
-                {templateQuery.isLoading ? (
-                  <CircularProgress size={20} />
-                ) : (
-                  <pre style={{ margin: 0, fontSize: '0.75rem', whiteSpace: 'pre' }}>{template}</pre>
-                )}
-              </Paper>
+              {templateQuery.isLoading ? (
+                <CircularProgress size={20} />
+              ) : (
+                <TextField
+                  value={effectiveTemplate}
+                  onChange={(e) => setEditedDrift(e.target.value)}
+                  multiline
+                  minRows={8}
+                  maxRows={18}
+                  fullWidth
+                  disabled={Boolean(setup)}
+                  sx={{ '& textarea': { fontFamily: 'monospace', fontSize: '0.75rem', whiteSpace: 'pre' } }}
+                />
+              )}
             </Box>
             {includeVersionLab && (
               <Box>

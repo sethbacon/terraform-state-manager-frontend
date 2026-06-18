@@ -1015,10 +1015,10 @@ export const api = {
   },
   testNotificationChannel: async (id: string): Promise<{ status: string }> =>
     (await apiClient.post<{ status: string }>(`/api/v1/notifications/channels/${id}/test`)).data,
-  getDriftWorkflow: async (provider: string): Promise<string> =>
+  getDriftWorkflow: async (provider: string, profile = 'default'): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/drift/workflow', {
-        params: { provider },
+        params: { provider, profile },
         responseType: 'text',
         transformResponse: (d) => d as string,
       })
@@ -1029,12 +1029,49 @@ export const api = {
     (await apiClient.get<{ runs: HealthRun[] }>('/api/v1/health-lab/runs')).data.runs,
   createHealthRun: async (input: CreateHealthRunInput): Promise<HealthRun> =>
     (await apiClient.post<HealthRun>('/api/v1/health-lab/runs', input)).data,
-  getHealthWorkflow: async (provider: string): Promise<string> =>
+  getHealthWorkflow: async (provider: string, profile = 'default'): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/health-lab/workflow', {
-        params: { provider },
+        params: { provider, profile },
         responseType: 'text',
         transformResponse: (d) => d as string,
       })
     ).data,
+
+  // CI workflow templates (admin: operator edit/add/replace of drift/version-lab YAML)
+  listCITemplates: async (): Promise<CITemplate[]> =>
+    (await apiClient.get<{ templates: CITemplate[] }>('/api/v1/admin/ci/templates')).data.templates,
+  createCITemplate: async (input: CITemplateInput): Promise<CITemplate> =>
+    (await apiClient.post<CITemplate>('/api/v1/admin/ci/templates', input)).data,
+  updateCITemplate: async (id: string, input: CITemplateEdit): Promise<CITemplate> =>
+    (await apiClient.put<CITemplate>(`/api/v1/admin/ci/templates/${id}`, input)).data,
+  deleteCITemplate: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/ci/templates/${id}`)
+  },
 }
+
+/** A stored, operator-managed CI workflow template, keyed by (provider, kind, profile). */
+export interface CITemplate {
+  id: string
+  provider: string
+  kind: string
+  profile: string
+  name: string
+  description: string
+  content: string
+  is_builtin: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CITemplateInput {
+  provider: string
+  kind: string
+  profile: string
+  name: string
+  description?: string
+  content: string
+}
+
+/** The editable fields of a template; the (provider, kind, profile) key is immutable. */
+export type CITemplateEdit = Pick<CITemplate, 'name' | 'description' | 'content'>
