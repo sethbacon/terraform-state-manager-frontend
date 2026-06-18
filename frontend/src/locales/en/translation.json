@@ -46,7 +46,9 @@
       "mtls": "mTLS Certificates",
       "mtlsTooltip": "Client-certificate subject to scope mappings",
       "apiKeys": "API keys",
-      "apiKeysTooltip": "Create and manage API keys for CI and scripts"
+      "apiKeysTooltip": "Create and manage API keys for CI and scripts",
+      "ciTemplates": "CI Templates",
+      "ciTemplatesTooltip": "Edit, add, or replace drift and version-lab pipeline templates"
     }
   },
   "common": {
@@ -366,6 +368,42 @@
     "newTransfer": "New transfer"
   },
   "pages": {
+    "ciTemplates": {
+      "pageTitle": "CI Templates",
+      "pageSubtitle": "Edit, add, or replace the drift and version-lab pipeline templates served to the repo wizard. The 'default' profile of each provider/kind falls back to the built-in when absent.",
+      "addTemplate": "Add template",
+      "emptyState": "No CI templates yet.",
+      "createFirst": "Add your first template",
+      "thProvider": "Provider",
+      "thKind": "Kind",
+      "thProfile": "Profile",
+      "thName": "Name",
+      "thActions": "Actions",
+      "builtinChip": "built-in",
+      "builtinNoDelete": "Built-in templates cannot be deleted",
+      "tooltipEdit": "Edit template",
+      "tooltipDelete": "Delete template",
+      "ariaEdit": "Edit template",
+      "ariaDelete": "Delete template",
+      "dialogTitleAdd": "Add CI template",
+      "dialogTitleEdit": "Edit CI template",
+      "dialogTitleDelete": "Delete template",
+      "confirmDelete": "Delete template \"{{name}}\"? This cannot be undone.",
+      "labelProvider": "Provider",
+      "labelKind": "Kind",
+      "labelProfile": "Profile",
+      "labelName": "Name",
+      "labelDescription": "Description",
+      "labelContent": "Template (YAML)",
+      "helpProfile": "Lowercase id, e.g. brunswick-azure. Letters, digits, dot, dash, underscore.",
+      "cancel": "Cancel",
+      "create": "Create",
+      "save": "Save",
+      "delete": "Delete",
+      "errSave": "Failed to save the template.",
+      "errDelete": "Failed to delete the template.",
+      "errProfile": "Profile must match [A-Za-z0-9._-]+"
+    },
     "apiDocs": {
       "sections": "Sections"
     },

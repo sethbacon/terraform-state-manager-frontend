@@ -466,13 +466,13 @@ describe('pipelines + CI sources', () => {
     expect(await api.getDriftWorkflow('azuredevops')).toBe('yaml: content')
     let [url, config] = get.mock.calls.slice(-1)[0] as [string, { params: unknown; responseType: string }]
     expect(url).toBe('/api/v1/drift/workflow')
-    expect(config.params).toEqual({ provider: 'azuredevops' })
+    expect(config.params).toEqual({ provider: 'azuredevops', profile: 'default' })
     expect(config.responseType).toBe('text')
 
     expect(await api.getHealthWorkflow('github')).toBe('yaml: content')
     ;[url, config] = get.mock.calls.slice(-1)[0] as [string, { params: unknown; responseType: string }]
     expect(url).toBe('/api/v1/health-lab/workflow')
-    expect(config.params).toEqual({ provider: 'github' })
+    expect(config.params).toEqual({ provider: 'github', profile: 'default' })
   })
 })
 
