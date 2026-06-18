@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.7.0...v1.7.1) (2026-06-18)
+
+
+### Bug Fixes
+
+* **dashboard:** show category label in bar chart tooltips ([#101](https://github.com/sethbacon/terraform-state-manager-frontend/issues/101)) ([16e583d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/16e583d0617024bb9d226b7851d79fb262529840))
+
 ## [1.7.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.6.1...v1.7.0) (2026-06-18)
 
 
