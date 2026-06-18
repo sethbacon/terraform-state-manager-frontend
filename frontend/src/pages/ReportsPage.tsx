@@ -1,33 +1,50 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
-  Autocomplete,
   Alert,
+  Autocomplete,
   Box,
   Button,
   Card,
   CardContent,
   CircularProgress,
-  Divider,
-  MenuItem,
+  Collapse,
   Stack,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import DownloadIcon from '@mui/icons-material/Download'
-import { useTranslation } from 'react-i18next'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import PageHeader from '../components/PageHeader'
-import { api, type ReportFormat } from '../services/api'
+import { api, type ReportFilters, type ReportFormat, type ReportStateRow, type VersionFilterOp } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
 function apiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
 }
+
+// Operator toggle, ascending so it reads older → newer. Meanings reuse the
+// version drill-down's translated labels; symbols are intentionally untranslated.
+const VERSION_OPS: { op: VersionFilterOp; symbol: string; labelKey: string }[] = [
+  { op: 'eq', symbol: '=', labelKey: 'pages.dashboard.versionOpEq' },
+  { op: 'lte', symbol: '≤', labelKey: 'pages.dashboard.versionOpLte' },
+  { op: 'lt', symbol: '<', labelKey: 'pages.dashboard.versionOpLt' },
+  { op: 'gte', symbol: '≥', labelKey: 'pages.dashboard.versionOpGte' },
+  { op: 'gt', symbol: '>', labelKey: 'pages.dashboard.versionOpGt' },
+]
 
 const FORMATS: { value: ReportFormat; label: string }[] = [
   { value: 'md', label: 'Markdown' },
@@ -35,161 +52,403 @@ const FORMATS: { value: ReportFormat; label: string }[] = [
   { value: 'csv', label: 'CSV' },
 ]
 
+type SortKey =
+  | 'source_name'
+  | 'state_key'
+  | 'terraform_version'
+  | 'rum'
+  | 'managed_resources'
+  | 'data_sources'
+  | 'total_resources'
+  | 'size'
+  | 'analyzed_at'
+
+// useDebounced delays propagating filter edits so typing doesn't fire a request
+// per keystroke. The initial value passes through immediately.
+function useDebounced<T>(value: T, ms: number): T {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), ms)
+    return () => clearTimeout(id)
+  }, [value, ms])
+  return debounced
+}
+
 export default function ReportsPage() {
   const { t } = useTranslation()
-  const [sourceId, setSourceId] = useState('')
-  const [stateKey, setStateKey] = useState('')
+  const navigate = useNavigate()
+  const [draft, setDraft] = useState<ReportFilters>({})
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>('rum')
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [downloading, setDownloading] = useState<ReportFormat | null>(null)
-  const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [exportError, setExportError] = useState<string | null>(null)
+
+  const applied = useDebounced(draft, 350)
+  const filterKey = useMemo(() => JSON.stringify(applied), [applied])
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
-  const statesQuery = useQuery({
-    queryKey: queryKeys.sources.states(sourceId),
-    queryFn: () => api.listStates(sourceId),
-    enabled: Boolean(sourceId),
-  })
-  const analysisQuery = useQuery({
-    queryKey: queryKeys.sources.analysis(sourceId, stateKey),
-    queryFn: () => api.analyzeState(sourceId, stateKey),
-    enabled: Boolean(sourceId && stateKey),
-  })
+  const sources = sourcesQuery.data ?? []
 
-  const onPickSource = (id: string) => {
-    setSourceId(id)
-    setStateKey('')
-    setDownloadError(null)
+  const reportQuery = useQuery({
+    queryKey: queryKeys.reports.states(filterKey),
+    queryFn: () => api.listReportStates(applied),
+    placeholderData: keepPreviousData,
+  })
+  const data = reportQuery.data
+
+  const set = (patch: Partial<ReportFilters>) => setDraft((d) => ({ ...d, ...patch }))
+  const resetFilters = () => {
+    setDraft({})
+    setExportError(null)
   }
 
-  const download = async (format: ReportFormat) => {
-    setDownloadError(null)
+  const sortedRows = useMemo(() => {
+    const rows = [...(data?.states ?? [])]
+    rows.sort((a, b) => {
+      const av = a[sortKey]
+      const bv = b[sortKey]
+      const cmp = typeof av === 'number' && typeof bv === 'number' ? av - bv : String(av).localeCompare(String(bv))
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return rows
+  }, [data, sortKey, sortDir])
+
+  const toggleSort = (key: SortKey) => {
+    if (key === sortKey) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir(key === 'state_key' || key === 'source_name' ? 'asc' : 'desc')
+    }
+  }
+
+  const openInSources = (row: ReportStateRow) => {
+    const params = new URLSearchParams({ source: row.source_id, state: row.state_key })
+    navigate(`/sources?${params.toString()}`)
+  }
+
+  const handleExport = async (format: ReportFormat) => {
+    setExportError(null)
     setDownloading(format)
     try {
-      await api.downloadReport(sourceId, stateKey, format)
+      await api.downloadStatesReport(applied, format)
     } catch (e) {
-      setDownloadError(apiErr(e))
+      setExportError(apiErr(e))
     } finally {
       setDownloading(null)
     }
   }
 
-  const a = analysisQuery.data?.analysis
+  const total = data?.total ?? 0
 
   return (
     <Box>
-      <PageHeader title={t('nav.reports')} description={t('help.pages.reports.body')} />
+      <PageHeader title={t('nav.reports')} description={t('pages.reports.description')} />
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3, maxWidth: 760 }}>
-        <TextField select label={t('pages.reports.source')} value={sourceId} onChange={(e) => onPickSource(e.target.value)} fullWidth>
-          {(sourcesQuery.data ?? []).map((s) => (
-            <MenuItem key={s.id} value={s.id}>
-              {s.name} ({s.type})
-            </MenuItem>
-          ))}
-        </TextField>
-        <Autocomplete
-          options={statesQuery.data ?? []}
-          loading={statesQuery.isLoading}
-          getOptionLabel={(st) => st.name || st.key}
-          value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
-          onChange={(_, v) => setStateKey(v?.key ?? '')}
-          disabled={!sourceId || statesQuery.isLoading}
-          fullWidth
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              label={t('pages.reports.stateFile')}
-              helperText={sourceId && statesQuery.data?.length === 0 ? t('pages.reports.noStates') : ' '}
+      <Card variant="outlined" sx={{ mb: 2 }}>
+        <CardContent>
+          <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
+            {t('pages.reports.filters')}
+          </Typography>
+          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
+            <Autocomplete
+              multiple
+              size="small"
+              options={sources}
+              getOptionLabel={(s) => s.name}
+              value={sources.filter((s) => (draft.sourceIds ?? []).includes(s.id))}
+              onChange={(_, v) => set({ sourceIds: v.map((s) => s.id) })}
+              renderInput={(params) => (
+                <TextField {...params} label={t('pages.reports.sources')} placeholder={t('pages.reports.allSources')} />
+              )}
             />
-          )}
-        />
-      </Stack>
+            <TextField
+              size="small"
+              label={t('pages.reports.searchKey')}
+              value={draft.q ?? ''}
+              onChange={(e) => set({ q: e.target.value })}
+            />
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <TextField
+                size="small"
+                label={t('pages.reports.version')}
+                value={draft.version ?? ''}
+                onChange={(e) => set({ version: e.target.value })}
+                sx={{ flexGrow: 1 }}
+              />
+              <ToggleButtonGroup
+                size="small"
+                exclusive
+                value={draft.op ?? 'eq'}
+                onChange={(_, v: VersionFilterOp | null) => v && set({ op: v })}
+                aria-label={t('pages.reports.versionOpAria')}
+              >
+                {VERSION_OPS.map(({ op, symbol, labelKey }) => (
+                  <Tooltip key={op} title={t(labelKey)}>
+                    <ToggleButton value={op} aria-label={t(labelKey)}>
+                      {symbol}
+                    </ToggleButton>
+                  </Tooltip>
+                ))}
+              </ToggleButtonGroup>
+            </Stack>
+            <Stack direction="row" spacing={1}>
+              <TextField
+                size="small"
+                label={t('pages.reports.provider')}
+                value={draft.provider ?? ''}
+                onChange={(e) => set({ provider: e.target.value })}
+                fullWidth
+              />
+              <TextField
+                size="small"
+                label={t('pages.reports.resourceType')}
+                value={draft.resourceType ?? ''}
+                onChange={(e) => set({ resourceType: e.target.value })}
+                fullWidth
+              />
+            </Stack>
+          </Box>
 
-      {!sourceId && <Alert severity="info">{t('pages.reports.chooseSource')}</Alert>}
+          <Button
+            size="small"
+            sx={{ mt: 1 }}
+            startIcon={advancedOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            onClick={() => setAdvancedOpen((o) => !o)}
+          >
+            {t('pages.reports.advanced')}
+          </Button>
+          <Collapse in={advancedOpen}>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                mt: 1,
+              }}
+            >
+              <NumberRange
+                label={t('pages.reports.rumRange')}
+                min={draft.rumMin}
+                max={draft.rumMax}
+                onMin={(v) => set({ rumMin: v })}
+                onMax={(v) => set({ rumMax: v })}
+              />
+              <NumberRange
+                label={t('pages.reports.managedRange')}
+                min={draft.managedMin}
+                max={draft.managedMax}
+                onMin={(v) => set({ managedMin: v })}
+                onMax={(v) => set({ managedMax: v })}
+              />
+              <NumberRange
+                label={t('pages.reports.dataRange')}
+                min={draft.dataMin}
+                max={draft.dataMax}
+                onMin={(v) => set({ dataMin: v })}
+                onMax={(v) => set({ dataMax: v })}
+              />
+              <NumberRange
+                label={t('pages.reports.totalRange')}
+                min={draft.totalMin}
+                max={draft.totalMax}
+                onMin={(v) => set({ totalMin: v })}
+                onMax={(v) => set({ totalMax: v })}
+              />
+              <NumberRange
+                label={t('pages.reports.sizeRange')}
+                min={draft.sizeMin}
+                max={draft.sizeMax}
+                onMin={(v) => set({ sizeMin: v })}
+                onMax={(v) => set({ sizeMax: v })}
+              />
+            </Box>
+          </Collapse>
 
-      {sourceId && stateKey && (
-        <Stack spacing={2}>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap' }}>
+          <Stack direction="row" spacing={1} sx={{ mt: 1.5, flexWrap: 'wrap' }} useFlexGap>
+            <Button size="small" onClick={resetFilters}>
+              {t('pages.reports.reset')}
+            </Button>
+            <Box sx={{ flexGrow: 1 }} />
             {FORMATS.map((f) => (
               <Button
                 key={f.value}
                 variant="outlined"
+                size="small"
                 startIcon={downloading === f.value ? <CircularProgress size={16} /> : <DownloadIcon />}
-                disabled={downloading !== null || analysisQuery.isLoading}
-                onClick={() => download(f.value)}
+                disabled={downloading !== null || total === 0}
+                onClick={() => handleExport(f.value)}
               >
                 {f.label}
               </Button>
             ))}
           </Stack>
-          {downloadError && <Alert severity="error">{downloadError}</Alert>}
-
-          {analysisQuery.isLoading && <CircularProgress size={20} />}
-          {analysisQuery.isError && <Alert severity="error">{apiErr(analysisQuery.error)}</Alert>}
-          {a && (
-            <>
-              <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}>
-                {[
-                  { label: 'RUM', value: a.rum },
-                  { label: 'Managed', value: a.managed_resources },
-                  { label: 'Data sources', value: a.data_sources },
-                  { label: 'Total instances', value: a.total_resources },
-                  { label: 'Terraform', value: a.terraform_version || '—' },
-                  { label: 'Serial', value: a.serial },
-                ].map((s) => (
-                  <Card key={s.label} variant="outlined">
-                    <CardContent sx={{ py: 1.5 }}>
-                      <Typography variant="overline" color="text.secondary">
-                        {s.label}
-                      </Typography>
-                      <Typography variant="h6">{s.value}</Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Box>
-              <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
-                <BreakdownTable title={t('pages.reports.topResourceTypes')} rows={a.resource_types.slice(0, 10)} />
-                <BreakdownTable title={t('pages.reports.providers')} rows={a.providers} />
-              </Box>
-            </>
+          {exportError && (
+            <Alert severity="error" sx={{ mt: 1 }} onClose={() => setExportError(null)}>
+              {exportError}
+            </Alert>
           )}
-        </Stack>
-      )}
-    </Box>
-  )
-}
+        </CardContent>
+      </Card>
 
-function BreakdownTable({ title, rows }: { title: string; rows: { key: string; count: number }[] }) {
-  const { t } = useTranslation()
-  return (
-    <Card variant="outlined">
-      <CardContent>
-        <Typography variant="subtitle1" sx={{ mb: 1 }}>
-          {title}
-        </Typography>
-        <Divider sx={{ mb: 1 }} />
-        {rows.length === 0 ? (
-          <Typography color="text.secondary" variant="body2">
-            None
-          </Typography>
-        ) : (
-          <Table size="small">
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 1.5,
+          gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))',
+          mb: 2,
+        }}
+      >
+        <SummaryCard label={t('pages.reports.matched')} value={data?.summary.matched ?? 0} />
+        <SummaryCard label={t('pages.reports.rum')} value={data?.summary.rum ?? 0} />
+        <SummaryCard label={t('pages.reports.managed')} value={data?.summary.managed_resources ?? 0} />
+        <SummaryCard label={t('pages.reports.dataSources')} value={data?.summary.data_sources ?? 0} />
+        <SummaryCard label={t('pages.reports.totalInstances')} value={data?.summary.total_resources ?? 0} />
+      </Box>
+
+      {reportQuery.isError && <Alert severity="error">{t('pages.reports.loadFailed')}</Alert>}
+
+      {data && data.truncated && (
+        <Alert severity="info" sx={{ mb: 1 }}>
+          {t('pages.reports.truncated', { shown: data.states.length, total: data.total })}
+        </Alert>
+      )}
+
+      <Card variant="outlined">
+        <TableContainer sx={{ maxHeight: 560 }}>
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>{t('common.name')}</TableCell>
-                <TableCell align="right">{t('pages.reports.count')}</TableCell>
+                <SortHeader label={t('pages.reports.colSource')} col="source_name" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colState')} col="state_key" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colVersion')} col="terraform_version" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colRum')} col="rum" align="right" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colManaged')} col="managed_resources" align="right" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colData')} col="data_sources" align="right" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colTotal')} col="total_resources" align="right" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colSize')} col="size" align="right" {...{ sortKey, sortDir, toggleSort }} />
+                <SortHeader label={t('pages.reports.colAnalyzed')} col="analyzed_at" {...{ sortKey, sortDir, toggleSort }} />
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((r) => (
-                <TableRow key={r.key}>
-                  <TableCell sx={{ wordBreak: 'break-all' }}>{r.key}</TableCell>
-                  <TableCell align="right">{r.count}</TableCell>
+              {reportQuery.isLoading && (
+                <TableRow>
+                  <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
+                    <CircularProgress size={22} />
+                  </TableCell>
+                </TableRow>
+              )}
+              {!reportQuery.isLoading && sortedRows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={9} align="center" sx={{ py: 3 }}>
+                    <Typography color="text.secondary" variant="body2">
+                      {t('pages.reports.empty')}
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {sortedRows.map((r) => (
+                <TableRow
+                  key={`${r.source_id}:${r.state_key}`}
+                  hover
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => openInSources(r)}
+                >
+                  <TableCell>{r.source_name}</TableCell>
+                  <TableCell sx={{ wordBreak: 'break-all' }}>{r.state_key}</TableCell>
+                  <TableCell>{r.terraform_version || t('pages.reports.unknownVersion')}</TableCell>
+                  <TableCell align="right">{r.rum}</TableCell>
+                  <TableCell align="right">{r.managed_resources}</TableCell>
+                  <TableCell align="right">{r.data_sources}</TableCell>
+                  <TableCell align="right">{r.total_resources}</TableCell>
+                  <TableCell align="right">{(r.size / 1024).toFixed(1)} KB</TableCell>
+                  <TableCell>{r.analyzed_at ? new Date(r.analyzed_at).toLocaleDateString() : '—'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        )}
+        </TableContainer>
+      </Card>
+    </Box>
+  )
+}
+
+function SummaryCard({ label, value }: { label: string; value: number }) {
+  return (
+    <Card variant="outlined">
+      <CardContent sx={{ py: 1.5 }}>
+        <Typography variant="overline" color="text.secondary">
+          {label}
+        </Typography>
+        <Typography variant="h6">{value.toLocaleString()}</Typography>
       </CardContent>
     </Card>
+  )
+}
+
+function SortHeader({
+  label,
+  col,
+  align,
+  sortKey,
+  sortDir,
+  toggleSort,
+}: {
+  label: string
+  col: SortKey
+  align?: 'right'
+  sortKey: SortKey
+  sortDir: 'asc' | 'desc'
+  toggleSort: (k: SortKey) => void
+}) {
+  return (
+    <TableCell align={align} sortDirection={sortKey === col ? sortDir : false}>
+      <TableSortLabel active={sortKey === col} direction={sortKey === col ? sortDir : 'asc'} onClick={() => toggleSort(col)}>
+        {label}
+      </TableSortLabel>
+    </TableCell>
+  )
+}
+
+function NumberRange({
+  label,
+  min,
+  max,
+  onMin,
+  onMax,
+}: {
+  label: string
+  min?: number
+  max?: number
+  onMin: (v: number | undefined) => void
+  onMax: (v: number | undefined) => void
+}) {
+  const { t } = useTranslation()
+  const parse = (s: string) => (s === '' ? undefined : Number(s))
+  return (
+    <Box>
+      <Typography variant="caption" color="text.secondary">
+        {label}
+      </Typography>
+      <Stack direction="row" spacing={1} sx={{ mt: 0.5 }}>
+        <TextField
+          size="small"
+          type="number"
+          label={t('pages.reports.min')}
+          value={min ?? ''}
+          onChange={(e) => onMin(parse(e.target.value))}
+          fullWidth
+        />
+        <TextField
+          size="small"
+          type="number"
+          label={t('pages.reports.max')}
+          value={max ?? ''}
+          onChange={(e) => onMax(parse(e.target.value))}
+          fullWidth
+        />
+      </Stack>
+    </Box>
   )
 }

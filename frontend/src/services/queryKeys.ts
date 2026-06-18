@@ -10,6 +10,9 @@ export const queryKeys = {
     statesByVersion: (version: string, op: string) =>
       ['dashboard', 'states-by-version', version, op] as const,
   },
+  reports: {
+    states: (filterKey: string) => ['reports', 'states', filterKey] as const,
+  },
   admin: {
     stats: () => ['admin', 'stats'] as const,
     usersAll: ['admin', 'users'] as const,

@@ -211,7 +211,10 @@ describe('UsersPage', () => {
   it('exports user data as a download', async () => {
     const createObjectURL = vi.fn(() => 'blob:user')
     const revokeObjectURL = vi.fn()
-    vi.stubGlobal('URL', Object.assign(Object.create(URL), { createObjectURL, revokeObjectURL }))
+    // Subclass URL so it stays constructable: link.click() triggers happy-dom
+    // navigation that calls `new URL` on a microtask, which a plain object stub
+    // can't satisfy (leaks an unhandled TypeError under --coverage).
+    vi.stubGlobal('URL', Object.assign(class extends URL { }, { createObjectURL, revokeObjectURL }))
     mocked.exportAdminUserData.mockResolvedValue({ blob: new Blob(['{}']), filename: 'user-data-u1.json' })
 
     renderPage()
