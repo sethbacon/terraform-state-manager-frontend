@@ -29,6 +29,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import type { TooltipProps } from 'recharts'
 import { api, type Count } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import PageHeader from '../components/PageHeader'
@@ -225,9 +226,41 @@ function CountBarChart({ data, color }: { data: Count[]; color: string }) {
       <BarChart data={data} layout="vertical" margin={{ left: 24 }}>
         <XAxis type="number" allowDecimals={false} />
         <YAxis type="category" dataKey="key" width={120} tick={{ fontSize: 12 }} />
-        <RTooltip />
+        <RTooltip content={<CountTooltip />} />
         <Bar dataKey="count" fill={color} radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
+  )
+}
+
+/**
+ * Tooltip for the horizontal count bars. The category (e.g. Terraform version)
+ * is not always visible on the Y axis, so show it alongside the count rather
+ * than relying on recharts' default content, which only renders the value.
+ */
+function CountTooltip({ active, payload }: TooltipProps<number, string>) {
+  const { t } = useTranslation()
+  if (!active || !payload || payload.length === 0) return null
+  const datum = payload[0].payload as Count
+  return (
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        border: 1,
+        borderColor: 'divider',
+        borderRadius: 1,
+        boxShadow: 3,
+        px: 1.5,
+        py: 1,
+        maxWidth: 260,
+      }}
+    >
+      <Typography variant="body2" sx={{ fontWeight: 600, wordBreak: 'break-all' }}>
+        {datum.key}
+      </Typography>
+      <Typography variant="caption" color="text.secondary">
+        {t('pages.dashboard.count', { value: datum.count })}
+      </Typography>
+    </Box>
   )
 }
