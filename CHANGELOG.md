@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.7.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.6.1...v1.7.0) (2026-06-18)
+
+
+### Features
+
+* **drift:** app-registration auth option for Azure DevOps CI sources ([#97](https://github.com/sethbacon/terraform-state-manager-frontend/issues/97)) ([11bd06c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/11bd06c5761aa1622b4c7eb1aa071be7c7fed257))
+* **drift:** GitHub App auth option for GitHub CI sources ([#98](https://github.com/sethbacon/terraform-state-manager-frontend/issues/98)) ([c5da4ee](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c5da4eec08bd2d95c81d449b6f36719cb7221370))
+
+
+### Bug Fixes
+
+* name current tab so suite switcher reuses one sibling tab ([#95](https://github.com/sethbacon/terraform-state-manager-frontend/issues/95)) ([23a014f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/23a014fc2b46a622b875656a56561cab301d4d31))
+
+
+### Documentation
+
+* add frontend companion documentation ([#100](https://github.com/sethbacon/terraform-state-manager-frontend/issues/100)) ([70910aa](https://github.com/sethbacon/terraform-state-manager-frontend/commit/70910aa68fbb49700a36dda8aed17f48d60e9c06))
+* correct README tech-stack and deployment notes ([#99](https://github.com/sethbacon/terraform-state-manager-frontend/issues/99)) ([2bdd7b4](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2bdd7b4b6adf3287a48ffdcf35e34df1665576b2))
+
 ## [1.6.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.6.0...v1.6.1) (2026-06-17)
 
 
