@@ -25,6 +25,8 @@ export const queryKeys = {
     identityMappings: () => ['admin', 'identity-group-mappings'] as const,
     mtls: () => ['admin', 'mtls'] as const,
     notifications: () => ['admin', 'notifications'] as const,
+    ciTemplates: () => ['admin', 'ci-templates'] as const,
+    ciTemplate: (id: string) => ['admin', 'ci-templates', id] as const,
   },
   sources: {
     all: ['sources'] as const,

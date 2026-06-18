@@ -17,6 +17,7 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser'
 import NotificationsIcon from '@mui/icons-material/Notifications'
+import IntegrationInstructionsIcon from '@mui/icons-material/IntegrationInstructions'
 
 export interface NavItem {
   path: string
@@ -83,6 +84,7 @@ export const navGroups: NavGroup[] = [
     labelKey: 'nav.groups.system',
     items: [
       { path: '/admin/notifications', labelKey: 'nav.admin.notifications', tooltipKey: 'nav.admin.notificationsTooltip', icon: <NotificationsIcon />, scope: 'admin' },
+      { path: '/admin/ci-templates', labelKey: 'nav.admin.ciTemplates', tooltipKey: 'nav.admin.ciTemplatesTooltip', icon: <IntegrationInstructionsIcon />, scope: 'admin' },
       { path: '/admin/audit-logs', labelKey: 'nav.admin.auditLogs', tooltipKey: 'nav.admin.auditLogsTooltip', icon: <HistoryIcon />, scope: 'admin' },
     ],
   },
