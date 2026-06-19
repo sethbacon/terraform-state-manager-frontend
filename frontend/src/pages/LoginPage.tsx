@@ -81,7 +81,7 @@ export default function LoginPage() {
     )
   }
   if (isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/admin" replace />
   }
 
   const ssoProviders = providers.filter((p) => p.type !== 'ldap')

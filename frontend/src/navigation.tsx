@@ -96,7 +96,9 @@ export const adminDashboardItem: NavItem = {
   labelKey: 'nav.admin.dashboard',
   tooltipKey: 'nav.admin.dashboardTooltip',
   icon: <DashboardCustomizeIcon />,
-  scope: 'admin',
+  // The dashboard index shows the estate overview to any authenticated user; the
+  // identity counts inside are admin-gated. Child /admin/* pages stay admin-only.
+  scope: null,
 }
 
 // API docs — shown standalone directly under Home (always visible).

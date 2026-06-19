@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -23,7 +23,6 @@ import {
   Typography,
   useTheme,
 } from '@mui/material'
-import RefreshIcon from '@mui/icons-material/Refresh'
 import StorageIcon from '@mui/icons-material/Storage'
 import CloseIcon from '@mui/icons-material/Close'
 import DownloadIcon from '@mui/icons-material/Download'
@@ -39,33 +38,41 @@ import {
   YAxis,
 } from 'recharts'
 import type { TooltipProps } from 'recharts'
-import { api, type Count, type VersionFilterOp, type VersionStateRef } from '../services/api'
+import {
+  api,
+  type Count,
+  type DashboardOverview,
+  type VersionFilterOp,
+  type VersionStateRef,
+} from '../services/api'
 import { queryKeys } from '../services/queryKeys'
-import PageHeader from '../components/PageHeader'
-import DashboardCard from '../components/DashboardCard'
-import EmptyState from '../components/EmptyState'
-import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
+import DashboardCard from './DashboardCard'
+import EmptyState from './EmptyState'
+import CardGridSkeleton from './skeletons/CardGridSkeleton'
 
-export default function DashboardPage() {
+/**
+ * EstateOverview renders the cross-source Terraform estate metrics (RUM, provider
+ * and resource-type breakdowns, Terraform version spread, per-source sync state).
+ * It is presentational: the overview data + refresh are owned by the parent so the
+ * same metrics can compose into the authenticated dashboard. The version-bar
+ * drill-down drawer is self-contained.
+ */
+export default function EstateOverview({
+  data,
+  isLoading,
+  isError,
+}: {
+  data?: DashboardOverview
+  isLoading: boolean
+  isError: boolean
+}) {
   const { t } = useTranslation()
   const theme = useTheme()
   const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const q = useQuery({ queryKey: queryKeys.dashboard.overview(), queryFn: () => api.getDashboardOverview() })
-  const [refreshing, setRefreshing] = useState(false)
   // Click-a-version drill-down: the clicked Terraform version and the active
   // comparison operator drive the side drawer listing the matching states.
   const [versionFilter, setVersionFilter] = useState<string | null>(null)
   const [versionOp, setVersionOp] = useState<VersionFilterOp>('eq')
-  const forceRefresh = async () => {
-    setRefreshing(true)
-    try {
-      const fresh = await api.getDashboardOverview(true)
-      queryClient.setQueryData(queryKeys.dashboard.overview(), fresh)
-    } finally {
-      setRefreshing(false)
-    }
-  }
 
   const palette = [
     theme.palette.primary.main,
@@ -80,31 +87,10 @@ export default function DashboardPage() {
 
   return (
     <Box>
-      <PageHeader
-        title={t('nav.dashboard')}
-        description={t('help.pages.dashboard.body')}
-        actions={
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            {q.data?.refreshed_at && (
-              <Typography variant="caption" color="text.secondary">
-                {t('pages.dashboard.asOf', { time: new Date(q.data.refreshed_at).toLocaleTimeString() })}
-              </Typography>
-            )}
-            <Tooltip title={t('common.refresh')}>
-              <span>
-                <IconButton size="small" onClick={forceRefresh} disabled={refreshing} aria-label={t('common.refresh')}>
-                  {refreshing ? <CircularProgress size={18} /> : <RefreshIcon fontSize="small" />}
-                </IconButton>
-              </span>
-            </Tooltip>
-          </Stack>
-        }
-      />
+      {isLoading && <CardGridSkeleton count={6} />}
+      {isError && <Alert severity="error">{t('common.error')}</Alert>}
 
-      {q.isLoading && <CardGridSkeleton count={6} />}
-      {q.isError && <Alert severity="error">{t('common.error')}</Alert>}
-
-      {q.data && q.data.sources === 0 && (
+      {data && data.sources === 0 && (
         <EmptyState
           icon={<StorageIcon />}
           title={t('pages.dashboard.empty')}
@@ -112,39 +98,39 @@ export default function DashboardPage() {
         />
       )}
 
-      {q.data && q.data.sources > 0 && (
+      {data && data.sources > 0 && (
         <>
-          {q.data.states_listed > q.data.states && (
+          {data.states_listed > data.states && (
             <Alert severity="info" sx={{ mb: 2 }}>
               {t('pages.dashboard.syncPartial', {
-                stored: q.data.states,
-                listed: q.data.states_listed,
+                stored: data.states,
+                listed: data.states_listed,
               })}
             </Alert>
           )}
-          {q.data.source_errors > 0 && (
+          {data.source_errors > 0 && (
             <Alert severity="warning" sx={{ mb: 2 }}>
-              {t('pages.dashboard.syncErrors', { count: q.data.source_errors })}
+              {t('pages.dashboard.syncErrors', { count: data.source_errors })}
             </Alert>
           )}
 
           <Box sx={{ display: 'grid', gap: 1.5, gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', mb: 3 }}>
-            <DashboardCard label={t('pages.dashboard.rum')} hint={t('pages.dashboard.rumHint')} value={q.data.rum} />
-            <DashboardCard label={t('pages.dashboard.managed')} value={q.data.managed_resources} />
-            <DashboardCard label={t('pages.dashboard.dataSources')} value={q.data.data_sources} />
-            <DashboardCard label={t('pages.dashboard.totalInstances')} value={q.data.total_resources} />
-            <DashboardCard label={t('pages.dashboard.sources')} value={q.data.sources} />
-            <DashboardCard label={t('pages.dashboard.states')} value={q.data.states} />
+            <DashboardCard label={t('pages.dashboard.rum')} hint={t('pages.dashboard.rumHint')} value={data.rum} />
+            <DashboardCard label={t('pages.dashboard.managed')} value={data.managed_resources} />
+            <DashboardCard label={t('pages.dashboard.dataSources')} value={data.data_sources} />
+            <DashboardCard label={t('pages.dashboard.totalInstances')} value={data.total_resources} />
+            <DashboardCard label={t('pages.dashboard.sources')} value={data.sources} />
+            <DashboardCard label={t('pages.dashboard.states')} value={data.states} />
           </Box>
 
-          {q.data.sync.length > 0 && (
+          {data.sync.length > 0 && (
             <Card variant="outlined" sx={{ mb: 3 }} data-testid="sync-status-panel">
               <CardContent sx={{ py: 1.5, '&:last-child': { pb: 1.5 } }}>
                 <Typography variant="overline" color="text.secondary">
                   {t('pages.dashboard.syncStatus')}
                 </Typography>
                 <Stack spacing={0.5}>
-                  {q.data.sync.map((s) => (
+                  {data.sync.map((s) => (
                     <Stack key={s.source_id} direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         {s.name}
@@ -189,14 +175,14 @@ export default function DashboardPage() {
               <ResponsiveContainer width="100%" height={260}>
                 <PieChart>
                   <Pie
-                    data={q.data.providers.slice(0, 8)}
+                    data={data.providers.slice(0, 8)}
                     dataKey="count"
                     nameKey="key"
                     cx="50%"
                     cy="50%"
                     outerRadius={90}
                   >
-                    {q.data.providers.slice(0, 8).map((_, i) => (
+                    {data.providers.slice(0, 8).map((_, i) => (
                       <Cell key={i} fill={palette[i % palette.length]} />
                     ))}
                   </Pie>
@@ -207,7 +193,7 @@ export default function DashboardPage() {
 
             <ChartCard title={t('pages.dashboard.terraformVersions')}>
               <CountBarChart
-                data={q.data.terraform_versions}
+                data={data.terraform_versions}
                 color={theme.palette.secondary.main}
                 onCategoryClick={(key) => {
                   setVersionFilter(key)
@@ -217,7 +203,7 @@ export default function DashboardPage() {
             </ChartCard>
 
             <ChartCard title={t('pages.dashboard.topResourceTypes')} span2>
-              <CountBarChart data={q.data.resource_types} color={theme.palette.primary.main} />
+              <CountBarChart data={data.resource_types} color={theme.palette.primary.main} />
             </ChartCard>
           </Box>
         </>

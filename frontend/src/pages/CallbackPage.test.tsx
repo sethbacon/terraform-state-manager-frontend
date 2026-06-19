@@ -20,9 +20,9 @@ beforeEach(() => {
 })
 
 describe('CallbackPage', () => {
-  it('reloads at the root on success so the cookie session is re-resolved', () => {
+  it('reloads at the dashboard on success so the cookie session is re-resolved', () => {
     renderAt('')
-    expect(replaceSpy).toHaveBeenCalledWith('/')
+    expect(replaceSpy).toHaveBeenCalledWith('/admin')
     expect(screen.getByText(i18n.t('auth.completingSignIn') as string)).toBeInTheDocument()
   })
 

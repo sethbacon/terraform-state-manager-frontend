@@ -81,7 +81,7 @@ beforeEach(() => {
 })
 
 const routes: Array<[path: string, textKey: string]> = [
-  ['/', 'nav.dashboard'],
+  ['/', 'landing.heroTitle'],
   ['/sources', 'nav.sources'],
   ['/drift', 'nav.drift'],
   ['/version-lab', 'nav.versionLab'],
@@ -111,9 +111,16 @@ describe('App routing', () => {
 
   it('redirects unauthenticated visitors to the login page', async () => {
     mockedUseAuth.mockReturnValue(authState({ user: null, isAuthenticated: false }))
-    window.history.replaceState({}, '', '/')
+    window.history.replaceState({}, '', '/sources')
     render(<App />)
     expect(await screen.findByText(i18n.t('pages.login.subtitle') as string)).toBeInTheDocument()
+  })
+
+  it('serves the public landing at / for anonymous visitors', async () => {
+    mockedUseAuth.mockReturnValue(authState({ user: null, isAuthenticated: false }))
+    window.history.replaceState({}, '', '/')
+    render(<App />)
+    expect(await screen.findByText(i18n.t('landing.heroTitle') as string)).toBeInTheDocument()
   })
 
   it('renders the not-found placeholder for unknown paths', async () => {
