@@ -117,10 +117,55 @@
   },
   "auth": {
     "account": "Account",
+    "signIn": "Sign in",
     "signOut": "Logout",
     "insufficientTitle": "Insufficient permissions",
     "insufficientBody": "You don't have the required access ({{scope}}) to view this page.",
     "completingSignIn": "Completing sign-in…"
+  },
+  "landing": {
+    "heroTitle": "Terraform state, under control",
+    "heroSubtitle": "Track your Terraform estate across every backend — detect drift, validate version upgrades, schedule checks, and move state safely.",
+    "signIn": "Sign in",
+    "apiDocs": "API docs",
+    "goToDashboard": "Go to dashboard",
+    "featuresTitle": "What you can do",
+    "open": "Open",
+    "signInToUse": "Sign in to use",
+    "gettingStarted": "Getting started",
+    "step1Title": "1. Sign in",
+    "step1DescAuth": "You're signed in. Head to your dashboard for a cross-source overview of your estate.",
+    "step1DescUnauth": "Sign in with your organization's identity provider to access your Terraform estate.",
+    "step2Title": "2. Connect a source",
+    "step2Desc": "Add a state backend (S3, Azure, GCS, Terraform Cloud, and more) so the analyzer can index your state files.",
+    "step3Title": "3. Monitor & act",
+    "step3Desc": "Run drift and version-lab checks, schedule recurring runs, generate reports, and transfer state between sources.",
+    "features": {
+      "sources": {
+        "title": "Sources",
+        "desc": "Connect and browse state backends; the analyzer indexes every state file for a unified view."
+      },
+      "drift": {
+        "title": "Drift",
+        "desc": "Compare state against code and live infrastructure to catch unmanaged changes early."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "Test plan health against pinned Terraform and provider versions before you upgrade."
+      },
+      "schedules": {
+        "title": "Schedules",
+        "desc": "Run drift and health checks on a cron schedule and get notified when something changes."
+      },
+      "reports": {
+        "title": "Reports",
+        "desc": "Generate and download analyzer reports across your estate, filtered the way you need."
+      },
+      "transfer": {
+        "title": "Transfer",
+        "desc": "Back up or migrate state between sources safely, with verification and decommissioning."
+      }
+    }
   },
   "help": {
     "title": "Help",
@@ -408,6 +453,7 @@
       "sections": "Sections"
     },
     "admin": {
+      "identity": "Identity",
       "overview": "Identity management overview. Users, organizations, and role templates come from the shared identity service.",
       "users": "Users",
       "organizations": "Organizations",

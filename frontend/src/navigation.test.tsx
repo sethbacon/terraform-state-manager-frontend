@@ -31,9 +31,10 @@ describe('navigation config', () => {
 
   it('gates admin routes behind the admin scope and core pages behind read scopes', () => {
     for (const item of allNavItems.filter((i) => i.path.startsWith('/admin'))) {
-      if (item.path === '/admin/apikeys') {
-        // Registry placement: API keys sit under Identity but are
-        // self-service — every authenticated user manages their own keys.
+      if (item.path === '/admin/apikeys' || item.path === '/admin') {
+        // /admin/apikeys is self-service. /admin (the dashboard index) shows the
+        // estate overview to any authenticated user — its identity counts are
+        // gated in-page — while the child /admin/* pages remain admin-only.
         expect(item.scope, item.path).toBeNull()
         continue
       }

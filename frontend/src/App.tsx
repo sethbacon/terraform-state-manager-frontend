@@ -10,7 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import RouteFocusManager from './components/RouteFocusManager'
 import PlaceholderPage from './components/PlaceholderPage'
-import DashboardPage from './pages/DashboardPage'
+import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import CallbackPage from './pages/CallbackPage'
 import SetupWizardPage from './pages/SetupWizardPage'
@@ -79,6 +79,10 @@ export default function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/auth/callback" element={<CallbackPage />} />
                     <Route path="/setup" element={<SetupWizardPage />} />
+                    {/* Public marketing landing — rendered in the Layout chrome without auth. */}
+                    <Route element={<Layout />}>
+                      <Route path="/" element={<LandingPage />} />
+                    </Route>
                     <Route
                       element={
                         <ProtectedRoute>
@@ -86,7 +90,6 @@ export default function App() {
                         </ProtectedRoute>
                       }
                     >
-                      <Route path="/" element={<DashboardPage />} />
                       {allNavItems
                         .filter((item) => item.path !== '/' && realPages[item.path])
                         .map((item) => (

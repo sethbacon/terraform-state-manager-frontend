@@ -3,6 +3,7 @@ import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom'
 import {
   AppBar,
   Box,
+  Button,
   Collapse,
   Divider,
   Drawer,
@@ -29,6 +30,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import LoginIcon from '@mui/icons-material/Login'
 import LogoutIcon from '@mui/icons-material/Logout'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
@@ -286,11 +288,17 @@ export default function Layout() {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title={user?.email ?? t('auth.account')}>
-            <IconButton color="inherit" onClick={(e) => setAccountAnchor(e.currentTarget)} aria-label={t('auth.account')}>
-              <AccountCircleIcon />
-            </IconButton>
-          </Tooltip>
+          {user ? (
+            <Tooltip title={user.email ?? t('auth.account')}>
+              <IconButton color="inherit" onClick={(e) => setAccountAnchor(e.currentTarget)} aria-label={t('auth.account')}>
+                <AccountCircleIcon />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Button color="inherit" startIcon={<LoginIcon />} component={RouterLink} to="/login">
+              {t('auth.signIn')}
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
 

@@ -28,7 +28,7 @@ export default function CallbackPage() {
     }
 
     // Full reload so AuthProvider re-resolves the session from the cookie.
-    window.location.replace('/')
+    window.location.replace('/admin')
   }, [navigate, params])
 
   return (

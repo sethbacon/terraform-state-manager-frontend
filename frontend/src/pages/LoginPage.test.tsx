@@ -41,6 +41,7 @@ function renderLogin() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<div>home page</div>} />
+        <Route path="/admin" element={<div>dashboard page</div>} />
       </Routes>
     </MemoryRouter>,
   )
@@ -58,10 +59,10 @@ describe('LoginPage', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
   })
 
-  it('redirects authenticated users home', () => {
+  it('redirects authenticated users to the dashboard', () => {
     mockedUseAuth.mockReturnValue(authState({ isAuthenticated: true }))
     renderLogin()
-    expect(screen.getByText('home page')).toBeInTheDocument()
+    expect(screen.getByText('dashboard page')).toBeInTheDocument()
   })
 
   it('shows a skeleton while providers load', () => {
