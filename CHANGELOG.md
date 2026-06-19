@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.12.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.11.0...v1.12.0) (2026-06-19)
+
+
+### Features
+
+* **dashboard:** public landing page + unified authenticated dashboard ([#122](https://github.com/sethbacon/terraform-state-manager-frontend/issues/122)) ([7600b20](https://github.com/sethbacon/terraform-state-manager-frontend/commit/7600b20f5c365ead1803ba982a3e2fd3a56197cd))
+
+
+### Bug Fixes
+
+* **a11y:** label the main navigation landmark ([#116](https://github.com/sethbacon/terraform-state-manager-frontend/issues/116)) ([6a7a714](https://github.com/sethbacon/terraform-state-manager-frontend/commit/6a7a71447f1f960e6bb16520bca415ec1bc330ae))
+* **nav:** label the /admin entry and breadcrumb root `Dashboard` ([#118](https://github.com/sethbacon/terraform-state-manager-frontend/issues/118)) ([3e1cb38](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3e1cb38217d196767c49baf0c192cc9c92d7ff23))
+* **nav:** strengthen the selected sidebar tint in dark mode ([#121](https://github.com/sethbacon/terraform-state-manager-frontend/issues/121)) ([c4a2970](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c4a29708e47e80e0d48a38faa1ef4a54bb701c3d))
+* **nav:** use Title Case `API Keys` label ([#117](https://github.com/sethbacon/terraform-state-manager-frontend/issues/117)) ([7eaa275](https://github.com/sethbacon/terraform-state-manager-frontend/commit/7eaa275fb2dd66804cb56d23bac177bb8b53b785))
+
 ## [1.11.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.10.0...v1.11.0) (2026-06-19)
 
 
