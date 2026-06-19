@@ -15,6 +15,7 @@ vi.mock('../services/api', async (importOriginal) => {
       listDriftRuns: vi.fn(),
       createDriftRun: vi.fn(),
       createPipeline: vi.fn(),
+      updatePipeline: vi.fn(),
       deletePipeline: vi.fn(),
       getDriftWorkflow: vi.fn(),
       listCISources: vi.fn(),
@@ -223,6 +224,53 @@ describe('DriftPage', () => {
     fireEvent.click(screen.getByLabelText('delete'))
     fireEvent.click(await screen.findByTestId('confirm-dialog-confirm'))
     await waitFor(() => expect(mocked.deletePipeline.mock.calls[0]?.[0]).toBe('p1'))
+  })
+
+  it('edits a pipeline, prefilling config and rotating the token only when provided', async () => {
+    mocked.updatePipeline.mockResolvedValue(pipelines[0] as Awaited<ReturnType<typeof api.updatePipeline>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByLabelText('edit'))
+    const dialog = await screen.findByRole('dialog')
+
+    // Existing coordinates are prefilled from config.
+    expect(within(dialog).getByDisplayValue('infra')).toBeInTheDocument()
+    expect(within(dialog).getByDisplayValue('tsm-drift.yml')).toBeInTheDocument()
+
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'renamed-ci' },
+    })
+    fireEvent.change(within(dialog).getByDisplayValue('infra'), { target: { value: 'platform' } })
+
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.updatePipeline).toHaveBeenCalledWith(
+        'p1',
+        expect.objectContaining({
+          name: 'renamed-ci',
+          config: expect.objectContaining({ owner: 'corp', repo: 'platform', workflow_id: 'tsm-drift.yml' }),
+        }),
+      ),
+    )
+    // No token entered → the request must not carry one.
+    expect(mocked.updatePipeline.mock.calls[0]?.[1]).not.toHaveProperty('token')
+  })
+
+  it('hides the token field for connections built from a CI source', async () => {
+    mocked.listPipelines.mockResolvedValue([
+      {
+        ...pipelines[0],
+        config: { ci_source_id: 'c1', owner: 'corp', repo: 'infra', workflow_id: 'tsm-drift.yml' },
+      },
+    ] as Awaited<ReturnType<typeof api.listPipelines>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByLabelText('edit'))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).queryByLabelText(new RegExp(`^${i18n.t('pages.drift.apiToken')}`))).not.toBeInTheDocument()
+    expect(within(dialog).getByText(i18n.t('pages.drift.credentialInherited') as string)).toBeInTheDocument()
   })
 
   it('manages CI sources: list, add (ADO requires a project), delete', async () => {

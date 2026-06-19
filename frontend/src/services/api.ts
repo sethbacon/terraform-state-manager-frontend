@@ -475,6 +475,14 @@ export interface CreatePipelineInput {
   token?: string
 }
 
+// Edits an existing connection. The provider is immutable; the token is rotated
+// only when a non-empty value is supplied (omit to keep the stored credential).
+export interface UpdatePipelineInput {
+  name: string
+  config: Record<string, unknown>
+  token?: string
+}
+
 // CI sources: org-level CI credentials (ADO org/project or GitHub owner) that
 // pipeline connections can be created from by selection.
 export interface CISource {
@@ -997,6 +1005,8 @@ export const api = {
     (await apiClient.get<{ pipelines: PipelineConnection[] }>('/api/v1/pipelines')).data.pipelines,
   createPipeline: async (input: CreatePipelineInput): Promise<PipelineConnection> =>
     (await apiClient.post<PipelineConnection>('/api/v1/pipelines', input)).data,
+  updatePipeline: async (id: string, input: UpdatePipelineInput): Promise<PipelineConnection> =>
+    (await apiClient.put<PipelineConnection>(`/api/v1/pipelines/${id}`, input)).data,
   deletePipeline: async (id: string): Promise<void> => {
     await apiClient.delete(`/api/v1/pipelines/${id}`)
   },
