@@ -45,7 +45,7 @@
       "oidcGroupsTooltip": "Map IdP groups to organizations and roles",
       "mtls": "mTLS Certificates",
       "mtlsTooltip": "Client-certificate subject to scope mappings",
-      "apiKeys": "API keys",
+      "apiKeys": "API Keys",
       "apiKeysTooltip": "Create and manage API keys for CI and scripts",
       "ciTemplates": "CI Templates",
       "ciTemplatesTooltip": "Edit, add, or replace drift and version-lab pipeline templates"
@@ -353,7 +353,7 @@
         ]
       },
       "adminApiKeys": {
-        "title": "API keys",
+        "title": "API Keys",
         "body": "Self-service Bearer credentials (tsm_…) for CI pipelines and scripts — drift ingest, state reads, anything the API offers. Everyone manages their own keys; admins see all keys. A key may only carry scopes its creator holds. The secret is shown exactly once at creation; rotation can keep the old key valid for up to 72 hours while consumers switch over."
       }
     }
@@ -1073,7 +1073,7 @@
       "noMappings": "No group mappings configured."
     },
     "apiKeys": {
-      "title": "API keys",
+      "title": "API Keys",
       "description": "Keys authenticate CI pipelines and scripts as Bearer tokens. A key carries only scopes you hold; admins see all keys.",
       "create": "Create key",
       "createTitle": "Create API key",
@@ -1125,6 +1125,7 @@
   "a11y": {
     "skipToContent": "Skip to main content",
     "openNavigation": "Open navigation",
+    "mainNavigation": "Main navigation",
     "closeNavigation": "Close navigation",
     "navigatedTo": "Navigated to {{title}}",
     "breadcrumbs": "Breadcrumb"
