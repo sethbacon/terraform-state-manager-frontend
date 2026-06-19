@@ -120,7 +120,9 @@ export default function Layout() {
   // when active so the icon and label never shift horizontally.
   const navItemSx = (active: boolean, basePl: number) => ({
     borderLeft: active ? `3px solid ${theme.palette.primary.main}` : '3px solid transparent',
-    bgcolor: active ? `${theme.palette.primary.main}14` : 'transparent',
+    // ~15% tint in dark mode (an 8% tint is barely visible on the dark sidebar),
+    // ~8% in light — mirrors the API Docs nav.
+    bgcolor: active ? `${theme.palette.primary.main}${theme.palette.mode === 'dark' ? '26' : '14'}` : 'transparent',
     pl: `${active ? basePl - 3 : basePl}px`,
   })
   const navTextProps = (active: boolean) => ({ primary: { sx: { fontWeight: active ? 600 : 400 } } })
