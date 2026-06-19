@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.11.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.10.0...v1.11.0) (2026-06-19)
+
+
+### Features
+
+* **drift:** edit pipeline connections and fix delete icon alignment ([#111](https://github.com/sethbacon/terraform-state-manager-frontend/issues/111)) ([ef3fa7e](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ef3fa7e6cec2e7a80a3671db35a67309fb4feac6))
+
 ## [1.10.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.9.0...v1.10.0) (2026-06-18)
 
 
