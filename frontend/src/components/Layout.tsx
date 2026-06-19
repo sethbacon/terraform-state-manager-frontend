@@ -129,7 +129,7 @@ export default function Layout() {
   const adminDashActive = location.pathname === adminDashboardItem.path
 
   const drawerContent = (
-    <Box sx={{ overflow: 'auto' }} role="navigation" aria-label={t('a11y.openNavigation')}>
+    <Box sx={{ overflow: 'auto' }} role="navigation" aria-label={t('a11y.mainNavigation')}>
       <List>
         {/* Home — standalone, no group header */}
         <ListItemButton

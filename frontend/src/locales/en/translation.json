@@ -1125,6 +1125,7 @@
   "a11y": {
     "skipToContent": "Skip to main content",
     "openNavigation": "Open navigation",
+    "mainNavigation": "Main navigation",
     "closeNavigation": "Close navigation",
     "navigatedTo": "Navigated to {{title}}",
     "breadcrumbs": "Breadcrumb"
