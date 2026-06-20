@@ -343,8 +343,24 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
                 <TableBody>
                   {run.summary.map((c) => (
                     <TableRow key={c.address}>
-                      <TableCell sx={{ wordBreak: 'break-all' }}>{c.address}</TableCell>
-                      <TableCell>
+                      <TableCell sx={{ wordBreak: 'break-all', verticalAlign: 'top' }}>
+                        {c.address}
+                        {c.attrs && c.attrs.length > 0 && (
+                          <Box component="ul" sx={{ m: 0, mt: 0.5, pl: 2 }}>
+                            {c.attrs.map((at) => (
+                              <Box
+                                component="li"
+                                key={at.name}
+                                sx={{ fontSize: '0.72rem', color: 'text.secondary', wordBreak: 'break-all' }}
+                              >
+                                <Box component="span" sx={{ color: 'text.primary' }}>{at.name}</Box>:{' '}
+                                {at.before ?? '∅'} → {at.after ?? '∅'}
+                              </Box>
+                            ))}
+                          </Box>
+                        )}
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'top' }}>
                         {c.actions.map((a) => (
                           <Chip key={a} size="small" label={a} color={actionColor(c.actions)} sx={{ mr: 0.5 }} />
                         ))}

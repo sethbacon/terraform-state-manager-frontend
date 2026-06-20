@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.13.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.12.0...v1.13.0) (2026-06-19)
+
+
+### Features
+
+* **drift:** show per-resource changed attributes in drift modals ([#123](https://github.com/sethbacon/terraform-state-manager-frontend/issues/123)) ([3a9b169](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3a9b169a5f4cf11e9476c00ddb0ec31d176db73a))
+
 ## [1.12.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.11.0...v1.12.0) (2026-06-19)
 
 

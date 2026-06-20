@@ -535,6 +535,21 @@ export interface CIWorkflowRef {
   file: string
 }
 
+// One changed resource in a drift summary: its address, the plan actions, and
+// (optionally) the changed attributes. The runner masks any value terraform
+// marked sensitive to "(sensitive)", so no secrets reach TSM.
+export interface DriftAttrChange {
+  name: string
+  before: string | null
+  after: string | null
+}
+
+export interface DriftSummaryItem {
+  address: string
+  actions: string[]
+  attrs?: DriftAttrChange[]
+}
+
 export interface DriftRun {
   id: string
   pipeline_connection_id: string | null
@@ -547,7 +562,7 @@ export interface DriftRun {
   changed: number | null
   destroyed: number | null
   drifted: boolean | null
-  summary?: { address: string; actions: string[] }[]
+  summary?: DriftSummaryItem[]
   detail: string
   actor: string
   created_at: string
@@ -620,7 +635,7 @@ export interface DriftRecord {
   added: number
   changed: number
   destroyed: number
-  summary?: { address: string; actions: string[] }[]
+  summary?: DriftSummaryItem[]
   status: 'open' | 'acknowledged' | 'resolved'
   acknowledged_by: string
   acknowledged_at: string | null

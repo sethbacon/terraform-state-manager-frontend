@@ -34,7 +34,13 @@ const openRecord: DriftRecord = {
   added: 1,
   changed: 2,
   destroyed: 1,
-  summary: [{ address: 'aws_instance.web', actions: ['update'] }],
+  summary: [
+    {
+      address: 'aws_instance.web',
+      actions: ['update'],
+      attrs: [{ name: 'instance_type', before: 't2.micro', after: 't3.micro' }],
+    },
+  ],
   status: 'open',
   acknowledged_by: '',
   acknowledged_at: null,
@@ -116,6 +122,9 @@ describe('DriftRecordsSection', () => {
     expect(within(dialog).getByText(/alice/)).toBeInTheDocument()
     expect(within(dialog).getByText(/cert rotation/)).toBeInTheDocument()
     expect(within(dialog).getByText('aws_instance.web')).toBeInTheDocument()
+    // per-resource changed attribute (name + before -> after)
+    expect(within(dialog).getByText('instance_type')).toBeInTheDocument()
+    expect(within(dialog).getByText(/t2\.micro → t3\.micro/)).toBeInTheDocument()
   })
 
   it('switching to All requests every status', async () => {
