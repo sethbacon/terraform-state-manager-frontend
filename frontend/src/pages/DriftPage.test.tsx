@@ -207,13 +207,19 @@ describe('DriftPage', () => {
     )
   })
 
-  it('shows the workflow template per provider', async () => {
+  it('shows the workflow template per provider and template style', async () => {
     mocked.getDriftWorkflow.mockResolvedValue('yaml: tsm-drift')
     renderPage()
     await screen.findByText('drift-ci')
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.workflowTemplate') as string }))
-    expect(await screen.findByText(/yaml: tsm-drift/)).toBeInTheDocument()
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByText(/yaml: tsm-drift/)).toBeInTheDocument()
+
+    // Switch the template style to the suite variant (combobox 1; provider is 0).
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('common.templateSuite') as string }))
+    await waitFor(() => expect(mocked.getDriftWorkflow).toHaveBeenCalledWith('github_actions', 'suite'))
   })
 
   it('deletes a pipeline behind confirmation', async () => {
