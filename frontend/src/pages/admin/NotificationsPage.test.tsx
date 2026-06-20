@@ -100,6 +100,33 @@ describe('NotificationsPage', () => {
     )
   })
 
+  it('creates a Microsoft Teams channel with a webhook URL', async () => {
+    mocked.createNotificationChannel.mockResolvedValue(channel as Awaited<ReturnType<typeof api.createNotificationChannel>>)
+    renderPage()
+    await screen.findByText('ops-webhook')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.notifications.add') as string }))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'ops-teams' },
+    })
+    fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('common.type')}`)))
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.notifications.typeTeams') as string }))
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.notifications.target')}`)), {
+      target: { value: 'https://example.webhook.office.com/webhookb2/x' },
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.createNotificationChannel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'ops-teams',
+          type: 'teams',
+          target: 'https://example.webhook.office.com/webhookb2/x',
+        }),
+      ),
+    )
+  })
+
   it('edits keeping the existing secret when the target is left blank', async () => {
     mocked.updateNotificationChannel.mockResolvedValue(channel as Awaited<ReturnType<typeof api.updateNotificationChannel>>)
     renderPage()

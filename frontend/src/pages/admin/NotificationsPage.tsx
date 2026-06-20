@@ -277,6 +277,7 @@ function ChannelFormDialog({
           >
             <MenuItem value="webhook">{t('pages.notifications.typeWebhook')}</MenuItem>
             <MenuItem value="slack">{t('pages.notifications.typeSlack')}</MenuItem>
+            <MenuItem value="teams">{t('pages.notifications.typeTeams')}</MenuItem>
           </TextField>
           <TextField
             label={t('pages.notifications.target')}
