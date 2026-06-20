@@ -252,6 +252,8 @@ function ChannelFormDialog({
   // On create the target is required; on edit a blank target keeps the existing one.
   const targetRequired = !channel
   const canSave = Boolean(name) && (!targetRequired || Boolean(target))
+  // Email channels carry recipient address(es), not a URL — relabel the target field.
+  const isEmail = type === 'email'
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -278,17 +280,26 @@ function ChannelFormDialog({
             <MenuItem value="webhook">{t('pages.notifications.typeWebhook')}</MenuItem>
             <MenuItem value="slack">{t('pages.notifications.typeSlack')}</MenuItem>
             <MenuItem value="teams">{t('pages.notifications.typeTeams')}</MenuItem>
+            <MenuItem value="email">{t('pages.notifications.typeEmail')}</MenuItem>
           </TextField>
           <TextField
-            label={t('pages.notifications.target')}
+            label={isEmail ? t('pages.notifications.targetEmail') : t('pages.notifications.target')}
             value={target}
             onChange={(e) => setTarget(e.target.value)}
             required={targetRequired}
             fullWidth
             size="small"
-            type="url"
-            placeholder="https://"
-            helperText={channel ? t('pages.notifications.targetKeep') : t('pages.notifications.targetHelp')}
+            type={isEmail ? 'text' : 'url'}
+            placeholder={isEmail ? 'ops@example.com, oncall@example.com' : 'https://'}
+            helperText={
+              channel
+                ? isEmail
+                  ? t('pages.notifications.targetEmailKeep')
+                  : t('pages.notifications.targetKeep')
+                : isEmail
+                  ? t('pages.notifications.targetEmailHelp')
+                  : t('pages.notifications.targetHelp')
+            }
           />
           <Box>
             <FormGroup row>

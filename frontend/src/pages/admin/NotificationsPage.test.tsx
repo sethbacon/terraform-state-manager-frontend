@@ -127,6 +127,34 @@ describe('NotificationsPage', () => {
     )
   })
 
+  it('creates an email channel with comma-separated recipients', async () => {
+    mocked.createNotificationChannel.mockResolvedValue(channel as Awaited<ReturnType<typeof api.createNotificationChannel>>)
+    renderPage()
+    await screen.findByText('ops-webhook')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.notifications.add') as string }))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'ops-email' },
+    })
+    fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('common.type')}`)))
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.notifications.typeEmail') as string }))
+    // The target field relabels to the email recipient label once Email is chosen.
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.notifications.targetEmail')}`)), {
+      target: { value: 'ops@example.com, oncall@example.com' },
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.createNotificationChannel).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'ops-email',
+          type: 'email',
+          target: 'ops@example.com, oncall@example.com',
+        }),
+      ),
+    )
+  })
+
   it('edits keeping the existing secret when the target is left blank', async () => {
     mocked.updateNotificationChannel.mockResolvedValue(channel as Awaited<ReturnType<typeof api.updateNotificationChannel>>)
     renderPage()
