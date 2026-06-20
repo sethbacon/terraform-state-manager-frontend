@@ -1073,9 +1073,10 @@ function NewRunDialog({
 function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation()
   const [provider, setProvider] = useState('github_actions')
+  const [variant, setVariant] = useState('default')
   const q = useQuery({
-    queryKey: ['drift', 'workflow', provider],
-    queryFn: () => api.getDriftWorkflow(provider),
+    queryKey: ['drift', 'workflow', provider, variant],
+    queryFn: () => api.getDriftWorkflow(provider, variant),
     enabled: open,
   })
 
@@ -1089,13 +1090,24 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
           label={t('common.provider')}
           value={provider}
           onChange={(e) => setProvider(e.target.value)}
-          sx={{ mb: 2, mt: 1, minWidth: 220 }}
+          sx={{ mb: 2, mt: 1, mr: 2, minWidth: 220 }}
         >
           {PROVIDERS.map((p) => (
             <MenuItem key={p.value} value={p.value}>
               {p.label}
             </MenuItem>
           ))}
+        </TextField>
+        <TextField
+          select
+          size="small"
+          label={t('common.templateStyle')}
+          value={variant}
+          onChange={(e) => setVariant(e.target.value)}
+          sx={{ mb: 2, mt: 1, minWidth: 260 }}
+        >
+          <MenuItem value="default">{t('common.templateBuiltin')}</MenuItem>
+          <MenuItem value="suite">{t('common.templateSuite')}</MenuItem>
         </TextField>
         <Divider sx={{ mb: 1 }} />
         {q.isLoading ? (

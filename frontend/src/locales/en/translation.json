@@ -88,7 +88,10 @@
     "create": "Create",
     "filter": "Filter",
     "ref": "Ref",
-    "provider": "Provider"
+    "provider": "Provider",
+    "templateStyle": "Template style",
+    "templateBuiltin": "Built-in (no dependencies)",
+    "templateSuite": "Terraform suite (actions / extension)"
   },
   "settings": {
     "title": "Settings",

@@ -177,7 +177,12 @@ describe('VersionLabPage workflow dialog', () => {
 
     fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
     fireEvent.click(await screen.findByRole('option', { name: /Azure DevOps/ }))
-    await waitFor(() => expect(mocked.getHealthWorkflow).toHaveBeenCalledWith('azure_devops'))
+    await waitFor(() => expect(mocked.getHealthWorkflow).toHaveBeenCalledWith('azure_devops', 'default'))
+
+    // Switch the template style to the suite variant.
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('common.templateSuite') as string }))
+    await waitFor(() => expect(mocked.getHealthWorkflow).toHaveBeenCalledWith('azure_devops', 'suite'))
 
     escapeDialog(dialog)
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
