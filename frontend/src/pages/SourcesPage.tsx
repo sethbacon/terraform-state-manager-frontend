@@ -21,7 +21,9 @@ import {
   IconButton,
   List,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
+  ListSubheader,
   Menu,
   MenuItem,
   Stack,
@@ -41,6 +43,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutlineOutlined'
 import DownloadIcon from '@mui/icons-material/Download'
+import IosShareIcon from '@mui/icons-material/IosShare'
 import StorageIcon from '@mui/icons-material/Storage'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import UploadFileIcon from '@mui/icons-material/UploadFile'
@@ -562,12 +565,15 @@ function StateDetail({
           <Button
             size="small"
             variant="outlined"
-            startIcon={<DownloadIcon />}
+            startIcon={<IosShareIcon />}
             onClick={(e) => setDownloadAnchor(e.currentTarget)}
           >
             {t('pages.sources.export')}
           </Button>
           <Menu anchorEl={downloadAnchor} open={Boolean(downloadAnchor)} onClose={() => setDownloadAnchor(null)}>
+            <ListSubheader sx={{ lineHeight: 2, bgcolor: 'transparent' }}>
+              {t('pages.sources.exportReportHeader')}
+            </ListSubheader>
             {(['md', 'json', 'csv'] as const).map((format) => (
               <MenuItem
                 key={format}
@@ -579,6 +585,18 @@ function StateDetail({
                 {format.toUpperCase()}
               </MenuItem>
             ))}
+            <Divider />
+            <MenuItem
+              onClick={() => {
+                void api.downloadRawState(sourceId, stateKey)
+                setDownloadAnchor(null)
+              }}
+            >
+              <ListItemIcon>
+                <DownloadIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>{t('pages.sources.downloadState')}</ListItemText>
+            </MenuItem>
           </Menu>
         </Stack>
         <Divider />
