@@ -83,7 +83,7 @@ beforeEach(() => {
   mockedUseAuth.mockReturnValue({ hasScope: () => true } as unknown as AuthShape)
   mockedUseSuite.mockReturnValue({ sibling: null, active: false } as ReturnType<typeof useSuite>)
   mocked.listPipelines.mockResolvedValue(pipelines as Awaited<ReturnType<typeof api.listPipelines>>)
-  mocked.listHealthRuns.mockResolvedValue(runs as Awaited<ReturnType<typeof api.listHealthRuns>>)
+  mocked.listHealthRuns.mockResolvedValue({ runs, total: runs.length } as Awaited<ReturnType<typeof api.listHealthRuns>>)
 })
 
 describe('VersionLabPage', () => {
@@ -95,16 +95,36 @@ describe('VersionLabPage', () => {
     expect(screen.getByText(/plan failed: provider mismatch/)).toBeInTheDocument()
   })
 
+  it('paginates and filters health runs server-side', async () => {
+    mocked.listHealthRuns.mockResolvedValueOnce({ runs, total: 60 } as Awaited<ReturnType<typeof api.listHealthRuns>>)
+    renderPage()
+    await screen.findByText('1.9.5')
+    expect(screen.getByText(/of 60/)).toBeInTheDocument()
+
+    // Next advances the server offset by one page.
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.next') as string }))
+    await waitFor(() =>
+      expect(mocked.listHealthRuns).toHaveBeenLastCalledWith(expect.objectContaining({ offset: 25 })),
+    )
+
+    // The status filter is sent to the server.
+    fireEvent.mouseDown(screen.getByLabelText(i18n.t('common.status') as string))
+    fireEvent.click(await screen.findByRole('option', { name: 'failed' }))
+    await waitFor(() =>
+      expect(mocked.listHealthRuns).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'failed' })),
+    )
+  })
+
   it('hints when no pipelines are configured and disables the run button', async () => {
     mocked.listPipelines.mockResolvedValue([])
-    mocked.listHealthRuns.mockResolvedValue([])
+    mocked.listHealthRuns.mockResolvedValue({ runs: [], total: 0 } as Awaited<ReturnType<typeof api.listHealthRuns>>)
     renderPage()
     expect(await screen.findByText(i18n.t('pages.versionLab.noPipelines') as string)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: i18n.t('actions.newHealthRun') as string })).toBeDisabled()
   })
 
   it('shows the no-runs hint', async () => {
-    mocked.listHealthRuns.mockResolvedValue([])
+    mocked.listHealthRuns.mockResolvedValue({ runs: [], total: 0 } as Awaited<ReturnType<typeof api.listHealthRuns>>)
     renderPage()
     expect(await screen.findByText(i18n.t('pages.versionLab.noRuns') as string)).toBeInTheDocument()
   })
@@ -122,7 +142,9 @@ describe('VersionLabPage', () => {
     await screen.findByText('1.9.5')
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newHealthRun') as string }))
-    fireEvent.mouseDown(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.versionLab.pipeline')}`)))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.versionLab.pipeline')}`)), {
+      target: { value: 'health' },
+    })
     fireEvent.click(await screen.findByRole('option', { name: /health-ci/ }))
     fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.versionLab.terraformVersion')}`)), {
       target: { value: '1.9.5' },
@@ -142,7 +164,9 @@ describe('VersionLabPage', () => {
     await screen.findByText('1.9.5')
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newHealthRun') as string }))
-    fireEvent.mouseDown(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.versionLab.pipeline')}`)))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.versionLab.pipeline')}`)), {
+      target: { value: 'health' },
+    })
     fireEvent.click(await screen.findByRole('option', { name: /health-ci/ }))
     fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.versionLab.dispatch') as string }))
 

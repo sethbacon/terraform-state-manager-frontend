@@ -74,6 +74,8 @@
     "type": "Type",
     "back": "Back",
     "next": "Next",
+    "previous": "Previous",
+    "all": "All",
     "submit": "Submit",
     "add": "Add",
     "remove": "Remove",
@@ -957,7 +959,8 @@
       "providerVersions": "Provider versions (optional)",
       "moduleVersions": "Module versions (optional)",
       "dispatch": "Dispatch",
-      "workflowTitle": "Version-health workflow template"
+      "workflowTitle": "Version-health workflow template",
+      "showing": "Showing {{from}}–{{to}} of {{total}}"
     },
     "schedules": {
       "title": "Schedules",

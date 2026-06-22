@@ -73,6 +73,6 @@ export const queryKeys = {
   },
   health: {
     all: ['health'] as const,
-    runs: () => ['health', 'runs'] as const,
+    runs: (page = 0, status = '') => ['health', 'runs', page, status] as const,
   },
 }

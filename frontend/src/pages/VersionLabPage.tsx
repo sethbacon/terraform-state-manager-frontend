@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -54,6 +55,8 @@ const PROVIDER_LABELS = [
   { value: 'azure_devops', label: 'Azure DevOps' },
 ]
 
+const PAGE_SIZE = 25
+
 function statusChip(run: HealthRun, t: (k: string) => string) {
   if (run.status === 'failed') return <Chip size="small" color="error" label={t('pages.versionLab.statusDispatchFailed')} />
   if (run.status === 'dispatched' || run.status === 'running')
@@ -82,14 +85,18 @@ export default function VersionLabPage() {
 
   const [newRunOpen, setNewRunOpen] = useState(false)
   const [workflowOpen, setWorkflowOpen] = useState(false)
+  const [page, setPage] = useState(0)
+  const [status, setStatus] = useState('')
 
   const pipelinesQuery = useQuery({ queryKey: queryKeys.pipelines.list(), queryFn: api.listPipelines })
   const runsQuery = useQuery({
-    queryKey: queryKeys.health.runs(),
-    queryFn: api.listHealthRuns,
+    queryKey: queryKeys.health.runs(page, status),
+    queryFn: () => api.listHealthRuns({ limit: PAGE_SIZE, offset: page * PAGE_SIZE, status: status || undefined }),
     refetchInterval: (q) =>
-      (q.state.data ?? []).some((r) => r.status === 'dispatched' || r.status === 'running') ? 4000 : false,
+      (q.state.data?.runs ?? []).some((r) => r.status === 'dispatched' || r.status === 'running') ? 4000 : false,
   })
+  const runs = runsQuery.data?.runs ?? []
+  const total = runsQuery.data?.total ?? 0
 
   return (
     <Box>
@@ -121,36 +128,74 @@ export default function VersionLabPage() {
         </Alert>
       )}
 
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }} spacing={1}>
+        <TextField
+          select
+          size="small"
+          label={t('common.status')}
+          value={status}
+          onChange={(e) => {
+            setStatus(e.target.value)
+            setPage(0)
+          }}
+          sx={{ minWidth: 180 }}
+        >
+          <MenuItem value="">{t('common.all')}</MenuItem>
+          {['dispatched', 'running', 'completed', 'failed'].map((s) => (
+            <MenuItem key={s} value={s}>
+              {s}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
+
       {runsQuery.isLoading && <TableSkeleton rows={4} columns={6} />}
-      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">{t('pages.versionLab.noRuns')}</Alert>}
-      {runsQuery.data && runsQuery.data.length > 0 && (
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>{t('common.status')}</TableCell>
-              <TableCell>{t('pages.versionLab.terraform')}</TableCell>
-              <TableCell>{t('pages.versionLab.checks')}</TableCell>
-              <TableCell>{t('common.ref')}</TableCell>
-              <TableCell>{t('common.created')}</TableCell>
-              <TableCell>{t('common.detail')}</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {runsQuery.data.map((r) => (
-              <TableRow key={r.id}>
-                <TableCell>{statusChip(r, t)}</TableCell>
-                <TableCell>{r.terraform_version || 'latest'}</TableCell>
-                <TableCell>
-                  {okText('init', r.init_ok)}
-                  {okText('plan', r.plan_ok)}
-                </TableCell>
-                <TableCell>{r.repo_ref || '—'}</TableCell>
-                <TableCell>{new Date(r.created_at).toLocaleString()}</TableCell>
-                <TableCell sx={{ maxWidth: 220, wordBreak: 'break-word' }}>{r.detail || '—'}</TableCell>
+      {!runsQuery.isLoading && total === 0 && <Alert severity="info">{t('pages.versionLab.noRuns')}</Alert>}
+      {!runsQuery.isLoading && total > 0 && (
+        <>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>{t('common.status')}</TableCell>
+                <TableCell>{t('pages.versionLab.terraform')}</TableCell>
+                <TableCell>{t('pages.versionLab.checks')}</TableCell>
+                <TableCell>{t('common.ref')}</TableCell>
+                <TableCell>{t('common.created')}</TableCell>
+                <TableCell>{t('common.detail')}</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {runs.map((r) => (
+                <TableRow key={r.id}>
+                  <TableCell>{statusChip(r, t)}</TableCell>
+                  <TableCell>{r.terraform_version || 'latest'}</TableCell>
+                  <TableCell>
+                    {okText('init', r.init_ok)}
+                    {okText('plan', r.plan_ok)}
+                  </TableCell>
+                  <TableCell>{r.repo_ref || '—'}</TableCell>
+                  <TableCell>{new Date(r.created_at).toLocaleString()}</TableCell>
+                  <TableCell sx={{ maxWidth: 220, wordBreak: 'break-word' }}>{r.detail || '—'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('pages.versionLab.showing', {
+                from: page * PAGE_SIZE + 1,
+                to: Math.min((page + 1) * PAGE_SIZE, total),
+                total,
+              })}
+            </Typography>
+            <Button size="small" disabled={page === 0} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+              {t('common.previous')}
+            </Button>
+            <Button size="small" disabled={(page + 1) * PAGE_SIZE >= total} onClick={() => setPage((p) => p + 1)}>
+              {t('common.next')}
+            </Button>
+          </Stack>
+        </>
       )}
 
       <NewHealthRunDialog
@@ -231,13 +276,14 @@ function NewHealthRunDialog({
       <DialogTitle>{t('pages.versionLab.newRunTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField select label={t('pages.versionLab.pipeline')} value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
-            {pipelines.map((p) => (
-              <MenuItem key={p.id} value={p.id}>
-                {p.name} ({p.provider})
-              </MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            options={pipelines}
+            getOptionLabel={(p) => `${p.name} (${p.provider})`}
+            isOptionEqualToValue={(a, b) => a.id === b.id}
+            value={pipelines.find((p) => p.id === pipelineId) ?? null}
+            onChange={(_, v) => setPipelineId(v?.id ?? '')}
+            renderInput={(params) => <TextField {...params} label={t('pages.versionLab.pipeline')} fullWidth />}
+          />
           <TextField label={t('pages.versionLab.gitRef')} value={repoRef} onChange={(e) => setRepoRef(e.target.value)} placeholder="main" fullWidth />
           <TextField label={t('pages.versionLab.workingDir')} value={workingDir} onChange={(e) => setWorkingDir(e.target.value)} fullWidth />
           <TextField

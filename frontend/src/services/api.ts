@@ -1157,8 +1157,19 @@ export const api = {
     ).data,
 
   // Version lab (Phase 4)
-  listHealthRuns: async (): Promise<HealthRun[]> =>
-    (await apiClient.get<{ runs: HealthRun[] }>('/api/v1/health-lab/runs')).data.runs,
+  listHealthRuns: async (
+    params?: { limit?: number; offset?: number; status?: string },
+  ): Promise<{ runs: HealthRun[]; total: number }> => {
+    const q = new URLSearchParams()
+    if (params?.limit != null) q.set('limit', String(params.limit))
+    if (params?.offset != null) q.set('offset', String(params.offset))
+    if (params?.status) q.set('status', params.status)
+    const qs = q.toString()
+    const { data } = await apiClient.get<{ runs: HealthRun[]; total: number }>(
+      `/api/v1/health-lab/runs${qs ? `?${qs}` : ''}`,
+    )
+    return { runs: data.runs, total: data.total ?? data.runs.length }
+  },
   createHealthRun: async (input: CreateHealthRunInput): Promise<HealthRun> =>
     (await apiClient.post<HealthRun>('/api/v1/health-lab/runs', input)).data,
   getHealthWorkflow: async (provider: string, profile = 'default'): Promise<string> =>
