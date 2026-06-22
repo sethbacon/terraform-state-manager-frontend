@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.15.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.14.0...v1.15.0) (2026-06-22)
+
+
+### Features
+
+* paginate + filter Version Lab runs list ([#133](https://github.com/sethbacon/terraform-state-manager-frontend/issues/133)) ([ba838f6](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ba838f6f3139417feaccbc443a8e95090f0dc6cd))
+* **sources:** separate report export from state-file download ([#131](https://github.com/sethbacon/terraform-state-manager-frontend/issues/131)) ([0e695db](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0e695db87ea54c2d656c30d703e9968ef87a0c76)), closes [#129](https://github.com/sethbacon/terraform-state-manager-frontend/issues/129)
+
+
+### Dependencies
+
+* bump @types/node to ^24 in frontend ([#130](https://github.com/sethbacon/terraform-state-manager-frontend/issues/130)) ([68d34a7](https://github.com/sethbacon/terraform-state-manager-frontend/commit/68d34a7fad9be286cc6b5e10b62a47d51a4d8a93))
+
 ## [1.14.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.13.0...v1.14.0) (2026-06-21)
 
 
