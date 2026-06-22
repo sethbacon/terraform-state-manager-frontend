@@ -532,6 +532,8 @@
       "tabOutputs": "Outputs",
       "tabRaw": "Raw",
       "export": "Export",
+      "exportReportHeader": "Analysis report",
+      "downloadState": "Download state file (.tfstate)",
       "outputsFailed": "Failed to load outputs.",
       "noOutputs": "This state declares no root-module outputs.",
       "outputName": "Name",

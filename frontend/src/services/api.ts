@@ -930,6 +930,27 @@ export const api = {
     link.remove()
     URL.revokeObjectURL(url)
   },
+  // Downloads the raw .tfstate file itself (not an analysis report) to disk.
+  downloadRawState: async (id: string, key: string): Promise<void> => {
+    const res = await apiClient.get(`/api/v1/sources/${id}/state/raw`, {
+      params: { key },
+      responseType: 'blob',
+    })
+    const disposition = res.headers['content-disposition'] as string | undefined
+    const match = disposition?.match(/filename="?([^"]+)"?/)
+    // Fall back to the state key's basename, ensuring a .tfstate suffix.
+    const base = key.split(/[\\/]/).pop() || 'terraform'
+    const fallback = base.endsWith('.tfstate') ? base : `${base}.tfstate`
+    const filename = match ? match[1] : fallback
+    const url = URL.createObjectURL(res.data as Blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  },
   // Reports: cross-fleet state query (live preview) and multi-format export.
   listReportStates: async (filters: ReportFilters): Promise<ReportStatesResult> =>
     (await apiClient.get<ReportStatesResult>('/api/v1/reports/states', { params: reportFilterParams(filters) })).data,

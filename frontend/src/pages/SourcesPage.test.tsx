@@ -25,6 +25,7 @@ vi.mock('../services/api', async (importOriginal) => {
       listBackups: vi.fn(),
       restoreBackup: vi.fn(),
       downloadReport: vi.fn(),
+      downloadRawState: vi.fn(),
       updateSource: vi.fn(),
       testSource: vi.fn(),
       stateOperation: vi.fn(),
@@ -330,6 +331,15 @@ describe('SourcesPage', () => {
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'md')
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'json')
     expect(mocked.downloadReport).toHaveBeenCalledWith('s1', 'app.tfstate', 'csv')
+  })
+
+  it('downloads the raw state file from the export menu', async () => {
+    mocked.downloadRawState.mockResolvedValue(undefined)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.export') as string }))
+    fireEvent.click(await screen.findByRole('menuitem', { name: i18n.t('pages.sources.downloadState') as string }))
+    await waitFor(() => expect(mocked.downloadRawState).toHaveBeenCalledWith('s1', 'app.tfstate'))
   })
 
   it('renders the outputs tab with sensitive values redacted', async () => {
