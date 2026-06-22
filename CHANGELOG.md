@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.14.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.13.0...v1.14.0) (2026-06-21)
+
+
+### Features
+
+* add template-style selector to drift + version lab workflow dialogs ([#127](https://github.com/sethbacon/terraform-state-manager-frontend/issues/127)) ([adecf61](https://github.com/sethbacon/terraform-state-manager-frontend/commit/adecf616f4a7d7e1360e2f4844f53499bd37d62e))
+* **notifications:** add Microsoft Teams and email channel types ([#125](https://github.com/sethbacon/terraform-state-manager-frontend/issues/125)) ([d5dce4c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d5dce4c6b59ed31c18ef443661d8a1b1c8e6dcc3))
+
+
+### Bug Fixes
+
+* **deps:** force js-yaml &gt;= 4.2.0 to clear CVE-2026-53550 ([#128](https://github.com/sethbacon/terraform-state-manager-frontend/issues/128)) ([8bb545b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8bb545b0a31ffd260b5d50f1fad6b0ac12c8ea21))
+
 ## [1.13.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.12.0...v1.13.0) (2026-06-19)
 
 
