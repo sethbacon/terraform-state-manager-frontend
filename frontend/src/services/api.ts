@@ -1000,6 +1000,21 @@ export const api = {
         { params: { key } },
       )
     ).data,
+  // Admin-only: delete the live state object. The backend takes a final
+  // recoverable backup first and refuses while the state is locked. purge=true
+  // also drops the saved backups (unrecoverable).
+  deleteState: async (
+    id: string,
+    key: string,
+    purge = false,
+  ): Promise<{ status: string; key: string; purged: boolean; backup_id?: string }> =>
+    (
+      await apiClient.post(
+        `/api/v1/sources/${id}/state/operations`,
+        { op: 'delete', key, ...(purge ? { purge: true } : {}) },
+        { params: { key } },
+      )
+    ).data,
   listBackups: async (id: string, key: string): Promise<Backup[]> =>
     (await apiClient.get<{ backups: Backup[] }>(`/api/v1/sources/${id}/state/backups`, { params: { key } })).data
       .backups,
