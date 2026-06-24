@@ -29,6 +29,7 @@ vi.mock('../services/api', async (importOriginal) => {
       updateSource: vi.fn(),
       testSource: vi.fn(),
       stateOperation: vi.fn(),
+      deleteState: vi.fn(),
       backupToSource: vi.fn(),
       migrateToSource: vi.fn(),
     },
@@ -420,6 +421,77 @@ describe('SourcesPage', () => {
     await waitFor(() =>
       expect(mocked.stateOperation).toHaveBeenCalledWith('s1', 'app.tfstate', 'mv', 'aws_instance.web', 'aws_instance.web2'),
     )
+  })
+
+  it('shows the admin Delete state action only to admins', async () => {
+    // Editor: every scope except admin. State ops stays; Delete state is hidden.
+    mockedUseAuth.mockReturnValue({ hasScope: (s: string) => s !== 'admin' } as unknown as AuthShape)
+    await openStateDetail()
+    expect(screen.getByRole('button', { name: i18n.t('pages.sources.stateOps') as string })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: i18n.t('pages.sources.deleteState') as string }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('admin deletes a state with type-to-confirm, then clears the selection', async () => {
+    mocked.deleteState.mockResolvedValue({
+      status: 'deleted',
+      key: 'app.tfstate',
+      purged: false,
+      backup_id: 'b1',
+    } as Awaited<ReturnType<typeof api.deleteState>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.deleteState') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    const del = within(dialog).getByRole('button', {
+      name: i18n.t('pages.sources.deleteStateConfirmLabel') as string,
+    })
+    expect(del).toBeDisabled() // gated until the exact key is typed
+
+    fireEvent.change(within(dialog).getByTestId('delete-state-confirm-input'), {
+      target: { value: 'app.tfstate' },
+    })
+    expect(del).toBeEnabled()
+    fireEvent.click(del)
+
+    await waitFor(() => expect(mocked.deleteState).toHaveBeenCalledWith('s1', 'app.tfstate', false))
+    // Selection cleared → back to the "select a state" placeholder.
+    expect(await screen.findByText(i18n.t('pages.sources.selectState') as string)).toBeInTheDocument()
+  })
+
+  it('passes purge=true when the purge box is checked', async () => {
+    mocked.deleteState.mockResolvedValue({ status: 'deleted', key: 'app.tfstate', purged: true } as Awaited<
+      ReturnType<typeof api.deleteState>
+    >)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.deleteState') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByLabelText(i18n.t('pages.sources.deleteStatePurgeLabel') as string))
+    fireEvent.change(within(dialog).getByTestId('delete-state-confirm-input'), {
+      target: { value: 'app.tfstate' },
+    })
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: i18n.t('pages.sources.deleteStateConfirmLabel') as string }),
+    )
+    await waitFor(() => expect(mocked.deleteState).toHaveBeenCalledWith('s1', 'app.tfstate', true))
+  })
+
+  it('surfaces a locked/denied error from the delete API', async () => {
+    mocked.deleteState.mockRejectedValue({ response: { data: { error: 'state is locked' } } })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.deleteState') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByTestId('delete-state-confirm-input'), {
+      target: { value: 'app.tfstate' },
+    })
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: i18n.t('pages.sources.deleteStateConfirmLabel') as string }),
+    )
+    expect(await within(dialog).findByText('state is locked')).toBeInTheDocument()
   })
 
   it('shows backend-specific guidance when targeting hcp or git', async () => {

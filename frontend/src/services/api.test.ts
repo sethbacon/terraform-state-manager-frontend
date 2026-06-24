@@ -329,6 +329,22 @@ describe('edit + transfer planes', () => {
     )
   })
 
+  it('deleteState posts an admin delete, with optional purge', async () => {
+    post.mockReturnValue(ok({ status: 'deleted', key: 'k', purged: false, backup_id: 'b1' }))
+    await api.deleteState('s1', 'k')
+    expect(post).toHaveBeenCalledWith(
+      '/api/v1/sources/s1/state/operations',
+      { op: 'delete', key: 'k' },
+      { params: { key: 'k' } },
+    )
+    await api.deleteState('s1', 'k', true)
+    expect(post).toHaveBeenLastCalledWith(
+      '/api/v1/sources/s1/state/operations',
+      { op: 'delete', key: 'k', purge: true },
+      { params: { key: 'k' } },
+    )
+  })
+
   it('backups list/restore', async () => {
     get.mockReturnValue(ok({ backups: [] }))
     await api.listBackups('s1', 'k')
@@ -513,7 +529,7 @@ describe('pipelines + CI sources', () => {
 
     const createObjectURL = vi.fn(() => 'blob:fake')
     const revokeObjectURL = vi.fn()
-    vi.stubGlobal('URL', Object.assign(class extends URL {}, { createObjectURL, revokeObjectURL }))
+    vi.stubGlobal('URL', Object.assign(class extends URL { }, { createObjectURL, revokeObjectURL }))
     get.mockReturnValue(ok(new Blob(['x']), { 'content-disposition': 'attachment; filename="states.csv"' }))
     await api.downloadStatesReport({ q: 'p' }, 'csv')
     const dlCall = get.mock.calls.slice(-1)[0] as [string, { params: URLSearchParams; responseType: string }]

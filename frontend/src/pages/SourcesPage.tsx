@@ -433,7 +433,7 @@ function StatesBrowser({
 }: {
   source: StateSource
   selectedKey: string | null
-  onSelectKey: (key: string) => void
+  onSelectKey: (key: string | null) => void
 }) {
   const statesQuery = useQuery({
     queryKey: queryKeys.sources.states(source.id),
@@ -493,9 +493,8 @@ function StatesBrowser({
               >
                 <ListItemText
                   primary={st.name}
-                  secondary={`${(st.size / 1024).toFixed(1)} KB${
-                    st.last_modified ? ` · ${new Date(st.last_modified).toLocaleString()}` : ''
-                  }`}
+                  secondary={`${(st.size / 1024).toFixed(1)} KB${st.last_modified ? ` · ${new Date(st.last_modified).toLocaleString()}` : ''
+                    }`}
                 />
               </ListItemButton>
             ))}
@@ -508,6 +507,7 @@ function StatesBrowser({
               sourceId={source.id}
               stateKey={selectedKey}
               stateName={statesQuery.data?.find((st) => st.key === selectedKey)?.name ?? selectedKey}
+              onDeleted={() => onSelectKey(null)}
             />
           ) : (
             <Card variant="outlined">
@@ -526,11 +526,14 @@ function StateDetail({
   sourceId,
   stateKey,
   stateName,
+  onDeleted,
 }: {
   sourceId: string
   stateKey: string
   /** Friendly display name (HCP keys are workspace ids); defaults to the key. */
   stateName?: string
+  /** Called after the state object is deleted, so the parent clears the selection. */
+  onDeleted: () => void
 }) {
   const displayName = stateName ?? stateKey
   const { t } = useTranslation()
@@ -538,6 +541,7 @@ function StateDetail({
   const [tab, setTab] = useState(0)
   const [transferOpen, setTransferOpen] = useState(false)
   const [opsOpen, setOpsOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
   const [downloadAnchor, setDownloadAnchor] = useState<null | HTMLElement>(null)
   return (
     <>
@@ -598,6 +602,17 @@ function StateDetail({
               <ListItemText>{t('pages.sources.downloadState')}</ListItemText>
             </MenuItem>
           </Menu>
+          {hasScope('admin') && (
+            <Button
+              size="small"
+              variant="outlined"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={() => setDeleteOpen(true)}
+            >
+              {t('pages.sources.deleteState')}
+            </Button>
+          )}
         </Stack>
         <Divider />
         <CardContent>
@@ -624,7 +639,119 @@ function StateDetail({
         stateKey={stateKey}
         stateName={displayName}
       />
+      <DeleteStateDialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        sourceId={sourceId}
+        stateKey={stateKey}
+        stateName={displayName}
+        onDeleted={onDeleted}
+      />
     </>
+  )
+}
+
+// DeleteStateDialog is the admin-only destructive delete of a state object. It
+// reminds the operator that a final backup is taken (and that they can download
+// first), offers an explicit purge of backups, and requires typing the exact
+// state key before the delete is enabled.
+function DeleteStateDialog({
+  open,
+  onClose,
+  sourceId,
+  stateKey,
+  stateName,
+  onDeleted,
+}: {
+  open: boolean
+  onClose: () => void
+  sourceId: string
+  stateKey: string
+  stateName?: string
+  onDeleted: () => void
+}) {
+  const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [purge, setPurge] = useState(false)
+  const [confirmKey, setConfirmKey] = useState('')
+
+  // Reset each time the dialog opens so a prior attempt never leaks in.
+  useEffect(() => {
+    if (open) {
+      setPurge(false)
+      setConfirmKey('')
+    }
+  }, [open])
+
+  const mutation = useMutation({
+    mutationFn: () => api.deleteState(sourceId, stateKey, purge),
+    onSuccess: () => {
+      for (const key of [
+        queryKeys.sources.states(sourceId),
+        queryKeys.sources.raw(sourceId, stateKey),
+        queryKeys.sources.analysis(sourceId, stateKey),
+        queryKeys.sources.resources(sourceId, stateKey),
+        queryKeys.sources.backups(sourceId, stateKey),
+      ]) {
+        queryClient.invalidateQueries({ queryKey: key })
+      }
+      onClose()
+      onDeleted()
+    },
+  })
+
+  const confirmed = confirmKey === stateKey
+
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+      <DialogTitle>{t('pages.sources.deleteStateTitle')}</DialogTitle>
+      <DialogContent>
+        <Stack spacing={2} sx={{ mt: 1 }}>
+          <Alert severity="error">
+            <Trans
+              i18nKey="pages.sources.deleteStateBody"
+              values={{ name: stateName ?? stateKey }}
+              components={{ 1: <b /> }}
+            />
+          </Alert>
+          <Typography variant="body2" color="text.secondary">
+            {t('pages.sources.deleteStateBackupNote')}
+          </Typography>
+          <FormControlLabel
+            control={<Checkbox checked={purge} onChange={(e) => setPurge(e.target.checked)} color="error" />}
+            label={t('pages.sources.deleteStatePurgeLabel')}
+          />
+          {purge && <Alert severity="warning">{t('pages.sources.deleteStatePurgeWarning')}</Alert>}
+          <Typography variant="body2">
+            <Trans
+              i18nKey="pages.sources.deleteStateConfirmPrompt"
+              values={{ key: stateKey }}
+              components={{ 1: <code /> }}
+            />
+          </Typography>
+          <TextField
+            value={confirmKey}
+            onChange={(e) => setConfirmKey(e.target.value)}
+            placeholder={stateKey}
+            fullWidth
+            size="small"
+            slotProps={{ htmlInput: { 'aria-label': t('pages.sources.deleteStateConfirmAria'), 'data-testid': 'delete-state-confirm-input' } }}
+          />
+          {mutation.isError && <Alert severity="error">{errMsg(mutation.error)}</Alert>}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
+        <Button
+          color="error"
+          variant="contained"
+          disabled={!confirmed || mutation.isPending}
+          onClick={() => mutation.mutate()}
+        >
+          {t('pages.sources.deleteStateConfirmLabel')}
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
