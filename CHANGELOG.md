@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.15.0...v1.16.0) (2026-06-24)
+
+
+### Features
+
+* **sources:** add admin-only "Delete state" action ([#135](https://github.com/sethbacon/terraform-state-manager-frontend/issues/135)) ([f10ca87](https://github.com/sethbacon/terraform-state-manager-frontend/commit/f10ca875089c06c9beebf78f2f9c3af5d92c77c0)), closes [#134](https://github.com/sethbacon/terraform-state-manager-frontend/issues/134)
+
 ## [1.15.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.14.0...v1.15.0) (2026-06-22)
 
 
