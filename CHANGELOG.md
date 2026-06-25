@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.16.0...v1.16.1) (2026-06-25)
+
+
+### Bug Fixes
+
+* **sources:** shorten state delete button label to "Delete" ([#137](https://github.com/sethbacon/terraform-state-manager-frontend/issues/137)) ([0f95022](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0f95022da080ad67dff345c9bf064f31b183053e))
+
 ## [1.16.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.15.0...v1.16.0) (2026-06-24)
 
 
