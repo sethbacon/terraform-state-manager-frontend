@@ -553,7 +553,7 @@
       "modulesFailed": "Failed to load module provenance.",
       "stateOps": "State ops",
       "transfer": "Transfer",
-      "deleteState": "Delete state",
+      "deleteState": "Delete",
       "deleteStateTitle": "Delete state file",
       "deleteStateBody": "This permanently removes the live state object for <1>{{name}}</1> from its backend.",
       "deleteStateBackupNote": "A final backup is taken server-side before deletion and the action is audited, so you can restore it from the Backups tab — unless you purge below. Consider using Export → Download state first.",
