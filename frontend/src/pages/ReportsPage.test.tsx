@@ -54,6 +54,7 @@ function renderPage() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  sessionStorage.clear()
   mocked.listSources.mockResolvedValue([{ id: 's1', name: 'prod', type: 's3' }] as Awaited<ReturnType<typeof api.listSources>>)
   mocked.listReportStates.mockResolvedValue(result as Awaited<ReturnType<typeof api.listReportStates>>)
 })
@@ -168,6 +169,34 @@ describe('ReportsPage', () => {
     fireEvent.change(search, { target: { value: 'xyz' } })
     expect(search.value).toBe('xyz')
     fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.reports.reset') as string }))
+    expect(search.value).toBe('')
+  })
+
+  it('restores the last filter set after remounting (navigate away and back)', async () => {
+    const first = renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    fireEvent.change(screen.getByLabelText(i18n.t('pages.reports.searchKey') as string), {
+      target: { value: 'prod' },
+    })
+    expect((screen.getByLabelText(i18n.t('pages.reports.searchKey') as string) as HTMLInputElement).value).toBe('prod')
+    first.unmount()
+
+    renderPage()
+    const restored = (await screen.findByLabelText(i18n.t('pages.reports.searchKey') as string)) as HTMLInputElement
+    expect(restored.value).toBe('prod')
+  })
+
+  it('does not restore filters after a reset', async () => {
+    const first = renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    fireEvent.change(screen.getByLabelText(i18n.t('pages.reports.searchKey') as string), {
+      target: { value: 'prod' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.reports.reset') as string }))
+    first.unmount()
+
+    renderPage()
+    const search = (await screen.findByLabelText(i18n.t('pages.reports.searchKey') as string)) as HTMLInputElement
     expect(search.value).toBe('')
   })
 })
