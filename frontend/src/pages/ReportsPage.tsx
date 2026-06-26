@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
@@ -28,6 +28,7 @@ import {
 import DownloadIcon from '@mui/icons-material/Download'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
+import RefreshIcon from '@mui/icons-material/Refresh'
 import PageHeader from '../components/PageHeader'
 import { api, type ReportFilters, type ReportFormat, type ReportStateRow, type VersionFilterOp } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
@@ -97,6 +98,8 @@ export default function ReportsPage() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
   const [downloading, setDownloading] = useState<ReportFormat | null>(null)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const queryClient = useQueryClient()
 
   const applied = useDebounced(draft, 350)
   const filterKey = useMemo(() => JSON.stringify(applied), [applied])
@@ -154,6 +157,22 @@ export default function ReportsPage() {
   const openInSources = (row: ReportStateRow) => {
     const params = new URLSearchParams({ source: row.source_id, state: row.state_key })
     navigate(`/sources?${params.toString()}`)
+  }
+
+  // One-shot refresh: reconcile the persistent analysis store before re-reading,
+  // scoped on the backend to the selected source(s) so a filtered view doesn't
+  // reconcile the whole fleet. Writes the fresh result into the current query
+  // cache key, mirroring the dashboard's force-refresh.
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    try {
+      const fresh = await api.listReportStates(applied, true)
+      queryClient.setQueryData(queryKeys.reports.states(filterKey), fresh)
+    } catch (e) {
+      setExportError(apiErr(e))
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   const handleExport = async (format: ReportFormat) => {
@@ -298,6 +317,18 @@ export default function ReportsPage() {
             <Button size="small" onClick={resetFilters}>
               {t('pages.reports.reset')}
             </Button>
+            <Tooltip title={t('pages.reports.refreshHint')}>
+              <span>
+                <Button
+                  size="small"
+                  startIcon={refreshing ? <CircularProgress size={16} /> : <RefreshIcon />}
+                  disabled={refreshing}
+                  onClick={handleRefresh}
+                >
+                  {t('common.refresh')}
+                </Button>
+              </span>
+            </Tooltip>
             <Box sx={{ flexGrow: 1 }} />
             {FORMATS.map((f) => (
               <Button

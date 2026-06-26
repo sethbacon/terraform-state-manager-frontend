@@ -199,4 +199,20 @@ describe('ReportsPage', () => {
     const search = (await screen.findByLabelText(i18n.t('pages.reports.searchKey') as string)) as HTMLInputElement
     expect(search.value).toBe('')
   })
+
+  it('refreshes with refresh=true, forwarding the current filters so the backend scopes it', async () => {
+    renderPage()
+    await screen.findByText('envs/prod/app.tfstate')
+    // Narrow to one source so the forwarded filter carries the selection.
+    fireEvent.change(screen.getByLabelText(i18n.t('pages.reports.searchKey') as string), {
+      target: { value: 'prod' },
+    })
+    await waitFor(() => expect(mocked.listReportStates).toHaveBeenCalledWith(expect.objectContaining({ q: 'prod' })))
+    mocked.listReportStates.mockClear()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.refresh') as string }))
+    await waitFor(() =>
+      expect(mocked.listReportStates).toHaveBeenCalledWith(expect.objectContaining({ q: 'prod' }), true),
+    )
+  })
 })

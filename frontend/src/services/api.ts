@@ -952,8 +952,13 @@ export const api = {
     URL.revokeObjectURL(url)
   },
   // Reports: cross-fleet state query (live preview) and multi-format export.
-  listReportStates: async (filters: ReportFilters): Promise<ReportStatesResult> =>
-    (await apiClient.get<ReportStatesResult>('/api/v1/reports/states', { params: reportFilterParams(filters) })).data,
+  listReportStates: async (filters: ReportFilters, refresh = false): Promise<ReportStatesResult> => {
+    const params = reportFilterParams(filters)
+    // Reconcile first when asked; the backend scopes the refresh to the selected
+    // source(s), so a filtered view doesn't reconcile the whole fleet.
+    if (refresh) params.set('refresh', 'true')
+    return (await apiClient.get<ReportStatesResult>('/api/v1/reports/states', { params })).data
+  },
   downloadStatesReport: async (filters: ReportFilters, format: ReportFormat): Promise<void> => {
     const params = reportFilterParams(filters)
     params.set('format', format)

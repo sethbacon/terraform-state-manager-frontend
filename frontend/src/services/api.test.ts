@@ -526,6 +526,13 @@ describe('pipelines + CI sources', () => {
     expect(listCall[0]).toBe('/api/v1/reports/states')
     expect(listCall[1].params.get('q')).toBe('prod')
     expect(listCall[1].params.getAll('source_id')).toEqual(['a', 'b'])
+    expect(listCall[1].params.has('refresh')).toBe(false)
+
+    // refresh=true forwards the same (scoping) filters with a reconcile flag.
+    await api.listReportStates({ sourceIds: ['a'] }, true)
+    const refreshCall = get.mock.calls.slice(-1)[0] as [string, { params: URLSearchParams }]
+    expect(refreshCall[1].params.get('refresh')).toBe('true')
+    expect(refreshCall[1].params.getAll('source_id')).toEqual(['a'])
 
     const createObjectURL = vi.fn(() => 'blob:fake')
     const revokeObjectURL = vi.fn()

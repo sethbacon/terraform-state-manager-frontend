@@ -1036,6 +1036,7 @@
       "provider": "Provider",
       "resourceType": "Resource type",
       "reset": "Reset filters",
+      "refreshHint": "Reconcile and reload the selected source(s) — or all sources when none is selected",
       "min": "Min",
       "max": "Max",
       "rumRange": "RUM",
