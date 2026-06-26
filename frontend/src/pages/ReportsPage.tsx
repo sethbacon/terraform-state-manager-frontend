@@ -52,6 +52,20 @@ const FORMATS: { value: ReportFormat; label: string }[] = [
   { value: 'csv', label: 'CSV' },
 ]
 
+// Persist the filter set so it survives navigating away from the page and back
+// (and a reload) within the browser session. sessionStorage scopes it to the tab
+// and clears when the tab closes, which suits a transient report query.
+const FILTERS_STORAGE_KEY = 'tsm.reports.filters'
+
+function loadStoredFilters(): ReportFilters {
+  try {
+    const raw = sessionStorage.getItem(FILTERS_STORAGE_KEY)
+    return raw ? (JSON.parse(raw) as ReportFilters) : {}
+  } catch {
+    return {}
+  }
+}
+
 type SortKey =
   | 'source_name'
   | 'state_key'
@@ -77,7 +91,7 @@ function useDebounced<T>(value: T, ms: number): T {
 export default function ReportsPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const [draft, setDraft] = useState<ReportFilters>({})
+  const [draft, setDraft] = useState<ReportFilters>(loadStoredFilters)
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('rum')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
@@ -86,6 +100,20 @@ export default function ReportsPage() {
 
   const applied = useDebounced(draft, 350)
   const filterKey = useMemo(() => JSON.stringify(applied), [applied])
+
+  // Persist filter edits so the last set is restored on remount; clearing all
+  // filters removes the entry so a reset starts clean next time.
+  useEffect(() => {
+    try {
+      if (Object.keys(draft).length === 0) {
+        sessionStorage.removeItem(FILTERS_STORAGE_KEY)
+      } else {
+        sessionStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(draft))
+      }
+    } catch {
+      // storage unavailable (e.g. privacy mode) — filters simply won't persist
+    }
+  }, [draft])
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
   const sources = sourcesQuery.data ?? []
