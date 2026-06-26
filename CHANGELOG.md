@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.17.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.16.1...v1.17.0) (2026-06-26)
+
+
+### Features
+
+* **reports:** add a scoped Refresh button to the Reports page ([c0e9ace](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c0e9acecfecdbbe397510be8b7541ebd02cfe4c0))
+* **reports:** add a scoped Refresh button to the Reports page ([58aed7f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/58aed7f8efafb1a0cd778958ba4a40859e684d9a))
+
+
+### Bug Fixes
+
+* **reports:** persist last filter set across navigation ([fe97bbb](https://github.com/sethbacon/terraform-state-manager-frontend/commit/fe97bbb6fef7edf2320af002a116788bf99682c9))
+* **reports:** persist the last filter set across navigation ([cccaff6](https://github.com/sethbacon/terraform-state-manager-frontend/commit/cccaff6ffb3d48195759dbdc3dd5f91a25fdd8a3))
+
 ## [1.16.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.16.0...v1.16.1) (2026-06-25)
 
 
