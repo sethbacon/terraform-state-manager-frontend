@@ -2,6 +2,20 @@ import axios from 'axios'
 import { clearAuthStorage } from '../utils/authStorage'
 import type { MeResponse } from '../types/auth'
 
+/**
+ * Runtime whitelabel theme config from the backend. All fields are optional so the
+ * frontend gracefully falls back to built-in defaults when the endpoint is absent.
+ */
+export interface UIThemeConfig {
+  product_name?: string
+  primary_color?: string
+  secondary_color_light?: string
+  secondary_color_dark?: string
+  logo_url?: string
+  favicon_url?: string
+  login_hero_url?: string
+}
+
 // Same-origin in dev (Vite proxies /api and /health to the backend) and in
 // production (nginx proxies the same paths). withCredentials so the HttpOnly auth
 // cookie is sent automatically. Sessions are cookie-only — the JWT is never read
@@ -767,6 +781,14 @@ export function reportFilterParams(f: ReportFilters): URLSearchParams {
 export const api = {
   getVersion: async (): Promise<VersionInfo> => (await apiClient.get<VersionInfo>('/api/v1/version')).data,
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
+  // Runtime whitelabel theme; null when the backend hasn't implemented the endpoint.
+  getUITheme: async (): Promise<UIThemeConfig | null> => {
+    try {
+      return (await apiClient.get<UIThemeConfig>('/api/v1/ui/theme')).data
+    } catch {
+      return null
+    }
+  },
   getDashboardOverview: async (refresh = false): Promise<DashboardOverview> =>
     (
       await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview', {

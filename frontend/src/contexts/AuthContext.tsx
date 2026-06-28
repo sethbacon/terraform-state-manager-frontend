@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { api } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
-import type { AuthContextType, MeResponse, User } from '../types/auth'
+import type { AuthContextType, MeResponse, RoleTemplateInfo, User } from '../types/auth'
 
 /** How long before session expiry the warning Snackbar appears. */
 export const SESSION_WARNING_LEAD_MS = 2 * 60 * 1000
@@ -25,8 +25,10 @@ function scopeSatisfied(scopes: string[], scope: string): boolean {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [roleTemplate, setRoleTemplate] = useState<RoleTemplateInfo | null>(null)
   const [allowedScopes, setAllowedScopes] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<Date | null>(null)
   const [sessionExpiresSoon, setSessionExpiresSoon] = useState(false)
   const warnTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -35,6 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // refresh response (expires_in) — the cookie itself is HttpOnly and unreadable.
   const scheduleSessionWarning = useCallback((expiresAt: Date) => {
     if (warnTimer.current) clearTimeout(warnTimer.current)
+    setSessionExpiresAt(expiresAt)
     setSessionExpiresSoon(false)
     const delay = expiresAt.getTime() - Date.now() - SESSION_WARNING_LEAD_MS
     if (delay > MAX_TIMEOUT_MS) return
@@ -56,6 +59,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (me: MeResponse) => {
       setUser(me.user)
       setAllowedScopes(me.allowed_scopes ?? [])
+      // Surface the primary org's role template so the context shape matches the
+      // registry frontend. The TSM /me payload carries it on the membership.
+      const primary = me.memberships?.find((m) => m.role_template_name)
+      setRoleTemplate(
+        primary?.role_template_name
+          ? {
+            name: primary.role_template_name,
+            display_name: primary.role_template_name,
+            scopes: primary.role_template_scopes,
+          }
+          : null,
+      )
       if (me.session_expires_at) scheduleSessionWarning(new Date(me.session_expires_at))
     },
     [scheduleSessionWarning],
@@ -66,7 +81,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       applyMe(await api.getCurrentUser())
     } catch {
       setUser(null)
+      setRoleTemplate(null)
       setAllowedScopes([])
+      setSessionExpiresAt(null)
     }
   }, [applyMe])
 
@@ -97,7 +114,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     if (warnTimer.current) clearTimeout(warnTimer.current)
     setSessionExpiresSoon(false)
+    setSessionExpiresAt(null)
     setUser(null)
+    setRoleTemplate(null)
     setAllowedScopes([])
     clearAuthStorage()
     api.logout()
@@ -119,9 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value: AuthContextType = {
     user,
+    roleTemplate,
     allowedScopes,
     isAuthenticated: user !== null,
     isLoading,
+    sessionExpiresAt,
     sessionExpiresSoon,
     login,
     devLogin,

@@ -5,11 +5,13 @@ import { AppThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { AnnouncerProvider } from './contexts/AnnouncerContext'
 import { HelpProvider } from './contexts/HelpContext'
+import { ConsentProvider } from './contexts/ConsentContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import RouteFocusManager from './components/RouteFocusManager'
 import PlaceholderPage from './components/PlaceholderPage'
+import ConsentBanner from './components/ConsentBanner'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import CallbackPage from './pages/CallbackPage'
@@ -69,48 +71,51 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppThemeProvider>
-        <AnnouncerProvider>
-          <AuthProvider>
-            <HelpProvider>
-              <BrowserRouter>
-                <RouteFocusManager />
-                <ErrorBoundary>
-                  <Routes>
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/auth/callback" element={<CallbackPage />} />
-                    <Route path="/setup" element={<SetupWizardPage />} />
-                    {/* Public marketing landing — rendered in the Layout chrome without auth. */}
-                    <Route element={<Layout />}>
-                      <Route path="/" element={<LandingPage />} />
-                    </Route>
-                    <Route
-                      element={
-                        <ProtectedRoute>
-                          <Layout />
-                        </ProtectedRoute>
-                      }
-                    >
-                      {allNavItems
-                        .filter((item) => item.path !== '/' && realPages[item.path])
-                        .map((item) => (
-                          <Route key={item.path} path={item.path} element={realPages[item.path]} />
-                        ))}
+        <ConsentProvider>
+          <AnnouncerProvider>
+            <AuthProvider>
+              <HelpProvider>
+                <BrowserRouter>
+                  <RouteFocusManager />
+                  <ErrorBoundary>
+                    <Routes>
+                      <Route path="/login" element={<LoginPage />} />
+                      <Route path="/auth/callback" element={<CallbackPage />} />
+                      <Route path="/setup" element={<SetupWizardPage />} />
+                      {/* Public marketing landing — rendered in the Layout chrome without auth. */}
+                      <Route element={<Layout />}>
+                        <Route path="/" element={<LandingPage />} />
+                      </Route>
                       <Route
-                        path="*"
                         element={
-                          <PlaceholderPage
-                            title="Page not found"
-                            description="The page you requested does not exist."
-                          />
+                          <ProtectedRoute>
+                            <Layout />
+                          </ProtectedRoute>
                         }
-                      />
-                    </Route>
-                  </Routes>
-                </ErrorBoundary>
-              </BrowserRouter>
-            </HelpProvider>
-          </AuthProvider>
-        </AnnouncerProvider>
+                      >
+                        {allNavItems
+                          .filter((item) => item.path !== '/' && realPages[item.path])
+                          .map((item) => (
+                            <Route key={item.path} path={item.path} element={realPages[item.path]} />
+                          ))}
+                        <Route
+                          path="*"
+                          element={
+                            <PlaceholderPage
+                              title="Page not found"
+                              description="The page you requested does not exist."
+                            />
+                          }
+                        />
+                      </Route>
+                    </Routes>
+                  </ErrorBoundary>
+                </BrowserRouter>
+              </HelpProvider>
+            </AuthProvider>
+          </AnnouncerProvider>
+          <ConsentBanner />
+        </ConsentProvider>
       </AppThemeProvider>
     </QueryClientProvider>
   )

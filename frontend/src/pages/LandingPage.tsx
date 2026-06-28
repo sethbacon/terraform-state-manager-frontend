@@ -12,6 +12,9 @@ import ScheduleIcon from '@mui/icons-material/Schedule'
 import AssessmentIcon from '@mui/icons-material/Assessment'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useAuth } from '../contexts/AuthContext'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '../services/api'
+import DashboardCard from '../components/DashboardCard'
 
 interface Feature {
   key: string
@@ -41,6 +44,14 @@ export default function LandingPage() {
   // Feature cards deep-link into the app for signed-in users; anonymous visitors
   // are routed to sign in first.
   const openFeature = (path: string) => navigate(isAuthenticated ? path : '/login')
+
+  // Signed-in users get a live estate summary (the data is private, so anonymous
+  // visitors see only the hero + feature cards below).
+  const { data: overview } = useQuery({
+    queryKey: ['dashboard', 'overview', 'landing'],
+    queryFn: () => api.getDashboardOverview(),
+    enabled: isAuthenticated,
+  })
 
   return (
     <Box>
@@ -100,6 +111,43 @@ export default function LandingPage() {
           </Button>
         </Stack>
       </Box>
+
+      {isAuthenticated && (
+        <Box sx={{ mb: 6 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+            {t('landing.estateTitle')}
+          </Typography>
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+            }}
+          >
+            <DashboardCard
+              label={t('landing.estate.sources')}
+              value={overview?.sources ?? '\u2014'}
+              to="/sources"
+            />
+            <DashboardCard
+              label={t('landing.estate.states')}
+              value={overview?.states ?? '\u2014'}
+              to="/sources"
+            />
+            <DashboardCard
+              label={t('landing.estate.rum')}
+              hint={t('landing.estate.rumHint')}
+              value={overview?.rum ?? '\u2014'}
+              to="/reports"
+            />
+            <DashboardCard
+              label={t('landing.estate.totalResources')}
+              value={overview?.total_resources ?? '\u2014'}
+              to="/reports"
+            />
+          </Box>
+        </Box>
+      )}
 
       {/* Feature cards */}
       <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>

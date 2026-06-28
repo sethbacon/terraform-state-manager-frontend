@@ -11,14 +11,31 @@ const SECONDARY_DARK = '#00D9C0'
  * createAppTheme builds the MUI theme for the given mode. Colours, font stack, and
  * the component baseline mirror the sibling terraform-registry-frontend so the two
  * apps share look-and-feel. When prefersReducedMotion is set, all MUI transitions
- * are disabled to honour the OS accessibility preference.
+ * are disabled to honour the OS accessibility preference. direction flips the theme
+ * to RTL for right-to-left languages (matches the registry frontend).
  */
-export function createAppTheme(mode: ThemeMode, prefersReducedMotion = false): Theme {
-  const secondary = mode === 'dark' ? SECONDARY_DARK : SECONDARY_LIGHT
+export interface ThemeOverrides {
+  primary?: string
+  secondaryLight?: string
+  secondaryDark?: string
+}
+
+export function createAppTheme(
+  mode: ThemeMode,
+  prefersReducedMotion = false,
+  direction: 'ltr' | 'rtl' = 'ltr',
+  overrides: ThemeOverrides = {},
+): Theme {
+  const primary = overrides.primary ?? BRAND_PRIMARY
+  const secondary =
+    mode === 'dark'
+      ? (overrides.secondaryDark ?? SECONDARY_DARK)
+      : (overrides.secondaryLight ?? SECONDARY_LIGHT)
   return createTheme({
+    direction,
     palette: {
       mode,
-      primary: { main: BRAND_PRIMARY },
+      primary: { main: primary },
       secondary: { main: secondary },
       // Match the registry's dark surfaces so the two apps share the same depth.
       ...(mode === 'dark' && {
@@ -48,7 +65,7 @@ export function createAppTheme(mode: ThemeMode, prefersReducedMotion = false): T
         styleOverrides: {
           // Expose brand colours as CSS custom properties for non-MUI elements.
           ':root': {
-            '--brand-primary': BRAND_PRIMARY,
+            '--brand-primary': primary,
             '--brand-secondary': secondary,
           },
           // Dark-mode-safe code styling so inline code and blocks stay legible.

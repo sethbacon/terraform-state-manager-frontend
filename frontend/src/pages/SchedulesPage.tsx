@@ -30,6 +30,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { api, type PipelineConnection, type Schedule, type ScheduleInput } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import PageHeader from '../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Schedule'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
 import ConfirmDialog from '../components/ConfirmDialog'
 
@@ -84,6 +85,7 @@ export default function SchedulesPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('pages.schedules.title')}
         description={t('pages.schedules.description')}
         actions={

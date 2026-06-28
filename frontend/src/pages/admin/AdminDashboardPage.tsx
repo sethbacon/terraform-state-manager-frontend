@@ -7,6 +7,7 @@ import { api } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import { useAuth } from '../../contexts/AuthContext'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/DashboardCustomize'
 import DashboardCard from '../../components/DashboardCard'
 import CardGridSkeleton from '../../components/skeletons/CardGridSkeleton'
 import EstateOverview from '../../components/EstateOverview'
@@ -38,6 +39,7 @@ export default function AdminDashboardPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('nav.admin.dashboard')}
         description={t('help.pages.dashboard.body')}
         actions={

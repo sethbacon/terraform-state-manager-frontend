@@ -28,4 +28,16 @@ describe('createAppTheme', () => {
   it('keeps transitions by default', () => {
     expect(createAppTheme('light').transitions.duration.standard).toBeGreaterThan(0)
   })
+
+  it('defaults to ltr and flips to rtl when requested', () => {
+    expect(createAppTheme('light').direction).toBe('ltr')
+    expect(createAppTheme('light', false, 'rtl').direction).toBe('rtl')
+  })
+
+  it('applies whitelabel colour overrides and falls back to the brand default', () => {
+    expect(createAppTheme('light', false, 'ltr', { primary: '#FF0000' }).palette.primary.main).toBe(
+      '#FF0000',
+    )
+    expect(createAppTheme('light').palette.primary.main).toBe(BRAND_PRIMARY)
+  })
 })

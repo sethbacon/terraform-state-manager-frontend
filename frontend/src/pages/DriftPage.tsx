@@ -47,6 +47,7 @@ import ConfirmDialog from '../components/ConfirmDialog'
 import DriftRecordsSection from '../components/DriftRecordsSection'
 import DriftRepoWizard from '../components/DriftRepoWizard'
 import PageHeader from '../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/CompareArrows'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
@@ -128,6 +129,7 @@ export default function DriftPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('nav.drift')}
         description={t('help.pages.drift.body')}
         actions={
@@ -320,10 +322,10 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
                 {run.repo_ref || t('pages.drift.defaultRef')} · {run.working_dir || '.'} ·{' '}
                 {run.added != null
                   ? t('pages.drift.addedChangedDestroyed', {
-                      added: run.added,
-                      changed: run.changed,
-                      destroyed: run.destroyed,
-                    })
+                    added: run.added,
+                    changed: run.changed,
+                    destroyed: run.destroyed,
+                  })
                   : t('pages.drift.pending')}
               </Typography>
               {run.detail && (
@@ -796,10 +798,10 @@ function CISourcesDialog({ open, onClose }: { open: boolean; onClose: () => void
           ? { tenant_id: tenantId, client_id: clientId, client_secret: clientSecret }
           : ghApp
             ? {
-                github_app_id: githubAppId,
-                github_installation_id: githubInstallationId,
-                app_private_key: appPrivateKey,
-              }
+              github_app_id: githubAppId,
+              github_installation_id: githubInstallationId,
+              app_private_key: appPrivateKey,
+            }
             : { token }),
       }),
     onSuccess: () => {

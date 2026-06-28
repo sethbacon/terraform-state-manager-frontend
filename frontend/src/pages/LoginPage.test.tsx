@@ -59,15 +59,15 @@ describe('LoginPage', () => {
     expect(screen.getByRole('progressbar')).toBeInTheDocument()
   })
 
-  it('redirects authenticated users to the dashboard', () => {
+  it('redirects authenticated users to the home page', () => {
     mockedUseAuth.mockReturnValue(authState({ isAuthenticated: true }))
     renderLogin()
-    expect(screen.getByText('dashboard page')).toBeInTheDocument()
+    expect(screen.getByText('home page')).toBeInTheDocument()
   })
 
   it('shows a skeleton while providers load', () => {
     mockedUseAuth.mockReturnValue(authState())
-    mockedApi.getProviders.mockReturnValue(new Promise(() => {})) // never resolves
+    mockedApi.getProviders.mockReturnValue(new Promise(() => { })) // never resolves
     renderLogin()
     expect(screen.getByTestId('provider-loading')).toBeInTheDocument()
   })

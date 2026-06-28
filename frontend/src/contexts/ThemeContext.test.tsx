@@ -1,7 +1,12 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { AppThemeProvider, useThemeMode } from './ThemeContext'
+import i18n from '../i18n'
+
+vi.mock('../services/api', () => ({
+  api: { getUITheme: vi.fn().mockResolvedValue(null) },
+}))
 
 const wrapper = ({ children }: { children: ReactNode }) => <AppThemeProvider>{children}</AppThemeProvider>
 
@@ -40,5 +45,31 @@ describe('AppThemeProvider', () => {
     const { result } = renderHook(() => useThemeMode(), { wrapper })
     expect(['light', 'dark']).toContain(result.current.mode)
     expect(result.current.mode).toBe('light')
+  })
+
+  it('exposes ltr direction by default', () => {
+    const { result } = renderHook(() => useThemeMode(), { wrapper })
+    expect(result.current.direction).toBe('ltr')
+  })
+
+  it('flips direction to rtl for right-to-left languages', () => {
+    const { result } = renderHook(() => useThemeMode(), { wrapper })
+    act(() => {
+      i18n.emit('languageChanged', 'ar')
+    })
+    expect(result.current.direction).toBe('rtl')
+    expect(document.documentElement.dir).toBe('rtl')
+    act(() => {
+      i18n.emit('languageChanged', 'en')
+    })
+    expect(result.current.direction).toBe('ltr')
+    expect(document.documentElement.dir).toBe('ltr')
+  })
+
+  it('exposes the default product name when no whitelabel config is set', () => {
+    const { result } = renderHook(() => useThemeMode(), { wrapper })
+    expect(result.current.productName).toBe('Terraform State Manager')
+    expect(result.current.logoUrl).toBeNull()
+    expect(result.current.loginHeroUrl).toBeNull()
   })
 })

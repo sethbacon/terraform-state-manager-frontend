@@ -18,6 +18,7 @@ import {
 import { api, type SSOConfig } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/VpnKey'
 import TableSkeleton from '../../components/skeletons/TableSkeleton'
 
 function StatusChip({ enabled }: { enabled: boolean }) {
@@ -86,7 +87,7 @@ export default function SSOPage() {
 
   return (
     <Box>
-      <PageHeader title={t('pages.sso.title')} description={t('pages.sso.description')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('pages.sso.title')} description={t('pages.sso.description')} />
       {q.isLoading && <TableSkeleton rows={4} columns={3} />}
       {q.isError && <Alert severity="error">{t('common.error')}</Alert>}
       {q.data && (
