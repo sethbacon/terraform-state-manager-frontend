@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "Statssjef",
+    "tagline": "Analyser, rediger og flytt Terraform-tilstanden på tvers av alle backend-miljøer."
+  },
+  "nav": {
+    "groups": {
+      "main": "Stat",
+      "identity": "Identitet",
+      "system": "System"
+    },
+    "dashboard": "Hjem",
+    "dashboardTooltip": "Oversikt og statistikk",
+    "sources": "Kilder",
+    "sourcesTooltip": "Tilkoblede backend-systemer i delstater",
+    "drift": "Drift",
+    "driftTooltip": "Sammenlign delstatslovgivning med regelverk og infrastruktur",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "Sjekk testplanens status opp mot fastsatte versjoner",
+    "schedules": "Tidsplaner",
+    "schedulesTooltip": "Gjentakende driftkjøringer etter en cron-plan",
+    "reports": "Rapporter",
+    "reportsTooltip": "Opprett og last ned analyserapportene",
+    "transfer": "Overføring",
+    "transferTooltip": "Sikkerhetskopiere eller overføre tilstand mellom kilder",
+    "apiDocs": "API-dokumentasjon",
+    "apiDocsTooltip": "Interaktiv OpenAPI-dokumentasjon",
+    "admin": {
+      "dashboard": "Dashbord",
+      "dashboardTooltip": "Oversikt over identitetsadministrasjon",
+      "users": "Brukere",
+      "usersTooltip": "Brukere og medlemskap",
+      "organizations": "Organisasjoner",
+      "organizationsTooltip": "Organisasjoner og IdP-tilknytninger",
+      "roles": "Roller",
+      "rolesTooltip": "Rollemaler og omfang",
+      "sso": "SSO",
+      "ssoTooltip": "Leverandører av enkel pålogging og tilordninger",
+      "notifications": "Varsler",
+      "notificationsTooltip": "Varslingskanaler for feil ved drift og kjøring",
+      "auditLogs": "Revisjonslogg",
+      "auditLogsTooltip": "Sikkerhets- og aktivitetslogg",
+      "oidcGroups": "OIDC-grupper",
+      "oidcGroupsTooltip": "Knytt IdP-grupper til organisasjoner og roller",
+      "mtls": "mTLS-sertifikater",
+      "mtlsTooltip": "Tilordninger av emne i klient-sertifikat til anvendelsesområde",
+      "apiKeys": "API-nøkler",
+      "apiKeysTooltip": "Opprett og administrer API-nøkler for CI og skript",
+      "ciTemplates": "CI-maler",
+      "ciTemplatesTooltip": "Rediger, legg til eller erstatt maler for drift- og VersionLab-pipeline"
+    }
+  },
+  "common": {
+    "loading": "Laster…",
+    "error": "Det oppstod en feil.",
+    "retry": "Prøv på nytt",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "delete": "Slett",
+    "confirm": "Bekreft",
+    "close": "Lukk",
+    "search": "Søk",
+    "download": "Last ned",
+    "refresh": "Oppdater",
+    "none": "Ingen",
+    "yes": "Ja",
+    "no": "Nei",
+    "actions": "Handlinger",
+    "created": "Opprettet",
+    "updated": "Oppdatert",
+    "status": "Status",
+    "name": "Navn",
+    "type": "Type",
+    "back": "Tilbake",
+    "next": "Neste",
+    "previous": "Forrige",
+    "all": "Alle",
+    "submit": "Send inn",
+    "add": "Legg til",
+    "remove": "Fjern",
+    "edit": "Rediger",
+    "view": "Vis",
+    "copy": "Kopier",
+    "copied": "Kopiert",
+    "required": "Påkrevd",
+    "optional": "Valgfritt",
+    "detail": "Detalj",
+    "apply": "Søk",
+    "create": "Opprett",
+    "filter": "Filter",
+    "ref": "Ref",
+    "provider": "Leverandør",
+    "templateStyle": "Malstil",
+    "templateBuiltin": "Innebygd (ingen avhengigheter)",
+    "templateSuite": "Terraform-pakken (handlinger / utvidelser)"
+  },
+  "settings": {
+    "title": "Innstillinger",
+    "appearance": "Utseende",
+    "theme": "Tema",
+    "themeLight": "Lys",
+    "themeDark": "Mørkt",
+    "themeSystem": "System",
+    "language": "Språk"
+  },
+  "about": {
+    "title": "Om",
+    "description": "En webapplikasjon for å analysere, redigere på en sikker måte og flytte Terraform-tilstand mellom eksisterende backender — med CI-drevet avviksdeteksjon og versjonstesting.",
+    "versionsHeading": "Versjoner",
+    "frontend": "Frontend-{{version}}",
+    "backend": "Backend-{{version}}",
+    "backendUnavailable": "Backend er utilgjengelig",
+    "built": "Bygget{{date}}",
+    "licenseHeading": "Lisens",
+    "licenseText": "Lisensiert under",
+    "apache": "Apache-lisens 2.0",
+    "sourceHeading": "Kilde",
+    "repoBackend": "Backend-repositorium",
+    "repoFrontend": "Frontend-repositorium",
+    "close": "Lukk"
+  },
+  "auth": {
+    "account": "Konto",
+    "signIn": "Logg inn",
+    "signOut": "Logg ut",
+    "insufficientTitle": "Manglende rettigheter",
+    "insufficientBody": "Du har ikke den nødvendige tilgangen ({{scope}}) for å se denne siden.",
+    "completingSignIn": "Fullfører pålogging…"
+  },
+  "landing": {
+    "heroTitle": "Terraform-tilstand, under kontroll",
+    "heroSubtitle": "Følg med på Terraform-miljøet ditt på tvers av alle backend-systemer – oppdag avvik, valider versjonsoppgraderinger, planlegg kontroller og overfør tilstanden på en sikker måte.",
+    "signIn": "Logg inn",
+    "apiDocs": "API-dokumentasjon",
+    "goToDashboard": "Gå til oversikten",
+    "estateTitle": "Arven din",
+    "estate": {
+      "sources": "Kilder",
+      "states": "Stater",
+      "rum": "RUM",
+      "rumHint": "Forvaltede ressurser",
+      "totalResources": "Totale ressurser"
+    },
+    "featuresTitle": "Hva du kan gjøre",
+    "open": "Åpne",
+    "signInToUse": "Logg inn for å bruke",
+    "gettingStarted": "Kom i gang",
+    "step1Title": "1. Logg inn",
+    "step1DescAuth": "Du er logget inn. Gå til oversiktssiden for å få en oversikt over porteføljen din på tvers av ulike kilder.",
+    "step1DescUnauth": "Logg inn med organisasjonens identitetsleverandør for å få tilgang til Terraform-miljøet ditt.",
+    "step2Title": "2. Koble til en kilde",
+    "step2Desc": "Legg til en tilstands-backend (S3, Azure, GCS, Terraform Cloud og flere) slik at analysatoren kan indeksere tilstandsfilene dine.",
+    "step3Title": "3. Overvåke og handle",
+    "step3Desc": "Kjør drift- og versjonslaboratoriekontroller, planlegg gjentatte kjøringer, generer rapporter og overfør status mellom kilder.",
+    "features": {
+      "sources": {
+        "title": "Kilder",
+        "desc": "Koble til og bla gjennom tilstandsbackendene; analysatoret indekserer alle tilstandsfiler for å gi et samlet overblikk."
+      },
+      "drift": {
+        "title": "Drift",
+        "desc": "Sammenlign tilstanden med koden og den eksisterende infrastrukturen for å oppdage uovervåkede endringer på et tidlig stadium."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "Kontroller at testplanen er i orden i forhold til de faste Terraform- og leverandørversjonene før du oppgraderer."
+      },
+      "schedules": {
+        "title": "Tidsplaner",
+        "desc": "Kjør drift- og tilstandskontroller etter en cron-plan, og få varsel når noe endres."
+      },
+      "reports": {
+        "title": "Rapporter",
+        "desc": "Generer og last ned analyserapportene for hele eiendomsporteføljen din, filtrert etter dine behov."
+      },
+      "transfer": {
+        "title": "Overføring",
+        "desc": "Sikkerhetskopier eller overfør tilstand mellom kilder på en sikker måte, med verifisering og avvikling."
+      }
+    }
+  },
+  "help": {
+    "title": "Hjelp",
+    "open": "Åpne hjelp",
+    "close": "Lukk hjelp",
+    "none": "Det finnes foreløpig ingen hjelp til denne siden.",
+    "pages": {
+      "dashboard": {
+        "title": "Hjem",
+        "body": "En oversikt over Terraform-miljøet ditt på tvers av kilder: samlet antall ressurser under forvaltning (RUM), fordeling etter leverandør og ressurstype, samt fordelingen av Terraform-versjoner."
+      },
+      "sources": {
+        "title": "Kilder",
+        "body": "Koble til eksisterende tilstands-backender og arbeid med tilstandsfilene deres — ingenting må migreres for å bruke TSM; programmet leser fra backenderne du allerede har."
+      },
+      "drift": {
+        "title": "Drift",
+        "body": "Send en Terraform-plan gjennom CI-systemet ditt for å sammenligne tilstanden med koden og den eksisterende infrastrukturen. Resultatene returneres via en signert engangs-callback og vises som en ressursspesifikk sammenligning."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "Test om Terraform-koden din utfører planlegging uten feil mot en fastsatt Terraform-versjon – og eventuelt fastsatte leverandør-/modulversjoner eller et register-speil – ved å sende init/plan til CI."
+      },
+      "reports": {
+        "title": "Rapporter",
+        "body": "Filtrer analyserte tilstandsfiler fra alle kilder – etter Terraform-versjon, leverandør, ressurstype, størrelse og antall ressurser – og eksporter deretter treffene som Markdown, JSON eller CSV."
+      },
+      "transfer": {
+        "title": "Overføring",
+        "body": "Kopier (sikkerhetskopier) eller flytt (migrer) en tilstandsfil mellom kilder — f.eks. fra lokal lagring til S3, eller fra HCP til et nytt backend-system."
+      },
+      "apiDocs": {
+        "title": "API-dokumentasjon",
+        "body": "Interaktiv OpenAPI-dokumentasjon generert fra håndteringsanmerkningene i backend-systemet. Rå spesifikasjon:"
+      },
+      "schedules": {
+        "title": "Tidsplaner",
+        "body": "Cron-styrte, gjentakende driftkjøringer. Hver tidsplan utfører det konfigurerte driftmålet med en bestemt frekvens og registrerer det siste resultatet."
+      },
+      "admin": {
+        "title": "Admin",
+        "body": "Oversikt over identitetsadministrasjon — antall brukere, organisasjoner og roller fra den delte identitetstjenesten. Kortene inneholder lenker til administrasjonssidene."
+      },
+      "adminUsers": {
+        "title": "Brukere",
+        "body": "Administrer brukerkontoer: søk, opprett, endre navn på, slett og administrer medlemskap i roller per organisasjon fra redigeringsvinduet."
+      },
+      "adminOrganizations": {
+        "title": "Organisasjoner",
+        "body": "Opprett og administrer organisasjoner, deres IdP-tilknytninger og medlemmene deres."
+      },
+      "adminRoles": {
+        "title": "Roller",
+        "body": "Rollemalene og de tilgangsrettighetene de gir. Systemrollene (leser, analytiker, operatør, redaktør, administrator) er forhåndsdefinerte."
+      },
+      "adminOidc": {
+        "title": "OIDC-grupper",
+        "body": "Tilordne IdP-grupper til organisasjonsroller. Disse tilordningene kan redigeres under kjøring og trer i kraft ved neste pålogging."
+      },
+      "adminMtls": {
+        "title": "mTLS-sertifikater",
+        "body": "Skrivebeskyttet visning av autentisering med gjensidig TLS og klient-sertifikat: om funksjonen er aktivert, klient-CA-en og tilordninger mellom sertifikatets subjekt og omfang (konfigurert i serverens konfigurasjonsfil)."
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "Skrivebeskyttet oversikt over alle identitetsleverandører: OIDC, SAML (per IdP), LDAP, mTLS og SCIM-provisjonering – aktivert status, nøkkelkonfigurasjon og gruppetilordninger. Hemmelige opplysninger vises aldri."
+      },
+      "adminNotifications": {
+        "title": "Varsler",
+        "body": "Webhook og Slack-kanaler utløses ved hendelser som dreier seg om oppdaget avvik og mislykkede kjøringer."
+      },
+      "adminAudit": {
+        "title": "Revisjonslogg",
+        "body": "Alle endringer i appen registreres her med opplysninger om utfører og IP-adresse: identitetsendringer, operasjoner knyttet til kilde, tilstand, sikkerhetskopiering og overføring, generering av rapporter, utførelse av oppdrag, tidsplaner, varslingskanaler og CI-integrasjoner."
+      },
+      "adminApiKeys": {
+        "title": "API-nøkler",
+        "body": "Selvbetjente bærerlegitimasjoner (tsm_…) for CI-rørledninger og skript — innlasting av driftdata, avlesning av tilstand, alt det API-et tilbyr. Hver enkelt administrerer sine egne nøkler; administratorer har oversikt over alle nøkler. En nøkkel kan kun ha de omfangene som oppretteren har. Den hemmelige nøkkelen vises nøyaktig én gang ved opprettelsen; ved rotasjon kan den gamle nøkkelen forbli gyldig i opptil 72 timer mens brukerne bytter over."
+      }
+    }
+  },
+  "actions": {
+    "addSource": "Legg til kilde",
+    "browseStates": "Bla gjennom delstater",
+    "newDriftRun": "Nytt drifttur",
+    "newHealthRun": "Nytt helseløp",
+    "addPipeline": "Legg til rørledning",
+    "workflowTemplate": "Arbeidsflytmal",
+    "newTransfer": "Ny overgang"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "CI-maler",
+      "pageSubtitle": "Rediger, legg til eller erstatt malene for drift- og version-lab-pipeline som brukes i repo-veiviseren. «Standard»-profilen for hver leverandør/type faller tilbake til den innebygde profilen dersom den mangler.",
+      "addTemplate": "Legg til mal",
+      "emptyState": "Det finnes ingen CI-maler ennå.",
+      "createFirst": "Legg til din første mal",
+      "thProvider": "Leverandør",
+      "thKind": "Vennlig",
+      "thProfile": "Profil",
+      "thName": "Navn",
+      "thActions": "Handlinger",
+      "builtinChip": "innebygd",
+      "builtinNoDelete": "Innebygde maler kan ikke slettes",
+      "tooltipEdit": "Rediger mal",
+      "tooltipDelete": "Slett mal",
+      "ariaEdit": "Rediger mal",
+      "ariaDelete": "Slett mal",
+      "dialogTitleAdd": "Legg til CI-mal",
+      "dialogTitleEdit": "Rediger CI-mal",
+      "dialogTitleDelete": "Slett mal",
+      "confirmDelete": "Skal malen «{{name}}» slettes? Dette kan ikke angres.",
+      "labelProvider": "Leverandør",
+      "labelKind": "Vennlig",
+      "labelProfile": "Profil",
+      "labelName": "Navn",
+      "labelDescription": "Beskrivelse",
+      "labelContent": "Mal (YAML)",
+      "helpProfile": "ID-en skal skrives med små bokstaver, f.eks. brunswick-azure. Bokstaver, tall, punktum, bindestrek og understrek.",
+      "cancel": "Avbryt",
+      "create": "Opprett",
+      "save": "Lagre",
+      "delete": "Slett",
+      "errSave": "Det gikk ikke å lagre malen.",
+      "errDelete": "Det gikk ikke å slette malen.",
+      "errProfile": "Profilen må bestå av [A-Za-z0-9._-]+"
+    },
+    "apiDocs": {
+      "sections": "Avsnitt"
+    },
+    "admin": {
+      "identity": "Identitet",
+      "overview": "Oversikt over identitetsadministrasjon. Brukere, organisasjoner og rollemaler hentes fra den delte identitetstjenesten.",
+      "users": "Brukere",
+      "organizations": "Organisasjoner",
+      "roles": "Roller"
+    },
+    "dashboard": {
+      "rum": "RUM",
+      "rumHint": "Forvaltede midler",
+      "managed": "Administrert",
+      "dataSources": "Datakilder",
+      "totalInstances": "Totalt antall forekomster",
+      "sources": "Kilder",
+      "states": "Statlige filer",
+      "providerDistribution": "Fordeling av leverandører",
+      "topResourceTypes": "De viktigste ressurstypene",
+      "terraformVersions": "Terraform-versjoner",
+      "count": "Telle: {{value}}",
+      "versionChartHint": "Klikk på en versjon for å vise statusfilene for den.",
+      "versionStatesTitle": "Statistikkfiler etter Terraform-versjon",
+      "versionStatesError": "Det lyktes ikke å laste inn de tilhørende tilstandsfilene.",
+      "versionStatesEmpty": "Ingen tilstandsfiler oppfyller dette versjonsfilteret.",
+      "versionStatesCount_one": "{{count}} statusfil",
+      "versionStatesCount_other": "{{count}} statlige filer",
+      "versionExportCsv": "Eksporter CSV",
+      "versionStateRum": "RUM {{count}}",
+      "versionUnknown": "ukjent",
+      "versionOpAria": "Versjonssammenligning",
+      "versionOpEq": "Nettopp denne versjonen",
+      "versionOpLte": "Denne versjonen eller eldre",
+      "versionOpLt": "Eldre enn denne versjonen",
+      "versionOpGte": "Denne versjonen eller nyere",
+      "versionOpGt": "Nyere enn denne versjonen",
+      "syncPartial": "{{stored}}er av {{listed}}-tilstandsfiler er analysert så langt — synkroniseringen pågår; det totale antallet vil øke etter hvert som den fullføres.",
+      "syncErrors_one": "{{count}} Kilden meldte om feil ved den siste synkroniseringen; tallene kan være ufullstendige.",
+      "syncErrors_other": "{{count}} Kildene har rapportert feil ved den siste synkroniseringen; tallene deres kan være ufullstendige.",
+      "syncStatus": "Kildesynkronisering",
+      "syncStates": "{{stored}} / {{listed}} analyserte delstater",
+      "syncedAt": "synkronisert {{time}}",
+      "syncReadErrors": "{{count}} lesefeil",
+      "syncPending": "venter på første synkronisering",
+      "empty": "Ingen status ennå. Koble til en kilde for å se flåtens nøkkeltall her.",
+      "goToSources": "Legg til en kilde",
+      "asOf": "Data per {{time}}"
+    },
+    "sources": {
+      "empty": "Det er ikke koblet til noen kilder ennå. Legg til en for å se gjennom og analysere tilstanden.",
+      "uploadAnalyze": "Analysere en opplastet tilstandsfil",
+      "loadFailed": "Det gikk ikke an å laste inn kildene.",
+      "deleteSourceAria": "slett kilde",
+      "browseStates": "Bla gjennom delstater",
+      "analysisTitle": "Analyse — {{name}}",
+      "deleteTitle": "Slett kilde",
+      "deleteBody": "Fjern kilden <1>{{name}}</3><!--1-->? Dette kobler den fra State Manager. Den underliggende tilstandsbackenden og dens filer blir <3>ikke<!--3--> berørt.",
+      "deleteConfirmLabel": "Slett kilde",
+      "editSourceAria": "Rediger kildekoden",
+      "editSourceTitle": "Rediger {{name}}",
+      "keepCredentialHelper": "La feltet stå tomt for å beholde gjeldende påloggingsopplysninger.",
+      "testConnection": "Test tilkoblingen",
+      "testOk": "OK · {{count}} angir",
+      "testFailed": "Tilkoblingen mislyktes",
+      "statesIn": "Delstater i «{{name}}»",
+      "stateCount_one": "{{count}} tilstand",
+      "stateCount_other": "{{count}} stater",
+      "listFailed": "Det gikk ikke å vise delstatene.",
+      "noStateFiles": "Det ble ikke funnet noen .tfstate-filer.",
+      "filterStates": "Filter{{count}}-delstater…",
+      "noStatesMatch": "Ingen delstater har navnet «{{filter}}».",
+      "selectState": "Velg en delstat for å se analysen for den.",
+      "tabAnalysis": "Analyse",
+      "tabResources": "Ressurser",
+      "tabOutputs": "Resultater",
+      "tabRaw": "Rå",
+      "export": "Eksport",
+      "exportReportHeader": "Analyserapport",
+      "downloadState": "Last ned tilstandsfil (.tfstate)",
+      "outputsFailed": "Det gikk ikke an å laste inn utdataene.",
+      "noOutputs": "Denne tilstanden angir ingen utdata fra rotmodulen.",
+      "outputName": "Navn",
+      "outputType": "Type",
+      "outputValue": "Verdi",
+      "sensitiveValue": "Sensitiv — skjult",
+      "tabBackups": "Sikkerhetskopier",
+      "tabModules": "Moduler",
+      "moduleSource": "Modul",
+      "moduleVersion": "Versjon",
+      "registryHost": "Registeret",
+      "constraintOnly": "kun begrensning",
+      "moduleStatus": "Status",
+      "moduleUpToDate": "Oppdatert",
+      "moduleUnknown": "Ukjent",
+      "noModules": "Det er ikke registrert noen modulopprinnelse for denne tilstanden. Legg inn en fullstendig plan i /drift/ingest for å fylle ut opplysningene.",
+      "modulesFailed": "Det gikk ikke å laste inn modulen «provenance».",
+      "stateOps": "Statlige operasjoner",
+      "transfer": "Overføring",
+      "deleteState": "Slett",
+      "deleteStateTitle": "Slett tilstandsfilen",
+      "deleteStateBody": "Dette fjerner permanent live-state-objektet for <1>{{name}}</1><!--1--> fra dets backend.",
+      "deleteStateBackupNote": "Det tas en siste sikkerhetskopi på serversiden før slettingen, og handlingen blir loggført, slik at du kan gjenopprette den fra fanen «Sikkerhetskopier» — med mindre du velger å slette den permanent nedenfor. Vurder å bruke «Eksporter» → «Last ned tilstand» først.",
+      "deleteStatePurgeLabel": "Slett også alle lagrede sikkerhetskopier og historikken (kan ikke angres)",
+      "deleteStatePurgeWarning": "Slettingen etterlater ingen gjenopprettbar kopi av denne tilstanden. Dette er irreversibelt.",
+      "deleteStateConfirmPrompt": "Skriv inn <1>{{key}}</1><!--1--> for å bekrefte.",
+      "deleteStateConfirmAria": "Bekreft statsnøkkelen som skal slettes",
+      "deleteStateConfirmLabel": "Slett tilstand",
+      "stateOpTitle": "Statlig drift",
+      "stateOpDesc": "Strukturert redigering av <1>{{name}}</1><!--1-->. Det tas først en sikkerhetskopi av den gjeldende versjonen, og endringen blir loggført.",
+      "operation": "Drift",
+      "opRemove": "Fjern (terraform state rm)",
+      "opMove": "Flytt / gi nytt navn (terraform state mv)",
+      "resourceAddress": "Ressursadresse",
+      "newAddress": "Ny adresse",
+      "analyzeFailed": "Det gikk ikke an å analysere denne tilstandsfilen.",
+      "resourcesFailed": "Det gikk ikke an å laste inn ressursene.",
+      "filterResources": "Filtrer etter type, navn, modul eller leverandør…",
+      "module": "Modul",
+      "mode": "Modus",
+      "instances": "Eksempler",
+      "rawFailed": "Det gikk ikke an å laste inn rådata.",
+      "edit": "Rediger",
+      "save": "Lagre",
+      "notValidJson": "Ugyldig JSON",
+      "saveHelp": "Når du lagrer, blir den gjeldende versjonen sikkerhetskopiert, endringen godkjennes og redigeringen loggføres.",
+      "overwriteTitle": "Skal tilstanden overskrives?",
+      "overwriteBody": "Den nåværende versjonen av <1>{{name}}</1><!--1--> vil bli sikkerhetskopiert og deretter erstattet. Du kan gå tilbake til den forrige versjonen fra fanen «Sikkerhetskopier».",
+      "overwrite": "Overskriv",
+      "backupsFailed": "Det gikk ikke å laste inn sikkerhetskopiene.",
+      "noBackups": "Ingen sikkerhetskopier ennå — det tas automatisk en sikkerhetskopi før hver redigering eller gjenoppretting.",
+      "serialHeader": "Serie",
+      "action": "Handling",
+      "restore": "Gjenopprett",
+      "rum": "RUM",
+      "managed": "Administrert",
+      "dataSources": "Datakilder",
+      "totalInstances": "Totalt antall forekomster",
+      "terraform": "Terraform",
+      "serial": "Serie",
+      "topResourceTypes": "De viktigste ressurstypene",
+      "providers": "Leverandører",
+      "count": "Antall",
+      "transferTitle": "Overføringstilstand",
+      "copyTo": "Kopier <1>{{name}}</1><!--1--> til en annen kilde.",
+      "addSourceTitle": "Legg til kilde for delstat",
+      "type": "Type",
+      "uploadError": "Det var ikke mulig å analysere denne filen – er det en gyldig Terraform-tilstands-JSON-fil?",
+      "types": {
+        "local": "Lokal katalog",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3 (eller S3-kompatibel)",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Git-depot",
+        "consul": "Konsul KV",
+        "pg": "PostgreSQL-backend",
+        "kubernetes": "Kubernetes-hemmeligheter",
+        "http": "HTTP-backend"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "Grunnbane",
+            "helper": "Katalogen er skannet etter .tfstate-filer"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "Organisasjon"
+          },
+          "hostname": {
+            "label": "Vertsnavn"
+          },
+          "token": {
+            "label": "API-token",
+            "helper": "Lagret kryptert i hvile"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "Bøtte"
+          },
+          "region": {
+            "label": "Region"
+          },
+          "prefix": {
+            "label": "Nøkkelprefiks"
+          },
+          "endpoint": {
+            "label": "Endepunkt (S3-kompatibelt)"
+          },
+          "access_key_id": {
+            "label": "Tilgangsnøkkel-ID"
+          },
+          "secret_access_key": {
+            "label": "Hemmelig tilgangsnøkkel"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "Lagringskonto"
+          },
+          "container": {
+            "label": "Beholder"
+          },
+          "prefix": {
+            "label": "Blob-prefiks"
+          },
+          "account_key": {
+            "label": "Kontonøkkel",
+            "helper": "Lagret kryptert i hvile"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "Bøtte"
+          },
+          "prefix": {
+            "label": "Objektprefiks"
+          },
+          "credentials_json": {
+            "label": "JSON-fil for tjenestekonto",
+            "helper": "Lim inn JSON-nøkkelen, eller la feltet stå tomt for å bruke applikasjonens standard påloggingsopplysninger"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "URL til arkivet"
+          },
+          "ref": {
+            "label": "Filial"
+          },
+          "prefix": {
+            "label": "Stiprefiks"
+          },
+          "username": {
+            "label": "Brukernavn"
+          },
+          "token": {
+            "label": "Token",
+            "helper": "For private repos; lagres kryptert"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "Adresse"
+          },
+          "scheme": {
+            "label": "Opplegg"
+          },
+          "path": {
+            "label": "KV-baneprefiks"
+          },
+          "datacenter": {
+            "label": "Datasenter"
+          },
+          "token": {
+            "label": "ACL-token",
+            "helper": "Lagret kryptert i hvile"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "Tilkoblingsstreng",
+            "helper": "Lagret kryptert i hvile"
+          },
+          "schema_name": {
+            "label": "Skjema"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "URL til API-serveren"
+          },
+          "namespace": {
+            "label": "Navneområde"
+          },
+          "labels": {
+            "label": "Etikettvelger"
+          },
+          "ca_cert": {
+            "label": "Klynge CA (PEM)"
+          },
+          "token": {
+            "label": "Bærertoken",
+            "helper": "Lagret kryptert i hvile"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "Angi URL"
+          },
+          "lock_address": {
+            "label": "Lås URL",
+            "helper": "Aktiverer innebygd LOCK/UNLOCK-låsing"
+          },
+          "unlock_address": {
+            "label": "Lås opp URL"
+          },
+          "update_method": {
+            "label": "Oppdateringsmetode"
+          },
+          "username": {
+            "label": "Brukernavn"
+          },
+          "password": {
+            "label": "Passord",
+            "helper": "Lagret kryptert i hvile"
+          }
+        }
+      },
+      "optionalField": "{{label}} (valgfritt)",
+      "createFailed": "Det gikk ikke å opprette kilden.",
+      "tabHistory": "Historie",
+      "historyEmpty": "Ingen historikk ennå. Øyeblikksbilder lagres etter hvert som synkroniseringstjenesten registrerer denne endringen i tilstanden.",
+      "historyError": "Det gikk ikke å laste inn analysehistorikken.",
+      "historyRum": "RUM",
+      "historyResources": "Ressurser",
+      "historySnapshots_one": "{{count}} øyeblikksbilde",
+      "historySnapshots_other": "{{count}} øyeblikksbilder",
+      "historyAnalyzedAt": "Observert",
+      "historySerial": "Serie",
+      "historyTfVersion": "Terraform",
+      "historySize": "Størrelse"
+    },
+    "drift": {
+      "pipelines": "Rørledningsforbindelser",
+      "noPipelines": "Det er ingen rørledningsforbindelser ennå. Legg til en for å sende ut drivprøver.",
+      "noRuns": "Det er ikke gjennomført noen drifttester ennå.",
+      "runs": "Driftkjøring",
+      "statusFailed": "mislyktes",
+      "statusDriftDetected": "avdrift oppdaget",
+      "statusNoDrift": "ingen avvik",
+      "recentRuns": "Siste løpeturer",
+      "dir": "Dir",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "Konfigurer repo",
+      "ciSources": "CI-kilder",
+      "deletePipelineTitle": "Slett rørledningsforbindelse",
+      "deletePipelineBody": "Fjern rørledningsforbindelsen <1>{{name}}</1><!--1-->? Drift- og version-lab-kjøringer vil ikke lenger kunne sendes gjennom den.",
+      "editPipelineTitle": "Rediger rørledningsforbindelse",
+      "runDetailTitle": "Driftkjøring",
+      "defaultRef": "standardreferanse",
+      "pending": "venter på",
+      "addedChangedDestroyed": "{{added}} lagt til / {{changed}} endret / {{destroyed}} slettet",
+      "resource": "Ressurs",
+      "change": "Endring",
+      "noResourceDrift": "Det ble ikke rapportert om avvik per ressurs.",
+      "noDetailsYet": "Det foreligger ingen opplysninger ennå – løpet har ikke offentliggjort noen resultater.",
+      "addPipelineTitle": "Legg til rørledningsforbindelse",
+      "ciSource": "CI-kilde",
+      "ciSourceHelp": "Velg en konfigurert CI-kilde for å velge blant dens rørledninger eller arbeidsflyter, eller skriv inn koordinatene manuelt.",
+      "manualEntry": "Manuell registrering",
+      "pipeline": "Rørledning",
+      "pipelineHelp": "Velg rørledningen som er opprettet fra TSM-arbeidsflytmalen (knappen «Arbeidsflytmal») — vanlige CI-rørledninger avviser utsendingsparametrene",
+      "repository": "Arkiv",
+      "repositoryHelp": "Repositorier som er synlige for denne kilden",
+      "workflow": "Arbeidsflyt",
+      "workflowHelp": "Velg arbeidsflyten som er opprettet fra TSM-arbeidsflytmalen (f.eks. tsm-drift.yml) — andre arbeidsflyter avviser innspillene til dispatch",
+      "defaultRefOptional": "Standardreferanse (valgfritt)",
+      "credentialInherited": "Påloggingsinformasjon arvet fra CI-kilden — rotasjon av tokenet dekker denne tilkoblingen.",
+      "apiToken": "API-token / PAT",
+      "tokenHelp": "Lagret kryptert i hvile",
+      "tokenHelpEdit": "La feltet stå tomt for å beholde det nåværende tokenet. Skriv inn en ny verdi for å bytte det ut.",
+      "ciSourcesTitle": "CI-kilder",
+      "ciSourcesDesc": "CI-påloggingsopplysninger på organisasjonsnivå (en Azure DevOps-organisasjon/et prosjekt eller en GitHub-eier). Pipelinetilkoblinger opprettes fra en kilde valgt blant dens pipeliner eller arbeidsflyter, og deler dens token.",
+      "noCiSources": "Ingen CI-kilder ennå — legg til en nedenfor.",
+      "ownerLabel": "Eier (organisasjon eller bruker)",
+      "organization": "Organisasjon",
+      "project": "Prosjekt",
+      "sourceTokenHelp": "Lagres kryptert i hvile; deles via tilkoblinger opprettet fra denne kilden",
+      "addCiSource": "Legg til CI-kilde",
+      "authMethod": "Autentiseringsmetode",
+      "authMethodPat": "Personlig tilgangstoken",
+      "authMethodApp": "App-registrering (Entra)",
+      "appAuthHelp": "Registrering av Microsoft Entra-app (klientlegitimasjon) — anbefales for planlagt drift; ingen utløpsdato for PAT.",
+      "tenantId": "Leietaker-ID",
+      "clientId": "Kunde-ID",
+      "clientSecret": "Klienthemmelighet",
+      "clientSecretHelp": "Lagres kryptert i hvile; vises aldri igjen.",
+      "githubAppHelp": "Installasjon av GitHub-appen (installasjon av tilgangstokener) — anbefales for planlagt drift; PAT-tokenene utløper ikke.",
+      "githubAppId": "App-ID",
+      "githubInstallationId": "Installasjons-ID",
+      "appPrivateKey": "Privatnøkkel (PEM)",
+      "appPrivateKeyHelp": "Lim inn den private nøkkelen (PEM) fra GitHub-appen. Lagres kryptert når den ikke er i bruk; vises aldri igjen.",
+      "testConnection": "Test tilkoblingen",
+      "testConnectionOk": "Tilkoblingen er bekreftet",
+      "deleteCiSourceTitle": "Slett CI-kilde",
+      "deleteCiSourceBody": "Slette «{{name}}»? Rørledningsforbindelser som er opprettet ut fra denne, vil slutte å sende data med mindre de har sitt eget token.",
+      "newRunTitle": "Nytt drifttur",
+      "gitRefOptional": "Git-referanse (valgfritt)",
+      "gitRefHelp": "La feltet stå tomt for å kjøre fra rørledningens standardgren; fyll det ut kun hvis du ønsker å planlegge en bestemt gren/referanse",
+      "workingDir": "Arbeidskatalog",
+      "dispatch": "Utsendelse",
+      "workflowTemplateTitle": "Mal for drift-arbeidsflyt",
+      "placeholderPipelineDefault": "standardgren for pipeline",
+      "wizard": {
+        "title": "Konfigurere drift for et arkiv",
+        "steps": {
+          "source": "Kilde og arkiv",
+          "workflow": "Arbeidsflytfil",
+          "connect": "Opprett og koble til"
+        },
+        "preflight": "CI-tilbakekallings-URL-en er <1>{{base}}</3><!--1--> — CI-agenter som er hostet eksternt, kan ikke nå en lokal/privat adresse, så kjøringene vil aldri rapportere resultater. Bruk en egenhostet agent som kan nå denne verten, eller opprett en tunnel og angi <3>TSM_SERVER_CALLBACK_URL<!--3-->.",
+        "preflightUnset": "ikke konfigurert",
+        "intro": "Velg CI-kilden og repositoriet som inneholder Terraform-filer. Veiviseren genererer TSM-drift-arbeidsflyten for dette, og oppretter deretter rørledningsforbindelsen.",
+        "noSourcesHelp": "Det er ikke konfigurert noen CI-kilder ennå — legg først til en via «CI-kilder»-knappen på Drift-siden.",
+        "sourceHelp": "På organisasjonsnivået brukes denne påloggingsinformasjonen til å bla gjennom og opprette.",
+        "repoHelp": "Repositorium som inneholder Terraform",
+        "workingDir": "Terraforms arbeidsmappe",
+        "workingDirHelp": "I forhold til repo-roten",
+        "serviceConnection": "Tjenestetilkobling (valgfritt)",
+        "serviceConnectionErr": "Kunne ikke vise en liste over tjenesteforbindelser (PAT har kanskje ikke tilstrekkelig omfang) — nevnes kun ved navn i YAML-veiledningen.",
+        "serviceConnectionHelp": "Oppgitt i den genererte YAML-veiledningen om påloggingsopplysninger",
+        "commitHeading": "Legg inn denne filen i <1>{{file}}</1><!--1--> på standardgrenen {{branch}} — enten manuelt eller via en PR",
+        "copy": "Kopier",
+        "copied": "Kopiert",
+        "commitViaPR": "Send inn via PR",
+        "setupExists": "Arbeidsflytfilen ligger allerede på standardgrenen — det er ingenting å legge inn. Fortsett med å opprette tilkoblingen.",
+        "prMerged": "Pull-forespørselen er slått sammen — arbeidsflyten ligger på standardgrenen. Fortsett med å opprette tilkoblingen.",
+        "prClosed": "Pull-forespørselen ble lukket uten å bli slått sammen. Gjør en «Commit» på nytt via PR, eller utfør en «Commit» manuelt.",
+        "prOpen": "Det er opprettet en pull-forespørsel fra <1>{{branch}}</3><!--1--> — <3>gå gjennom og slå den sammen<!--3-->. Venter på at den skal slås sammen…",
+        "credsInfoAdo": "Rørledningen trenger påloggingsopplysninger for skytjenesten for å kjøre Terraform — konfigurer en tjenesteforbindelse/arbeidsbelastningsidentitet der malen angir det. Påloggingsopplysningene lagres i CI, aldri i TSM.",
+        "credsInfoGh": "Rørledningen trenger påloggingsopplysninger for skytjenesten for å kjøre Terraform — koble til en OIDC-rolle i skyen eller lagringsplasshemmeligheter der malen angir det. Påloggingsopplysningene lagres i CI, aldri i TSM.",
+        "pipelineName": "Rørledningens navn",
+        "connectionName": "Navn på tilkobling",
+        "adoConnectDesc": "Når filen er lagt inn, oppretter TSM i ett trinn både Azure DevOps-pipelinedefinisjonen som peker mot <1>{{path}}</1><!--1--> i <3>{{repo}}</3><!--3--> og pipelinetilkoblingen. Merk: Den første kjøringen kan kreve en engangsautorisering av ressurser i Azure DevOps (tilgang til tjenestetilkobling).",
+        "ghConnectDesc": "Når filen er slått sammen med standardgrenen <1>{{repo}}</3><!--1-->, registrerer GitHub arbeidsflyten automatisk — TSM oppdager deretter <3>tsm-drift.yml<!--3--> og oppretter tilkoblingen.",
+        "ghMissing": "Arbeidsflyt <1>tsm-drift.yml<!--1--> er ikke funnet på {{repo}} ennå. Legg den inn i standardgrenen, vent noen sekunder på at GitHub skal oppdatere, og sjekk på nytt.",
+        "done": "Rørledningstilkobling <1>{{name}}</1><!--1--> er opprettet — du kan nå kjøre drift-kjøringer mot den.",
+        "existingPipeline": "Det finnes allerede en pipeline med navnet <1>{{name}}</1><!--1--> i dette prosjektet — koble deg til den i stedet for å opprette en duplikat.",
+        "useExisting": "Bruk eksisterende",
+        "createAnyway": "Lag det uansett",
+        "createBoth": "Opprett rørledning og tilkobling",
+        "checkAgain": "Sjekk igjen",
+        "detectConnect": "Oppdage og koble til",
+        "includeVersionLab": "Konfigurer også arbeidsflyten i Version Lab",
+        "includeVersionLabHelp": "Lagre tsm-health.yml sammen med drift-arbeidsflyten og opprett en ny rørledningsforbindelse for versjonstesting.",
+        "driftFile": "Drift-arbeidsflyt",
+        "versionLabFile": "Arbeidsflyt i Version Lab",
+        "dispatchFirstRun": "Start en første driftkjøring etter tilkobling",
+        "firstRunDispatched": "Første driftkjøring er i gang — se den på denne siden.",
+        "firstRunFailed": "Tilkoblingen ble opprettet, men den første kjøringen kunne ikke sendes ut: {{error}}",
+        "versionLabSuffix": "Version Lab"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "Eier"
+          },
+          "repo": {
+            "label": "Arkiv"
+          },
+          "workflow_id": {
+            "label": "Arbeidsflytfil eller -ID"
+          },
+          "ref": {
+            "label": "Standardreferanse"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "Organisasjon"
+          },
+          "project": {
+            "label": "Prosjekt"
+          },
+          "pipeline_id": {
+            "label": "Rørlednings-ID"
+          },
+          "ref": {
+            "label": "Standardreferanse"
+          }
+        }
+      },
+      "recordsTitle": "Drift-rekorder",
+      "recordsFilter": "Opptaksfilter",
+      "recordsActive": "Aktiv",
+      "recordsAll": "Alle",
+      "recordOpen": "Åpne",
+      "recordAcknowledged": "Bekreftet",
+      "recordResolved": "Vedtatt",
+      "recordSeverity": "Alvorlighetsgrad",
+      "recordState": "Kilde / tilstand",
+      "recordDetections": "Påvisninger",
+      "recordFirstDetected": "Oppdaget for første gang",
+      "recordLastDetected": "Sist registrert",
+      "noActiveRecords": "Ingen avvik — hver tilstand stemmer overens med koden sin.",
+      "noRecords": "Det finnes ingen driftoppføringer ennå. Oppføringene vises når en driftkjøring eller en innlastingsrapport viser endringer.",
+      "acknowledge": "Bekreft",
+      "resolve": "Løsning",
+      "acknowledgeTitle": "Ta høyde for avvik",
+      "acknowledgeBody": "Merk denne driften som observert. Registreringen forblir bekreftet ved gjentatte registreringer og løses automatisk når det rapporteres om en feilfri kjøring.",
+      "ackNoteLabel": "Merknad (valgfritt)",
+      "ackedBy": "Omtalt av {{actor}}",
+      "recordDetailTitle": "Driftrekord"
+    },
+    "versionLab": {
+      "noPipelines": "Ingen rørledningsforbindelser ennå — legg til en på Drift-siden, og gå deretter tilbake hit.",
+      "noRuns": "Det er ikke gjennomført noen helsetester ennå.",
+      "terraform": "Terraform",
+      "checks": "Sjekker",
+      "statusDispatchFailed": "utsendelsen mislyktes",
+      "statusHealthy": "sunn",
+      "statusUnhealthy": "usunt",
+      "newRunTitle": "Ny versjon – helseløp",
+      "pipeline": "Rørledning",
+      "gitRef": "Git-referanse",
+      "workingDir": "Arbeidskatalog",
+      "terraformVersion": "Terraform-versjon",
+      "registryHost": "Registret (valgfritt)",
+      "registryHostHelp": "Registreringens vert slik den fremgår av kildadressene i modulen din (f.eks. registry.example.com) – ikke en speil-URL eller -bane. Fylles ut automatisk fra den tilkoblede registreringen når dette er tilgjengelig; leverandører hentes fra dens nettverksspeil.",
+      "providerVersions": "Leverandørversjoner (valgfritt)",
+      "moduleVersions": "Modulversjoner (valgfritt)",
+      "dispatch": "Utsendelse",
+      "workflowTitle": "Mal for arbeidsflyt for versjonsstatus",
+      "showing": "Viser {{from}}–{{to}} av {{total}}"
+    },
+    "schedules": {
+      "title": "Tidsplaner",
+      "description": "Kjør driftkontroller automatisk etter en cron-plan. Hver gang en brann oppstår, utløses en driftkontroll i den valgte CI-pipelineen.",
+      "add": "Legg til tidsplan",
+      "edit": "Rediger tidsplan",
+      "cron": "Tidsplan",
+      "cronHelp": "Cron-uttrykk (f.eks. «0 3 * * *») eller et nøkkelord: daglig, ukentlig, hvert 15. minutt.",
+      "pipeline": "CI-prosess",
+      "sourceId": "Kilde-ID (valgfritt)",
+      "stateKey": "Statlig nøkkel (valgfritt)",
+      "repoRef": "Repo-referanse (valgfritt)",
+      "workingDir": "Arbeidskatalog (valgfritt)",
+      "enabled": "Aktivert",
+      "lastRun": "Siste løp",
+      "nextRun": "Neste løp",
+      "runNow": "Kjør nå",
+      "never": "Løp aldri",
+      "noSchedules": "Det finnes ingen tidsplaner ennå. Legg til en for å kjøre driftkontroller automatisk.",
+      "deleteTitle": "Slett tidsplan",
+      "deleteConfirm": "Skal du slette tidsplanen «{{name}}»? Da vil den slutte å kjøre."
+    },
+    "notifications": {
+      "title": "Varsler",
+      "description": "Send varsler til en webhook, Slack, Microsoft Teams eller e-post når en drift-kjøring oppdager avvik eller mislykkes. Mottakeradressene lagres kryptert og vises aldri igjen.",
+      "add": "Legg til kanal",
+      "edit": "Rediger kanal",
+      "noChannels": "Det finnes ingen varslingskanaler ennå. Legg til en for å motta Drift-varsler.",
+      "events": "Arrangementer",
+      "allEvents": "Alle arrangementer",
+      "target": "Mål-URL",
+      "targetHelp": "URL-adressen til webhooken, Slack eller Teams som skal brukes for innkommende webhooker, som det skal sendes en POST-forespørsel til.",
+      "targetKeep": "La feltet stå tomt for å beholde den nåværende URL-adressen.",
+      "targetEmail": "Mottakerens e-postadresser",
+      "targetEmailHelp": "E-postadresser atskilt med komma. Sendt via det konfigurerte SMTP-reléet.",
+      "targetEmailKeep": "La feltet stå tomt for å beholde de nåværende mottakerne.",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "E-post",
+      "eventsHelp": "La begge boksene være umerket for å motta alle hendelser.",
+      "test": "Send test",
+      "testSent": "Testmelding sendt.",
+      "lastDelivery": "Siste levering",
+      "neverSent": "Aldri sendt",
+      "deleteTitle": "Slett kanal",
+      "deleteConfirm": "Skal kanalen «{{name}}» slettes?",
+      "event": {
+        "drift_detected": "Drift oppdaget",
+        "run_failed": "Kjøringen mislyktes"
+      }
+    },
+    "reports": {
+      "description": "Filtrer analyserte tilstandsfiler fra alle kilder, og eksporter deretter treffene som Markdown, JSON eller CSV.",
+      "filters": "Filtre",
+      "advanced": "Avanserte filtre",
+      "sources": "Kilder",
+      "allSources": "Alle kilder",
+      "searchKey": "Statsnøkkelen inneholder",
+      "version": "Terraform-versjon",
+      "versionOpAria": "Versjonssammenligning",
+      "provider": "Leverandør",
+      "resourceType": "Ressurstype",
+      "reset": "Tilbakestill filtre",
+      "refreshHint": "Synkroniser og last inn de valgte kildene på nytt — eller alle kildene hvis ingen er valgt",
+      "min": "Min",
+      "max": "Max",
+      "rumRange": "RUM",
+      "managedRange": "Administrerte ressurser",
+      "dataRange": "Datakilder",
+      "totalRange": "Totalt antall forekomster",
+      "sizeRange": "Størrelse (byte)",
+      "matched": "Samstemt",
+      "rum": "RUM",
+      "managed": "Administrert",
+      "dataSources": "Datakilder",
+      "totalInstances": "Totalt antall forekomster",
+      "results": "Resultater",
+      "truncated": "Viser de første {{shown}} av {{total}} treffene — juster filtrene eller eksporter for å få hele settet.",
+      "empty": "Det finnes ingen statlige filer som oppfyller disse filtrene.",
+      "loadFailed": "Det lyktes ikke å laste inn de tilhørende tilstandsfilene.",
+      "export": "Eksport",
+      "exportError": "Eksporten mislyktes.",
+      "colSource": "Kilde",
+      "colState": "Statlig fil",
+      "colVersion": "Terraform",
+      "colRum": "RUM",
+      "colManaged": "Administrert",
+      "colData": "Data",
+      "colTotal": "Totalt",
+      "colSize": "Størrelse",
+      "colAnalyzed": "Analysert",
+      "unknownVersion": "ukjent"
+    },
+    "transfer": {
+      "needScope": "Du må ha omfanget «state:transfer» for å kunne utføre overføringer.",
+      "source": "Kilde",
+      "destination": "Reisemål",
+      "stateFile": "Statlig fil",
+      "noStatesInSource": "Ingen tilstandsfiler i denne kilden",
+      "mode": "Modus",
+      "modeBackup": "Sikkerhetskopi (kopi)",
+      "modeMigrate": "Migrere (kopiere + kontrollere paritet)",
+      "targetSource": "Kilde for mål",
+      "targetKey": "Målnøkkel",
+      "hcpTargetHint": "HCP-mål: Nøkkelen er NAVNET på arbeidsområdet — hvis et arbeidsområde mangler, opprettes det automatisk i organisasjonen. For å overskrive et eksisterende arbeidsområde må tilstandens serienummer økes, og slektslinjen må stemme overens; arbeidsområdet er låst under skrivingen.",
+      "gitTargetHint": "Git-mål: endringene blir lagt inn i den konfigurerte grenen og sendt direkte (aldri tvangssendt) — grenen må tillate direkte oppsendinger. Nøklene må ende på .tfstate.",
+      "targetKeyHelp": "Målbane/nøkkel i målkilden",
+      "sameTarget": "Målet må være forskjellig fra kildetilstanden.",
+      "decommissionLabel": "Deaktiver kilden etter en bekreftet migrering (tømmer den opprinnelige kilden; sikkerhetskopieres først)",
+      "confirmDecommission": "Skriv inn kildestatsnøkkelen for å bekrefte avviklingen",
+      "newTransfer": "Ny overgang",
+      "runBackup": "Sikkerhetskopi",
+      "runMigrate": "Migrere",
+      "runMigrateDecommission": "Migrering og avvikling",
+      "verified": "bekreftet: {{value}}",
+      "sourceDecommissioned": "kilden er tatt ut av drift"
+    },
+    "login": {
+      "signIn": "Logg inn",
+      "signInWith": "Logg inn med {{provider}}",
+      "signInWithSSO": "Logg inn med SSO",
+      "signInWithAzureAD": "Logg inn med Azure AD",
+      "signInWithLdap": "Logg inn med LDAP",
+      "devLogin": "Utviklerinnlogging (Admin)",
+      "devModeNotice": "Utviklingsmodus – Klikk nedenfor for å logge inn uten OAuth",
+      "devLoginFailed": "Innloggingen som utvikler mislyktes. Sjekk serverloggene.",
+      "subtitle": "Logg inn for å fortsette",
+      "noProviders": "Det er ikke konfigurert noen SSO-leverandører. Ta kontakt med administratoren din.",
+      "or": "ELLER",
+      "orUseProductionAuth": "ELLER BRUK PRODUKSJONSAUTHENTISERING",
+      "orSignInWithLdap": "ELLER LOGG INN MED LDAP",
+      "loadingProviders": "Laster inn påloggingsleverandører",
+      "username": "Brukernavn",
+      "password": "Passord",
+      "ldapError": "Ugyldig brukernavn eller passord.",
+      "ssoInfo": "Denne applikasjonen bruker Single Sign-On for autentisering.",
+      "ssoContact": "Ta kontakt med administratoren din hvis du trenger tilgang."
+    },
+    "sso": {
+      "title": "SSO / Identitet",
+      "description": "Skrivebeskyttet visning av konfigurasjonen for enkel pålogging og tildeling av rettigheter. Du kan redigere disse i serverkonfigurasjonsfilen.",
+      "enabled": "Aktivert",
+      "disabled": "Funksjonshemmet",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIM-konfigurering",
+      "scimNote": "Når denne funksjonen er aktivert, aksepterer /scim/v2 SCIM 2.0-bruker- og gruppeprovisjonering fra en klient med bærertoken som har omfanget scim:provision.",
+      "group": "Gruppe",
+      "groupDn": "Gruppe DN",
+      "organization": "Organisasjon",
+      "role": "Rolle",
+      "subject": "Sertifikatets emne",
+      "scopes": "Omfang",
+      "idps": "Identitetsleverandører",
+      "idpInitiated": "IdP-initiert SSO",
+      "issuer": "Utstederens nettadresse",
+      "groupClaim": "Gruppesøksmål",
+      "groupAttribute": "Gruppeattributt",
+      "entityId": "Enhets-ID",
+      "acsUrl": "ACS-URL",
+      "host": "Vert",
+      "baseDn": "Basis-DN",
+      "caFile": "CA-fil for klient",
+      "defaultRole": "Standardrolle",
+      "noMappings": "Det er ikke konfigurert noen gruppetilknytninger."
+    },
+    "apiKeys": {
+      "title": "API-nøkler",
+      "description": "Nøkler brukes til å autentisere CI-rørledninger og skript som «Bearer»-tokens. En nøkkel inneholder kun de omfangene du har tilgang til; administratorer kan se alle nøkler.",
+      "create": "Opprett nøkkel",
+      "createTitle": "Opprett API-nøkkel",
+      "editTitle": "Rediger API-nøkkel",
+      "empty": "Ingen API-nøkler ennå. Opprett en for å kunne kalle opp API-et fra CI (drift-innlasting, tilstandsavlesninger) uten en nettlesersesjon.",
+      "prefix": "Nøkkel",
+      "scopes": "Omfang",
+      "scopesHelp": "En nøkkel kan kun inneholde omfang som du selv har.",
+      "expires": "Utløpsdato",
+      "expiresLabel": "Utløpsdato (valgfritt)",
+      "expiresHelp": "La feltet stå tomt hvis nøkkelen ikke skal ha utløpsdato.",
+      "expired": "Utløpt",
+      "never": "Aldri",
+      "lastUsed": "Sist brukt",
+      "neverUsed": "Aldri",
+      "descriptionLabel": "Beskrivelse (valgfritt)",
+      "secretTitle": "Din nye API-nøkkel",
+      "secretWarning": "Kopier denne nøkkelen nå – den vises bare én gang og kan ikke gjenopprettes.",
+      "secretStored": "Jeg har lagt nøkkelen til side",
+      "rotate": "Roter",
+      "rotateTitle": "Spill «{{name}}»",
+      "rotateBody": "Det opprettes en erstatningsnøkkel med samme anvendelsesområder. Trekk den gamle nøkkelen tilbake umiddelbart, eller la den forbli gyldig i en overgangsperiode mens brukerne bytter over.",
+      "graceLabel": "Gyldighetsperiode for gamle nøkler",
+      "graceImmediate": "Opphev umiddelbart",
+      "graceHours_one": "La det stå i en {{count}} time",
+      "graceHours_other": "Oppbevar i {{count}} timer",
+      "deleteTitle": "Slett API-nøkkel",
+      "deleteBody": "Slette «{{name}}»? Alt som bruker denne til å autentisere seg, slutter å fungere umiddelbart."
+    }
+  },
+  "commandPalette": {
+    "title": "Kommandopalett",
+    "placeholder": "Søkesider…",
+    "empty": "Ingen resultater.",
+    "openButton": "Åpne kommandopaletten",
+    "hint": "Hurtignavigering (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "Navigasjon"
+    }
+  },
+  "support": {
+    "title": "Støtte",
+    "contextHelp": "Konteksthjelp"
+  },
+  "session": {
+    "expiresSoon": "Sesjonen din utløper om {{minutes}} minutter. Oppdater siden for å forbli innlogget.",
+    "refresh": "Oppdater økt"
+  },
+  "consentBanner": {
+    "ariaLabel": "Samtykke til bruk av informasjonskapsler",
+    "title": "Vi legger stor vekt på å beskytte personopplysningene dine",
+    "essential": "Viktig (alltid på)",
+    "errorReporting": "Feilrapportering",
+    "performanceMonitoring": "Ytelsesovervåking",
+    "analytics": "Analytikk",
+    "hideDetails": "Skjul detaljer",
+    "customize": "Tilpass",
+    "rejectAll": "Avvis alle",
+    "acceptAll": "Godta alle"
+  },
+  "a11y": {
+    "skipToContent": "Gå til hovedinnholdet",
+    "openNavigation": "Åpne navigasjonen",
+    "mainNavigation": "Hovednavigasjon",
+    "closeNavigation": "Lukk navigasjonen",
+    "navigatedTo": "Gikk til {{title}}",
+    "breadcrumbs": "Navigasjonsstien"
+  },
+  "errorBoundary": {
+    "title": "Det oppstod en feil",
+    "description": "Det oppstod en uventet feil under visningen av denne siden.",
+    "tryAgain": "Prøv på nytt",
+    "reloadPage": "Last inn siden på nytt"
+  },
+  "empty": {
+    "default": "Det er ingenting her ennå."
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "Brukere",
+      "pageSubtitle": "Administrer brukerkontoer og tilgangsrettigheter",
+      "addUser": "Legg til bruker",
+      "cancel": "Avbryt",
+      "save": "Lagre",
+      "create": "Opprett",
+      "add": "Legg til",
+      "delete": "Slett",
+      "erase": "Slett",
+      "errLoad": "Det gikk ikke å laste inn brukere. Prøv på nytt.",
+      "errSave": "Det gikk ikke å lagre brukeren. Prøv på nytt.",
+      "errDelete": "Det gikk ikke å slette brukeren. Prøv på nytt.",
+      "userErased": "Brukerdata er slettet.",
+      "errErase": "Det gikk ikke å slette brukerdataene. Prøv på nytt.",
+      "exportedData": "Eksporterte brukerdata for {{email}}.",
+      "errExport": "Det gikk ikke å eksportere brukerdata.",
+      "errAddMembership": "Det gikk ikke å legge til organisasjonsmedlemskap",
+      "errUpdateRole": "Det gikk ikke å oppdatere rollen",
+      "errRemoveMembership": "Det lyktes ikke å fjerne fra organisasjonen",
+      "searchPlaceholder": "Søk etter brukere...",
+      "thName": "Navn",
+      "thEmail": "E-post",
+      "thOrgRoles": "Organisasjoner og roller",
+      "thCreated": "Opprettet",
+      "thActions": "Handlinger",
+      "emptyTitle": "Ingen brukere funnet",
+      "emptyDescription": "Brukere vises her etter at de har logget seg inn for første gang. Inviter teammedlemmer ved å dele appens nettadresse og oppgi en SSO- eller utviklerinnloggingsleverandør.",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}: Ingen rolle tildelt",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "Ingen rolle",
+      "noOrganizations": "Ingen organisasjoner",
+      "tooltipEdit": "Rediger bruker",
+      "ariaEdit": "Rediger bruker",
+      "tooltipExport": "Eksportere brukerdata (GDPR artikkel 15/20)",
+      "ariaExport": "Eksporter brukerdata",
+      "tooltipErase": "Slette brukerdata (GDPR artikkel 17)",
+      "ariaErase": "Slett brukerdata",
+      "tooltipDelete": "Slett bruker",
+      "ariaDelete": "Slett bruker",
+      "dialogTitleEdit": "Rediger bruker",
+      "dialogTitleAdd": "Legg til bruker",
+      "labelEmail": "E-post",
+      "helpEmail": "Brukerens e-postadresse. Brukes som påloggings-ID og kan ikke endres etter opprettelsen.",
+      "labelName": "Navn",
+      "helpName": "Fullt visningsnavn vises overalt i grensesnittet",
+      "sectionOrgMembership": "Medlemskap i organisasjonen",
+      "currentOrgs": "Nåværende organisasjoner:",
+      "addToOrg": "Legg til i organisasjonen",
+      "orgOptional": "Organisasjon (valgfritt)",
+      "menuNone": "Ingen",
+      "helpAssignOrg": "Tilordne denne brukeren til en organisasjon for å styre hvilke ressurser vedkommende har tilgang til.",
+      "labelRoleTemplate": "Rollemal",
+      "helpRoleTemplate": "Definerer hvilke rettigheter som er tildelt i den valgte organisasjonen. Du kan administrere maler under «Admin» → «Roller».",
+      "ariaRemoveFromOrg": "Fjern fra organisasjonen",
+      "dialogTitleDelete": "Slett bruker",
+      "confirmDelete": "Er du sikker på at du vil slette brukeren «{{name}}»? Denne handlingen kan ikke angres.",
+      "eraseTitle": "Slette brukerdata (GDPR artikkel 17)",
+      "eraseWarnPart1": "Dette gjør at opplysningene blir anonymisert permanent ",
+      "eraseWarnPart2": "...s personopplysninger. Brukeroppføringen blir merket som «tombstone», API-nøkler og organisasjonsmedlemskap slettes, og alle økter oppheves. Oppføringene i revisjonsloggen beholdes med anonymiserte identifikatorer. ",
+      "eraseWarnCannotUndo": "Denne handlingen kan ikke angres.",
+      "eraseConfirmPart1": "For å bekrefte, skriv inn brukerens e-postadresse (",
+      "eraseConfirmPart2": ") nedenfor.",
+      "ariaConfirmErasure": "Bekreft slettingen ved å skrive inn brukerens e-postadresse"
+    },
+    "organizations": {
+      "pageTitle": "Organisasjoner",
+      "pageSubtitle": "Administrer organisasjoner og deres medlemmer",
+      "addOrganization": "Legg til organisasjon",
+      "cancel": "Avbryt",
+      "save": "Lagre",
+      "create": "Opprett",
+      "close": "Lukk",
+      "delete": "Slett",
+      "errLoad": "Det gikk ikke å laste inn organisasjonene. Prøv på nytt.",
+      "errSave": "Det gikk ikke å lagre organisasjonen. Prøv på nytt.",
+      "errDelete": "Det gikk ikke å slette organisasjonen. Prøv på nytt.",
+      "errName": "Organisasjonsnavnet må bestå av 1–64 tegn, begynne med en liten bokstav eller et tall, og kun inneholde små bokstaver, tall, bindestreker eller understreker.",
+      "errAddMember": "Det gikk ikke å legge til medlem",
+      "errUpdateRole": "Det gikk ikke å oppdatere medlemsrollen",
+      "errRemoveMember": "Det gikk ikke å fjerne medlemmet",
+      "emptyState": "Ingen organisasjoner funnet",
+      "createFirst": "Opprett den første organisasjonen",
+      "thName": "Navn",
+      "thDisplayName": "Visningsnavn",
+      "thIdentityProvider": "Identitetsleverandør",
+      "thMembers": "Medlemmer",
+      "thCreated": "Opprettet",
+      "thActions": "Handlinger",
+      "idpAny": "Noen",
+      "viewMembers": "Vis medlemmer",
+      "tooltipEditOrg": "Rediger organisasjon",
+      "ariaEditOrg": "Rediger organisasjon",
+      "tooltipDeleteOrg": "Slett organisasjon",
+      "ariaDeleteOrg": "Slett organisasjon",
+      "dialogTitleEdit": "Rediger organisasjon",
+      "dialogTitleAdd": "Legg til organisasjon",
+      "labelName": "Navn",
+      "helpNameInvalid": "Må begynne med en liten bokstav eller et tall; kun små bokstaver, tall, bindestreker og understreker er tillatt (maks. 64 tegn)",
+      "helpName": "Organisasjonsnavn som brukes i register-URL-er (f.eks. myorg)",
+      "renameWarnPart1": "Hvis du endrer navnet på denne organisasjonen, vil alle modul- og leverandørnavneområder som for øyeblikket bruker ",
+      "renameWarnPart2": " til ",
+      "renameWarnPart3": ". Brukermedlemskapene er knyttet til ID-en og vil ikke bli berørt. Sørg for at alle Terraform-konfigurasjoner som refererer til det gamle navnet, blir oppdatert.",
+      "labelDisplayName": "Visningsnavn",
+      "helpDisplayName": "Visningsnavn for organisasjonen",
+      "labelIdpType": "Type identitetsleverandør",
+      "menuIdpAny": "Hvilken som helst (ingen begrensninger)",
+      "labelIdpName": "IdP-navn",
+      "helpIdpName": "Navnet på identitetsleverandøren (f.eks. SAML-IdP-navn fra konfigurasjonen)",
+      "dialogTitleDelete": "Slett organisasjon",
+      "confirmDelete": "Er du sikker på at du vil slette organisasjonen «{{name}}»? Denne handlingen kan ikke angres.",
+      "membersTitle": "Organisasjonsmedlemmer – {{name}}",
+      "addMember": "Legg til medlem",
+      "membersManageDesc": "Administrer medlemmer og deres roller i denne organisasjonen",
+      "membersViewDesc": "Vis medlemmer og deres roller i denne organisasjonen",
+      "noMembers": "Det er ingen medlemmer i denne organisasjonen ennå",
+      "addFirstMember": "Legg til første medlem",
+      "thEmail": "E-post",
+      "thRole": "Rolle",
+      "noRole": "Ingen rolle",
+      "unknown": "Ukjent",
+      "tooltipRemoveMember": "Fjern medlem",
+      "ariaRemoveMember": "Fjern medlem",
+      "addMemberTitle": "Legg til medlem i {{name}}",
+      "labelSelectUser": "Velg bruker",
+      "placeholderSearchUsers": "Søk etter brukere...",
+      "labelRoleTemplate": "Rollemal",
+      "menuNoRoleViewOnly": "Ingen rolle (kun visning)"
+    },
+    "roles": {
+      "loadError": "Det gikk ikke å laste inn roller. Prøv på nytt.",
+      "title": "Roller og rettigheter",
+      "subtitle": "Se de tilgjengelige rollene og de tilhørende tillatelsesområdene. Systemroller er forhåndsdefinerte og kan ikke endres.",
+      "availableScopesReference": "Referanse for tilgjengelige skoper",
+      "scopesDefine": "Omfang definerer hvilke handlinger en rolle kan utføre i applikasjonen.",
+      "thScope": "Omfang",
+      "thDescription": "Beskrivelse",
+      "roleTemplates": "Rollemaler",
+      "clickRole": "Klikk på en rolle for å se alle detaljene om dens omfang.",
+      "noRoles": "Ingen roller funnet.",
+      "systemChip": "System",
+      "scopeCount_one": "{{count}} omfang",
+      "scopeCount_other": "{{count}} omfang",
+      "assignedScopes": "Tildelte områder:",
+      "permissionsByCategory": "Tillatelser etter kategori:",
+      "fullAccessViaAdmin": "Full tilgang (via administrator)",
+      "noAccess": "Ingen tilgang",
+      "metaRoleId": "Rolle-ID",
+      "metaCreated": "Opprettet",
+      "metaUpdated": "Oppdatert"
+    },
+    "auditLog": {
+      "exportCsv": "Eksporter som CSV",
+      "exportJson": "Eksporter som JSON",
+      "labelStartDate": "Startdato",
+      "labelEndDate": "Sluttdato",
+      "labelResourceType": "Ressurstype",
+      "labelAction": "Handling",
+      "labelUserEmail": "Brukerens e-postadresse",
+      "placeholderUserEmail": "Søk etter e-postadresse...",
+      "thTimestamp": "Tidsstempel",
+      "thAction": "Handling",
+      "thResource": "Ressurs",
+      "thUser": "Bruker",
+      "thIpAddress": "IP-adresse",
+      "emptyTitle": "Ingen revisjonsoppføringer samsvarer med de gjeldende filtrene",
+      "emptySubtitle": "Det vises oppføringer i revisjonsloggen når brukere foretar endringer. Juster filtrene ovenfor eller publiser en modul for å se en slik oppføring.",
+      "detailTitle": "Detaljer i revisjonsloggen",
+      "close": "Lukk",
+      "pageTitle": "Revisjonslogger",
+      "pageSubtitle": "Spor systemaktivitet på tvers av alle ressurser og brukere",
+      "export": "Eksport",
+      "errExport": "Det gikk ikke å eksportere revisjonslogger",
+      "allResourceTypes": "Alle ressurstyper",
+      "reset": "Tilbakestill",
+      "detailId": "ID",
+      "detailResourceId": "Ressurs-ID",
+      "detailOrgId": "Organisasjons-ID",
+      "detailMetadata": "Metadata"
+    },
+    "oidcSettings": {
+      "pageTitle": "OIDC-grupper",
+      "pageSubtitle": "Konfigurer tilordning av gruppekrav fra identitetsleverandøren din til organisasjoner og roller i registeret. Endringene trer i kraft ved neste pålogging, uten at serveren må startes på nytt.",
+      "errLoad": "Det gikk ikke å laste inn OIDC-konfigurasjonen",
+      "msgSaved": "Innstillingene for gruppekartlegging er lagret.",
+      "errSave": "Det gikk ikke å lagre innstillingene for gruppetilknytning",
+      "activeProvider": "Aktiv OIDC-leverandør",
+      "labelProvider": "Leverandør",
+      "labelIssuer": "Utsteder",
+      "labelClientId": "Kunde-ID",
+      "labelStatus": "Status",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "groupClaimMapping": "Kartlegging av gruppekrav",
+      "groupClaimDescBefore": "Knytt IDP-gruppepåstander til registerorganisasjoner og roller. Navnet på gruppepåstanden må samsvare med påstandsnøkkelen i OIDC-ID-tokenet ditt (f.eks. ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "Navn på gruppesøksmål",
+      "helpGroupClaimName": "ID-token-kravet som inneholder brukerens gruppeliste",
+      "labelDefaultRole": "Standardrolle",
+      "menuNone": "Ingen",
+      "groupMappings": "Gruppetilordninger",
+      "addMapping": "Legg til tilordning",
+      "emptyMappings": "Det er ikke konfigurert noen gruppetilknytninger. Klikk på «Legg til tilknytning» for å opprette en.",
+      "thIdpGroup": "IdP-gruppen",
+      "thOrganization": "Organisasjon",
+      "thRole": "Rolle",
+      "thActions": "Handlinger",
+      "tooltipEdit": "Rediger tilordning av krav",
+      "ariaEdit": "Rediger tilordning av krav",
+      "tooltipDelete": "Slett tilordning av krav",
+      "ariaDelete": "Slett tilordning av krav",
+      "saving": "Lagrer…",
+      "saveChanges": "Lagre endringer",
+      "dialogTitleEdit": "Rediger gruppetilordning",
+      "dialogTitleAdd": "Legg til gruppetilordning",
+      "labelIdpGroup": "IdP-gruppen",
+      "helpIdpGroup": "Det eksakte gruppenavnet slik det fremgår av ID-token-kravet",
+      "labelOrganization": "Organisasjon",
+      "helpOrganization": "Navnet på den organisasjonen i registeret som brukeren skal legges til i",
+      "labelRole": "Rolle",
+      "cancel": "Avbryt",
+      "update": "Oppdatering",
+      "add": "Legg til",
+      "removeTitle": "Fjern gruppetilknytning",
+      "removeTextBefore": "Fjern tilordningen for gruppen ",
+      "removeTextAfter": "? Dette vil ikke påvirke eksisterende medlemskap — det hindrer bare at nye pålogginger automatisk oppretter dette medlemskapet.",
+      "remove": "Fjern",
+      "notSet": "(ikke angitt)",
+      "none": "(ingen)",
+      "samlGroupMappings": "SAML-gruppetilordninger",
+      "samlReadOnly": "SAML-gruppetilordninger konfigureres i serverkonfigurasjonsfilen og er skrivebeskyttet.",
+      "chipGroupAttribute": "Gruppegenskaper: {{value}}",
+      "chipDefaultRole": "Standardrolle: {{value}}",
+      "thSamlGroup": "SAML-gruppen",
+      "noSamlMappings": "Det er ikke konfigurert noen SAML-gruppetilknytninger.",
+      "ldapGroupMappings": "LDAP-gruppetilordninger",
+      "ldapReadOnly": "LDAP-gruppetilordninger konfigureres i serverens konfigurasjonsfil og er skrivebeskyttet.",
+      "thLdapGroupDn": "LDAP-gruppens DN",
+      "noLdapMappings": "Det er ikke konfigurert noen LDAP-gruppetilknytninger."
+    }
+  },
+  "mtls": {
+    "pageTitle": "mTLS-klientsertifikat-tilordninger",
+    "pageSubtitle": "Gjensidige tilordninger mellom TLS-sertifikat og emne. Disse konfigureres i serverkonfigurasjonsfilen og er skrivebeskyttet.",
+    "errLoad": "Det gikk ikke å laste inn mTLS-konfigurasjonen.",
+    "enabled": "Aktivert",
+    "disabled": "Funksjonshemmet",
+    "caFile": "CA-fil",
+    "noMappings": "Det er ikke konfigurert noen mTLS-sertifikat-tilordninger.",
+    "certificateSubject": "Sertifikatets emne",
+    "scopes": "Omfang"
+  }
+}

@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "Responsabile di Stato",
+    "tagline": "Analizza, modifica e trasferisci lo stato di Terraform su tutti i backend."
+  },
+  "nav": {
+    "groups": {
+      "main": "Stato",
+      "identity": "Identità",
+      "system": "Sistema"
+    },
+    "dashboard": "Home",
+    "dashboardTooltip": "Panoramica e statistiche",
+    "sources": "Fonti",
+    "sourcesTooltip": "Backend di stato connessi",
+    "drift": "Deriva",
+    "driftTooltip": "Confronta la situazione attuale con la normativa e le infrastrutture",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "Verifica lo stato del piano di test rispetto alle versioni fissate",
+    "schedules": "Orari",
+    "schedulesTooltip": "Le sessioni di drift ricorrenti vengono eseguite secondo una pianificazione cron",
+    "reports": "Rapporti",
+    "reportsTooltip": "Generare e scaricare i report dell'analizzatore",
+    "transfer": "Trasferimento",
+    "transferTooltip": "Eseguire il backup o la migrazione dello stato tra le origini",
+    "apiDocs": "Documentazione API",
+    "apiDocsTooltip": "Documentazione interattiva di OpenAPI",
+    "admin": {
+      "dashboard": "Pannello di controllo",
+      "dashboardTooltip": "Panoramica sulla gestione delle identità",
+      "users": "Utenti",
+      "usersTooltip": "Utenti e abbonamenti",
+      "organizations": "Organizzazioni",
+      "organizationsTooltip": "Organizzazioni e associazioni IdP",
+      "roles": "Ruoli",
+      "rolesTooltip": "Modelli di ruolo e ambiti di applicazione",
+      "sso": "SSO",
+      "ssoTooltip": "Fornitori di Single Sign-On e mappature",
+      "notifications": "Notifiche",
+      "notificationsTooltip": "Canali di allarme per guasti dovuti a deriva e fuori controllo",
+      "auditLogs": "Registro di controllo",
+      "auditLogsTooltip": "Audit trail relativo alla sicurezza e alle attività",
+      "oidcGroups": "Gruppi OIDC",
+      "oidcGroupsTooltip": "Mappare i gruppi IdP alle organizzazioni e ai ruoli",
+      "mtls": "Certificati mTLS",
+      "mtlsTooltip": "Soggetto del certificato client soggetto a mappature di ambito",
+      "apiKeys": "Chiavi API",
+      "apiKeysTooltip": "Creare e gestire le chiavi API per la CI e gli script",
+      "ciTemplates": "Modelli CI",
+      "ciTemplatesTooltip": "Modifica, aggiungi o sostituisci i modelli di pipeline di Drift e Version-Lab"
+    }
+  },
+  "common": {
+    "loading": "Caricamento in corso…",
+    "error": "Si è verificato un errore.",
+    "retry": "Riprova",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "confirm": "Conferma",
+    "close": "Chiudi",
+    "search": "Cerca",
+    "download": "Scarica",
+    "refresh": "Aggiorna",
+    "none": "Nessuno",
+    "yes": "Sì",
+    "no": "No",
+    "actions": "Azioni",
+    "created": "Creato",
+    "updated": "Aggiornato",
+    "status": "Stato",
+    "name": "Nome",
+    "type": "Tipo",
+    "back": "Indietro",
+    "next": "Avanti",
+    "previous": "Precedente",
+    "all": "Tutto",
+    "submit": "Invia",
+    "add": "Aggiungi",
+    "remove": "Rimuovi",
+    "edit": "Modifica",
+    "view": "Visualizza",
+    "copy": "Copia",
+    "copied": "Copiato",
+    "required": "Obbligatorio",
+    "optional": "Facoltativo",
+    "detail": "Dettagli",
+    "apply": "Candidati",
+    "create": "Crea",
+    "filter": "Filtro",
+    "ref": "Rif.",
+    "provider": "Fornitore",
+    "templateStyle": "Stile del modello",
+    "templateBuiltin": "Integrato (senza dipendenze)",
+    "templateSuite": "Suite Terraform (azioni / estensioni)"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "appearance": "Aspetto",
+    "theme": "Tema",
+    "themeLight": "Luce",
+    "themeDark": "Buio",
+    "themeSystem": "Sistema",
+    "language": "Lingua"
+  },
+  "about": {
+    "title": "Informazioni su",
+    "description": "Un'applicazione web per analizzare, modificare in modo sicuro e trasferire lo stato di Terraform tra i backend esistenti, con rilevamento delle discrepanze e test delle versioni basati sulla CI.",
+    "versionsHeading": "Versioni",
+    "frontend": "Frontend{{version}}",
+    "backend": "Backend{{version}}",
+    "backendUnavailable": "Backend non disponibile",
+    "built": "Realizzato c{{date}}",
+    "licenseHeading": "Licenza",
+    "licenseText": "Concesso in licenza ai sensi della",
+    "apache": "Licenza Apache 2.0",
+    "sourceHeading": "Fonte",
+    "repoBackend": "Repository backend",
+    "repoFrontend": "Repository frontend",
+    "close": "Chiudi"
+  },
+  "auth": {
+    "account": "Account",
+    "signIn": "Accedi",
+    "signOut": "Esci",
+    "insufficientTitle": "Autorizzazioni insufficienti",
+    "insufficientBody": "Non disponi dei diritti di accesso necessari ({{scope}}) per visualizzare questa pagina.",
+    "completingSignIn": "Accesso in corso…"
+  },
+  "landing": {
+    "heroTitle": "Lo stato di Terraform, sotto controllo",
+    "heroSubtitle": "Tieni traccia del tuo ambiente Terraform su tutti i backend: individua gli scostamenti, verifica gli aggiornamenti di versione, pianifica i controlli e trasferisci lo stato in modo sicuro.",
+    "signIn": "Accedi",
+    "apiDocs": "Documentazione API",
+    "goToDashboard": "Vai alla dashboard",
+    "estateTitle": "Il tuo patrimonio",
+    "estate": {
+      "sources": "Fonti",
+      "states": "Stati",
+      "rum": "RUM",
+      "rumHint": "Risorse gestite",
+      "totalResources": "Risorse totali"
+    },
+    "featuresTitle": "Cosa puoi fare",
+    "open": "Apri",
+    "signInToUse": "Accedi per utilizzare il servizio",
+    "gettingStarted": "Per iniziare",
+    "step1Title": "1. Accedi",
+    "step1DescAuth": "Hai effettuato l'accesso. Vai alla tua dashboard per una panoramica trasversale del tuo patrimonio.",
+    "step1DescUnauth": "Accedi tramite il provider di identità della tua organizzazione per accedere al tuo ambiente Terraform.",
+    "step2Title": "2. Collegare una sorgente",
+    "step2Desc": "Aggiungi un backend di stato (S3, Azure, GCS, Terraform Cloud e altri) in modo che l'analizzatore possa indicizzare i tuoi file di stato.",
+    "step3Title": "3. Monitorare e agire",
+    "step3Desc": "Eseguire controlli di drift e version-lab, pianificare esecuzioni ricorrenti, generare report e trasferire lo stato tra le fonti.",
+    "features": {
+      "sources": {
+        "title": "Fonti",
+        "desc": "Connettiti e sfoglia i backend di stato; l'analizzatore indicizza ogni file di stato per offrire una visione unificata."
+      },
+      "drift": {
+        "title": "Deriva",
+        "desc": "Confronta lo stato effettivo con il codice e l'infrastruttura operativa per individuare tempestivamente le modifiche non gestite."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "Prima di eseguire l'aggiornamento, verifica la validità del piano di test rispetto alle versioni di Terraform e dei provider fissate."
+      },
+      "schedules": {
+        "title": "Orari",
+        "desc": "Esegui i controlli di drift e di integrità secondo una pianificazione cron e ricevi una notifica quando si verifica un cambiamento."
+      },
+      "reports": {
+        "title": "Rapporti",
+        "desc": "Genera e scarica i report dell'analizzatore relativi a tutto il tuo parco macchine, filtrati in base alle tue esigenze."
+      },
+      "transfer": {
+        "title": "Trasferimento",
+        "desc": "Eseguire il backup o la migrazione dello stato tra le origini in modo sicuro, con verifica e disattivazione."
+      }
+    }
+  },
+  "help": {
+    "title": "Aiuto",
+    "open": "Apri la guida",
+    "close": "Chiudi la guida",
+    "none": "Per questa pagina non è ancora disponibile alcuna guida.",
+    "pages": {
+      "dashboard": {
+        "title": "Home",
+        "body": "Una panoramica trasversale del vostro ambiente Terraform: totale delle risorse gestite (RUM), ripartizione per provider e per tipo di risorsa, e distribuzione delle versioni di Terraform."
+      },
+      "sources": {
+        "title": "Fonti",
+        "body": "Collega i backend di stato esistenti e lavora con i relativi file di stato: non è necessaria alcuna migrazione per utilizzare TSM, che legge direttamente i backend già in uso."
+      },
+      "drift": {
+        "title": "Deriva",
+        "body": "Invia un piano Terraform tramite il tuo sistema di integrazione continua (CI) per confrontare lo stato con il codice e l'infrastruttura attiva. I risultati vengono restituiti tramite una callback firmata monouso e visualizzati sotto forma di differenze per singola risorsa."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "Verifica se i tuoi piani di codice Terraform vengono generati correttamente con una versione Terraform fissata — e, facoltativamente, con versioni fisse di provider/moduli o un mirror del registro — eseguendo il comando `init/plan` nella CI."
+      },
+      "reports": {
+        "title": "Rapporti",
+        "body": "Filtra i file di stato analizzati in tutte le fonti — in base alla versione di Terraform, al provider, al tipo di risorsa, alle dimensioni e al numero di risorse — quindi esporta i risultati corrispondenti in formato Markdown, JSON o CSV."
+      },
+      "transfer": {
+        "title": "Trasferimento",
+        "body": "Copiare (backup) o spostare (migrare) un file di stato tra diverse origini — ad esempio, da un sistema locale a S3, oppure da HCP a un nuovo backend."
+      },
+      "apiDocs": {
+        "title": "Documentazione API",
+        "body": "Documentazione OpenAPI interattiva generata dalle annotazioni degli handler del backend. Specifiche grezze:"
+      },
+      "schedules": {
+        "title": "Orari",
+        "body": "Esecuzioni ricorrenti di drift gestite da Cron. Ogni pianificazione invia il proprio obiettivo di drift configurato a intervalli regolari e registra l'ultimo risultato."
+      },
+      "admin": {
+        "title": "Amministratore",
+        "body": "Panoramica sulla gestione delle identità — numero di utenti, organizzazioni e ruoli provenienti dal servizio di identità condiviso. Le schede rimandano alle pagine di gestione."
+      },
+      "adminUsers": {
+        "title": "Utenti",
+        "body": "Gestione degli account utente: ricerca, creazione, rinominazione, eliminazione e gestione delle appartenenze ai ruoli per organizzazione dalla finestra di dialogo di modifica."
+      },
+      "adminOrganizations": {
+        "title": "Organizzazioni",
+        "body": "Creare e gestire le organizzazioni, i relativi collegamenti IdP e i relativi membri."
+      },
+      "adminRoles": {
+        "title": "Ruoli",
+        "body": "I modelli di ruolo e gli ambiti di autorizzazione che conferiscono. I ruoli di sistema (lettore, analista, operatore, redattore, amministratore) sono predefiniti."
+      },
+      "adminOidc": {
+        "title": "Gruppi OIDC",
+        "body": "Assegna i gruppi IdP ai ruoli dell'organizzazione. Queste assegnazioni sono modificabili in fase di esecuzione e diventano effettive al successivo accesso."
+      },
+      "adminMtls": {
+        "title": "Certificati mTLS",
+        "body": "Vista in sola lettura dell'autenticazione tramite certificato client Mutual-TLS: se è abilitata, l'autorità di certificazione (CA) del client e le corrispondenze tra il soggetto del certificato e l'ambito (configurate nel file di configurazione del server)."
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "Aggregato in sola lettura di ogni provider di identità: OIDC, SAML (per singolo IdP), LDAP, mTLS e l'opzione di provisioning SCIM — stato di attivazione, configurazione delle chiavi e mappature dei gruppi. I segreti non vengono mai visualizzati."
+      },
+      "adminNotifications": {
+        "title": "Notifiche",
+        "body": "Webhook e canali Slack attivati in caso di rilevamento di scostamenti e di errori nell'esecuzione."
+      },
+      "adminAudit": {
+        "title": "Registro di controllo",
+        "body": "Ogni modifica apportata all'app viene registrata qui con l'indicazione dell'autore e dell'IP: modifiche all'identità, operazioni relative a origine/stato/backup/trasferimento, generazione di report, invio di comandi di esecuzione, pianificazioni, canali di notifica e integrazioni CI."
+      },
+      "adminApiKeys": {
+        "title": "Chiavi API",
+        "body": "Credenziali self-service di tipo \"Bearer\" (tsm_…) per pipeline e script CI — acquisizione dei dati di drift, letture dello stato e qualsiasi altra funzionalità offerta dall’API. Ciascuno gestisce le proprie chiavi; gli amministratori possono visualizzare tutte le chiavi. Una chiave può avere solo gli ambiti di cui è titolare il suo creatore. Il segreto viene mostrato esattamente una sola volta al momento della creazione; la rotazione può mantenere valida la vecchia chiave per un massimo di 72 ore, il tempo necessario agli utenti per effettuare il passaggio."
+      }
+    }
+  },
+  "actions": {
+    "addSource": "Aggiungi fonte",
+    "browseStates": "Sfoglia gli Stati",
+    "newDriftRun": "Nuova discesa in drift",
+    "newHealthRun": "Nuova corsa per la salute",
+    "addPipeline": "Aggiungi pipeline",
+    "workflowTemplate": "Modello di flusso di lavoro",
+    "newTransfer": "Nuovo trasferimento"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "Modelli CI",
+      "pageSubtitle": "Modifica, aggiungi o sostituisci i modelli di pipeline drift e version-lab forniti dalla procedura guidata del repository. Il profilo \"predefinito\" di ciascun provider/tipo ricorre a quello integrato in caso di assenza.",
+      "addTemplate": "Aggiungi modello",
+      "emptyState": "Non ci sono ancora modelli CI.",
+      "createFirst": "Aggiungi il tuo primo modello",
+      "thProvider": "Fornitore",
+      "thKind": "Tipo",
+      "thProfile": "Profilo",
+      "thName": "Nome",
+      "thActions": "Azioni",
+      "builtinChip": "integrato",
+      "builtinNoDelete": "I modelli predefiniti non possono essere eliminati",
+      "tooltipEdit": "Modifica modello",
+      "tooltipDelete": "Elimina modello",
+      "ariaEdit": "Modifica modello",
+      "ariaDelete": "Elimina modello",
+      "dialogTitleAdd": "Aggiungi modello CI",
+      "dialogTitleEdit": "Modifica modello CI",
+      "dialogTitleDelete": "Elimina modello",
+      "confirmDelete": "Elimina il modello \"{{name}}\"? Questa operazione non può essere annullata.",
+      "labelProvider": "Fornitore",
+      "labelKind": "Tipo",
+      "labelProfile": "Profilo",
+      "labelName": "Nome",
+      "labelDescription": "Descrizione",
+      "labelContent": "Modello (YAML)",
+      "helpProfile": "ID in minuscolo, ad esempio brunswick-azure. Lettere, cifre, punto, trattino, trattino basso.",
+      "cancel": "Annulla",
+      "create": "Crea",
+      "save": "Salva",
+      "delete": "Elimina",
+      "errSave": "Impossibile salvare il modello.",
+      "errDelete": "Impossibile eliminare il modello.",
+      "errProfile": "Il profilo deve contenere caratteri [A-Za-z0-9._-]+"
+    },
+    "apiDocs": {
+      "sections": "Sezioni"
+    },
+    "admin": {
+      "identity": "Identità",
+      "overview": "Panoramica sulla gestione delle identità. Gli utenti, le organizzazioni e i modelli di ruolo provengono dal servizio di identità condiviso.",
+      "users": "Utenti",
+      "organizations": "Organizzazioni",
+      "roles": "Ruoli"
+    },
+    "dashboard": {
+      "rum": "RUM",
+      "rumHint": "Patrimonio gestito",
+      "managed": "Gestito",
+      "dataSources": "Fonti dei dati",
+      "totalInstances": "Numero totale di istanze",
+      "sources": "Fonti",
+      "states": "File di sistema",
+      "providerDistribution": "Distribuzione dei fornitori",
+      "topResourceTypes": "Principali tipi di risorse",
+      "terraformVersions": "Versioni di Terraform",
+      "count": "Conte: {{value}}",
+      "versionChartHint": "Fai clic su una versione per visualizzare l'elenco dei relativi file di stato.",
+      "versionStatesTitle": "File di stato per versione di Terraform",
+      "versionStatesError": "Impossibile caricare i file di stato corrispondenti.",
+      "versionStatesEmpty": "Nessun file di stato corrisponde a questo filtro di versione.",
+      "versionStatesCount_one": "{{count}} file di stato",
+      "versionStatesCount_other": "{{count}} file di sistema",
+      "versionExportCsv": "Esporta CSV",
+      "versionStateRum": "RUM{{count}}",
+      "versionUnknown": "sconosciuto",
+      "versionOpAria": "Confronto tra le versioni",
+      "versionOpEq": "Proprio questa versione",
+      "versionOpLte": "Questa versione o una precedente",
+      "versionOpLt": "Versione precedente a questa",
+      "versionOpGte": "Questa versione o una più recente",
+      "versionOpGt": "Più recente di questa versione",
+      "syncPartial": "Finora sono stati analizzati {{stored}} file di stato di {{listed}} — sincronizzazione in corso; i totali aumenteranno al termine dell'operazione.",
+      "syncErrors_one": "{{count}} La fonte ha segnalato degli errori nell'ultima sincronizzazione; i dati potrebbero essere incompleti.",
+      "syncErrors_other": "{{count}} alcune fonti hanno segnalato errori nell'ultima sincronizzazione; i loro dati potrebbero essere incompleti.",
+      "syncStatus": "Sincronizzazione delle fonti",
+      "syncStates": "{{stored}} / {{listed}} Stati analizzati",
+      "syncedAt": "sincronizzato {{time}}",
+      "syncReadErrors": "{{count}} errori di lettura",
+      "syncPending": "in attesa della prima sincronizzazione",
+      "empty": "Non è ancora disponibile. Collega una fonte per visualizzare qui i dati relativi alla tua flotta.",
+      "goToSources": "Aggiungi una fonte",
+      "asOf": "Dati aggiornati al {{time}}"
+    },
+    "sources": {
+      "empty": "Non sono ancora state collegate fonti. Aggiungine una per visualizzarla e analizzarne lo stato.",
+      "uploadAnalyze": "Analizzare un file di stato caricato",
+      "loadFailed": "Impossibile caricare le fonti.",
+      "deleteSourceAria": "elimina sorgente",
+      "browseStates": "Sfoglia gli Stati",
+      "analysisTitle": "Analisi — {{name}}",
+      "deleteTitle": "Elimina sorgente",
+      "deleteBody": "Rimuovere la sorgente <1>{{name}}</3><!--1-->? In questo modo verrà disconnessa dallo State Manager. Il backend di stato sottostante e i relativi file <3>non<!--3--> vengono modificati.",
+      "deleteConfirmLabel": "Elimina sorgente",
+      "editSourceAria": "Modifica sorgente",
+      "editSourceTitle": "Modifica {{name}}",
+      "keepCredentialHelper": "Lasciare vuoto per mantenere le credenziali attuali.",
+      "testConnection": "Verifica della connessione",
+      "testOk": "OK · {{count}} states",
+      "testFailed": "Connessione non riuscita",
+      "statesIn": "Stati presenti nell'{{name}}",
+      "stateCount_one": "{{count}} stato",
+      "stateCount_other": "{{count}} stati",
+      "listFailed": "Impossibile elencare gli stati.",
+      "noStateFiles": "Non sono stati trovati file .tfstate.",
+      "filterStates": "Filtra gli Stati dell'{{count}}…",
+      "noStatesMatch": "Nessuno Stato corrisponde a “{{filter}}”.",
+      "selectState": "Seleziona uno Stato per visualizzarne l'analisi.",
+      "tabAnalysis": "Analisi",
+      "tabResources": "Risorse",
+      "tabOutputs": "Risultati",
+      "tabRaw": "Grezzo",
+      "export": "Esporta",
+      "exportReportHeader": "Rapporto di analisi",
+      "downloadState": "Scarica il file di stato (.tfstate)",
+      "outputsFailed": "Impossibile caricare i risultati.",
+      "noOutputs": "Questo stato non dichiara alcuna uscita del modulo root.",
+      "outputName": "Nome",
+      "outputType": "Tipo",
+      "outputValue": "Valore",
+      "sensitiveValue": "Sensibile — nascosto",
+      "tabBackups": "Backup",
+      "tabModules": "Moduli",
+      "moduleSource": "Modulo",
+      "moduleVersion": "Versione",
+      "registryHost": "Registro",
+      "constraintOnly": "solo vincolo",
+      "moduleStatus": "Stato",
+      "moduleUpToDate": "Aggiornato",
+      "moduleUnknown": "Sconosciuto",
+      "noModules": "Per questo stato non è stata registrata alcuna provenienza dei moduli. Invia un piano completo a /drift/ingest per popolarlo.",
+      "modulesFailed": "Impossibile caricare il modulo \"provenance\".",
+      "stateOps": "Operazioni statali",
+      "transfer": "Trasferimento",
+      "deleteState": "Elimina",
+      "deleteStateTitle": "Elimina il file di stato",
+      "deleteStateBody": "Questa operazione rimuove definitivamente l'oggetto di stato attivo per <1>{{name}}</1><!--1--> dal relativo backend.",
+      "deleteStateBackupNote": "Prima della cancellazione viene eseguito un backup finale sul server e l'operazione viene registrata; è quindi possibile ripristinare i dati dalla scheda \"Backup\", a meno che non si proceda alla cancellazione definitiva come indicato di seguito. Si consiglia di utilizzare prima l'opzione \"Esporta → Scarica stato\".",
+      "deleteStatePurgeLabel": "Elimina anche tutti i backup salvati e la cronologia (operazione irreversibile)",
+      "deleteStatePurgeWarning": "La cancellazione definitiva non lascia alcuna copia recuperabile di questo stato. L'operazione è irreversibile.",
+      "deleteStateConfirmPrompt": "Digita <1>{{key}}</1><!--1--> per confermare.",
+      "deleteStateConfirmAria": "Confermare la chiave di sistema da eliminare",
+      "deleteStateConfirmLabel": "Elimina stato",
+      "stateOpTitle": "Gestione statale",
+      "stateOpDesc": "Modifica strutturata di <1>{{name}}</1><!--1-->. Viene prima eseguito un backup della versione corrente e la modifica viene registrata.",
+      "operation": "Funzionamento",
+      "opRemove": "Rimuovi (terraform state rm)",
+      "opMove": "Sposta / rinomina (terraform state mv)",
+      "resourceAddress": "Indirizzo della risorsa",
+      "newAddress": "Nuovo indirizzo",
+      "analyzeFailed": "Impossibile analizzare questo file di stato.",
+      "resourcesFailed": "Impossibile caricare le risorse.",
+      "filterResources": "Filtra per tipo, nome, modulo o fornitore…",
+      "module": "Modulo",
+      "mode": "Modalità",
+      "instances": "Esempi",
+      "rawFailed": "Impossibile caricare lo stato grezzo.",
+      "edit": "Modifica",
+      "save": "Salva",
+      "notValidJson": "JSON non valido",
+      "saveHelp": "Al momento del salvataggio, viene eseguito un backup della versione corrente, la modifica viene convalidata e l'operazione di modifica viene registrata.",
+      "overwriteTitle": "Sovrascrivere lo stato?",
+      "overwriteBody": "Verrà eseguito un backup della versione corrente di <1>{{name}}</1><!--1-->, che verrà poi sostituita. È possibile ripristinare la versione precedente dalla scheda \"Backup\".",
+      "overwrite": "Sovrascrivi",
+      "backupsFailed": "Impossibile caricare i backup.",
+      "noBackups": "Non ci sono ancora backup: ne viene creato uno automaticamente prima di ogni modifica o ripristino.",
+      "serialHeader": "Seriale",
+      "action": "Azione",
+      "restore": "Ripristina",
+      "rum": "RUM",
+      "managed": "Gestito",
+      "dataSources": "Fonti dei dati",
+      "totalInstances": "Numero totale di istanze",
+      "terraform": "Terraform",
+      "serial": "Seriale",
+      "topResourceTypes": "Principali tipi di risorse",
+      "providers": "Fornitori",
+      "count": "Conte",
+      "transferTitle": "Stato del trasferimento",
+      "copyTo": "Copia <1>{{name}}</1><!--1--> in un'altra fonte.",
+      "addSourceTitle": "Aggiungi fonte statale",
+      "type": "Tipo",
+      "uploadError": "Impossibile analizzare quel file: si tratta di un file JSON di stato Terraform valido?",
+      "types": {
+        "local": "Elenco locale",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3 (o compatibile con S3)",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Repository Git",
+        "consul": "Console KV",
+        "pg": "Backend PostgreSQL",
+        "kubernetes": "Segreti di Kubernetes",
+        "http": "Backend HTTP"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "Percorso di base",
+            "helper": "La directory è stata analizzata alla ricerca di file .tfstate"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "Organizzazione"
+          },
+          "hostname": {
+            "label": "Nome host"
+          },
+          "token": {
+            "label": "Token API",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "Secchio"
+          },
+          "region": {
+            "label": "Regione"
+          },
+          "prefix": {
+            "label": "Prefisso chiave"
+          },
+          "endpoint": {
+            "label": "Endpoint (compatibile con S3)"
+          },
+          "access_key_id": {
+            "label": "ID chiave di accesso"
+          },
+          "secret_access_key": {
+            "label": "Chiave di accesso segreta"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "Account di archiviazione"
+          },
+          "container": {
+            "label": "Contenitore"
+          },
+          "prefix": {
+            "label": "Prefisso \"blob\""
+          },
+          "account_key": {
+            "label": "Codice account",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "Secchio"
+          },
+          "prefix": {
+            "label": "Prefisso dell'oggetto"
+          },
+          "credentials_json": {
+            "label": "Account di servizio JSON",
+            "helper": "Incolla il JSON della chiave oppure lascia il campo vuoto per utilizzare le credenziali predefinite dell'applicazione"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "URL del repository"
+          },
+          "ref": {
+            "label": "Filiale"
+          },
+          "prefix": {
+            "label": "Prefisso del percorso"
+          },
+          "username": {
+            "label": "Nome utente"
+          },
+          "token": {
+            "label": "Token",
+            "helper": "Per i repository privati: archiviati in forma crittografata"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "Indirizzo"
+          },
+          "scheme": {
+            "label": "Schema"
+          },
+          "path": {
+            "label": "Prefisso del percorso KV"
+          },
+          "datacenter": {
+            "label": "Centro dati"
+          },
+          "token": {
+            "label": "Token ACL",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "Stringa di connessione",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          },
+          "schema_name": {
+            "label": "Schema"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "URL del server API"
+          },
+          "namespace": {
+            "label": "Spazio dei nomi"
+          },
+          "labels": {
+            "label": "Selettore di etichette"
+          },
+          "ca_cert": {
+            "label": "Cluster CA (PEM)"
+          },
+          "token": {
+            "label": "Token al portatore",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "URL dello Stato"
+          },
+          "lock_address": {
+            "label": "Blocca URL",
+            "helper": "Abilita il blocco nativo LOCK/UNLOCK"
+          },
+          "unlock_address": {
+            "label": "Sblocca URL"
+          },
+          "update_method": {
+            "label": "Metodo di aggiornamento"
+          },
+          "username": {
+            "label": "Nome utente"
+          },
+          "password": {
+            "label": "Password",
+            "helper": "Archiviati in forma crittografata quando non sono in uso"
+          }
+        }
+      },
+      "optionalField": "{{label}} (facoltativo)",
+      "createFailed": "Impossibile creare la fonte.",
+      "tabHistory": "Storia",
+      "historyEmpty": "Non ci sono ancora dati storici. Le istantanee vengono accumulate man mano che il servizio di sincronizzazione rileva questo cambiamento di stato.",
+      "historyError": "Impossibile caricare la cronologia delle analisi.",
+      "historyRum": "RUM",
+      "historyResources": "Risorse",
+      "historySnapshots_one": "{{count}} istantanea",
+      "historySnapshots_other": "{{count}} istantanee",
+      "historyAnalyzedAt": "Osservato",
+      "historySerial": "Seriale",
+      "historyTfVersion": "Terraform",
+      "historySize": "Dimensioni"
+    },
+    "drift": {
+      "pipelines": "Collegamenti delle condutture",
+      "noPipelines": "Non ci sono ancora collegamenti alla pipeline. Aggiungine uno per avviare le esecuzioni di drift.",
+      "noRuns": "Non sono ancora state effettuate prove di deriva.",
+      "runs": "Gare di drift",
+      "statusFailed": "fallito",
+      "statusDriftDetected": "rilevata deriva",
+      "statusNoDrift": "nessuna deriva",
+      "recentRuns": "Corse recenti",
+      "dir": "Dir",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "Configurare il repository",
+      "ciSources": "Fonti CI",
+      "deletePipelineTitle": "Elimina connessione alla pipeline",
+      "deletePipelineBody": "Rimuovere il collegamento alla pipeline <1>{{name}}</1><!--1-->? Le esecuzioni Drift e version-lab non potranno più essere inviate tramite questo collegamento.",
+      "editPipelineTitle": "Modifica connessione della pipeline",
+      "runDetailTitle": "Gara di drift",
+      "defaultRef": "riferimento predefinito",
+      "pending": "in sospeso",
+      "addedChangedDestroyed": "{{added}} aggiunto / {{changed}} modificato / {{destroyed}} eliminato",
+      "resource": "Risorsa",
+      "change": "Modifica",
+      "noResourceDrift": "Non è stata segnalata alcuna deriva per singola risorsa.",
+      "noDetailsYet": "Non ci sono ancora dettagli: la corsa non ha ancora comunicato i risultati.",
+      "addPipelineTitle": "Aggiungi un collegamento alla conduttura",
+      "ciSource": "Codice sorgente CI",
+      "ciSourceHelp": "Seleziona una fonte CI configurata per scegliere tra le sue pipeline o i suoi flussi di lavoro, oppure inserisci manualmente le coordinate.",
+      "manualEntry": "Inserimento manuale",
+      "pipeline": "Condotta",
+      "pipelineHelp": "Seleziona la pipeline creata dal modello di flusso di lavoro TSM (pulsante “Modello di flusso di lavoro”) — le normali pipeline CI rifiutano i parametri di invio",
+      "repository": "Archivio",
+      "repositoryHelp": "Repository visibili a questa sorgente",
+      "workflow": "Flusso di lavoro",
+      "workflowHelp": "Selezionare il flusso di lavoro creato dal modello di flusso di lavoro TSM (ad es. tsm-drift.yml) — gli altri flussi di lavoro non accettano gli input di invio",
+      "defaultRefOptional": "Riferimento predefinito (facoltativo)",
+      "credentialInherited": "Credenziale ereditata dalla fonte CI — la rotazione del token copre questa connessione.",
+      "apiToken": "Token API / PAT",
+      "tokenHelp": "Archiviati in forma crittografata quando non sono in uso",
+      "tokenHelpEdit": "Lasciare vuoto per mantenere il token attuale. Inserire un nuovo valore per sostituirlo.",
+      "ciSourcesTitle": "Fonti CI",
+      "ciSourcesDesc": "Credenziali CI a livello di organizzazione (un’organizzazione o un progetto Azure DevOps oppure un proprietario GitHub). Le connessioni alle pipeline vengono create a partire da una sorgente selezionata tra le sue pipeline o i suoi flussi di lavoro e condividono il relativo token.",
+      "noCiSources": "Non ci sono ancora fonti CI — aggiungine una qui sotto.",
+      "ownerLabel": "Proprietario (organizzazione o utente)",
+      "organization": "Organizzazione",
+      "project": "Progetto",
+      "sourceTokenHelp": "Archiviati in forma crittografata quando inattivi; condivisi tramite connessioni stabilite a partire da questa fonte",
+      "addCiSource": "Aggiungi sorgente CI",
+      "authMethod": "Metodo di autenticazione",
+      "authMethodPat": "Token di accesso personale",
+      "authMethodApp": "Registrazione dell'app (Entra)",
+      "appAuthHelp": "Registrazione dell'app Microsoft Entra (credenziali client) — consigliata per la deriva programmata; nessuna scadenza del PAT.",
+      "tenantId": "Codice inquilino",
+      "clientId": "ID cliente",
+      "clientSecret": "Codice segreto del cliente",
+      "clientSecretHelp": "Archiviati in forma crittografata; non vengono mai più visualizzati.",
+      "githubAppHelp": "Installazione dell'app GitHub (token di accesso all'installazione) — consigliata per il drift programmato; i token PAT non scadono.",
+      "githubAppId": "ID app",
+      "githubInstallationId": "ID installazione",
+      "appPrivateKey": "Chiave privata (PEM)",
+      "appPrivateKeyHelp": "Incolla la chiave privata dell'app GitHub (PEM). Verrà archiviata in forma crittografata; non verrà mai più visualizzata.",
+      "testConnection": "Verifica della connessione",
+      "testConnectionOk": "Connessione verificata",
+      "deleteCiSourceTitle": "Elimina sorgente CI",
+      "deleteCiSourceBody": "Eliminare \"{{name}}\"? Le connessioni della pipeline create a partire da esso smetteranno di inviare dati a meno che non dispongano di un proprio token.",
+      "newRunTitle": "Nuova discesa in drift",
+      "gitRefOptional": "Riferimento Git (facoltativo)",
+      "gitRefHelp": "Lasciare vuoto per eseguire l'operazione dal ramo predefinito della pipeline; impostare solo per pianificare un ramo/riferimento specifico",
+      "workingDir": "Directory di lavoro",
+      "dispatch": "Comunicato",
+      "workflowTemplateTitle": "Modello di flusso di lavoro Drift",
+      "placeholderPipelineDefault": "ramo predefinito del pipeline",
+      "wizard": {
+        "title": "Configurare il drift per un repository",
+        "steps": {
+          "source": "Fonte e repository",
+          "workflow": "File del flusso di lavoro",
+          "connect": "Crea e connettiti"
+        },
+        "preflight": "L'URL di callback della CI è <1>{{base}}</3><!--1--> — gli agenti CI in hosting non possono raggiungere un indirizzo locale/privato, quindi le esecuzioni non restituirebbero mai alcun risultato. Utilizza un agente self-hosted in grado di raggiungere questo host, oppure configura un tunnel e imposta <3>TSM_SERVER_CALLBACK_URL<!--3-->.",
+        "preflightUnset": "non configurato",
+        "intro": "Seleziona il codice sorgente CI e il repository contenente il tuo Terraform. La procedura guidata genera il flusso di lavoro TSM drift corrispondente, quindi crea la connessione alla pipeline.",
+        "noSourcesHelp": "Non sono ancora state configurate fonti CI: aggiungine prima una tramite il pulsante “Fonti CI” nella pagina Drift.",
+        "sourceHelp": "Le credenziali a livello di organizzazione utilizzate per la navigazione e la creazione.",
+        "repoHelp": "Repository contenente il Terraform",
+        "workingDir": "Directory di lavoro di Terraform",
+        "workingDirHelp": "Rispetto alla radice del repository",
+        "serviceConnection": "Allacciamento al servizio (opzionale)",
+        "serviceConnectionErr": "Impossibile elencare le connessioni di servizio (il PAT potrebbe non avere l'ambito necessario) — citato per nome solo nelle linee guida YAML.",
+        "serviceConnectionHelp": "Indicato nelle linee guida sulle credenziali YAML generate",
+        "commitHeading": "Esegui il commit di questo file su <1>{{file}}</1><!--1--> nel ramo predefinito {{branch}} — manualmente o tramite PR",
+        "copy": "Copia",
+        "copied": "Copiato",
+        "commitViaPR": "Effettua il commit tramite PR",
+        "setupExists": "Il file del flusso di lavoro si trova già sul ramo predefinito: non c'è nulla da sottoporre a commit. Procedi con la creazione della connessione.",
+        "prMerged": "Pull request unita: il flusso di lavoro si trova sul ramo predefinito. Procedi con la creazione della connessione.",
+        "prClosed": "La richiesta di pull è stata chiusa senza essere stata integrata. Riprova a eseguire il commit tramite PR oppure esegui il commit manualmente.",
+        "prOpen": "È stata aperta una pull request da <1>{{branch}}</3><!--1--> — <3>esaminarla e unirla<!--3-->. In attesa dell'unione…",
+        "credsInfoAdo": "La pipeline richiede credenziali cloud per eseguire Terraform: configurare una connessione al servizio o un'identità del carico di lavoro nei punti indicati dal template. Le credenziali rimangono nell'ambiente CI, mai in TSM.",
+        "credsInfoGh": "La pipeline richiede credenziali cloud per eseguire Terraform: configurare un ruolo OIDC cloud o i segreti del repository nei punti indicati dal template. Le credenziali rimangono nella CI, mai in TSM.",
+        "pipelineName": "Nome della conduttura",
+        "connectionName": "Nome della connessione",
+        "adoConnectDesc": "Una volta confermato il file, TSM crea in un unico passaggio la definizione della pipeline di Azure DevOps che punta a <1>{{path}}</1><!--1--> in <3>{{repo}}</3><!--3--> e la connessione alla pipeline. Nota: la prima esecuzione potrebbe richiedere un'autorizzazione una tantum delle risorse in Azure DevOps (accesso alla connessione al servizio).",
+        "ghConnectDesc": "Una volta che il file è stato integrato nel ramo predefinito di <1>{{repo}}</3><!--1-->, GitHub registra automaticamente il flusso di lavoro; TSM rileva quindi <3>tsm-drift.yml<!--3--> e crea la connessione.",
+        "ghMissing": "Il file <1>tsm-drift.yml<!--1--> del flusso di lavoro non è ancora presente su {{repo}}. Effettua il commit sul ramo predefinito, attendi qualche secondo affinché GitHub aggiorni i dati, quindi ricontrolla.",
+        "done": "È stato creato il collegamento alla pipeline <1>{{name}}</1><!--1-->: ora è possibile avviare le esecuzioni di drift su di esso.",
+        "existingPipeline": "In questo progetto esiste già una pipeline denominata <1>{{name}}</1><!--1-->: collegati a quella invece di crearne una duplicata.",
+        "useExisting": "Utilizzare quelli esistenti",
+        "createAnyway": "Crea comunque",
+        "createBoth": "Crea pipeline e connessione",
+        "checkAgain": "Controlla di nuovo",
+        "detectConnect": "Rileva e connettiti",
+        "includeVersionLab": "Configurare inoltre il flusso di lavoro di Version Lab",
+        "includeVersionLabHelp": "Esegue il commit del file tsm-health.yml insieme al flusso di lavoro drift e crea una seconda connessione alla pipeline per il test delle versioni.",
+        "driftFile": "Flusso di lavoro Drift",
+        "versionLabFile": "Flusso di lavoro di Version Lab",
+        "dispatchFirstRun": "Eseguire una prima prova di drift dopo il collegamento",
+        "firstRunDispatched": "Pubblicata la prima manche di drift: guardala su questa pagina.",
+        "firstRunFailed": "Connessione creata, ma il primo tentativo di invio non è andato a buon fine: {{error}}",
+        "versionLabSuffix": "Version Lab"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "Proprietario"
+          },
+          "repo": {
+            "label": "Archivio"
+          },
+          "workflow_id": {
+            "label": "File o ID del flusso di lavoro"
+          },
+          "ref": {
+            "label": "Riferimento predefinito"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "Organizzazione"
+          },
+          "project": {
+            "label": "Progetto"
+          },
+          "pipeline_id": {
+            "label": "ID della conduttura"
+          },
+          "ref": {
+            "label": "Riferimento predefinito"
+          }
+        }
+      },
+      "recordsTitle": "Record di drift",
+      "recordsFilter": "Filtro record",
+      "recordsActive": "Attivo",
+      "recordsAll": "Tutto",
+      "recordOpen": "Apri",
+      "recordAcknowledged": "Riconoscimento",
+      "recordResolved": "Risolto",
+      "recordSeverity": "Gravità",
+      "recordState": "Fonte / Stato",
+      "recordDetections": "Rilevamenti",
+      "recordFirstDetected": "Rilevato per la prima volta",
+      "recordLastDetected": "Ultimo rilevamento",
+      "noActiveRecords": "Nessuna discrepanza: ogni stato corrisponde al proprio codice.",
+      "noRecords": "Non ci sono ancora registrazioni relative alla deriva. Le registrazioni compaiono quando una sessione di deriva o un’importazione segnala delle variazioni.",
+      "acknowledge": "Riconoscere",
+      "resolve": "Risoluzione",
+      "acknowledgeTitle": "Riconoscere la deriva",
+      "acknowledgeBody": "Contrassegna questo drift come rilevato. Il record rimane contrassegnato anche in caso di nuovi rilevamenti e viene risolto automaticamente quando viene segnalato un ciclo di funzionamento regolare.",
+      "ackNoteLabel": "Nota (facoltativa)",
+      "ackedBy": "Riconoscimento a cura di {{actor}}",
+      "recordDetailTitle": "Record di drift"
+    },
+    "versionLab": {
+      "noPipelines": "Non ci sono ancora collegamenti alla pipeline: aggiungine uno nella pagina Drift, poi torna qui.",
+      "noRuns": "Non ci sono ancora state corse per il benessere.",
+      "terraform": "Terraform",
+      "checks": "Assegni",
+      "statusDispatchFailed": "Invio non riuscito",
+      "statusHealthy": "sano",
+      "statusUnhealthy": "malsano",
+      "newRunTitle": "Nuova versione - corsa salutare",
+      "pipeline": "Condotta",
+      "gitRef": "Riferimento Git",
+      "workingDir": "Directory di lavoro",
+      "terraformVersion": "Versione di Terraform",
+      "registryHost": "Host del registro (facoltativo)",
+      "registryHostHelp": "L'host del registro così come appare negli indirizzi sorgente del modulo (ad es. registry.example.com) — non un URL o un percorso di un mirror. Viene compilato automaticamente dal registro collegato, se disponibile; i provider vengono recuperati dal mirror di rete di quest'ultimo.",
+      "providerVersions": "Versioni del provider (facoltativo)",
+      "moduleVersions": "Versioni dei moduli (facoltativo)",
+      "dispatch": "Comunicato",
+      "workflowTitle": "Modello di flusso di lavoro per la verifica dello stato delle versioni",
+      "showing": "Visualizzazione di {{from}} –{{to}} di {{total}}"
+    },
+    "schedules": {
+      "title": "Orari",
+      "description": "Esegui automaticamente i controlli di drift secondo una pianificazione cron. Ogni fire avvia un'esecuzione di drift sulla pipeline CI selezionata.",
+      "add": "Aggiungi programma",
+      "edit": "Modifica il programma",
+      "cron": "Programma",
+      "cronHelp": "Espressione Cron (ad es. \"0 3 * * *\") o una parola chiave: giornaliera, settimanale, ogni 15 minuti.",
+      "pipeline": "Pipeline CI",
+      "sourceId": "ID sorgente (facoltativo)",
+      "stateKey": "Chiave di stato (facoltativa)",
+      "repoRef": "Riferimento al repo (facoltativo)",
+      "workingDir": "Directory di lavoro (facoltativa)",
+      "enabled": "Abilitato",
+      "lastRun": "Ultima corsa",
+      "nextRun": "Prossima corsa",
+      "runNow": "Esegui ora",
+      "never": "Non correre mai",
+      "noSchedules": "Non ci sono ancora pianificazioni. Aggiungine una per eseguire automaticamente i controlli di deriva.",
+      "deleteTitle": "Elimina programma",
+      "deleteConfirm": "Elimina la pianificazione “{{name}}”? La sua esecuzione verrà interrotta."
+    },
+    "notifications": {
+      "title": "Notifiche",
+      "description": "Invia notifiche a un webhook, a Slack, a Microsoft Teams o via e-mail quando un'esecuzione di Drift rileva una deriva o non va a buon fine. Le destinazioni vengono memorizzate in forma crittografata e non vengono mai più visualizzate.",
+      "add": "Aggiungi canale",
+      "edit": "Modifica canale",
+      "noChannels": "Non ci sono ancora canali di notifica. Aggiungine uno per ricevere gli avvisi di deriva.",
+      "events": "Eventi",
+      "allEvents": "Tutti gli eventi",
+      "target": "URL di destinazione",
+      "targetHelp": "L'URL del webhook, di Slack o di Teams a cui inviare la richiesta POST.",
+      "targetKeep": "Lasciare vuoto per mantenere l'URL attuale.",
+      "targetEmail": "Indirizzi e-mail dei destinatari",
+      "targetEmailHelp": "Indirizzi e-mail separati da virgole. Inviati tramite il relay SMTP configurato.",
+      "targetEmailKeep": "Lasciare vuoto per mantenere i destinatari attuali.",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "E-mail",
+      "eventsHelp": "Lascia entrambe le caselle deselezionate per ricevere tutti gli eventi.",
+      "test": "Invia test",
+      "testSent": "Notifica di test inviata.",
+      "lastDelivery": "Ultima consegna",
+      "neverSent": "Mai inviato",
+      "deleteTitle": "Elimina canale",
+      "deleteConfirm": "Eliminare il canale \"{{name}}\"?",
+      "event": {
+        "drift_detected": "Rilevata deriva",
+        "run_failed": "Esecuzione non riuscita"
+      }
+    },
+    "reports": {
+      "description": "Filtra i file di stato analizzati provenienti da tutte le fonti, quindi esporta i risultati corrispondenti in formato Markdown, JSON o CSV.",
+      "filters": "Filtri",
+      "advanced": "Filtri avanzati",
+      "sources": "Fonti",
+      "allSources": "Tutte le fonti",
+      "searchKey": "La chiave di stato contiene",
+      "version": "Versione di Terraform",
+      "versionOpAria": "Confronto tra le versioni",
+      "provider": "Fornitore",
+      "resourceType": "Tipo di risorsa",
+      "reset": "Reimposta i filtri",
+      "refreshHint": "Eseguire la riconciliazione e ricaricare le fonti selezionate — oppure tutte le fonti se nessuna è selezionata",
+      "min": "Min",
+      "max": "Max",
+      "rumRange": "RUM",
+      "managedRange": "Risorse gestite",
+      "dataRange": "Fonti dei dati",
+      "totalRange": "Numero totale di istanze",
+      "sizeRange": "Dimensione (byte)",
+      "matched": "Abbinati",
+      "rum": "RUM",
+      "managed": "Gestito",
+      "dataSources": "Fonti dei dati",
+      "totalInstances": "Numero totale di istanze",
+      "results": "Risultati",
+      "truncated": "Vengono visualizzati i primi {{shown}} dei {{total}} risultati — affina i filtri o esporta i dati per visualizzare l'elenco completo.",
+      "empty": "Non ci sono file di stato che corrispondono a questi filtri.",
+      "loadFailed": "Impossibile caricare i file di stato corrispondenti.",
+      "export": "Esporta",
+      "exportError": "L'esportazione non è andata a buon fine.",
+      "colSource": "Fonte",
+      "colState": "File di sistema",
+      "colVersion": "Terraform",
+      "colRum": "RUM",
+      "colManaged": "Gestito",
+      "colData": "Dati",
+      "colTotal": "Totale",
+      "colSize": "Dimensioni",
+      "colAnalyzed": "Analizzato",
+      "unknownVersion": "sconosciuto"
+    },
+    "transfer": {
+      "needScope": "Per eseguire i trasferimenti è necessario l'ambito \"state:transfer\".",
+      "source": "Fonte",
+      "destination": "Destinazione",
+      "stateFile": "File di sistema",
+      "noStatesInSource": "In questa fonte non sono presenti file di stato",
+      "mode": "Modalità",
+      "modeBackup": "Backup (copia)",
+      "modeMigrate": "Migrazione (copia + verifica della parità)",
+      "targetSource": "Fonte di destinazione",
+      "targetKey": "Chiave di riferimento",
+      "hcpTargetHint": "Obiettivo HCP: l'elemento chiave è il NOME dello spazio di lavoro — se lo spazio di lavoro non esiste, viene creato automaticamente all'interno dell'organizzazione. La sovrascrittura di uno spazio di lavoro esistente richiede che il numero di serie dello stato sia superiore e che il suo lignaggio corrisponda; lo spazio di lavoro viene bloccato durante la scrittura.",
+      "gitTargetHint": "Destinazione Git: la scrittura viene confermata nel ramo configurato e inviata direttamente (mai con un push forzato) — il ramo deve accettare i push diretti. I nomi dei file devono terminare con .tfstate.",
+      "targetKeyHelp": "Percorso di destinazione/chiave all'interno della fonte di destinazione",
+      "sameTarget": "La destinazione deve essere diversa dallo stato di origine.",
+      "decommissionLabel": "Disattivare la fonte dopo una migrazione verificata (svuota la fonte originale; viene prima eseguito il backup)",
+      "confirmDecommission": "Digita la chiave di stato di origine per confermare la messa fuori servizio",
+      "newTransfer": "Nuovo trasferimento",
+      "runBackup": "Backup",
+      "runMigrate": "Migrazione",
+      "runMigrateDecommission": "Migrazione e dismissione",
+      "verified": "verificato: {{value}}",
+      "sourceDecommissioned": "fonte dismessa"
+    },
+    "login": {
+      "signIn": "Accedi",
+      "signInWith": "Accedi con {{provider}}",
+      "signInWithSSO": "Accedi tramite SSO",
+      "signInWithAzureAD": "Accedi con Azure AD",
+      "signInWithLdap": "Accedi con LDAP",
+      "devLogin": "Accesso sviluppatore (amministratore)",
+      "devModeNotice": "Modalità di sviluppo - Clicca qui sotto per accedere senza OAuth",
+      "devLoginFailed": "Accesso dello sviluppatore non riuscito. Controllare i log del server.",
+      "subtitle": "Accedi per continuare",
+      "noProviders": "Non sono stati configurati provider SSO. Contatta l'amministratore.",
+      "or": "OPPURE",
+      "orUseProductionAuth": "OPPURE UTILIZZARE L'AUTORIZZAZIONE DI PRODUZIONE",
+      "orSignInWithLdap": "OPPURE ACCEDI CON LDAP",
+      "loadingProviders": "Caricamento dei provider di accesso",
+      "username": "Nome utente",
+      "password": "Password",
+      "ldapError": "Nome utente o password non validi.",
+      "ssoInfo": "Questa applicazione utilizza il Single Sign-On per l'autenticazione.",
+      "ssoContact": "Se hai bisogno di accedere, contatta il tuo amministratore."
+    },
+    "sso": {
+      "title": "SSO / Identità",
+      "description": "Visualizzazione in sola lettura delle impostazioni di Single Sign-On e provisioning. Per modificarle, accedere al file di configurazione del server.",
+      "enabled": "Abilitato",
+      "disabled": "Disabile",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "Provisioning SCIM",
+      "scimNote": "Se abilitato, /scim/v2 accetta il provisioning di utenti e gruppi SCIM 2.0 da un client con token bearer in possesso dell'ambito scim:provision.",
+      "group": "Gruppo",
+      "groupDn": "Gruppo DN",
+      "organization": "Organizzazione",
+      "role": "Ruolo",
+      "subject": "Oggetto del certificato",
+      "scopes": "Campi di applicazione",
+      "idps": "Fornitori di identità",
+      "idpInitiated": "SSO avviato dall'IdP",
+      "issuer": "URL dell'emittente",
+      "groupClaim": "Richiesta collettiva",
+      "groupAttribute": "Attributo di gruppo",
+      "entityId": "ID entità",
+      "acsUrl": "URL ACS",
+      "host": "Presentatore",
+      "baseDn": "DN di base",
+      "caFile": "File CA del cliente",
+      "defaultRole": "Ruolo predefinito",
+      "noMappings": "Non sono state configurate mappature di gruppo."
+    },
+    "apiKeys": {
+      "title": "Chiavi API",
+      "description": "Le chiavi autenticano le pipeline e gli script CI come token Bearer. Una chiave contiene solo gli ambiti di cui sei titolare; gli amministratori possono visualizzare tutte le chiavi.",
+      "create": "Crea chiave",
+      "createTitle": "Crea una chiave API",
+      "editTitle": "Modifica chiave API",
+      "empty": "Non ci sono ancora chiavi API. Creane una per richiamare l'API da CI (importazione Drift, letture dello stato) senza una sessione del browser.",
+      "prefix": "Legenda",
+      "scopes": "Campi di applicazione",
+      "scopesHelp": "Una chiave può contenere solo gli ambiti di cui sei titolare.",
+      "expires": "Scadenza",
+      "expiresLabel": "Scadenza (facoltativo)",
+      "expiresHelp": "Lasciare vuoto per una chiave senza scadenza.",
+      "expired": "Scaduto",
+      "never": "Mai",
+      "lastUsed": "Ultimo utilizzo",
+      "neverUsed": "Mai",
+      "descriptionLabel": "Descrizione (facoltativa)",
+      "secretTitle": "La tua nuova chiave API",
+      "secretWarning": "Copia subito questa chiave: viene visualizzata una sola volta e non è possibile recuperarla.",
+      "secretStored": "Ho messo al sicuro la chiave",
+      "rotate": "Ruota",
+      "rotateTitle": "Ruota “{{name}}”",
+      "rotateBody": "Viene creata una chiave sostitutiva con gli stessi ambiti. Revoca immediatamente la vecchia chiave oppure mantienila valida per un periodo di tolleranza, in modo che gli utenti possano effettuare la transizione.",
+      "graceLabel": "Validità delle vecchie chiavi",
+      "graceImmediate": "Revocare immediatamente",
+      "graceHours_one": "Lasciare riposare per un{{count}}a ora",
+      "graceHours_other": "Lasciare riposare per {{count}} ore",
+      "deleteTitle": "Elimina chiave API",
+      "deleteBody": "Eliminare “{{name}}”? Qualsiasi processo che utilizzi questo file per l'autenticazione smetterà immediatamente di funzionare."
+    }
+  },
+  "commandPalette": {
+    "title": "Palette dei comandi",
+    "placeholder": "Pagine di ricerca…",
+    "empty": "Nessun risultato.",
+    "openButton": "Apri la tavolozza dei comandi",
+    "hint": "Navigazione rapida (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "Navigazione"
+    }
+  },
+  "support": {
+    "title": "Assistenza",
+    "contextHelp": "Guida contestuale"
+  },
+  "session": {
+    "expiresSoon": "La tua sessione scadrà tra {{minutes}} minuti. Aggiorna la pagina per rimanere connesso.",
+    "refresh": "Aggiorna sessione"
+  },
+  "consentBanner": {
+    "ariaLabel": "Consenso all'uso dei cookie",
+    "title": "Teniamo molto alla tua privacy",
+    "essential": "Essenziale (sempre attivo)",
+    "errorReporting": "Segnalazione degli errori",
+    "performanceMonitoring": "Monitoraggio delle prestazioni",
+    "analytics": "Analisi",
+    "hideDetails": "Nascondi i dettagli",
+    "customize": "Personalizza",
+    "rejectAll": "Rifiuta tutto",
+    "acceptAll": "Accetta tutto"
+  },
+  "a11y": {
+    "skipToContent": "Vai al contenuto principale",
+    "openNavigation": "Apri la navigazione",
+    "mainNavigation": "Navigazione principale",
+    "closeNavigation": "Chiudi la barra di navigazione",
+    "navigatedTo": "Sono stato reindirizzato a {{title}}",
+    "breadcrumbs": "Percorso di navigazione"
+  },
+  "errorBoundary": {
+    "title": "Si è verificato un errore",
+    "description": "Si è verificato un errore imprevisto durante il caricamento di questa pagina.",
+    "tryAgain": "Riprova",
+    "reloadPage": "Aggiorna la pagina"
+  },
+  "empty": {
+    "default": "Non c'è ancora nulla qui."
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "Utenti",
+      "pageSubtitle": "Gestire gli account utente e le autorizzazioni",
+      "addUser": "Aggiungi utente",
+      "cancel": "Annulla",
+      "save": "Salva",
+      "create": "Crea",
+      "add": "Aggiungi",
+      "delete": "Elimina",
+      "erase": "Cancella",
+      "errLoad": "Impossibile caricare gli utenti. Riprovare.",
+      "errSave": "Impossibile salvare l'utente. Riprovare.",
+      "errDelete": "Impossibile eliminare l'utente. Riprovare.",
+      "userErased": "Dati utente cancellati.",
+      "errErase": "Impossibile cancellare i dati dell'utente. Riprovare.",
+      "exportedData": "Dati utente esportati per {{email}}.",
+      "errExport": "Impossibile esportare i dati dell'utente.",
+      "errAddMembership": "Impossibile aggiungere l'appartenenza all'organizzazione",
+      "errUpdateRole": "Impossibile aggiornare il ruolo",
+      "errRemoveMembership": "Impossibile rimuovere dall'organizzazione",
+      "searchPlaceholder": "Cerca utenti...",
+      "thName": "Nome",
+      "thEmail": "E-mail",
+      "thOrgRoles": "Organizzazioni e ruoli",
+      "thCreated": "Creato",
+      "thActions": "Azioni",
+      "emptyTitle": "Nessun utente trovato",
+      "emptyDescription": "Gli utenti compaiono qui dopo aver effettuato l'accesso per la prima volta. Invita i tuoi colleghi condividendo l'URL dell'app e un provider SSO o dev-login.",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}e: nessun ruolo assegnato",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "Nessun ruolo",
+      "noOrganizations": "Nessuna organizzazione",
+      "tooltipEdit": "Modifica utente",
+      "ariaEdit": "Modifica utente",
+      "tooltipExport": "Esportazione dei dati dell'utente (articolo 15, paragrafo 20, del GDPR)",
+      "ariaExport": "Esporta i dati dell'utente",
+      "tooltipErase": "Cancellazione dei dati dell'utente (articolo 17 del GDPR)",
+      "ariaErase": "Cancella i dati dell'utente",
+      "tooltipDelete": "Elimina utente",
+      "ariaDelete": "Elimina utente",
+      "dialogTitleEdit": "Modifica utente",
+      "dialogTitleAdd": "Aggiungi utente",
+      "labelEmail": "E-mail",
+      "helpEmail": "Indirizzo e-mail dell'utente. Viene utilizzato come identificativo di accesso e non può essere modificato dopo la creazione.",
+      "labelName": "Nome",
+      "helpName": "Nome completo visualizzato in tutta l'interfaccia",
+      "sectionOrgMembership": "Adesione all'organizzazione",
+      "currentOrgs": "Organizzazioni attuali:",
+      "addToOrg": "Aggiungi all'organizzazione",
+      "orgOptional": "Organizzazione (facoltativo)",
+      "menuNone": "Nessuno",
+      "helpAssignOrg": "Assegna questo utente a un'organizzazione per controllare a quali risorse può accedere.",
+      "labelRoleTemplate": "Modello di ruolo",
+      "helpRoleTemplate": "Definisce le autorizzazioni concesse all'interno dell'organizzazione selezionata. Gestisci i modelli in Amministrazione → Ruoli.",
+      "ariaRemoveFromOrg": "Rimuovi dall'organizzazione",
+      "dialogTitleDelete": "Elimina utente",
+      "confirmDelete": "Sei sicuro di voler eliminare l'utente \"{{name}}\"? Questa operazione non può essere annullata.",
+      "eraseTitle": "Cancellazione dei dati dell'utente (articolo 17 del GDPR)",
+      "eraseWarnPart1": "Questo rende il dato anonimo in modo permanente ",
+      "eraseWarnPart2": "i dati personali dell'utente. Il record dell'utente viene contrassegnato come inattivo, le chiavi API e le affiliazioni all'organizzazione vengono eliminate e tutte le sessioni vengono revocate. Le voci del registro di audit vengono conservate con identificatori anonimizzati. ",
+      "eraseWarnCannotUndo": "Questa operazione non può essere annullata.",
+      "eraseConfirmPart1": "Per confermare, digita l'indirizzo e-mail dell'utente (",
+      "eraseConfirmPart2": ") qui sotto.",
+      "ariaConfirmErasure": "Conferma la cancellazione digitando l'indirizzo e-mail dell'utente"
+    },
+    "organizations": {
+      "pageTitle": "Organizzazioni",
+      "pageSubtitle": "Gestire le organizzazioni e i loro membri",
+      "addOrganization": "Aggiungi organizzazione",
+      "cancel": "Annulla",
+      "save": "Salva",
+      "create": "Crea",
+      "close": "Chiudi",
+      "delete": "Elimina",
+      "errLoad": "Impossibile caricare le organizzazioni. Riprovare.",
+      "errSave": "Impossibile salvare l'organizzazione. Riprovare.",
+      "errDelete": "Impossibile eliminare l'organizzazione. Riprovare.",
+      "errName": "Il nome dell'organizzazione deve contenere da 1 a 64 caratteri, iniziare con una lettera minuscola o una cifra e contenere solo lettere minuscole, cifre, trattini o caratteri di sottolineatura.",
+      "errAddMember": "Impossibile aggiungere il membro",
+      "errUpdateRole": "Impossibile aggiornare il ruolo del membro",
+      "errRemoveMember": "Impossibile rimuovere il membro",
+      "emptyState": "Nessuna organizzazione trovata",
+      "createFirst": "Crea la prima organizzazione",
+      "thName": "Nome",
+      "thDisplayName": "Nome visualizzato",
+      "thIdentityProvider": "Fornitore di identità",
+      "thMembers": "Membri",
+      "thCreated": "Creato",
+      "thActions": "Azioni",
+      "idpAny": "Qualsiasi",
+      "viewMembers": "Visualizza i membri",
+      "tooltipEditOrg": "Modifica organizzazione",
+      "ariaEditOrg": "Modifica organizzazione",
+      "tooltipDeleteOrg": "Elimina organizzazione",
+      "ariaDeleteOrg": "Elimina organizzazione",
+      "dialogTitleEdit": "Modifica organizzazione",
+      "dialogTitleAdd": "Aggiungi organizzazione",
+      "labelName": "Nome",
+      "helpNameInvalid": "Deve iniziare con una lettera minuscola o una cifra; sono ammessi solo lettere minuscole, cifre, trattini e caratteri di sottolineatura (massimo 64 caratteri)",
+      "helpName": "Nome dell'organizzazione utilizzato negli URL del registro (ad es., myorg)",
+      "renameWarnPart1": "La ridenominazione di questa organizzazione aggiornerà tutti gli spazi dei nomi dei moduli e dei provider che attualmente utilizzano ",
+      "renameWarnPart2": " a ",
+      "renameWarnPart3": ". Gli abbonamenti degli utenti sono associati tramite ID e non subiranno alcuna modifica. Assicurati di aggiornare tutte le configurazioni Terraform che fanno riferimento al nome precedente.",
+      "labelDisplayName": "Nome visualizzato",
+      "helpDisplayName": "Nome visualizzato dell'organizzazione",
+      "labelIdpType": "Tipo di provider di identità",
+      "menuIdpAny": "Qualsiasi (senza restrizioni)",
+      "labelIdpName": "Nome dell'IdP",
+      "helpIdpName": "Nome del provider di identità (ad es., nome dell'IdP SAML specificato nella configurazione)",
+      "dialogTitleDelete": "Elimina organizzazione",
+      "confirmDelete": "Sei sicuro di voler eliminare l'organizzazione \"{{name}}\"? Questa operazione non può essere annullata.",
+      "membersTitle": "Membri dell'organizzazione - {{name}}",
+      "addMember": "Aggiungi membro",
+      "membersManageDesc": "Gestire i membri e i loro ruoli all'interno di questa organizzazione",
+      "membersViewDesc": "Visualizza i membri e i loro ruoli all'interno di questa organizzazione",
+      "noMembers": "Non ci sono ancora membri in questa organizzazione",
+      "addFirstMember": "Aggiungi il primo membro",
+      "thEmail": "E-mail",
+      "thRole": "Ruolo",
+      "noRole": "Nessun ruolo",
+      "unknown": "Sconosciuto",
+      "tooltipRemoveMember": "Rimuovi membro",
+      "ariaRemoveMember": "Rimuovi membro",
+      "addMemberTitle": "Aggiungi un membro a {{name}}",
+      "labelSelectUser": "Seleziona utente",
+      "placeholderSearchUsers": "Cerca utenti...",
+      "labelRoleTemplate": "Modello di ruolo",
+      "menuNoRoleViewOnly": "Nessun ruolo (solo visualizzazione)"
+    },
+    "roles": {
+      "loadError": "Impossibile caricare i ruoli. Riprovare.",
+      "title": "Ruoli e autorizzazioni",
+      "subtitle": "Visualizza i ruoli disponibili e gli ambiti di autorizzazione ad essi associati. I ruoli di sistema sono predefiniti e non possono essere modificati.",
+      "availableScopesReference": "Riferimento agli oscilloscopi disponibili",
+      "scopesDefine": "Gli ambiti definiscono quali azioni un ruolo può eseguire nell'applicazione.",
+      "thScope": "Ambito di applicazione",
+      "thDescription": "Descrizione",
+      "roleTemplates": "Modelli di ruolo",
+      "clickRole": "Clicca su un ruolo per visualizzarne tutti i dettagli relativi all'ambito di applicazione.",
+      "noRoles": "Nessun ruolo trovato.",
+      "systemChip": "Sistema",
+      "scopeCount_one": "{{count}} ambito di applicazione",
+      "scopeCount_other": "{{count}} campi di applicazione",
+      "assignedScopes": "Ambiti assegnati:",
+      "permissionsByCategory": "Autorizzazioni per categoria:",
+      "fullAccessViaAdmin": "Accesso completo (tramite amministratore)",
+      "noAccess": "Accesso negato",
+      "metaRoleId": "ID ruolo",
+      "metaCreated": "Creato",
+      "metaUpdated": "Aggiornato"
+    },
+    "auditLog": {
+      "exportCsv": "Esporta come CSV",
+      "exportJson": "Esporta come JSON",
+      "labelStartDate": "Data di inizio",
+      "labelEndDate": "Data di scadenza",
+      "labelResourceType": "Tipo di risorsa",
+      "labelAction": "Azione",
+      "labelUserEmail": "Indirizzo e-mail dell'utente",
+      "placeholderUserEmail": "Cerca per e-mail...",
+      "thTimestamp": "Data e ora",
+      "thAction": "Azione",
+      "thResource": "Risorsa",
+      "thUser": "Utente",
+      "thIpAddress": "Indirizzo IP",
+      "emptyTitle": "Non sono presenti voci di revisione che corrispondono ai filtri attuali",
+      "emptySubtitle": "Le voci del registro di audit vengono visualizzate quando gli utenti apportano modifiche. Modifica i filtri qui sopra o pubblica un modulo per visualizzarne una.",
+      "detailTitle": "Dettagli del registro di audit",
+      "close": "Chiudi",
+      "pageTitle": "Registri di audit",
+      "pageSubtitle": "Monitorare l'attività del sistema su tutte le risorse e tutti gli utenti",
+      "export": "Esporta",
+      "errExport": "Impossibile esportare i registri di audit",
+      "allResourceTypes": "Tutti i tipi di risorse",
+      "reset": "Reimposta",
+      "detailId": "ID",
+      "detailResourceId": "ID risorsa",
+      "detailOrgId": "ID organizzazione",
+      "detailMetadata": "Metadati"
+    },
+    "oidcSettings": {
+      "pageTitle": "Gruppi OIDC",
+      "pageSubtitle": "Configura la mappatura dei diritti di gruppo dal tuo provider di identità alle organizzazioni e ai ruoli del registro. Le modifiche entreranno in vigore al prossimo accesso, senza che sia necessario riavviare il server.",
+      "errLoad": "Impossibile caricare la configurazione OIDC",
+      "msgSaved": "Le impostazioni di mappatura del gruppo sono state salvate correttamente.",
+      "errSave": "Impossibile salvare le impostazioni di mappatura dei gruppi",
+      "activeProvider": "Provider OIDC attivo",
+      "labelProvider": "Fornitore",
+      "labelIssuer": "Emittente",
+      "labelClientId": "ID cliente",
+      "labelStatus": "Stato",
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "groupClaimMapping": "Mappatura delle richieste di risarcimento collettive",
+      "groupClaimDescBefore": "Mappa le affermazioni del gruppo IDP relative alle organizzazioni e ai ruoli presenti nel registro. Il nome dell'affermazione del gruppo deve corrispondere alla chiave dell'affermazione presente nel token ID OIDC (ad es. ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "Nome della richiesta di risarcimento collettiva",
+      "helpGroupClaimName": "Il claim del token ID che contiene l'elenco dei gruppi dell'utente",
+      "labelDefaultRole": "Ruolo predefinito",
+      "menuNone": "Nessuno",
+      "groupMappings": "Mappature di gruppo",
+      "addMapping": "Aggiungi mappatura",
+      "emptyMappings": "Non sono state configurate mappature di gruppo. Fare clic su \"Aggiungi mappatura\" per crearne una.",
+      "thIdpGroup": "Gruppo IdP",
+      "thOrganization": "Organizzazione",
+      "thRole": "Ruolo",
+      "thActions": "Azioni",
+      "tooltipEdit": "Modifica la mappatura delle richieste di risarcimento",
+      "ariaEdit": "Modifica la mappatura delle richieste di risarcimento",
+      "tooltipDelete": "Elimina la mappatura delle richieste di risarcimento",
+      "ariaDelete": "Elimina la mappatura delle richieste di risarcimento",
+      "saving": "Salvataggio in corso…",
+      "saveChanges": "Salva le modifiche",
+      "dialogTitleEdit": "Modifica mappatura gruppi",
+      "dialogTitleAdd": "Aggiungi mappatura di gruppo",
+      "labelIdpGroup": "Gruppo IdP",
+      "helpIdpGroup": "Il nome esatto del gruppo così come appare nel claim del token ID",
+      "labelOrganization": "Organizzazione",
+      "helpOrganization": "Nome dell'organizzazione del registro a cui verrà aggiunto l'utente",
+      "labelRole": "Ruolo",
+      "cancel": "Annulla",
+      "update": "Aggiornamento",
+      "add": "Aggiungi",
+      "removeTitle": "Rimuovi associazione gruppo",
+      "removeTextBefore": "Rimuovi la mappatura per il gruppo ",
+      "removeTextAfter": "? Ciò non avrà alcun effetto sugli abbonamenti esistenti: impedisce semplicemente che i nuovi accessi impostino automaticamente questo abbonamento.",
+      "remove": "Rimuovi",
+      "notSet": "(non impostato)",
+      "none": "(nessuno)",
+      "samlGroupMappings": "Mappature del gruppo SAML",
+      "samlReadOnly": "Le mappature dei gruppi SAML vengono configurate nel file di configurazione del server e sono di sola lettura.",
+      "chipGroupAttribute": "Attributo del gruppo: {{value}}",
+      "chipDefaultRole": "Ruolo predefinito: {{value}}",
+      "thSamlGroup": "Gruppo SAML",
+      "noSamlMappings": "Non sono state configurate mappature di gruppi SAML.",
+      "ldapGroupMappings": "Mappature dei gruppi LDAP",
+      "ldapReadOnly": "Le mappature dei gruppi LDAP vengono configurate nel file di configurazione del server e sono di sola lettura.",
+      "thLdapGroupDn": "DN del gruppo LDAP",
+      "noLdapMappings": "Non sono state configurate mappature di gruppi LDAP."
+    }
+  },
+  "mtls": {
+    "pageTitle": "Mappature dei certificati client mTLS",
+    "pageSubtitle": "Mappature reciproche tra certificati TLS e soggetti. Queste sono configurate nel file di configurazione del server e sono di sola lettura.",
+    "errLoad": "Impossibile caricare la configurazione mTLS.",
+    "enabled": "Abilitato",
+    "disabled": "Disabile",
+    "caFile": "File CA",
+    "noMappings": "Non sono state configurate mappature dei certificati mTLS.",
+    "certificateSubject": "Oggetto del certificato",
+    "scopes": "Campi di applicazione"
+  }
+}

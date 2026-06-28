@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform 状态管理器",
+    "shortName": "州经理",
+    "tagline": "分析、编辑并在各个后端之间迁移 Terraform 状态。"
+  },
+  "nav": {
+    "groups": {
+      "main": "州",
+      "identity": "身份",
+      "system": "系统"
+    },
+    "dashboard": "首页",
+    "dashboardTooltip": "概述与统计数据",
+    "sources": "来源",
+    "sourcesTooltip": "连接状态后端",
+    "drift": "漂移",
+    "driftTooltip": "比较各州的情况与法规及基础设施",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "根据已固定版本检查测试计划状态",
+    "schedules": "时间表",
+    "schedulesTooltip": "按cron计划运行的定期漂移任务",
+    "reports": "报告",
+    "reportsTooltip": "生成并下载分析器报告",
+    "transfer": "转账",
+    "transferTooltip": "在不同源之间备份或迁移状态",
+    "apiDocs": "API 文档",
+    "apiDocsTooltip": "交互式 OpenAPI 文档",
+    "admin": {
+      "dashboard": "仪表盘",
+      "dashboardTooltip": "身份管理概述",
+      "users": "用户",
+      "usersTooltip": "用户与会员资格",
+      "organizations": "组织",
+      "organizationsTooltip": "组织与身份提供商（IdP）的绑定",
+      "roles": "角色",
+      "rolesTooltip": "角色模板和作用域",
+      "sso": "SSO",
+      "ssoTooltip": "单点登录提供商和映射关系",
+      "notifications": "通知",
+      "notificationsTooltip": "漂移和运行故障的告警通道",
+      "auditLogs": "审计日志",
+      "auditLogsTooltip": "安全与活动审计日志",
+      "oidcGroups": "OIDC 组",
+      "oidcGroupsTooltip": "将身份提供商（IdP）组映射到组织和角色",
+      "mtls": "mTLS 证书",
+      "mtlsTooltip": "受范围映射影响的客户端证书主体",
+      "apiKeys": "API密钥",
+      "apiKeysTooltip": "为持续集成（CI）和脚本创建并管理 API 密钥",
+      "ciTemplates": "CI 模板",
+      "ciTemplatesTooltip": "编辑、添加或替换 drift 和 version-lab 管道模板"
+    }
+  },
+  "common": {
+    "loading": "正在加载……",
+    "error": "出现了一些问题。",
+    "retry": "重试",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "confirm": "确认",
+    "close": "关闭",
+    "search": "搜索",
+    "download": "下载",
+    "refresh": "刷新",
+    "none": "无",
+    "yes": "是",
+    "no": "不",
+    "actions": "操作",
+    "created": "创建",
+    "updated": "已更新",
+    "status": "状态",
+    "name": "姓名",
+    "type": "类型",
+    "back": "返回",
+    "next": "下一页",
+    "previous": "上一页",
+    "all": "全部",
+    "submit": "提交",
+    "add": "添加",
+    "remove": "删除",
+    "edit": "编辑",
+    "view": "查看",
+    "copy": "复制",
+    "copied": "已复制",
+    "required": "必填",
+    "optional": "可选",
+    "detail": "详情",
+    "apply": "申请",
+    "create": "创建",
+    "filter": "筛选",
+    "ref": "Ref",
+    "provider": "服务提供商",
+    "templateStyle": "模板样式",
+    "templateBuiltin": "内置（无依赖项）",
+    "templateSuite": "Terraform 套件（操作/扩展）"
+  },
+  "settings": {
+    "title": "设置",
+    "appearance": "外观",
+    "theme": "主题",
+    "themeLight": "光",
+    "themeDark": "黑暗",
+    "themeSystem": "系统",
+    "language": "语言"
+  },
+  "about": {
+    "title": "关于",
+    "description": "一款用于分析、安全编辑以及在现有后端之间迁移 Terraform 状态的 Web 应用程序——具备由持续集成驱动的偏移检测和版本测试功能。",
+    "versionsHeading": "版本",
+    "frontend": "前端 {{version}}",
+    "backend": "后端 {{version}}",
+    "backendUnavailable": "后端不可用",
+    "built": "{{date}} 构建",
+    "licenseHeading": "许可协议",
+    "licenseText": "根据以下许可协议发布：",
+    "apache": "Apache 2.0 许可协议",
+    "sourceHeading": "来源",
+    "repoBackend": "后端仓库",
+    "repoFrontend": "前端代码库",
+    "close": "关闭"
+  },
+  "auth": {
+    "account": "账户",
+    "signIn": "登录",
+    "signOut": "退出",
+    "insufficientTitle": "权限不足",
+    "insufficientBody": "您没有查看此页面的所需权限（{{scope}}）。",
+    "completingSignIn": "正在完成登录……"
+  },
+  "landing": {
+    "heroTitle": "Terraform 状态，尽在掌控",
+    "heroSubtitle": "跨所有后端跟踪您的 Terraform 环境——检测配置漂移、验证版本升级、安排检查，并安全地迁移状态。",
+    "signIn": "登录",
+    "apiDocs": "API 文档",
+    "goToDashboard": "转到仪表盘",
+    "estateTitle": "您的遗产",
+    "estate": {
+      "sources": "来源",
+      "states": "各州",
+      "rum": "朗姆酒",
+      "rumHint": "管理下的资源",
+      "totalResources": "资源总计"
+    },
+    "featuresTitle": "你可以做些什么",
+    "open": "打开",
+    "signInToUse": "登录后即可使用",
+    "gettingStarted": "入门指南",
+    "step1Title": "1. 登录",
+    "step1DescAuth": "您已登录。请前往仪表盘，查看您资产组合的跨来源概览。",
+    "step1DescUnauth": "请使用您所在组织的身份提供商登录，以访问您的 Terraform 环境。",
+    "step2Title": "2. 连接信号源",
+    "step2Desc": "添加一个状态后端（S3、Azure、GCS、Terraform Cloud 等），以便分析器能够对您的状态文件进行索引。",
+    "step3Title": "3. 监测与行动",
+    "step3Desc": "运行漂移和版本标签检查，安排定期运行，生成报告，并在源之间传输状态。",
+    "features": {
+      "sources": {
+        "title": "来源",
+        "desc": "连接并浏览状态后端；分析器会为每个状态文件建立索引，以提供统一的视图。"
+      },
+      "drift": {
+        "title": "漂移",
+        "desc": "将实际状态与代码及生产环境进行对比，以便尽早发现未经管理的变更。"
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "升级前，请根据已固定的 Terraform 和提供商版本验证测试计划的状态。"
+      },
+      "schedules": {
+        "title": "时间表",
+        "desc": "按照cron计划运行漂移和健康检查，并在出现变化时收到通知。"
+      },
+      "reports": {
+        "title": "报告",
+        "desc": "根据您的需求进行筛选，生成并下载整个资产组合的分析报告。"
+      },
+      "transfer": {
+        "title": "转账",
+        "desc": "在进行验证和退役处理的同时，安全地备份或迁移源系统之间的状态。"
+      }
+    }
+  },
+  "help": {
+    "title": "帮助",
+    "open": "打开帮助",
+    "close": "关闭帮助",
+    "none": "此页面目前尚无帮助文档。",
+    "pages": {
+      "dashboard": {
+        "title": "首页",
+        "body": "您 Terraform 环境的跨源概览：总管理资源量（RUM）、按提供商和资源类型细分的统计数据，以及 Terraform 版本分布情况。"
+      },
+      "sources": {
+        "title": "来源",
+        "body": "连接现有的状态后端并处理其状态文件——无需迁移任何内容即可使用 TSM；它会读取您现有的后端。"
+      },
+      "drift": {
+        "title": "漂移",
+        "body": "通过持续集成（CI）触发 Terraform 计划任务，以将状态与代码及生产环境进行对比。结果将通过一个经过签名的单次回调返回，并以资源级差异的形式呈现。"
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "通过将 init/plan 任务提交至持续集成（CI），测试您的 Terraform 代码是否能针对固定的 Terraform 版本（以及可选的固定提供程序/模块版本或注册表镜像）顺利生成计划。"
+      },
+      "reports": {
+        "title": "报告",
+        "body": "按 Terraform 版本、提供程序、资源类型、大小和资源数量，筛选并分析所有来源的状态文件，然后将匹配结果导出为 Markdown、JSON 或 CSV 格式。"
+      },
+      "transfer": {
+        "title": "转账",
+        "body": "在不同源之间复制（备份）或移动（迁移）状态文件——例如，从本地到 S3，或从 HCP 迁移到新的后端。"
+      },
+      "apiDocs": {
+        "title": "API 文档",
+        "body": "根据后端处理程序注解生成的交互式 OpenAPI 文档。原始规范："
+      },
+      "schedules": {
+        "title": "时间表",
+        "body": "由Cron驱动的周期性漂移运行。每个计划都会按照设定的频率分发其配置的漂移目标，并记录最后的结果。"
+      },
+      "admin": {
+        "title": "管理员",
+        "body": "身份管理概述——来自共享身份服务的用户、组织和角色数量统计。卡片链接至管理页面。"
+      },
+      "adminUsers": {
+        "title": "用户",
+        "body": "管理用户账户：在编辑对话框中搜索、创建、重命名、删除用户账户，并管理各组织的角色成员资格。"
+      },
+      "adminOrganizations": {
+        "title": "组织",
+        "body": "创建和管理组织、其身份提供商（IdP）绑定及其成员。"
+      },
+      "adminRoles": {
+        "title": "角色",
+        "body": "角色模板及其授予的权限范围。系统角色（查看者、分析师、操作员、编辑、管理员）均为预定义角色。"
+      },
+      "adminOidc": {
+        "title": "OIDC 组",
+        "body": "将身份提供商（IdP）组映射到组织角色。这些映射可在运行时进行编辑，并在下次登录时生效。"
+      },
+      "adminMtls": {
+        "title": "mTLS 证书",
+        "body": "互惠 TLS 客户端证书身份验证的只读视图：是否已启用、客户端 CA 以及证书主体 → 范围映射（在服务器配置文件中配置）。"
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "每个身份提供商的只读汇总信息：OIDC、SAML（按身份提供商）、LDAP、mTLS 以及 SCIM 配置开关——启用状态、密钥配置和组映射。密钥信息绝不会显示。"
+      },
+      "adminNotifications": {
+        "title": "通知",
+        "body": "在检测到漂移和运行失败事件时，会触发 Webhook 和 Slack 频道。"
+      },
+      "adminAudit": {
+        "title": "审计日志",
+        "body": "应用程序中的每一处变更都会记录在此处，并附有执行者和 IP 地址信息：身份变更、源/状态/备份/转移操作、报告生成、运行调度、计划任务、通知渠道以及 CI 集成。"
+      },
+      "adminApiKeys": {
+        "title": "API密钥",
+        "body": "用于 CI 管道和脚本的自助式 Bearer 凭证（tsm_…）——数据导入、状态读取，以及 API 提供的任何功能。 每个人自行管理自己的密钥；管理员可以查看所有密钥。一个密钥只能包含其创建者持有的权限范围。密钥在创建时仅显示一次；通过轮换机制，旧密钥在用户完成切换期间最多可保持有效 72 小时。"
+      }
+    }
+  },
+  "actions": {
+    "addSource": "添加来源",
+    "browseStates": "浏览各州",
+    "newDriftRun": "新的漂移跑法",
+    "newHealthRun": "新一期健康跑",
+    "addPipeline": "添加管道",
+    "workflowTemplate": "工作流模板",
+    "newTransfer": "新转会"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "CI 模板",
+      "pageSubtitle": "编辑、添加或替换提供给仓库向导的 drift 和 version-lab 管道模板。如果某个提供商/类型的“默认”配置文件不存在，则会回退到内置配置。",
+      "addTemplate": "添加模板",
+      "emptyState": "目前尚无 CI 模板。",
+      "createFirst": "添加您的第一个模板",
+      "thProvider": "服务提供商",
+      "thKind": "种类",
+      "thProfile": "个人简介",
+      "thName": "姓名",
+      "thActions": "操作",
+      "builtinChip": "内置的",
+      "builtinNoDelete": "内置模板无法删除",
+      "tooltipEdit": "编辑模板",
+      "tooltipDelete": "删除模板",
+      "ariaEdit": "编辑模板",
+      "ariaDelete": "删除模板",
+      "dialogTitleAdd": "添加 CI 模板",
+      "dialogTitleEdit": "编辑 CI 模板",
+      "dialogTitleDelete": "删除模板",
+      "confirmDelete": "是否要删除模板“{{name}}”？此操作无法撤销。",
+      "labelProvider": "服务提供商",
+      "labelKind": "种类",
+      "labelProfile": "个人简介",
+      "labelName": "姓名",
+      "labelDescription": "描述",
+      "labelContent": "模板（YAML）",
+      "helpProfile": "ID 必须为小写，例如 brunswick-azure。可包含字母、数字、点、连字符和下划线。",
+      "cancel": "取消",
+      "create": "创建",
+      "save": "保存",
+      "delete": "删除",
+      "errSave": "无法保存模板。",
+      "errDelete": "无法删除该模板。",
+      "errProfile": "用户名必须符合 [A-Za-z0-9._-]+ 的格式"
+    },
+    "apiDocs": {
+      "sections": "章节"
+    },
+    "admin": {
+      "identity": "身份",
+      "overview": "身份管理概述。用户、组织和角色模板均来自共享身份服务。",
+      "users": "用户",
+      "organizations": "组织",
+      "roles": "角色"
+    },
+    "dashboard": {
+      "rum": "朗姆酒",
+      "rumHint": "管理资产",
+      "managed": "托管",
+      "dataSources": "数据来源",
+      "totalInstances": "实例总数",
+      "sources": "来源",
+      "states": "州文件",
+      "providerDistribution": "服务提供商分布",
+      "topResourceTypes": "主要资源类型",
+      "terraformVersions": "Terraform 版本",
+      "count": "计数：{{value}}",
+      "versionChartHint": "点击某个版本以列出其状态文件。",
+      "versionStatesTitle": "按 Terraform 版本分类的状态文件",
+      "versionStatesError": "无法加载相应的状态文件。",
+      "versionStatesEmpty": "没有状态文件符合此版本过滤条件。",
+      "versionStatesCount_one": "{{count}} 状态文件",
+      "versionStatesCount_other": "{{count}} 状态文件",
+      "versionExportCsv": "导出 CSV",
+      "versionStateRum": "RUM {{count}}",
+      "versionUnknown": "未知",
+      "versionOpAria": "版本对比",
+      "versionOpEq": "正是这个版本",
+      "versionOpLte": "此版本或更早版本",
+      "versionOpLt": "早于此版本",
+      "versionOpGte": "此版本或更高版本",
+      "versionOpGt": "比此版本更新",
+      "syncPartial": "目前已分析 {{stored}} 个 {{listed}} 状态文件——同步正在进行中；随着同步完成，总数将增加。",
+      "syncErrors_one": "{{count}} 数据源报告称上次同步时出现了错误；其数据可能不完整。",
+      "syncErrors_other": "{{count}} 消息来源报告称上次同步时出现了错误；其数据可能不完整。",
+      "syncStatus": "源同步",
+      "syncStates": "{{stored}} / 分析了{{listed}}个州",
+      "syncedAt": "已同步 {{time}}简体中文（大陆）",
+      "syncReadErrors": "{{count}} 读取错误",
+      "syncPending": "正在等待首次同步",
+      "empty": "目前尚无数据。请连接数据源，即可在此查看您的车队指标。",
+      "goToSources": "添加来源",
+      "asOf": "数据截至 {{time}}"
+    },
+    "sources": {
+      "empty": "尚未连接任何数据源。请添加一个数据源，以便浏览和分析其状态。",
+      "uploadAnalyze": "分析上传的状态文件",
+      "loadFailed": "无法加载源文件。",
+      "deleteSourceAria": "删除源代码",
+      "browseStates": "浏览各州",
+      "analysisTitle": "分析 — {{name}}",
+      "deleteTitle": "删除源内容",
+      "deleteBody": "移除源 <1>{{name}}</3><!--1-->？这将使其与状态管理器断开连接。底层状态后端及其文件将 <3>保持不变<!--3-->。",
+      "deleteConfirmLabel": "删除源内容",
+      "editSourceAria": "编辑源代码",
+      "editSourceTitle": "编辑 {{name}}",
+      "keepCredentialHelper": "若要保留当前凭据，请留空。",
+      "testConnection": "测试连接",
+      "testOk": "OK · {{count}} 指出",
+      "testFailed": "连接失败",
+      "statesIn": "{{name}} 中的州",
+      "stateCount_one": "{{count}} 状态",
+      "stateCount_other": "{{count}} 州",
+      "listFailed": "无法列出各州。",
+      "noStateFiles": "未找到 .tfstate 文件。",
+      "filterStates": "筛选{{count}}的状态……",
+      "noStatesMatch": "没有哪个州与“{{filter}}”相符。",
+      "selectState": "选择一个州，查看其分析报告。",
+      "tabAnalysis": "分析",
+      "tabResources": "资源",
+      "tabOutputs": "输出",
+      "tabRaw": "原始",
+      "export": "导出",
+      "exportReportHeader": "分析报告",
+      "downloadState": "下载状态文件（.tfstate）",
+      "outputsFailed": "无法加载输出。",
+      "noOutputs": "该状态声明不输出任何根模块。",
+      "outputName": "姓名",
+      "outputType": "类型",
+      "outputValue": "值",
+      "sensitiveValue": "敏感 — 隐藏",
+      "tabBackups": "备份",
+      "tabModules": "模块",
+      "moduleSource": "模块",
+      "moduleVersion": "版本",
+      "registryHost": "注册表",
+      "constraintOnly": "仅限约束",
+      "moduleStatus": "状态",
+      "moduleUpToDate": "最新",
+      "moduleUnknown": "未知",
+      "noModules": "未捕获此状态的模块来源信息。请将完整计划推送到 /drift/ingest 以填充该信息。",
+      "modulesFailed": "无法加载模块 provenance。",
+      "stateOps": "国家行动",
+      "transfer": "转账",
+      "deleteState": "删除",
+      "deleteStateTitle": "删除状态文件",
+      "deleteStateBody": "这将永久从其后端中移除 <1>{{name}}</1><!--1--> 的活动状态对象。",
+      "deleteStateBackupNote": "删除前会在服务器端进行最终备份，且该操作会被记录在审计日志中，因此您可以从“备份”选项卡中将其恢复——除非您在下方执行了彻底清除操作。建议您先使用“导出”→“下载当前状态”功能。",
+      "deleteStatePurgeLabel": "同时删除所有已保存的备份和历史记录（此操作无法撤销）",
+      "deleteStatePurgeWarning": "清除操作不会保留该状态的可恢复副本。此操作不可逆。",
+      "deleteStateConfirmPrompt": "请输入 <1> {{key}}</1><!--1--> 进行确认。",
+      "deleteStateConfirmAria": "请确认要删除的状态密钥",
+      "deleteStateConfirmLabel": "删除状态",
+      "stateOpTitle": "国家运作",
+      "stateOpDesc": "对 <1>{{name}}</1> 进行<!--1-->结构化编辑。首先对当前版本进行备份，并对更改进行审计。",
+      "operation": "操作",
+      "opRemove": "删除 (terraform state rm)",
+      "opMove": "移动/重命名（terraform state mv）",
+      "resourceAddress": "资源地址",
+      "newAddress": "新地址",
+      "analyzeFailed": "无法分析此状态文件。",
+      "resourcesFailed": "无法加载资源。",
+      "filterResources": "按类型、名称、模块或提供商筛选……",
+      "module": "模块",
+      "mode": "模式",
+      "instances": "实例",
+      "rawFailed": "无法加载原始状态。",
+      "edit": "编辑",
+      "save": "保存",
+      "notValidJson": "非有效的 JSON",
+      "saveHelp": "保存时，系统会备份当前版本，验证更改内容，并对编辑操作进行审计。",
+      "overwriteTitle": "是否覆盖当前状态？",
+      "overwriteBody": "<1>{{name}}</1><!--1--> 的当前版本将被备份，然后被替换。您可以在“备份”选项卡中进行还原。",
+      "overwrite": "覆盖",
+      "backupsFailed": "无法加载备份。",
+      "noBackups": "目前尚无备份——每次编辑或还原前都会自动生成一份备份。",
+      "serialHeader": "连续剧",
+      "action": "动作",
+      "restore": "还原",
+      "rum": "朗姆酒",
+      "managed": "托管",
+      "dataSources": "数据来源",
+      "totalInstances": "实例总数",
+      "terraform": "Terraform",
+      "serial": "连续剧",
+      "topResourceTypes": "主要资源类型",
+      "providers": "服务提供商",
+      "count": "计数",
+      "transferTitle": "传输状态",
+      "copyTo": "将 <1>{{name}}</1><!--1--> 复制到另一个源中。",
+      "addSourceTitle": "添加状态来源",
+      "type": "类型",
+      "uploadError": "无法分析该文件——这是有效的 Terraform 状态 JSON 文件吗？",
+      "types": {
+        "local": "本地目录",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3（或与 S3 兼容）",
+        "azureblob": "Azure Blob 存储",
+        "gcs": "Google 云存储",
+        "git": "Git 仓库",
+        "consul": "KV领事",
+        "pg": "PostgreSQL 后端",
+        "kubernetes": "Kubernetes 密钥",
+        "http": "HTTP 后端"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "基路径",
+            "helper": "已扫描该目录中的 .tfstate 文件"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "组织"
+          },
+          "hostname": {
+            "label": "主机名"
+          },
+          "token": {
+            "label": "API 令牌",
+            "helper": "静止状态下以加密形式存储"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "桶"
+          },
+          "region": {
+            "label": "地区"
+          },
+          "prefix": {
+            "label": "密钥前缀"
+          },
+          "endpoint": {
+            "label": "端点（兼容 S3）"
+          },
+          "access_key_id": {
+            "label": "访问密钥 ID"
+          },
+          "secret_access_key": {
+            "label": "密钥"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "存储账户"
+          },
+          "container": {
+            "label": "容器"
+          },
+          "prefix": {
+            "label": "Blob 前缀"
+          },
+          "account_key": {
+            "label": "账户密钥",
+            "helper": "静止状态下以加密形式存储"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "桶"
+          },
+          "prefix": {
+            "label": "对象前缀"
+          },
+          "credentials_json": {
+            "label": "服务账户 JSON",
+            "helper": "粘贴密钥 JSON，或留空以使用应用程序默认凭据"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "仓库网址"
+          },
+          "ref": {
+            "label": "分支"
+          },
+          "prefix": {
+            "label": "路径前缀"
+          },
+          "username": {
+            "label": "用户名"
+          },
+          "token": {
+            "label": "代币",
+            "helper": "对于私有仓库；以加密形式存储"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "地址"
+          },
+          "scheme": {
+            "label": "方案"
+          },
+          "path": {
+            "label": "KV路径前缀"
+          },
+          "datacenter": {
+            "label": "数据中心"
+          },
+          "token": {
+            "label": "ACL 令牌",
+            "helper": "静止状态下以加密形式存储"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "连接字符串",
+            "helper": "静止状态下以加密形式存储"
+          },
+          "schema_name": {
+            "label": "模式"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "API 服务器 URL"
+          },
+          "namespace": {
+            "label": "命名空间"
+          },
+          "labels": {
+            "label": "标签选择器"
+          },
+          "ca_cert": {
+            "label": "集群 CA（PEM）"
+          },
+          "token": {
+            "label": "无记名代币",
+            "helper": "静止状态下以加密形式存储"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "州网址"
+          },
+          "lock_address": {
+            "label": "锁定网址",
+            "helper": "启用原生 LOCK/UNLOCK 锁定功能"
+          },
+          "unlock_address": {
+            "label": "解锁网址"
+          },
+          "update_method": {
+            "label": "更新方法"
+          },
+          "username": {
+            "label": "用户名"
+          },
+          "password": {
+            "label": "密码",
+            "helper": "静止状态下以加密形式存储"
+          }
+        }
+      },
+      "optionalField": "{{label}} （可选）",
+      "createFailed": "无法创建源。",
+      "tabHistory": "历史",
+      "historyEmpty": "尚无历史记录。当同步服务检测到此状态变化时，快照会随之累积。",
+      "historyError": "无法加载分析历史记录。",
+      "historyRum": "朗姆酒",
+      "historyResources": "资源",
+      "historySnapshots_one": "{{count}} 快照",
+      "historySnapshots_other": "{{count}} 快照",
+      "historyAnalyzedAt": "观察到",
+      "historySerial": "连续剧",
+      "historyTfVersion": "Terraform",
+      "historySize": "尺寸"
+    },
+    "drift": {
+      "pipelines": "管道连接",
+      "noPipelines": "目前尚未连接任何管道。请添加一条管道以调度漂移运行。",
+      "noRuns": "目前还没有漂移跑。",
+      "runs": "漂移赛段",
+      "statusFailed": "失败",
+      "statusDriftDetected": "检测到漂移",
+      "statusNoDrift": "无漂移",
+      "recentRuns": "最近的跑步记录",
+      "dir": "Dir简体中文（大陆）",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "设置代码库",
+      "ciSources": "CI 来源",
+      "deletePipelineTitle": "删除管道连接",
+      "deletePipelineBody": "删除管道连接 <1>{{name}}</1><!--1-->？Drift 和 version-lab 的运行将无法再通过该连接进行调度。",
+      "editPipelineTitle": "编辑管道连接",
+      "runDetailTitle": "漂移赛",
+      "defaultRef": "默认引用",
+      "pending": "待定",
+      "addedChangedDestroyed": "{{added}} 已添加 / {{changed}} 已修改 / {{destroyed}} 已删除",
+      "resource": "资源",
+      "change": "更改",
+      "noResourceDrift": "未报告任何按资源计算的偏差。",
+      "noDetailsYet": "目前尚无详细信息——该运行尚未报告结果。",
+      "addPipelineTitle": "添加管道连接",
+      "ciSource": "CI 源代码",
+      "ciSourceHelp": "选择一个已配置的 CI 源，以便从其管道或工作流中进行选择，或者手动输入坐标。",
+      "manualEntry": "手动输入",
+      "pipeline": "管道",
+      "pipelineHelp": "选择由 TSM 工作流模板创建的管道（“工作流模板”按钮）——常规 CI 管道会拒绝这些调度参数",
+      "repository": "代码库",
+      "repositoryHelp": "此源可见的仓库",
+      "workflow": "工作流程",
+      "workflowHelp": "选择基于 TSM 工作流模板创建的工作流（例如 tsm-drift.yml）——其他工作流会拒绝调度输入",
+      "defaultRefOptional": "默认引用（可选）",
+      "credentialInherited": "从 CI 源继承的凭据——轮换其令牌即可覆盖此连接。",
+      "apiToken": "API 令牌 / PAT",
+      "tokenHelp": "静止状态下以加密形式存储",
+      "tokenHelpEdit": "若要保留当前令牌，请留空。若要轮换令牌，请输入新值。",
+      "ciSourcesTitle": "CI 来源",
+      "ciSourcesDesc": "组织级 CI 凭据（Azure DevOps 组织/项目或 GitHub 所有者）。从源组织构建的管道连接会从该组织的管道或工作流中选择，并共享其令牌。",
+      "noCiSources": "目前尚无 CI 来源——请在下方添加一个。",
+      "ownerLabel": "所有者（组织或用户）",
+      "organization": "组织",
+      "project": "项目",
+      "sourceTokenHelp": "以加密形式存储；通过由此源建立的连接进行共享",
+      "addCiSource": "添加 CI 源",
+      "authMethod": "身份验证方法",
+      "authMethodPat": "个人访问令牌",
+      "authMethodApp": "应用注册（Entra）",
+      "appAuthHelp": "Microsoft Entra 应用注册（客户端凭据）—— 推荐用于计划性漂移；PAT 无过期时间。",
+      "tenantId": "租户编号",
+      "clientId": "客户ID",
+      "clientSecret": "客户端密钥",
+      "clientSecretHelp": "以加密形式存储；此后不再显示。",
+      "githubAppHelp": "GitHub App 安装（安装访问令牌）—— 推荐用于定时同步；PAT 无过期时间。",
+      "githubAppId": "应用 ID",
+      "githubInstallationId": "安装 ID",
+      "appPrivateKey": "私钥（PEM）",
+      "appPrivateKeyHelp": "粘贴 GitHub App 的私钥（PEM 格式）。该私钥在存储时经过加密；此后将不再显示。",
+      "testConnection": "测试连接",
+      "testConnectionOk": "已验证连接",
+      "deleteCiSourceTitle": "删除 CI 源代码",
+      "deleteCiSourceBody": "删除“{{name}}”？由此构建的管道连接将停止分发，除非它们携带自己的令牌。",
+      "newRunTitle": "新的漂移跑法",
+      "gitRefOptional": "Git 引用 (可选)",
+      "gitRefHelp": "留空表示从管道的默认分支运行；仅在需要指定特定分支/引用时才进行设置",
+      "workingDir": "工作目录",
+      "dispatch": "快讯",
+      "workflowTemplateTitle": "Drift 工作流模板",
+      "placeholderPipelineDefault": "管道默认分支",
+      "wizard": {
+        "title": "为仓库设置 Drift",
+        "steps": {
+          "source": "来源与存储库",
+          "workflow": "工作流文件",
+          "connect": "创建与连接"
+        },
+        "preflight": "CI 回调 URL 为 <1>{{base}}</3><!--1--> — 托管式 CI 代理无法访问本地/私有地址，因此运行任务将无法报告结果。请使用能够访问该主机的自托管代理，或开通隧道并设置 <3>TSM_SERVER_CALLBACK_URL<!--3-->。",
+        "preflightUnset": "未配置",
+        "intro": "选择 CI 源以及包含您的 Terraform 的代码库。向导会据此生成 TSM 漂移工作流，然后创建管道连接。",
+        "noSourcesHelp": "尚未配置任何 CI 源——请先通过“Drift”页面上的“CI 源”按钮添加一个。",
+        "sourceHelp": "用于浏览和创建的组织级凭据。",
+        "repoHelp": "包含 Terraform 的代码库",
+        "workingDir": "Terraform 工作目录",
+        "workingDirHelp": "相对于仓库根目录",
+        "serviceConnection": "服务连接（可选）",
+        "serviceConnectionErr": "无法列出服务连接（PAT 可能缺少作用域）——仅在 YAML 指南中按名称提及。",
+        "serviceConnectionHelp": "在生成的 YAML 凭据指南中列出的名称",
+        "commitHeading": "将此文件提交到 <1>{{file}}</1><!--1--> 的默认分支 {{branch}} — 手动提交，或通过 PR 提交",
+        "copy": "复制",
+        "copied": "已复制",
+        "commitViaPR": "通过 PR 提交",
+        "setupExists": "工作流文件已位于默认分支上——无需提交。继续创建连接。",
+        "prMerged": "已合并拉取请求——工作流位于默认分支上。请继续创建连接。",
+        "prClosed": "该拉取请求在未合并的情况下已被关闭。请通过拉取请求重新提交，或手动提交。",
+        "prOpen": "来自 <1>{{branch}}</3><!--1--> 的拉取请求已创建 — <3>请审核并<!--3-->合并。正在等待合并……",
+        "credsInfoAdo": "该管道需要云凭据才能运行 Terraform——请在模板指定的位置配置服务连接/工作负载身份。凭据应保存在 CI 中，绝不保存在 TSM 中。",
+        "credsInfoGh": "该管道需要云凭据才能运行 Terraform——请在模板指定的位置配置云 OIDC 角色或仓库密钥。凭据应保存在 CI 中，绝不保存在 TSM 中。",
+        "pipelineName": "管道名称",
+        "connectionName": "连接名称",
+        "adoConnectDesc": "文件提交后，TSM 会在一步操作中创建指向 <1>{{path}}</1><!--1-->（位于 <3>{{repo}}</3><!--3-->）的 Azure DevOps 管道定义，并建立管道连接。注意：首次运行时，可能需要在 Azure DevOps 中进行一次性的资源授权（服务连接访问）。",
+        "ghConnectDesc": "文件合并到 <1>{{repo}}</3> 的默认<!--1-->分支后，GitHub 会自动注册该工作流——随后 TSM 会检测到 <3>tsm-drift.yml<!--3--> 并建立连接。",
+        "ghMissing": "工作流 <1>tsm-drift.yml<!--1--> 目前尚未出现在 {{repo}} 中。请将其提交到默认分支，等待几秒钟让 GitHub 同步，然后再次检查。",
+        "done": "已创建管道连接 <1>{{name}}</1><!--1-->——现在可以针对该管道调度漂移运行了。",
+        "existingPipeline": "该项目中已存在一个名为 <1>{{name}}</1><!--1--> 的管道——请连接到该管道，而非创建重复项。",
+        "useExisting": "利用现有",
+        "createAnyway": "无论如何都要创作",
+        "createBoth": "创建管道和连接",
+        "checkAgain": "请再次检查",
+        "detectConnect": "检测与连接",
+        "includeVersionLab": "同时设置 Version Lab 工作流",
+        "includeVersionLabHelp": "将 tsm-health.yml 与 drift 工作流一同提交，并为版本测试创建第二个管道连接。",
+        "driftFile": "Drift 工作流",
+        "versionLabFile": "Version Lab 工作流程",
+        "dispatchFirstRun": "连接后发送首次漂移运行指令",
+        "firstRunDispatched": "首轮漂移赛段已出发——请在本页面观看。",
+        "firstRunFailed": "已建立连接，但首次运行未能分发：{{error}}",
+        "versionLabSuffix": "Version Lab"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "业主"
+          },
+          "repo": {
+            "label": "代码库"
+          },
+          "workflow_id": {
+            "label": "工作流文件或 ID"
+          },
+          "ref": {
+            "label": "默认引用"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "组织"
+          },
+          "project": {
+            "label": "项目"
+          },
+          "pipeline_id": {
+            "label": "管道 ID"
+          },
+          "ref": {
+            "label": "默认引用"
+          }
+        }
+      },
+      "recordsTitle": "漂移记录",
+      "recordsFilter": "记录过滤器",
+      "recordsActive": "有效",
+      "recordsAll": "全部",
+      "recordOpen": "打开",
+      "recordAcknowledged": "已确认",
+      "recordResolved": "已解决",
+      "recordSeverity": "严重程度",
+      "recordState": "来源/状态",
+      "recordDetections": "检测结果",
+      "recordFirstDetected": "首次发现",
+      "recordLastDetected": "最后一次检测到",
+      "noActiveRecords": "无活动漂移——每个状态都与其代码相对应。",
+      "noRecords": "目前尚无漂移记录。当漂移运行或数据导入报告发生变化时，记录就会显示出来。",
+      "acknowledge": "致谢",
+      "resolve": "决心",
+      "acknowledgeTitle": "承认漂移",
+      "acknowledgeBody": "将此漂移标记为“已观察到”。当报告运行正常时，该记录在重新检测和自动解析过程中仍会被视为已确认。",
+      "ackNoteLabel": "注（可选）",
+      "ackedBy": "经 {{actor}} 确认",
+      "recordDetailTitle": "漂移记录"
+    },
+    "versionLab": {
+      "noPipelines": "目前尚无管道连接——请在“Drift”页面添加一个，然后返回此处。",
+      "noRuns": "目前还没有健康跑活动。",
+      "terraform": "Terraform",
+      "checks": "支票",
+      "statusDispatchFailed": "发送失败",
+      "statusHealthy": "健康的",
+      "statusUnhealthy": "不健康的",
+      "newRunTitle": "新版本——健康跑",
+      "pipeline": "管道",
+      "gitRef": "Git 引用",
+      "workingDir": "工作目录",
+      "terraformVersion": "Terraform 版本",
+      "registryHost": "注册表主机（可选）",
+      "registryHostHelp": "注册表的主机名（如您模块源地址中所示，例如 registry.example.com）——而非镜像网址或路径。如有可用，将从已连接的注册表中自动填充；提供商信息则从其网络镜像中获取。",
+      "providerVersions": "提供商版本（可选）",
+      "moduleVersions": "模块版本（可选）",
+      "dispatch": "快讯",
+      "workflowTitle": "版本健康工作流模板",
+      "showing": "显示 {{from}}–{{to}}，来自 {{total}}"
+    },
+    "schedules": {
+      "title": "时间表",
+      "description": "根据 cron 计划自动运行漂移检查。每次触发都会在选定的 CI 管道上启动一次漂移运行。",
+      "add": "添加日程",
+      "edit": "编辑日程",
+      "cron": "日程安排",
+      "cronHelp": "Cron 表达式（例如“0 3 * * *”）或关键字：每天、每周、每 15 分钟。",
+      "pipeline": "CI 管道",
+      "sourceId": "源ID（可选）",
+      "stateKey": "状态键（可选）",
+      "repoRef": "Repo 引用（可选）",
+      "workingDir": "工作目录（可选）",
+      "enabled": "已启用",
+      "lastRun": "最后一次运行",
+      "nextRun": "下次运行",
+      "runNow": "立即运行",
+      "never": "切勿奔跑",
+      "noSchedules": "目前还没有计划任务。请添加一个计划任务，用于自动运行漂移检查。",
+      "deleteTitle": "删除计划",
+      "deleteConfirm": "删除计划任务“{{name}}”？这将停止其运行。"
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "当漂移检测运行检测到漂移或失败时，向 Webhook、Slack、Microsoft Teams 或电子邮件发送警报。接收目标以加密形式存储，且不会再次显示。",
+      "add": "添加频道",
+      "edit": "编辑频道",
+      "noChannels": "目前尚无通知渠道。请添加一个以接收 Drift 警报。",
+      "events": "活动",
+      "allEvents": "所有活动",
+      "target": "目标网址",
+      "targetHelp": "要发送 POST 请求的 webhook、Slack 或 Teams 的传入 webhook URL。",
+      "targetKeep": "若要保留当前网址，请留空。",
+      "targetEmail": "收件人电子邮件",
+      "targetEmailHelp": "以逗号分隔的电子邮件地址。通过已配置的 SMTP 中继发送。",
+      "targetEmailKeep": "如需保留当前收件人，请留空。",
+      "typeWebhook": "Webhook（JSON）",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "电子邮件",
+      "eventsHelp": "若要接收所有事件，请保持这两个选项均未勾选。",
+      "test": "发送测试",
+      "testSent": "已发送测试通知。",
+      "lastDelivery": "最后一次配送",
+      "neverSent": "从未发送过",
+      "deleteTitle": "删除频道",
+      "deleteConfirm": "删除频道“{{name}}”？",
+      "event": {
+        "drift_detected": "检测到漂移",
+        "run_failed": "运行失败"
+      }
+    },
+    "reports": {
+      "description": "筛选所有来源中已分析的状态文件，然后将匹配结果导出为 Markdown、JSON 或 CSV 格式。",
+      "filters": "筛选条件",
+      "advanced": "高级筛选器",
+      "sources": "来源",
+      "allSources": "所有来源",
+      "searchKey": "状态键包含",
+      "version": "Terraform 版本",
+      "versionOpAria": "版本对比",
+      "provider": "服务提供商",
+      "resourceType": "资源类型",
+      "reset": "重置筛选条件",
+      "refreshHint": "对所选源进行核对并重新加载——若未选中任何源，则对所有源进行此操作",
+      "min": "Min",
+      "max": "马克斯",
+      "rumRange": "朗姆酒",
+      "managedRange": "托管资源",
+      "dataRange": "数据来源",
+      "totalRange": "实例总数",
+      "sizeRange": "大小（字节）",
+      "matched": "匹配",
+      "rum": "朗姆酒",
+      "managed": "托管",
+      "dataSources": "数据来源",
+      "totalInstances": "实例总数",
+      "results": "结果",
+      "truncated": "显示“{{shown}}”与“{{total}}”匹配结果中的前几项——请调整筛选条件或导出以查看完整列表。",
+      "empty": "没有符合这些筛选条件的州文件。简体中文（大陆）",
+      "loadFailed": "无法加载相应的状态文件。",
+      "export": "导出",
+      "exportError": "导出失败。",
+      "colSource": "来源",
+      "colState": "状态文件",
+      "colVersion": "Terraform",
+      "colRum": "朗姆酒",
+      "colManaged": "托管",
+      "colData": "数据",
+      "colTotal": "总计",
+      "colSize": "尺寸",
+      "colAnalyzed": "已分析",
+      "unknownVersion": "未知"
+    },
+    "transfer": {
+      "needScope": "您需要使用 state:transfer 作用域来执行转账。",
+      "source": "来源",
+      "destination": "目的地",
+      "stateFile": "状态文件",
+      "noStatesInSource": "此源中没有状态文件",
+      "mode": "模式",
+      "modeBackup": "备份（复制）",
+      "modeMigrate": "迁移（复制 + 校验奇偶校验）",
+      "targetSource": "目标源",
+      "targetKey": "目标键",
+      "hcpTargetHint": "HCP 目标：关键在于工作区名称——如果工作区不存在，系统会自动在组织中创建一个。覆盖现有工作区需要该状态的序列号递增且其血统匹配；写入期间，该工作区将被锁定。",
+      "gitTargetHint": "Git 目标：将写入内容提交到配置的分支并直接推送（绝不强制推送）——该分支必须支持直接推送。密钥名称必须以 .tfstate 结尾。",
+      "targetKeyHelp": "目标源中的目标路径/键",
+      "sameTarget": "目标状态必须与源状态不同。",
+      "decommissionLabel": "在验证迁移完成后停用源（清空原始数据；先进行备份）",
+      "confirmDecommission": "请输入源状态密钥以确认停用",
+      "newTransfer": "新转会",
+      "runBackup": "备份",
+      "runMigrate": "迁移",
+      "runMigrateDecommission": "迁移与退役",
+      "verified": "已验证：{{value}}",
+      "sourceDecommissioned": "源代码已停用"
+    },
+    "login": {
+      "signIn": "登录",
+      "signInWith": "使用 {{provider}} 登录",
+      "signInWithSSO": "使用单点登录（SSO）登录",
+      "signInWithAzureAD": "使用 Azure AD 登录",
+      "signInWithLdap": "使用 LDAP 登录",
+      "devLogin": "开发者登录（管理员）",
+      "devModeNotice": "开发模式——点击下方，无需 OAuth 即可登录",
+      "devLoginFailed": "开发者登录失败。请检查服务器日志。",
+      "subtitle": "请登录以继续",
+      "noProviders": "未配置任何 SSO 提供商。请联系您的管理员。",
+      "or": "或",
+      "orUseProductionAuth": "或使用生产授权",
+      "orSignInWithLdap": "或使用 LDAP 登录",
+      "loadingProviders": "正在加载登录提供商",
+      "username": "用户名",
+      "password": "密码",
+      "ldapError": "用户名或密码无效。",
+      "ssoInfo": "该应用程序使用单点登录进行身份验证。",
+      "ssoContact": "如需访问权限，请联系您的管理员。"
+    },
+    "sso": {
+      "title": "SSO / 身份认证",
+      "description": "已配置的单点登录和用户配置的只读视图。请在服务器配置文件中进行编辑。",
+      "enabled": "已启用",
+      "disabled": "已禁用",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIM 配置",
+      "scimNote": "启用后，/scim/v2 将接受来自持有 scim:provision 作用域的 bearer-token 客户端发起的 SCIM 2.0 用户和组配置请求。",
+      "group": "组",
+      "groupDn": "组 DN",
+      "organization": "组织",
+      "role": "角色",
+      "subject": "证书主题",
+      "scopes": "范围",
+      "idps": "身份提供商",
+      "idpInitiated": "由身份提供商（IdP）发起的单点登录（SSO）",
+      "issuer": "发行人网址",
+      "groupClaim": "集体索赔",
+      "groupAttribute": "组属性",
+      "entityId": "实体 ID",
+      "acsUrl": "ACS 网址",
+      "host": "主持人",
+      "baseDn": "基DN",
+      "caFile": "客户端 CA 文件",
+      "defaultRole": "默认角色",
+      "noMappings": "未配置任何组映射。"
+    },
+    "apiKeys": {
+      "title": "API密钥",
+      "description": "密钥以 Bearer 令牌的形式对 CI 管道和脚本进行身份验证。每个密钥仅包含您持有的权限范围；管理员可以查看所有密钥。",
+      "create": "创建密钥",
+      "createTitle": "创建 API 密钥",
+      "editTitle": "编辑 API 密钥",
+      "empty": "目前还没有 API 密钥。请创建一个，以便在无需浏览器会话的情况下，从 CI 调用 API（Drift 数据导入、状态读取）。",
+      "prefix": "关键",
+      "scopes": "范围",
+      "scopesHelp": "一把钥匙只能携带你自己持有的作用域。",
+      "expires": "有效期至",
+      "expiresLabel": "到期日（可选）",
+      "expiresHelp": "若需创建无过期时间的密钥，请留空。",
+      "expired": "已过期",
+      "never": "绝不",
+      "lastUsed": "最后使用时间",
+      "neverUsed": "绝不",
+      "descriptionLabel": "描述（可选）",
+      "secretTitle": "您的新 API 密钥",
+      "secretWarning": "请立即复制此密钥——它只会显示一次，且无法恢复。",
+      "secretStored": "我把钥匙收好了",
+      "rotate": "旋转",
+      "rotateTitle": "旋转“{{name}}”",
+      "rotateBody": "将创建一个具有相同作用域的替换密钥。请立即撤销旧密钥，或者在用户完成切换期间，允许旧密钥在宽限期内继续有效。",
+      "graceLabel": "旧密钥的有效期",
+      "graceImmediate": "立即撤销",
+      "graceHours_one": "{{count}}小时内保留",
+      "graceHours_other": "保留{{count}}小时",
+      "deleteTitle": "删除 API 密钥",
+      "deleteBody": "删除“{{name}}”？任何依赖它进行身份验证的功能都会立即停止工作。"
+    }
+  },
+  "commandPalette": {
+    "title": "命令面板",
+    "placeholder": "搜索页面……",
+    "empty": "没有结果。",
+    "openButton": "打开命令面板",
+    "hint": "快速导航 (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "导航"
+    }
+  },
+  "support": {
+    "title": "支持",
+    "contextHelp": "上下文帮助"
+  },
+  "session": {
+    "expiresSoon": "您的会话将在{{minutes}}分钟后过期。请刷新页面以保持登录状态。",
+    "refresh": "刷新会话"
+  },
+  "consentBanner": {
+    "ariaLabel": "Cookie 同意",
+    "title": "我们重视您的隐私",
+    "essential": "必备（始终开启）",
+    "errorReporting": "错误报告",
+    "performanceMonitoring": "性能监控",
+    "analytics": "分析",
+    "hideDetails": "隐藏详细信息",
+    "customize": "自定义",
+    "rejectAll": "全部拒绝",
+    "acceptAll": "全部接受"
+  },
+  "a11y": {
+    "skipToContent": "跳转至主要内容",
+    "openNavigation": "打开导航",
+    "mainNavigation": "主导航",
+    "closeNavigation": "关闭导航",
+    "navigatedTo": "已访问 {{title}}",
+    "breadcrumbs": "面包屑导航"
+  },
+  "errorBoundary": {
+    "title": "出现了一些问题",
+    "description": "在渲染此页面时发生了一个意外错误。",
+    "tryAgain": "请重试",
+    "reloadPage": "刷新页面"
+  },
+  "empty": {
+    "default": "这里目前还没有内容。"
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "用户",
+      "pageSubtitle": "管理用户账户和权限",
+      "addUser": "添加用户",
+      "cancel": "取消",
+      "save": "保存",
+      "create": "创建",
+      "add": "添加",
+      "delete": "删除",
+      "erase": "删除",
+      "errLoad": "无法加载用户。请重试。",
+      "errSave": "保存用户失败。请重试。",
+      "errDelete": "删除用户失败。请重试。",
+      "userErased": "用户数据已删除。",
+      "errErase": "无法清除用户数据。请重试。",
+      "exportedData": "已导出{{email}}的用户数据。",
+      "errExport": "导出用户数据失败。",
+      "errAddMembership": "添加组织成员身份失败",
+      "errUpdateRole": "角色更新失败",
+      "errRemoveMembership": "无法从组织中移除",
+      "searchPlaceholder": "搜索用户...",
+      "thName": "姓名",
+      "thEmail": "电子邮件",
+      "thOrgRoles": "组织与角色",
+      "thCreated": "创建",
+      "thActions": "操作",
+      "emptyTitle": "未找到用户",
+      "emptyDescription": "用户首次登录后会出现在此处。您可以通过分享应用链接以及SSO或开发者登录提供商来邀请队友。",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}：未分配角色",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "无角色",
+      "noOrganizations": "没有组织",
+      "tooltipEdit": "编辑用户",
+      "ariaEdit": "编辑用户",
+      "tooltipExport": "导出用户数据（《通用数据保护条例》（GDPR）第15条/第20条）",
+      "ariaExport": "导出用户数据",
+      "tooltipErase": "删除用户数据（《通用数据保护条例》（GDPR）第17条）",
+      "ariaErase": "清除用户数据",
+      "tooltipDelete": "删除用户",
+      "ariaDelete": "删除用户",
+      "dialogTitleEdit": "编辑用户",
+      "dialogTitleAdd": "添加用户",
+      "labelEmail": "电子邮件",
+      "helpEmail": "用户的电子邮件地址。用作登录标识符，创建后无法更改。",
+      "labelName": "姓名",
+      "helpName": "在整个界面中显示的完整显示名称",
+      "sectionOrgMembership": "组织会员资格",
+      "currentOrgs": "当前所属组织：",
+      "addToOrg": "添加到组织",
+      "orgOptional": "组织（可选）",
+      "menuNone": "无",
+      "helpAssignOrg": "将此用户分配到某个组织，以控制其可访问的资源。",
+      "labelRoleTemplate": "角色模板",
+      "helpRoleTemplate": "定义了在所选组织内授予的权限。请在“管理”→“角色”下管理模板。",
+      "ariaRemoveFromOrg": "从组织中移除",
+      "dialogTitleDelete": "删除用户",
+      "confirmDelete": "您确定要删除用户“{{name}}”吗？此操作无法撤销。",
+      "eraseTitle": "删除用户数据（《通用数据保护条例》（GDPR）第17条）",
+      "eraseWarnPart1": "这会使其永久匿名化 ",
+      "eraseWarnPart2": "的个人数据。用户记录将被标记为“已废弃”，API 密钥和组织成员资格将被删除，所有会话将被撤销。审计日志条目将保留，其中标识符将被匿名化处理。 ",
+      "eraseWarnCannotUndo": "此操作无法撤销。",
+      "eraseConfirmPart1": "请输入该用户的电子邮件地址以确认（",
+      "eraseConfirmPart2": ") 如下。",
+      "ariaConfirmErasure": "请输入用户邮箱以确认删除"
+    },
+    "organizations": {
+      "pageTitle": "组织",
+      "pageSubtitle": "管理组织及其成员",
+      "addOrganization": "添加组织",
+      "cancel": "取消",
+      "save": "保存",
+      "create": "创建",
+      "close": "关闭",
+      "delete": "删除",
+      "errLoad": "无法加载组织。请重试。",
+      "errSave": "保存组织失败。请重试。",
+      "errDelete": "删除组织失败。请重试。",
+      "errName": "组织名称必须为 1 至 64 个字符，以小写字母或数字开头，且仅包含小写字母、数字、连字符或下划线。",
+      "errAddMember": "添加成员失败",
+      "errUpdateRole": "更新成员角色失败",
+      "errRemoveMember": "无法删除成员",
+      "emptyState": "未找到任何组织",
+      "createFirst": "创建第一个组织",
+      "thName": "姓名",
+      "thDisplayName": "显示名称",
+      "thIdentityProvider": "身份提供商",
+      "thMembers": "成员",
+      "thCreated": "创建",
+      "thActions": "操作",
+      "idpAny": "任何",
+      "viewMembers": "查看成员",
+      "tooltipEditOrg": "编辑组织",
+      "ariaEditOrg": "编辑组织",
+      "tooltipDeleteOrg": "删除组织",
+      "ariaDeleteOrg": "删除组织",
+      "dialogTitleEdit": "编辑组织",
+      "dialogTitleAdd": "添加组织",
+      "labelName": "姓名",
+      "helpNameInvalid": "必须以小写字母或数字开头；仅允许使用小写字母、数字、连字符和下划线（最多 64 个字符）",
+      "helpName": "注册表 URL 中使用的组织名称（例如，myorg）",
+      "renameWarnPart1": "重命名该组织将更新当前使用该名称的所有模块和提供程序命名空间 ",
+      "renameWarnPart2": " 到 ",
+      "renameWarnPart3": ". 用户会员资格通过 ID 进行关联，因此不会受到影响。请确保更新所有引用旧名称的 Terraform 配置。",
+      "labelDisplayName": "显示名称",
+      "helpDisplayName": "组织的显示名称",
+      "labelIdpType": "身份提供商类型",
+      "menuIdpAny": "任意（无限制）",
+      "labelIdpName": "身份提供商名称",
+      "helpIdpName": "身份提供商的名称（例如，配置文件中的 SAML IdP 名称）",
+      "dialogTitleDelete": "删除组织",
+      "confirmDelete": "您确定要删除组织“{{name}}”吗？此操作无法撤销。",
+      "membersTitle": "组织成员 - {{name}}",
+      "addMember": "添加成员",
+      "membersManageDesc": "管理该组织中的成员及其角色",
+      "membersViewDesc": "查看该组织中的成员及其角色",
+      "noMembers": "该组织目前尚无成员",
+      "addFirstMember": "添加第一位成员",
+      "thEmail": "电子邮件",
+      "thRole": "角色",
+      "noRole": "无角色",
+      "unknown": "未知",
+      "tooltipRemoveMember": "移除成员",
+      "ariaRemoveMember": "移除成员",
+      "addMemberTitle": "将成员添加到{{name}}",
+      "labelSelectUser": "选择用户",
+      "placeholderSearchUsers": "搜索用户...",
+      "labelRoleTemplate": "角色模板",
+      "menuNoRoleViewOnly": "无角色（仅查看）简体中文（大陆）"
+    },
+    "roles": {
+      "loadError": "加载角色失败。请重试。",
+      "title": "角色与权限",
+      "subtitle": "查看可用的角色及其关联的权限范围。系统角色是预定义的，无法修改。",
+      "availableScopesReference": "可用作用域参考",
+      "scopesDefine": "作用域定义了某个角色在应用程序中可以执行哪些操作。",
+      "thScope": "范围",
+      "thDescription": "描述",
+      "roleTemplates": "角色模板",
+      "clickRole": "点击某个角色，即可查看其完整职责范围详情。",
+      "noRoles": "未找到任何角色。",
+      "systemChip": "系统",
+      "scopeCount_one": "{{count}} 范围",
+      "scopeCount_other": "{{count}} 范围",
+      "assignedScopes": "指定范围：",
+      "permissionsByCategory": "按类别划分的权限：",
+      "fullAccessViaAdmin": "完全访问权限（通过管理员）",
+      "noAccess": "无访问权限",
+      "metaRoleId": "角色 ID",
+      "metaCreated": "创建",
+      "metaUpdated": "已更新"
+    },
+    "auditLog": {
+      "exportCsv": "导出为 CSV",
+      "exportJson": "导出为 JSON",
+      "labelStartDate": "开始日期",
+      "labelEndDate": "结束日期",
+      "labelResourceType": "资源类型",
+      "labelAction": "动作",
+      "labelUserEmail": "用户电子邮件",
+      "placeholderUserEmail": "按电子邮件搜索...",
+      "thTimestamp": "时间戳",
+      "thAction": "动作",
+      "thResource": "资源",
+      "thUser": "用户",
+      "thIpAddress": "IP地址",
+      "emptyTitle": "没有审计条目符合当前筛选条件",
+      "emptySubtitle": "当用户进行更改时，会显示审计日志条目。请调整上方的筛选条件或发布一个模块，即可查看相关条目。",
+      "detailTitle": "审计日志详细信息",
+      "close": "关闭",
+      "pageTitle": "审计日志",
+      "pageSubtitle": "跟踪所有资源和用户的系统活动",
+      "export": "导出",
+      "errExport": "导出审计日志失败",
+      "allResourceTypes": "所有资源类型",
+      "reset": "重置",
+      "detailId": "ID",
+      "detailResourceId": "资源 ID",
+      "detailOrgId": "组织ID",
+      "detailMetadata": "元数据"
+    },
+    "oidcSettings": {
+      "pageTitle": "OIDC 组",
+      "pageSubtitle": "配置从身份提供商到注册表中的组织和角色的组声明映射。更改将在下次登录时生效，无需重启服务器。",
+      "errLoad": "无法加载 OIDC 配置",
+      "msgSaved": "组映射设置已成功保存。",
+      "errSave": "无法保存组映射设置",
+      "activeProvider": "活动中的 OIDC 提供者",
+      "labelProvider": "服务提供商",
+      "labelIssuer": "发行人",
+      "labelClientId": "客户ID",
+      "labelStatus": "状态",
+      "active": "有效",
+      "inactive": "已停用",
+      "groupClaimMapping": "群体索赔映射",
+      "groupClaimDescBefore": "将 IDP 组的声明映射到注册表中的组织和角色。组声明的名称必须与您的 OIDC 身份令牌中的声明键相匹配（例如： ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "集体索赔名称",
+      "helpGroupClaimName": "包含用户组列表的 ID 令牌声明",
+      "labelDefaultRole": "默认角色",
+      "menuNone": "无",
+      "groupMappings": "组映射",
+      "addMapping": "添加映射",
+      "emptyMappings": "未配置任何组映射。请点击“添加映射”来创建一个。",
+      "thIdpGroup": "IdP集团",
+      "thOrganization": "组织",
+      "thRole": "角色",
+      "thActions": "操作",
+      "tooltipEdit": "编辑索赔映射",
+      "ariaEdit": "编辑索赔映射",
+      "tooltipDelete": "删除索赔映射",
+      "ariaDelete": "删除索赔映射",
+      "saving": "正在保存……",
+      "saveChanges": "保存更改",
+      "dialogTitleEdit": "编辑组映射",
+      "dialogTitleAdd": "添加组映射",
+      "labelIdpGroup": "IdP集团",
+      "helpIdpGroup": "ID令牌声明中显示的精确组名",
+      "labelOrganization": "组织",
+      "helpOrganization": "用户将被添加到的注册表组织名称",
+      "labelRole": "角色",
+      "cancel": "取消",
+      "update": "更新",
+      "add": "添加",
+      "removeTitle": "删除组映射",
+      "removeTextBefore": "删除该组的映射 ",
+      "removeTextAfter": "？这不会影响现有的会员资格——它只是阻止新登录的用户自动获得该会员资格。",
+      "remove": "删除",
+      "notSet": "(未设置)",
+      "none": "(无)",
+      "samlGroupMappings": "SAML 组映射",
+      "samlReadOnly": "SAML 组映射在服务器配置文件中进行配置，且为只读。",
+      "chipGroupAttribute": "组属性：{{value}}",
+      "chipDefaultRole": "默认角色：{{value}}",
+      "thSamlGroup": "SAML 组",
+      "noSamlMappings": "未配置任何 SAML 组映射。",
+      "ldapGroupMappings": "LDAP 组映射",
+      "ldapReadOnly": "LDAP 组映射在服务器配置文件中进行配置，且为只读。",
+      "thLdapGroupDn": "LDAP 组 DN",
+      "noLdapMappings": "未配置任何 LDAP 组映射。"
+    }
+  },
+  "mtls": {
+    "pageTitle": "mTLS 客户端证书映射",
+    "pageSubtitle": "TLS 证书主体与作用域之间的相互映射。这些映射在服务器配置文件中进行配置，且为只读。",
+    "errLoad": "无法加载 mTLS 配置。",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "caFile": "CA 文件",
+    "noMappings": "未配置任何 mTLS 证书映射。",
+    "certificateSubject": "证书主题",
+    "scopes": "范围"
+  }
+}
