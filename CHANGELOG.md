@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.17.0...v1.18.0) (2026-06-28)
+
+
+### Features
+
+* UX alignment + consume @sethbacon/terraform-suite-ui ([#142](https://github.com/sethbacon/terraform-state-manager-frontend/issues/142)) ([0900227](https://github.com/sethbacon/terraform-state-manager-frontend/commit/09002276efb309bb26c89ae500afc2c7e179a194))
+
 ## [1.17.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.16.1...v1.17.0) (2026-06-26)
 
 
