@@ -29,6 +29,7 @@ import ScienceIcon from '@mui/icons-material/Science'
 import DescriptionIcon from '@mui/icons-material/Description'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Science'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { api, type HealthRun, type PipelineConnection } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
@@ -101,6 +102,7 @@ export default function VersionLabPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('nav.versionLab')}
         description={t('help.pages.versionLab.body')}
         actions={

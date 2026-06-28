@@ -16,6 +16,7 @@ import {
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/SwapHoriz'
 import TargetBackendHint from '../components/TargetBackendHint'
 import { api, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
@@ -98,7 +99,7 @@ export default function TransferPage() {
 
   return (
     <Box>
-      <PageHeader title={t('nav.transfer')} description={t('help.pages.transfer.body')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('nav.transfer')} description={t('help.pages.transfer.body')} />
 
       {!canTransfer && (
         <Alert severity="warning" sx={{ mb: 3 }}>

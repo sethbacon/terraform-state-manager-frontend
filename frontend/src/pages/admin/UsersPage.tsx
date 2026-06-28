@@ -42,6 +42,7 @@ import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'
 import SearchIcon from '@mui/icons-material/Search'
 import EmptyState from '../../components/EmptyState'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/People'
 import { api, type AdminUser, type AdminUserMembership, type AdminOrganization, type RoleTemplate } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import { getRoleTemplateColor } from '../../utils/scopes'
@@ -225,6 +226,7 @@ export default function UsersPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('admin.users.pageTitle')}
         description={t('admin.users.pageSubtitle')}
         actions={
@@ -298,9 +300,9 @@ export default function UsersPage() {
                               title={
                                 m.role_template_display_name
                                   ? t('admin.users.tooltipMembership', {
-                                      org: m.organization_name,
-                                      role: m.role_template_display_name,
-                                    })
+                                    org: m.organization_name,
+                                    role: m.role_template_display_name,
+                                  })
                                   : t('admin.users.tooltipMembershipNoRole', { org: m.organization_name })
                               }
                             >

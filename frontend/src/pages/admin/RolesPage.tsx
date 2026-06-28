@@ -25,6 +25,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import LockIcon from '@mui/icons-material/Lock'
 import ShieldIcon from '@mui/icons-material/Shield'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Badge'
 import { api, type RoleTemplate } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import { AVAILABLE_SCOPES, SYSTEM_ROLE_ORDER, getScopeColor, getScopeInfo } from '../../utils/scopes'
@@ -71,7 +72,7 @@ export default function RolesPage() {
 
   return (
     <Box aria-busy={rolesQuery.isLoading} aria-live="polite">
-      <PageHeader title={t('admin.roles.title')} description={t('admin.roles.subtitle')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('admin.roles.title')} description={t('admin.roles.subtitle')} />
 
       {rolesQuery.isError && (
         <Alert severity="error" sx={{ mb: 3 }}>

@@ -123,7 +123,7 @@
   "auth": {
     "account": "Account",
     "signIn": "Sign in",
-    "signOut": "Logout",
+    "signOut": "Sign out",
     "insufficientTitle": "Insufficient permissions",
     "insufficientBody": "You don't have the required access ({{scope}}) to view this page.",
     "completingSignIn": "Completing sign-in…"
@@ -134,6 +134,14 @@
     "signIn": "Sign in",
     "apiDocs": "API docs",
     "goToDashboard": "Go to dashboard",
+    "estateTitle": "Your estate",
+    "estate": {
+      "sources": "Sources",
+      "states": "States",
+      "rum": "RUM",
+      "rumHint": "Resources under management",
+      "totalResources": "Total resources"
+    },
     "featuresTitle": "What you can do",
     "open": "Open",
     "signInToUse": "Sign in to use",
@@ -1190,6 +1198,18 @@
   "session": {
     "expiresSoon": "Your session expires in {{minutes}} minutes. Refresh to stay signed in.",
     "refresh": "Refresh session"
+  },
+  "consentBanner": {
+    "ariaLabel": "Cookie consent",
+    "title": "We value your privacy",
+    "essential": "Essential (always on)",
+    "errorReporting": "Error Reporting",
+    "performanceMonitoring": "Performance Monitoring",
+    "analytics": "Analytics",
+    "hideDetails": "Hide details",
+    "customize": "Customize",
+    "rejectAll": "Reject all",
+    "acceptAll": "Accept all"
   },
   "a11y": {
     "skipToContent": "Skip to main content",

@@ -19,6 +19,11 @@ describe('PageHeader', () => {
     expect(screen.getByRole('button', { name: 'New source' })).toBeInTheDocument()
   })
 
+  it('renders an optional leading icon beside the title', () => {
+    render(<PageHeader title="State Sources" icon={<svg data-testid="page-icon" />} />)
+    expect(screen.getByTestId('page-icon')).toBeInTheDocument()
+  })
+
   it('omits the description node when not provided', () => {
     render(<PageHeader title="T" />)
     expect(screen.queryByText('Browse and manage state')).not.toBeInTheDocument()

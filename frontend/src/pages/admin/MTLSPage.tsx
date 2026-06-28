@@ -16,6 +16,7 @@ import {
   Typography,
 } from '@mui/material'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/VerifiedUser'
 import { api } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import { getScopeColor } from '../../utils/scopes'
@@ -27,7 +28,7 @@ export default function MTLSPage() {
 
   return (
     <Box>
-      <PageHeader title={t('mtls.pageTitle')} description={t('mtls.pageSubtitle')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('mtls.pageTitle')} description={t('mtls.pageSubtitle')} />
       {configQuery.isLoading && (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
           <CircularProgress aria-label={t('common.loading')} />

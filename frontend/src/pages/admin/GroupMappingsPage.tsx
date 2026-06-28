@@ -36,6 +36,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/ManageAccounts'
 import { api, type OIDCGroupMapping } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import { SYSTEM_ROLE_ORDER } from '../../utils/scopes'
@@ -135,7 +136,7 @@ export default function GroupMappingsPage() {
 
   return (
     <Box aria-live="polite">
-      <PageHeader title={t('admin.oidcSettings.pageTitle')} description={t('admin.oidcSettings.pageSubtitle')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('admin.oidcSettings.pageTitle')} description={t('admin.oidcSettings.pageSubtitle')} />
 
       {(error || configQuery.isError) && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>

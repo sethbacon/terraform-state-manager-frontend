@@ -31,6 +31,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 import HistoryIcon from '@mui/icons-material/History'
 import EmptyState from '../../components/EmptyState'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/History'
 import { api, type AuditLogEntry, type AuditLogFilters } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 
@@ -157,6 +158,7 @@ export default function AuditLogPage() {
   return (
     <Box aria-busy={logsQuery.isLoading} aria-live="polite">
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('admin.auditLog.pageTitle')}
         description={t('admin.auditLog.pageSubtitle')}
         actions={

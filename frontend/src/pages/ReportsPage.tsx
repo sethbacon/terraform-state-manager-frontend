@@ -30,6 +30,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'
 import RefreshIcon from '@mui/icons-material/Refresh'
 import PageHeader from '../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Assessment'
 import { api, type ReportFilters, type ReportFormat, type ReportStateRow, type VersionFilterOp } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
@@ -191,7 +192,7 @@ export default function ReportsPage() {
 
   return (
     <Box>
-      <PageHeader title={t('nav.reports')} description={t('pages.reports.description')} />
+      <PageHeader icon={<PageTitleIcon />} title={t('nav.reports')} description={t('pages.reports.description')} />
 
       <Card variant="outlined" sx={{ mb: 2 }}>
         <CardContent>

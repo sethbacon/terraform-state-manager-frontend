@@ -36,6 +36,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Business'
 import {
   api,
   type AdminOrganization,
@@ -209,6 +210,7 @@ export default function OrganizationsPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('admin.organizations.pageTitle')}
         description={t('admin.organizations.pageSubtitle')}
         actions={

@@ -33,6 +33,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/IntegrationInstructions'
 import { api, type CITemplate } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 
@@ -134,6 +135,7 @@ export default function CITemplatesPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('pages.ciTemplates.pageTitle')}
         description={t('pages.ciTemplates.pageSubtitle')}
         actions={

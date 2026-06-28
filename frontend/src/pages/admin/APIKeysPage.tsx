@@ -34,6 +34,7 @@ import { useTranslation } from 'react-i18next'
 import { api, type APIKey, type APIKeyInput } from '../../services/api'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Key'
 import TableSkeleton from '../../components/skeletons/TableSkeleton'
 import { queryKeys } from '../../services/queryKeys'
 import { useAuth } from '../../contexts/AuthContext'
@@ -98,6 +99,7 @@ export default function APIKeysPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('pages.apiKeys.title')}
         description={t('pages.apiKeys.description')}
         actions={

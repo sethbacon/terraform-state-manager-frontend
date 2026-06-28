@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import DashboardIcon from '@mui/icons-material/Dashboard'
+import HomeIcon from '@mui/icons-material/Home'
 import StorageIcon from '@mui/icons-material/Storage'
 import CompareArrowsIcon from '@mui/icons-material/CompareArrows'
 import ScienceIcon from '@mui/icons-material/Science'
@@ -42,7 +42,7 @@ export const homeItem: NavItem = {
   path: '/',
   labelKey: 'nav.dashboard',
   tooltipKey: 'nav.dashboardTooltip',
-  icon: <DashboardIcon />,
+  icon: <HomeIcon />,
   scope: null,
 }
 

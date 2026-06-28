@@ -32,6 +32,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { api, type NotificationChannel, type NotificationChannelInput } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import PageHeader from '../../components/PageHeader'
+import PageTitleIcon from '@mui/icons-material/Notifications'
 import TableSkeleton from '../../components/skeletons/TableSkeleton'
 import ConfirmDialog from '../../components/ConfirmDialog'
 
@@ -71,6 +72,7 @@ export default function NotificationsPage() {
   return (
     <Box>
       <PageHeader
+        icon={<PageTitleIcon />}
         title={t('pages.notifications.title')}
         description={t('pages.notifications.description')}
         actions={
