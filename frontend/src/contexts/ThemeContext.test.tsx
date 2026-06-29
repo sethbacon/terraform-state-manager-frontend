@@ -16,7 +16,7 @@ describe('AppThemeProvider', () => {
   })
 
   it('throws when used outside the provider', () => {
-    expect(() => renderHook(() => useThemeMode())).toThrow(/within AppThemeProvider/)
+    expect(() => renderHook(() => useThemeMode())).toThrow(/within (App|Suite)ThemeProvider/)
   })
 
   it('defaults to light without a stored preference (no matchMedia dark)', () => {

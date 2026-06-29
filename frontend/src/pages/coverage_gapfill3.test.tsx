@@ -9,7 +9,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from '../components/Layout'
 import { AppThemeProvider } from '../contexts/ThemeContext'
-import { HelpProvider } from '../contexts/HelpContext'
+import { HelpProvider, useHelp } from '../contexts/HelpContext'
 import UsersPage from './admin/UsersPage'
 import AuditLogPage from './admin/AuditLogPage'
 import GroupMappingsPage from './admin/GroupMappingsPage'
@@ -17,6 +17,7 @@ import VersionLabPage from './VersionLabPage'
 import SchedulesPage from './SchedulesPage'
 import { api } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import { queryKeys } from '../services/queryKeys'
 import i18n from '../i18n'
 
 vi.mock('../services/api', async (importOriginal) => {
@@ -104,6 +105,40 @@ describe('Layout keyboard and dismiss paths', () => {
     const dialog = await screen.findByRole('dialog')
     escapeDialog(dialog)
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('falls back to defaults when the persisted nav-group state is corrupted', () => {
+    localStorage.setItem('tsm-nav-groups-open', 'not-json{')
+    renderLayout()
+    // The JSON.parse in the openGroups initializer throws; the catch falls back
+    // to defaults and the shell still renders.
+    expect(screen.getByText('home outlet')).toBeInTheDocument()
+  })
+
+  it('renders the temporary drawer on mobile viewports', async () => {
+    const original = window.matchMedia
+    // Force the md-down breakpoint so Layout takes its mobile branch (AppBar menu
+    // button + temporary Drawer).
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: true,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })) as unknown as typeof window.matchMedia
+    try {
+      renderLayout()
+      // The mobile AppBar menu button opens the temporary drawer.
+      fireEvent.click(screen.getByLabelText(i18n.t('a11y.openNavigation') as string))
+      expect(
+        await screen.findByRole('navigation', { name: i18n.t('a11y.mainNavigation') as string }),
+      ).toBeInTheDocument()
+    } finally {
+      window.matchMedia = original
+    }
   })
 })
 
@@ -273,5 +308,35 @@ describe('AuditLogPage detail dialog and action filter', () => {
     const action = screen.getByLabelText(new RegExp(`^${i18n.t('admin.auditLog.labelAction')}`))
     fireEvent.change(action, { target: { value: 'state.' } })
     expect((action as HTMLInputElement).value).toBe('state.')
+  })
+})
+
+describe('queryKeys factories', () => {
+  it('builds stable admin and source keys', () => {
+    expect(queryKeys.admin.ciTemplate('ci1')).toEqual(['admin', 'ci-templates', 'ci1'])
+    expect(queryKeys.sources.analysis('s1', 'k1')).toEqual(['sources', 's1', 'analysis', 'k1'])
+  })
+})
+
+describe('HelpContext storage fallback', () => {
+  it('defaults to closed when reading persisted state throws', () => {
+    const spy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('storage blocked')
+    })
+    try {
+      let open: boolean | undefined
+      function Probe() {
+        open = useHelp().helpOpen
+        return null
+      }
+      render(
+        <HelpProvider>
+          <Probe />
+        </HelpProvider>,
+      )
+      expect(open).toBe(false)
+    } finally {
+      spy.mockRestore()
+    }
   })
 })
