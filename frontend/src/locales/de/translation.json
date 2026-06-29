@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "Landesleiter",
+    "tagline": "Den Terraform-Status über alle Backends hinweg analysieren, bearbeiten und übertragen."
+  },
+  "nav": {
+    "groups": {
+      "main": "Bundesstaat",
+      "identity": "Identität",
+      "system": "System"
+    },
+    "dashboard": "Startseite",
+    "dashboardTooltip": "Übersicht und Statistiken",
+    "sources": "Quellen",
+    "sourcesTooltip": "Vernetzte Backends auf Staatsebene",
+    "drift": "Drift",
+    "driftTooltip": "Vergleich zwischen Zustand, Code und Infrastruktur",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "Überprüfung des Zustands des Testplans anhand festgelegter Versionen",
+    "schedules": "Zeitpläne",
+    "schedulesTooltip": "Wiederkehrende Drift-Läufe nach einem Cron-Zeitplan",
+    "reports": "Berichte",
+    "reportsTooltip": "Analyseberichte erstellen und herunterladen",
+    "transfer": "Übertragung",
+    "transferTooltip": "Sicherung oder Migration des Zustands zwischen Quellen",
+    "apiDocs": "API-Dokumentation",
+    "apiDocsTooltip": "Interaktive OpenAPI-Dokumentation",
+    "admin": {
+      "dashboard": "Dashboard",
+      "dashboardTooltip": "Überblick über das Identitätsmanagement",
+      "users": "Benutzer",
+      "usersTooltip": "Benutzer und Mitgliedschaften",
+      "organizations": "Organisationen",
+      "organizationsTooltip": "Organisationen und IdP-Bindungen",
+      "roles": "Rollen",
+      "rolesTooltip": "Rollenvorlagen und Geltungsbereiche",
+      "sso": "SSO",
+      "ssoTooltip": "Single-Sign-On-Anbieter und Zuordnungen",
+      "notifications": "Benachrichtigungen",
+      "notificationsTooltip": "Warnkanäle für Drift- und Laufstörungen",
+      "auditLogs": "Prüfprotokoll",
+      "auditLogsTooltip": "Sicherheits- und Aktivitätsprotokoll",
+      "oidcGroups": "OIDC-Gruppen",
+      "oidcGroupsTooltip": "IdP-Gruppen Organisationen und Rollen zuordnen",
+      "mtls": "mTLS-Zertifikate",
+      "mtlsTooltip": "Zuordnung von Client-Zertifikaten zu Gültigkeitsbereichen",
+      "apiKeys": "API-Schlüssel",
+      "apiKeysTooltip": "API-Schlüssel für CI und Skripte erstellen und verwalten",
+      "ciTemplates": "CI-Vorlagen",
+      "ciTemplatesTooltip": "Drift- und Version-Lab-Pipeline-Vorlagen bearbeiten, hinzufügen oder ersetzen"
+    }
+  },
+  "common": {
+    "loading": "Wird geladen…",
+    "error": "Es ist ein Fehler aufgetreten.",
+    "retry": "Erneut versuchen",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "close": "Schließen",
+    "search": "Suche",
+    "download": "Herunterladen",
+    "refresh": "Aktualisieren",
+    "none": "Keine",
+    "yes": "Ja",
+    "no": "Nein",
+    "actions": "Aktionen",
+    "created": "Erstellt",
+    "updated": "Aktualisiert",
+    "status": "Status",
+    "name": "Name",
+    "type": "Typ",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "all": "Alle",
+    "submit": "Absenden",
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "edit": "Bearbeiten",
+    "view": "Anzeigen",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "required": "Erforderlich",
+    "optional": "Optional",
+    "detail": "Details",
+    "apply": "Bewerben",
+    "create": "Erstellen",
+    "filter": "Filter",
+    "ref": "Ref",
+    "provider": "Anbieter",
+    "templateStyle": "Vorlagenstil",
+    "templateBuiltin": "Integriert (keine Abhängigkeiten)",
+    "templateSuite": "Terraform-Suite (Aktionen / Erweiterung)"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "appearance": "Aussehen",
+    "theme": "Thema",
+    "themeLight": "Licht",
+    "themeDark": "Dunkel",
+    "themeSystem": "System",
+    "language": "Sprache"
+  },
+  "about": {
+    "title": "Über",
+    "description": "Eine Webanwendung zur Analyse, sicheren Bearbeitung und Übertragung des Terraform-Status zwischen bestehenden Backends – mit CI-gesteuerter Abweichungserkennung und Versionstests.",
+    "versionsHeading": "Versionen",
+    "frontend": "Frontend-{{version}}",
+    "backend": "Backend-{{version}}",
+    "backendUnavailable": "Backend nicht verfügbar",
+    "built": "Errichtet{{date}}",
+    "licenseHeading": "Lizenz",
+    "licenseText": "Lizenziert unter der",
+    "apache": "Apache-Lizenz 2.0",
+    "sourceHeading": "Quelle",
+    "repoBackend": "Backend-Repository",
+    "repoFrontend": "Frontend-Repository",
+    "close": "Schließen"
+  },
+  "auth": {
+    "account": "Konto",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "insufficientTitle": "Unzureichende Berechtigungen",
+    "insufficientBody": "Sie verfügen nicht über die erforderlichen Zugriffsrechte ({{scope}}), um diese Seite anzuzeigen.",
+    "completingSignIn": "Anmeldung wird abgeschlossen…"
+  },
+  "landing": {
+    "heroTitle": "Terraform-State – alles unter Kontrolle",
+    "heroSubtitle": "Behalten Sie den Überblick über Ihre Terraform-Umgebung in allen Backends – erkennen Sie Abweichungen, überprüfen Sie Versions-Upgrades, planen Sie Überprüfungen und übertragen Sie den Status sicher.",
+    "signIn": "Anmelden",
+    "apiDocs": "API-Dokumentation",
+    "goToDashboard": "Zum Dashboard wechseln",
+    "estateTitle": "Ihr Nachlass",
+    "estate": {
+      "sources": "Quellen",
+      "states": "Bundesstaaten",
+      "rum": "RUM",
+      "rumHint": "Verwaltetes Vermögen",
+      "totalResources": "Gesamte Ressourcen"
+    },
+    "featuresTitle": "Was Sie tun können",
+    "open": "Öffnen",
+    "signInToUse": "Bitte melden Sie sich an, um die Funktion zu nutzen",
+    "gettingStarted": "Erste Schritte",
+    "step1Title": "1. Anmelden",
+    "step1DescAuth": "Sie sind angemeldet. Rufen Sie Ihr Dashboard auf, um einen quellenübergreifenden Überblick über Ihr Portfolio zu erhalten.",
+    "step1DescUnauth": "Melden Sie sich über den Identitätsanbieter Ihrer Organisation an, um auf Ihre Terraform-Umgebung zuzugreifen.",
+    "step2Title": "2. Eine Quelle anschließen",
+    "step2Desc": "Fügen Sie ein State-Backend hinzu (S3, Azure, GCS, Terraform Cloud und weitere), damit der Analysator Ihre State-Dateien indizieren kann.",
+    "step3Title": "3. Überwachen und handeln",
+    "step3Desc": "Drift- und Version-Lab-Prüfungen durchführen, wiederkehrende Ausführungen planen, Berichte erstellen und den Status zwischen Quellen übertragen.",
+    "features": {
+      "sources": {
+        "title": "Quellen",
+        "desc": "Verbinden Sie sich mit den Status-Backends und durchsuchen Sie diese; der Analysator indexiert jede Statusdatei, um eine einheitliche Ansicht zu ermöglichen."
+      },
+      "drift": {
+        "title": "Drift",
+        "desc": "Vergleichen Sie den Ist-Zustand mit dem Code und der Live-Infrastruktur, um nicht verwaltete Änderungen frühzeitig zu erkennen."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "Überprüfen Sie vor dem Upgrade, ob der Testplan mit den festgelegten Terraform- und Provider-Versionen kompatibel ist."
+      },
+      "schedules": {
+        "title": "Zeitpläne",
+        "desc": "Führen Sie Drift- und Zustandsprüfungen nach einem Cron-Zeitplan durch und lassen Sie sich benachrichtigen, wenn sich etwas ändert."
+      },
+      "reports": {
+        "title": "Berichte",
+        "desc": "Erstellen und laden Sie Analyseberichte für Ihre gesamte Infrastruktur herunter, die genau nach Ihren Anforderungen gefiltert sind."
+      },
+      "transfer": {
+        "title": "Übertragung",
+        "desc": "Sichern oder migrieren Sie den Systemzustand sicher zwischen verschiedenen Quellen – einschließlich Überprüfung und Außerbetriebnahme."
+      }
+    }
+  },
+  "help": {
+    "title": "Hilfe",
+    "open": "Hilfe öffnen",
+    "close": "Hilfe schließen",
+    "none": "Für diese Seite gibt es noch keine Hilfe.",
+    "pages": {
+      "dashboard": {
+        "title": "Startseite",
+        "body": "Ein quellenübergreifender Überblick über Ihre Terraform-Umgebung: Gesamtzahl der verwalteten Ressourcen (RUM), Aufschlüsselung nach Anbietern und Ressourcentypen sowie die Verteilung der Terraform-Versionen."
+      },
+      "sources": {
+        "title": "Quellen",
+        "body": "Binden Sie vorhandene Status-Backends ein und arbeiten Sie mit deren Statusdateien – es wird nichts migriert, um TSM zu nutzen; das Programm liest die Backends aus, die Sie bereits haben."
+      },
+      "drift": {
+        "title": "Drift",
+        "body": "Senden Sie einen Terraform-Plan über Ihre CI-Umgebung, um den Status mit dem Code und der Live-Infrastruktur abzugleichen. Die Ergebnisse werden über einen signierten One-Shot-Callback zurückgegeben und als ressourcenbezogene Differenzdarstellung angezeigt."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "Prüfen Sie, ob Ihre Terraform-Code-Pläne mit einer festgelegten Terraform-Version – und optional mit festgelegten Provider-/Modulversionen oder einem Registry-Mirror – einwandfrei funktionieren, indem Sie „init/plan“ an die CI-Umgebung übermitteln."
+      },
+      "reports": {
+        "title": "Berichte",
+        "body": "Filtern Sie die analysierten Statusdateien aller Quellen – nach Terraform-Version, Provider, Ressourcentyp, Größe und Anzahl der Ressourcen – und exportieren Sie die Treffer anschließend als Markdown, JSON oder CSV."
+      },
+      "transfer": {
+        "title": "Übertragung",
+        "body": "Eine Statusdatei zwischen Quellen kopieren (sichern) oder verschieben (migrieren) – z. B. von einem lokalen Speicherort nach S3 oder von HCP auf ein neues Backend."
+      },
+      "apiDocs": {
+        "title": "API-Dokumentation",
+        "body": "Interaktive OpenAPI-Dokumentation, die anhand der Handler-Annotationen des Backends generiert wurde. Rohspezifikation:"
+      },
+      "schedules": {
+        "title": "Zeitpläne",
+        "body": "Durch Cron gesteuerte, wiederkehrende Drift-Läufe. Jeder Zeitplan führt das konfigurierte Drift-Ziel in festgelegten Intervallen aus und protokolliert das letzte Ergebnis."
+      },
+      "admin": {
+        "title": "Admin",
+        "body": "Überblick über das Identitätsmanagement – Anzahl der Benutzer, Organisationen und Rollen aus dem gemeinsamen Identitätsdienst. Die Karten verweisen auf die Verwaltungsseiten."
+      },
+      "adminUsers": {
+        "title": "Benutzer",
+        "body": "Benutzerkonten verwalten: Suchen, anlegen, umbenennen, löschen und die Zugehörigkeit zu organisationsspezifischen Rollen über den Bearbeitungsdialog verwalten."
+      },
+      "adminOrganizations": {
+        "title": "Organisationen",
+        "body": "Organisationen, deren IdP-Bindungen und deren Mitglieder anlegen und verwalten."
+      },
+      "adminRoles": {
+        "title": "Rollen",
+        "body": "Die Rollenvorlagen und die damit verbundenen Berechtigungsbereiche. Systemrollen (Betrachter, Analyst, Operator, Redakteur, Administrator) sind vordefiniert."
+      },
+      "adminOidc": {
+        "title": "OIDC-Gruppen",
+        "body": "Ordnen Sie IdP-Gruppen Organisationsrollen zu. Diese Zuordnungen können zur Laufzeit bearbeitet werden und werden bei der nächsten Anmeldung wirksam."
+      },
+      "adminMtls": {
+        "title": "mTLS-Zertifikate",
+        "body": "Schreibgeschützte Ansicht der Mutual-TLS-Authentifizierung per Client-Zertifikat: ob sie aktiviert ist, die Client-Zertifizierungsstelle sowie die Zuordnungen zwischen Zertifikatsbetreff und Geltungsbereich (konfiguriert in der Serverkonfigurationsdatei)."
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "Schreibgeschützte Zusammenfassung aller Identitätsanbieter: OIDC, SAML (pro IdP), LDAP, mTLS sowie der SCIM-Provisioning-Schalter – Aktivierungsstatus, Schlüsselkonfiguration und Gruppenzuordnungen. Geheimnisse werden niemals angezeigt."
+      },
+      "adminNotifications": {
+        "title": "Benachrichtigungen",
+        "body": "Webhooks und Slack-Kanäle werden bei Ereignissen ausgelöst, bei denen Abweichungen festgestellt wurden oder der Lauf fehlgeschlagen ist."
+      },
+      "adminAudit": {
+        "title": "Prüfprotokoll",
+        "body": "Jede Änderung in der gesamten App wird hier mit Angabe des Ausführenden und der IP-Adresse erfasst: Identitätsänderungen, Vorgänge in Bezug auf Quelle, Status, Sicherung und Übertragung, Berichterstellung, Ausführungsaufträge, Zeitpläne, Benachrichtigungskanäle und CI-Integrationen."
+      },
+      "adminApiKeys": {
+        "title": "API-Schlüssel",
+        "body": "Self-Service-Bearer-Anmeldedaten (tsm_…) für CI-Pipelines und Skripte – Drift-Import, Statusabfragen, alles, was die API bietet. Jeder verwaltet seine eigenen Schlüssel; Administratoren sehen alle Schlüssel. Ein Schlüssel darf nur die Bereiche enthalten, über die sein Ersteller verfügt. Das Geheimnis wird bei der Erstellung genau einmal angezeigt; durch Rotation kann der alte Schlüssel bis zu 72 Stunden lang gültig bleiben, während die Nutzer umstellen."
+      }
+    }
+  },
+  "actions": {
+    "addSource": "Quelle hinzufügen",
+    "browseStates": "Bundesstaaten durchsuchen",
+    "newDriftRun": "Neuer Drift-Lauf",
+    "newHealthRun": "Neuer Gesundheitslauf",
+    "addPipeline": "Pipeline hinzufügen",
+    "workflowTemplate": "Workflow-Vorlage",
+    "newTransfer": "Neuer Transfer"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "CI-Vorlagen",
+      "pageSubtitle": "Bearbeiten, ergänzen oder ersetzen Sie die Drift- und Version-Lab-Pipeline-Vorlagen, die dem Repo-Assistenten bereitgestellt werden. Das „Standard“-Profil jedes Anbieters/Typs greift auf die integrierte Vorlage zurück, wenn keine vorhanden ist.",
+      "addTemplate": "Vorlage hinzufügen",
+      "emptyState": "Es gibt noch keine CI-Vorlagen.",
+      "createFirst": "Fügen Sie Ihre erste Vorlage hinzu",
+      "thProvider": "Anbieter",
+      "thKind": "Art",
+      "thProfile": "Profil",
+      "thName": "Name",
+      "thActions": "Aktionen",
+      "builtinChip": "integriert",
+      "builtinNoDelete": "Voreingestellte Vorlagen können nicht gelöscht werden",
+      "tooltipEdit": "Vorlage bearbeiten",
+      "tooltipDelete": "Vorlage löschen",
+      "ariaEdit": "Vorlage bearbeiten",
+      "ariaDelete": "Vorlage löschen",
+      "dialogTitleAdd": "CI-Vorlage hinzufügen",
+      "dialogTitleEdit": "CI-Vorlage bearbeiten",
+      "dialogTitleDelete": "Vorlage löschen",
+      "confirmDelete": "Vorlage „{{name}}“ löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "labelProvider": "Anbieter",
+      "labelKind": "Art",
+      "labelProfile": "Profil",
+      "labelName": "Name",
+      "labelDescription": "Beschreibung",
+      "labelContent": "Vorlage (YAML)",
+      "helpProfile": "ID in Kleinbuchstaben, z. B. brunswick-azure. Buchstaben, Ziffern, Punkt, Bindestrich, Unterstrich.",
+      "cancel": "Abbrechen",
+      "create": "Erstellen",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "errSave": "Die Vorlage konnte nicht gespeichert werden.",
+      "errDelete": "Die Vorlage konnte nicht gelöscht werden.",
+      "errProfile": "Das Profil muss dem Muster [A-Za-z0-9._-]+ entsprechen."
+    },
+    "apiDocs": {
+      "sections": "Abschnitte"
+    },
+    "admin": {
+      "identity": "Identität",
+      "overview": "Überblick über das Identitätsmanagement. Benutzer, Organisationen und Rollenvorlagen stammen aus dem gemeinsamen Identitätsdienst.",
+      "users": "Benutzer",
+      "organizations": "Organisationen",
+      "roles": "Rollen"
+    },
+    "dashboard": {
+      "rum": "RUM",
+      "rumHint": "Verwaltetes Vermögen",
+      "managed": "Verwaltet",
+      "dataSources": "Datenquellen",
+      "totalInstances": "Gesamtanzahl der Instanzen",
+      "sources": "Quellen",
+      "states": "Staatsakten",
+      "providerDistribution": "Verteilung der Anbieter",
+      "topResourceTypes": "Die wichtigsten Ressourcentypen",
+      "terraformVersions": "Terraform-Versionen",
+      "count": "Zählung: {{value}}",
+      "versionChartHint": "Klicken Sie auf eine Version, um deren Statusdateien anzuzeigen.",
+      "versionStatesTitle": "Statusdateien nach Terraform-Version",
+      "versionStatesError": "Die entsprechenden Statusdateien konnten nicht geladen werden.",
+      "versionStatesEmpty": "Es gibt keine Statusdateien, die diesem Versionsfilter entsprechen.",
+      "versionStatesCount_one": "{{count}} Statusdatei",
+      "versionStatesCount_other": "{{count}} Statusdateien",
+      "versionExportCsv": "Als CSV exportieren",
+      "versionStateRum": "RUM-{{count}}",
+      "versionUnknown": "unbekannt",
+      "versionOpAria": "Versionsvergleich",
+      "versionOpEq": "Genau diese Version",
+      "versionOpLte": "Diese Version oder älter",
+      "versionOpLt": "Älter als diese Version",
+      "versionOpGte": "Diese Version oder eine neuere",
+      "versionOpGt": "Neuer als diese Version",
+      "syncPartial": "Bisher wurden {{stored}} der {{listed}}-Statusdateien analysiert – die Synchronisierung läuft noch; die Gesamtzahlen werden sich nach Abschluss des Vorgangs erhöhen.",
+      "syncErrors_one": "{{count}} Die Quelle hat bei der letzten Synchronisierung Fehler gemeldet; die Zahlen sind möglicherweise unvollständig.",
+      "syncErrors_other": "{{count}} Die Quellen haben Fehler bei ihrer letzten Synchronisierung gemeldet; ihre Zahlen sind möglicherweise unvollständig.",
+      "syncStatus": "Quellensynchronisierung",
+      "syncStates": "{{stored}} / {{listed}} analysierte Bundesstaaten",
+      "syncedAt": "{{time}} synchronisiert",
+      "syncReadErrors": "{{count}} Lesefehler",
+      "syncPending": "Warten auf die erste Synchronisierung",
+      "empty": "Noch kein Status. Verbinden Sie eine Datenquelle, um hier die Kennzahlen Ihrer Flotte anzuzeigen.",
+      "goToSources": "Quelle hinzufügen",
+      "asOf": "Stand: {{time}}"
+    },
+    "sources": {
+      "empty": "Es sind noch keine Quellen verbunden. Fügen Sie eine hinzu, um deren Status anzuzeigen und zu analysieren.",
+      "uploadAnalyze": "Eine hochgeladene Statusdatei analysieren",
+      "loadFailed": "Das Laden der Quellen ist fehlgeschlagen.",
+      "deleteSourceAria": "Quelle löschen",
+      "browseStates": "Bundesstaaten durchsuchen",
+      "analysisTitle": "Analyse — {{name}}",
+      "deleteTitle": "Quelle löschen",
+      "deleteBody": "Die Quelle <1>{{name}}</3> entfernen<!--1-->? Dadurch wird die Verbindung zum State Manager getrennt. Das zugrunde liegende State-Backend und dessen Dateien bleiben <3>unberührt<!--3-->.",
+      "deleteConfirmLabel": "Quelle löschen",
+      "editSourceAria": "Quelle bearbeiten",
+      "editSourceTitle": "Bearbeiten{{name}}",
+      "keepCredentialHelper": "Lassen Sie das Feld leer, um die aktuellen Anmeldedaten beizubehalten.",
+      "testConnection": "Verbindung testen",
+      "testOk": "OK · {{count}} states",
+      "testFailed": "Verbindung fehlgeschlagen",
+      "statesIn": "Bundesstaaten in „{{name}}“",
+      "stateCount_one": "{{count}} Zustand",
+      "stateCount_other": "{{count}} Bundesstaaten",
+      "listFailed": "Die Auflistung der Bundesstaaten ist fehlgeschlagen.",
+      "noStateFiles": "Es wurden keine .tfstate-Dateien gefunden.",
+      "filterStates": "Filter „{{count}}“ (Bundesstaaten)…",
+      "noStatesMatch": "Es gibt keinen Staat, der „{{filter}}“ entspricht.",
+      "selectState": "Wählen Sie einen Bundesstaat aus, um dessen Analyse anzuzeigen.",
+      "tabAnalysis": "Analyse",
+      "tabResources": "Ressourcen",
+      "tabOutputs": "Ergebnisse",
+      "tabRaw": "Roh",
+      "export": "Exportieren",
+      "exportReportHeader": "Analysebericht",
+      "downloadState": "Statusdatei (.tfstate) herunterladen",
+      "outputsFailed": "Die Ausgaben konnten nicht geladen werden.",
+      "noOutputs": "Dieser Zustand deklariert keine Root-Modul-Ausgaben.",
+      "outputName": "Name",
+      "outputType": "Typ",
+      "outputValue": "Wert",
+      "sensitiveValue": "Vertraulich — verborgen",
+      "tabBackups": "Sicherungen",
+      "tabModules": "Module",
+      "moduleSource": "Modul",
+      "moduleVersion": "Version",
+      "registryHost": "Register",
+      "constraintOnly": "nur Einschränkung",
+      "moduleStatus": "Status",
+      "moduleUpToDate": "Auf dem neuesten Stand",
+      "moduleUnknown": "Unbekannt",
+      "noModules": "Für diesen Status wurde keine Modulherkunft erfasst. Übertrage einen vollständigen Plan an /drift/ingest, um die Daten einzuspielen.",
+      "modulesFailed": "Das Modul „provenance“ konnte nicht geladen werden.",
+      "stateOps": "Staatliche Operationen",
+      "transfer": "Übertragung",
+      "deleteState": "Löschen",
+      "deleteStateTitle": "Statusdatei löschen",
+      "deleteStateBody": "Dadurch wird das Live-State-Objekt für <1>{{name}}</1><!--1--> dauerhaft aus seinem Backend entfernt.",
+      "deleteStateBackupNote": "Vor dem Löschen wird serverseitig eine abschließende Sicherung erstellt, und der Vorgang wird protokolliert, sodass Sie die Daten über die Registerkarte „Sicherungen“ wiederherstellen können – es sei denn, Sie wählen unten die Option „Endgültig löschen“. Ziehen Sie zunächst die Option „Exportieren → Status herunterladen“ in Betracht.",
+      "deleteStatePurgeLabel": "Löschen Sie außerdem alle gespeicherten Sicherungen und den Verlauf (kann nicht rückgängig gemacht werden)",
+      "deleteStatePurgeWarning": "Beim Löschen wird keine wiederherstellbare Kopie dieses Zustands hinterlassen. Dieser Vorgang ist irreversibel.",
+      "deleteStateConfirmPrompt": "Geben Sie zur Bestätigung <1>{{key}}</1><!--1--> ein.",
+      "deleteStateConfirmAria": "Bestätigen Sie den zu löschenden Statusschlüssel",
+      "deleteStateConfirmLabel": "Status löschen",
+      "stateOpTitle": "Staatlicher Betrieb",
+      "stateOpDesc": "Strukturierte Bearbeitung von <1>{{name}}</1><!--1-->. Zunächst wird eine Sicherungskopie der aktuellen Version erstellt, und die Änderung wird protokolliert.",
+      "operation": "Betrieb",
+      "opRemove": "Entfernen (terraform state rm)",
+      "opMove": "Verschieben / Umbenennen (terraform state mv)",
+      "resourceAddress": "Ressourcenadresse",
+      "newAddress": "Neue Adresse",
+      "analyzeFailed": "Die Analyse dieser Statusdatei ist fehlgeschlagen.",
+      "resourcesFailed": "Das Laden der Ressourcen ist fehlgeschlagen.",
+      "filterResources": "Nach Typ, Name, Modul oder Anbieter filtern…",
+      "module": "Modul",
+      "mode": "Modus",
+      "instances": "Instanzen",
+      "rawFailed": "Der Rohdatenzustand konnte nicht geladen werden.",
+      "edit": "Bearbeiten",
+      "save": "Speichern",
+      "notValidJson": "Ungültiges JSON",
+      "saveHelp": "Beim Speichern wird die aktuelle Version gesichert, die Änderung überprüft und der Bearbeitungsvorgang protokolliert.",
+      "overwriteTitle": "Zustand überschreiben?",
+      "overwriteBody": "Die aktuelle Version von <1>{{name}}</1><!--1--> wird gesichert und anschließend ersetzt. Sie können die Änderung über die Registerkarte „Backups“ rückgängig machen.",
+      "overwrite": "Überschreiben",
+      "backupsFailed": "Das Laden der Sicherungen ist fehlgeschlagen.",
+      "noBackups": "Es gibt noch keine Sicherungskopien – vor jeder Bearbeitung oder Wiederherstellung wird automatisch eine erstellt.",
+      "serialHeader": "Serien",
+      "action": "Aktion",
+      "restore": "Wiederherstellen",
+      "rum": "RUM",
+      "managed": "Verwaltet",
+      "dataSources": "Datenquellen",
+      "totalInstances": "Gesamtanzahl der Instanzen",
+      "terraform": "Terraform",
+      "serial": "Serien",
+      "topResourceTypes": "Die wichtigsten Ressourcentypen",
+      "providers": "Anbieter",
+      "count": "Anzahl",
+      "transferTitle": "Übertragungsstatus",
+      "copyTo": "Kopieren Sie <1>{{name}}</1><!--1--> in eine andere Quelle.",
+      "addSourceTitle": "Quellstaat hinzufügen",
+      "type": "Typ",
+      "uploadError": "Diese Datei konnte nicht analysiert werden – handelt es sich um eine gültige Terraform-State-JSON-Datei?",
+      "types": {
+        "local": "Lokales Verzeichnis",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3 (oder S3-kompatibel)",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Git-Repository",
+        "consul": "Konsul KV",
+        "pg": "PostgreSQL-Backend",
+        "kubernetes": "Kubernetes-Secrets",
+        "http": "HTTP-Backend"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "Basispfad",
+            "helper": "Verzeichnis nach .tfstate-Dateien durchsucht"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "Organisation"
+          },
+          "hostname": {
+            "label": "Hostname"
+          },
+          "token": {
+            "label": "API-Token",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "Eimer"
+          },
+          "region": {
+            "label": "Region"
+          },
+          "prefix": {
+            "label": "Schlüsselpräfix"
+          },
+          "endpoint": {
+            "label": "Endpunkt (S3-kompatibel)"
+          },
+          "access_key_id": {
+            "label": "Zugriffsschlüssel-ID"
+          },
+          "secret_access_key": {
+            "label": "Geheimer Zugangsschlüssel"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "Speicherkonto"
+          },
+          "container": {
+            "label": "Behälter"
+          },
+          "prefix": {
+            "label": "Blob-Präfix"
+          },
+          "account_key": {
+            "label": "Kontoschlüssel",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "Eimer"
+          },
+          "prefix": {
+            "label": "Objektpräfix"
+          },
+          "credentials_json": {
+            "label": "JSON-Datei für das Dienstkonto",
+            "helper": "Fügen Sie den JSON-Schlüssel ein oder lassen Sie das Feld leer, um die Standard-Anmeldedaten der Anwendung zu verwenden."
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "URL des Repositorys"
+          },
+          "ref": {
+            "label": "Zweigstelle"
+          },
+          "prefix": {
+            "label": "Pfadpräfix"
+          },
+          "username": {
+            "label": "Benutzername"
+          },
+          "token": {
+            "label": "Token",
+            "helper": "Bei privaten Repos: verschlüsselt gespeichert"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "Adresse"
+          },
+          "scheme": {
+            "label": "Schema"
+          },
+          "path": {
+            "label": "KV-Pfadpräfix"
+          },
+          "datacenter": {
+            "label": "Rechenzentrum"
+          },
+          "token": {
+            "label": "ACL-Token",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "Verbindungszeichenfolge",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          },
+          "schema_name": {
+            "label": "Schema"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "URL des API-Servers"
+          },
+          "namespace": {
+            "label": "Namensraum"
+          },
+          "labels": {
+            "label": "Etikettenauswahl"
+          },
+          "ca_cert": {
+            "label": "Cluster CA (PEM)"
+          },
+          "token": {
+            "label": "Inhaber-Token",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "URL angeben"
+          },
+          "lock_address": {
+            "label": "URL sperren",
+            "helper": "Aktiviert die native LOCK/UNLOCK-Sperre"
+          },
+          "unlock_address": {
+            "label": "URL entsperren"
+          },
+          "update_method": {
+            "label": "Update-Methode"
+          },
+          "username": {
+            "label": "Benutzername"
+          },
+          "password": {
+            "label": "Passwort",
+            "helper": "Im Ruhezustand verschlüsselt gespeichert"
+          }
+        }
+      },
+      "optionalField": "{{label}} (optional)",
+      "createFailed": "Die Quelle konnte nicht erstellt werden.",
+      "tabHistory": "Geschichte",
+      "historyEmpty": "Noch kein Verlauf. Es werden Momentaufnahmen erstellt, sobald der Synchronisierungsdienst diese Zustandsänderung feststellt.",
+      "historyError": "Der Analyseverlauf konnte nicht geladen werden.",
+      "historyRum": "RUM",
+      "historyResources": "Ressourcen",
+      "historySnapshots_one": "{{count}} Momentaufnahme",
+      "historySnapshots_other": "{{count}} Momentaufnahmen",
+      "historyAnalyzedAt": "Beobachtet",
+      "historySerial": "Serien",
+      "historyTfVersion": "Terraform",
+      "historySize": "Größe"
+    },
+    "drift": {
+      "pipelines": "Rohrleitungsanschlüsse",
+      "noPipelines": "Es sind noch keine Pipeline-Verbindungen vorhanden. Fügen Sie eine hinzu, um Drift-Läufe zu starten.",
+      "noRuns": "Bisher noch keine Drift-Läufe.",
+      "runs": "Drift-Läufe",
+      "statusFailed": "fehlgeschlagen",
+      "statusDriftDetected": "Abweichung festgestellt",
+      "statusNoDrift": "keine Abweichung",
+      "recentRuns": "Letzte Läufe",
+      "dir": "Regie",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "Repo einrichten",
+      "ciSources": "CI-Quellen",
+      "deletePipelineTitle": "Pipeline-Verbindung löschen",
+      "deletePipelineBody": "Die Pipeline-Verbindung <1> entfernen{{name}}</1><!--1-->? Drift- und Version-Lab-Läufe können dann nicht mehr über diese Verbindung versendet werden.",
+      "editPipelineTitle": "Pipeline-Verbindung bearbeiten",
+      "runDetailTitle": "Drift-Lauf",
+      "defaultRef": "Standardreferenz",
+      "pending": "noch ausstehend",
+      "addedChangedDestroyed": "{{added}} hinzugefügt / {{changed}} geändert / {{destroyed}} gelöscht",
+      "resource": "Ressource",
+      "change": "Ändern",
+      "noResourceDrift": "Es wurde keine Abweichung pro Ressource gemeldet.",
+      "noDetailsYet": "Es liegen noch keine Einzelheiten vor – die Messung hat noch keine Ergebnisse geliefert.",
+      "addPipelineTitle": "Pipeline-Verbindung hinzufügen",
+      "ciSource": "CI-Quelle",
+      "ciSourceHelp": "Wählen Sie eine konfigurierte CI-Quelle aus, um aus deren Pipelines oder Workflows auszuwählen, oder geben Sie die Koordinaten manuell ein.",
+      "manualEntry": "Manuelle Eingabe",
+      "pipeline": "Pipeline",
+      "pipelineHelp": "Wählen Sie die aus der TSM-Workflow-Vorlage erstellte Pipeline aus (Schaltfläche „Workflow-Vorlage“) – normale CI-Pipelines lehnen die Versandparameter ab",
+      "repository": "Repository",
+      "repositoryHelp": "Für diese Quelle sichtbare Repositories",
+      "workflow": "Arbeitsablauf",
+      "workflowHelp": "Wählen Sie den Workflow aus, der anhand der TSM-Workflow-Vorlage erstellt wurde (z. B. tsm-drift.yml) – andere Workflows lehnen die Dispatch-Eingaben ab",
+      "defaultRefOptional": "Standardreferenz (optional)",
+      "credentialInherited": "Von der CI-Quelle geerbte Anmeldedaten – durch die Rotation des Tokens wird diese Verbindung abgedeckt.",
+      "apiToken": "API-Token / PAT",
+      "tokenHelp": "Im Ruhezustand verschlüsselt gespeichert",
+      "tokenHelpEdit": "Lassen Sie das Feld leer, um das aktuelle Token beizubehalten. Geben Sie einen neuen Wert ein, um es zu rotieren.",
+      "ciSourcesTitle": "CI-Quellen",
+      "ciSourcesDesc": "Anmeldedaten auf Organisationsebene (eine Azure DevOps-Organisation/ein Azure DevOps-Projekt oder ein GitHub-Besitzer). Pipeline-Verbindungen, die auf der Grundlage einer Quelle erstellt wurden, greifen auf deren Pipelines oder Workflows zurück und nutzen deren Token.",
+      "noCiSources": "Noch keine CI-Quellen – füge unten eine hinzu.",
+      "ownerLabel": "Eigentümer (Organisation oder Benutzer)",
+      "organization": "Organisation",
+      "project": "Projekt",
+      "sourceTokenHelp": "Wird im Ruhezustand verschlüsselt gespeichert; wird über Verbindungen weitergegeben, die auf dieser Quelle basieren",
+      "addCiSource": "CI-Quelle hinzufügen",
+      "authMethod": "Authentifizierungsmethode",
+      "authMethodPat": "Persönliches Zugriffstoken",
+      "authMethodApp": "App-Registrierung (Entra)",
+      "appAuthHelp": "Microsoft Entra-App-Registrierung (Client-Anmeldeinformationen) – empfohlen für geplante Drift; kein Ablauf der PAT.",
+      "tenantId": "Mieter-ID",
+      "clientId": "Kunden-ID",
+      "clientSecret": "Client-Geheimnis",
+      "clientSecretHelp": "Wird im Ruhezustand verschlüsselt gespeichert; wird nie wieder angezeigt.",
+      "githubAppHelp": "Installation der GitHub-App (Installationszugriffstoken) – empfohlen für geplante Drifts; keine Ablaufdauer der PATs.",
+      "githubAppId": "App-ID",
+      "githubInstallationId": "Installations-ID",
+      "appPrivateKey": "Privater Schlüssel (PEM)",
+      "appPrivateKeyHelp": "Fügen Sie den privaten Schlüssel (PEM) der GitHub-App ein. Dieser wird im Ruhezustand verschlüsselt gespeichert und nie wieder angezeigt.",
+      "testConnection": "Verbindung testen",
+      "testConnectionOk": "Verbindung überprüft",
+      "deleteCiSourceTitle": "CI-Quelle löschen",
+      "deleteCiSourceBody": "„{{name}}“ löschen? Die daraus erstellten Pipeline-Verbindungen werden keine Daten mehr weiterleiten, es sei denn, sie verfügen über ein eigenes Token.",
+      "newRunTitle": "Neuer Drift-Lauf",
+      "gitRefOptional": "Git-Ref (optional)",
+      "gitRefHelp": "Leer lassen, um den Standardzweig der Pipeline auszuführen; nur festlegen, um einen bestimmten Zweig/eine bestimmte Referenz zu planen",
+      "workingDir": "Arbeitsverzeichnis",
+      "dispatch": "Versand",
+      "workflowTemplateTitle": "Drift-Workflow-Vorlage",
+      "placeholderPipelineDefault": "Standardzweig der Pipeline",
+      "wizard": {
+        "title": "Drift für ein Repository einrichten",
+        "steps": {
+          "source": "Quelle & Repository",
+          "workflow": "Workflow-Datei",
+          "connect": "Erstellen & verbinden"
+        },
+        "preflight": "Die CI-Callback-URL lautet <1>{{base}}</3><!--1--> – gehostete CI-Agenten können keine lokalen/privaten Adressen erreichen, sodass die Läufe niemals Ergebnisse melden würden. Verwenden Sie einen selbst gehosteten Agenten, der diesen Host erreichen kann, oder richten Sie einen Tunnel ein und legen Sie <3>TSM_SERVER_CALLBACK_URL fest<!--3-->.",
+        "preflightUnset": "nicht konfiguriert",
+        "intro": "Wählen Sie die CI-Quelle und das Repository aus, das Ihr Terraform enthält. Der Assistent generiert daraufhin den TSM-Drift-Workflow und richtet anschließend die Pipeline-Verbindung ein.",
+        "noSourcesHelp": "Es sind noch keine CI-Quellen konfiguriert – fügen Sie zunächst über die Schaltfläche „CI-Quellen“ auf der Drift-Seite eine hinzu.",
+        "sourceHelp": "Die Anmeldedaten auf Organisationsebene, die zum Durchsuchen und Erstellen verwendet werden.",
+        "repoHelp": "Repository mit den Terraform-Dateien",
+        "workingDir": "Terraform-Arbeitsverzeichnis",
+        "workingDirHelp": "Relativ zum Repo-Stammverzeichnis",
+        "serviceConnection": "Service-Anbindung (optional)",
+        "serviceConnectionErr": "Service-Verbindungen konnten nicht aufgelistet werden (möglicherweise fehlt dem PAT der Geltungsbereich) – wird nur namentlich in der YAML-Anleitung erwähnt.",
+        "serviceConnectionHelp": "In den generierten YAML-Anweisungen zu den Anmeldedaten genannt",
+        "commitHeading": "Diese Datei auf dem Standard-Branch „{{branch}}“ unter <1>{{file}}</1><!--1--> einchecken – manuell oder über einen Pull-Request",
+        "copy": "Kopieren",
+        "copied": "Kopiert",
+        "commitViaPR": "Über PR committen",
+        "setupExists": "Die Workflow-Datei befindet sich bereits auf dem Standard-Branch – es muss nichts committet werden. Fahren Sie mit der Erstellung der Verbindung fort.",
+        "prMerged": "Pull-Anfrage zusammengeführt – der Workflow befindet sich auf dem Standardzweig. Fahren Sie mit der Einrichtung der Verbindung fort.",
+        "prClosed": "Der Pull-Request wurde ohne Zusammenführung geschlossen. Führe den Commit über den PR erneut durch oder führe ihn manuell durch.",
+        "prOpen": "Pull-Request von <1>{{branch}}</3><!--1--> eröffnet — <3>bitte prüfen und <!--3-->zusammenführen. Ich warte auf die Zusammenführung…",
+        "credsInfoAdo": "Die Pipeline benötigt Cloud-Anmeldedaten, um Terraform auszuführen – richten Sie eine Serviceverbindung bzw. eine Workload-Identität an der in der Vorlage angegebenen Stelle ein. Die Anmeldedaten verbleiben in CI, niemals in TSM.",
+        "credsInfoGh": "Die Pipeline benötigt Cloud-Anmeldedaten, um Terraform auszuführen – richten Sie eine Cloud-OIDC-Rolle oder Repo-Geheimnisse an den in der Vorlage angegebenen Stellen ein. Die Anmeldedaten verbleiben in CI, niemals in TSM.",
+        "pipelineName": "Pipeline-Name",
+        "connectionName": "Verbindungsname",
+        "adoConnectDesc": "Sobald die Datei übertragen wurde, erstellt TSM in einem Schritt die Azure DevOps-Pipeline-Definition, die auf <1>{{path}}</1><!--1--> in <3>{{repo}}</3><!--3--> verweist, sowie die Pipeline-Verbindung. Hinweis: Beim ersten Ausführen ist möglicherweise eine einmalige Ressourcenautorisierung in Azure DevOps erforderlich (Zugriff auf die Dienstverbindung).",
+        "ghConnectDesc": "Sobald die Datei in den Standard-Branch von <1>{{repo}}</3> zusammengeführt<!--1--> wurde, registriert GitHub den Workflow automatisch – TSM erkennt daraufhin <3>tsm-drift.yml<!--3--> und stellt die Verbindung her.",
+        "ghMissing": "Der Workflow <1>tsm-drift.yml<!--1--> wurde unter {{repo}} noch nicht gefunden. Füge ihn in den Standard-Zweig ein, warte ein paar Sekunden, bis GitHub die Änderung übernommen hat, und versuche es dann erneut.",
+        "done": "Pipeline-Verbindung <1> „{{name}}</1><!--1-->“ wurde erstellt – Sie können nun Drift-Läufe dafür auslösen.",
+        "existingPipeline": "In diesem Projekt existiert bereits eine Pipeline namens <1>{{name}}</1><!--1--> – stellen Sie eine Verbindung zu dieser her, anstatt eine doppelte zu erstellen.",
+        "useExisting": "Vorhandene nutzen",
+        "createAnyway": "Trotzdem erstellen",
+        "createBoth": "Pipeline und Verbindung erstellen",
+        "checkAgain": "Noch einmal überprüfen",
+        "detectConnect": "Erkennen & verbinden",
+        "includeVersionLab": "Richten Sie außerdem den „Version Lab“-Workflow ein",
+        "includeVersionLabHelp": "Führt ein Commit für die Datei „tsm-health.yml“ zusammen mit dem Drift-Workflow durch und erstellt eine zweite Pipeline-Verbindung für die Versionsprüfung.",
+        "driftFile": "Drift-Workflow",
+        "versionLabFile": "Version Lab-Workflow",
+        "dispatchFirstRun": "Nach dem Anschließen einen ersten Drift-Lauf starten",
+        "firstRunDispatched": "Der erste Drift-Lauf ist gestartet – hier auf dieser Seite könnt ihr ihn euch ansehen.",
+        "firstRunFailed": "Verbindung hergestellt, aber der erste Durchlauf konnte nicht ausgeführt werden: {{error}}",
+        "versionLabSuffix": "Version Lab"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "Eigentümer"
+          },
+          "repo": {
+            "label": "Repository"
+          },
+          "workflow_id": {
+            "label": "Workflow-Datei oder -ID"
+          },
+          "ref": {
+            "label": "Standardreferenz"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "Organisation"
+          },
+          "project": {
+            "label": "Projekt"
+          },
+          "pipeline_id": {
+            "label": "Pipeline-ID"
+          },
+          "ref": {
+            "label": "Standardreferenz"
+          }
+        }
+      },
+      "recordsTitle": "Drift-Rekorde",
+      "recordsFilter": "Datensatzfilter",
+      "recordsActive": "Aktiv",
+      "recordsAll": "Alle",
+      "recordOpen": "Öffnen",
+      "recordAcknowledged": "Bestätigt",
+      "recordResolved": "Beschlossen",
+      "recordSeverity": "Schweregrad",
+      "recordState": "Quelle / Bundesstaat",
+      "recordDetections": "Erfassungen",
+      "recordFirstDetected": "Erstmals festgestellt",
+      "recordLastDetected": "Zuletzt erkannt",
+      "noActiveRecords": "Keine aktive Abweichung – jeder Zustand entspricht seinem Code.",
+      "noRecords": "Es liegen noch keine Drift-Datensätze vor. Datensätze werden angezeigt, sobald sich bei einem Drift-Lauf oder beim Import Änderungen ergeben.",
+      "acknowledge": "Bestätigen",
+      "resolve": "Entschlossenheit",
+      "acknowledgeTitle": "Abweichung anerkennen",
+      "acknowledgeBody": "Markieren Sie diese Abweichung als gesehen. Der Datensatz bleibt auch bei erneuter Erkennung bestätigt und wird automatisch aufgelöst, sobald ein fehlerfreier Durchlauf gemeldet wird.",
+      "ackNoteLabel": "Anmerkung (optional)",
+      "ackedBy": "Anerkannt von {{actor}}",
+      "recordDetailTitle": "Drift-Rekord"
+    },
+    "versionLab": {
+      "noPipelines": "Es gibt noch keine Pipeline-Verbindungen – fügen Sie eine auf der Seite „Drift“ hinzu und kehren Sie dann hierher zurück.",
+      "noRuns": "Es wurden noch keine Gesundheitsläufe durchgeführt.",
+      "terraform": "Terraform",
+      "checks": "Schecks",
+      "statusDispatchFailed": "Versand fehlgeschlagen",
+      "statusHealthy": "gesund",
+      "statusUnhealthy": "ungesund",
+      "newRunTitle": "Neue Version – Gesundheitslauf",
+      "pipeline": "Pipeline",
+      "gitRef": "Git-Referenz",
+      "workingDir": "Arbeitsverzeichnis",
+      "terraformVersion": "Terraform-Version",
+      "registryHost": "Registrierungshost (optional)",
+      "registryHostHelp": "Der Host der Registry, wie er in den Quelladressen Ihres Moduls angegeben ist (z. B. registry.example.com) – keine Spiegel-URL oder kein Pfad. Wird, sofern verfügbar, automatisch aus der verbundenen Registry ausgefüllt; Anbieter werden aus deren Netzwerk-Spiegel abgerufen.",
+      "providerVersions": "Anbieter-Versionen (optional)",
+      "moduleVersions": "Modulversionen (optional)",
+      "dispatch": "Versand",
+      "workflowTitle": "Workflow-Vorlage für den Versionsstatus",
+      "showing": "{{from}}wird angezeigt –{{to}} von {{total}}"
+    },
+    "schedules": {
+      "title": "Zeitpläne",
+      "description": "Führen Sie Drift-Prüfungen automatisch nach einem Cron-Zeitplan durch. Bei jedem Auslösen wird ein Drift-Lauf in der ausgewählten CI-Pipeline gestartet.",
+      "add": "Termin hinzufügen",
+      "edit": "Zeitplan bearbeiten",
+      "cron": "Zeitplan",
+      "cronHelp": "Cron-Ausdruck (z. B. „0 3 * * *“) oder ein Schlüsselwort: täglich, wöchentlich, alle 15 Minuten.",
+      "pipeline": "CI-Pipeline",
+      "sourceId": "Quell-ID (optional)",
+      "stateKey": "Zustandsschlüssel (optional)",
+      "repoRef": "Repo-Referenz (optional)",
+      "workingDir": "Arbeitsverzeichnis (optional)",
+      "enabled": "Aktiviert",
+      "lastRun": "Letzter Lauf",
+      "nextRun": "Nächster Lauf",
+      "runNow": "Jetzt ausführen",
+      "never": "Niemals laufen",
+      "noSchedules": "Es gibt noch keine Zeitpläne. Fügen Sie einen hinzu, um Drift-Prüfungen automatisch durchzuführen.",
+      "deleteTitle": "Zeitplan löschen",
+      "deleteConfirm": "Den Zeitplan „{{name}}“ löschen? Dann wird die Ausführung beendet."
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "description": "Lassen Sie sich Benachrichtigungen an einen Webhook, an Slack, Microsoft Teams oder per E-Mail senden, wenn ein Drift-Lauf eine Abweichung feststellt oder fehlschlägt. Die Empfängeradressen werden verschlüsselt gespeichert und nie wieder angezeigt.",
+      "add": "Kanal hinzufügen",
+      "edit": "Kanal bearbeiten",
+      "noChannels": "Es sind noch keine Benachrichtigungskanäle vorhanden. Fügen Sie einen hinzu, um Drift-Benachrichtigungen zu erhalten.",
+      "events": "Veranstaltungen",
+      "allEvents": "Alle Veranstaltungen",
+      "target": "Ziel-URL",
+      "targetHelp": "Die URL des Webhooks, von Slack oder Teams, an die ein POST-Request gesendet werden soll.",
+      "targetKeep": "Lassen Sie das Feld leer, um die aktuelle URL beizubehalten.",
+      "targetEmail": "E-Mail-Adressen der Empfänger",
+      "targetEmailHelp": "Durch Kommas getrennte E-Mail-Adressen. Versand über den konfigurierten SMTP-Relay.",
+      "targetEmailKeep": "Lassen Sie das Feld leer, um die aktuellen Empfänger beizubehalten.",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "E-Mail",
+      "eventsHelp": "Lassen Sie beide Kästchen deaktiviert, um alle Ereignisse zu erhalten.",
+      "test": "Test senden",
+      "testSent": "Testbenachrichtigung gesendet.",
+      "lastDelivery": "Letzte Lieferung",
+      "neverSent": "Wurde nie gesendet",
+      "deleteTitle": "Kanal löschen",
+      "deleteConfirm": "Den Kanal „{{name}}“ löschen?",
+      "event": {
+        "drift_detected": "Abweichung festgestellt",
+        "run_failed": "Ausführung fehlgeschlagen"
+      }
+    },
+    "reports": {
+      "description": "Filtern Sie die analysierten Statusdateien aus allen Quellen und exportieren Sie die Übereinstimmungen anschließend als Markdown, JSON oder CSV.",
+      "filters": "Filter",
+      "advanced": "Erweiterte Filter",
+      "sources": "Quellen",
+      "allSources": "Alle Quellen",
+      "searchKey": "Der State-Schlüssel enthält",
+      "version": "Terraform-Version",
+      "versionOpAria": "Versionsvergleich",
+      "provider": "Anbieter",
+      "resourceType": "Ressourcentyp",
+      "reset": "Filter zurücksetzen",
+      "refreshHint": "Die ausgewählten Quellen abgleichen und neu laden – oder alle Quellen, wenn keine ausgewählt ist",
+      "min": "Min",
+      "max": "Max",
+      "rumRange": "RUM",
+      "managedRange": "Verwaltete Ressourcen",
+      "dataRange": "Datenquellen",
+      "totalRange": "Gesamtanzahl der Instanzen",
+      "sizeRange": "Größe (Bytes)",
+      "matched": "Abgestimmt",
+      "rum": "RUM",
+      "managed": "Verwaltet",
+      "dataSources": "Datenquellen",
+      "totalInstances": "Gesamtanzahl der Instanzen",
+      "results": "Ergebnisse",
+      "truncated": "Es werden die ersten {{shown}} von {{total}} Treffern angezeigt – verfeinern Sie die Filter oder exportieren Sie die Ergebnisse, um den vollständigen Datensatz zu erhalten.",
+      "empty": "Es gibt keine Statusdateien, die diesen Filtern entsprechen.",
+      "loadFailed": "Die entsprechenden Statusdateien konnten nicht geladen werden.",
+      "export": "Exportieren",
+      "exportError": "Der Export ist fehlgeschlagen.",
+      "colSource": "Quelle",
+      "colState": "Statusdatei",
+      "colVersion": "Terraform",
+      "colRum": "RUM",
+      "colManaged": "Verwaltet",
+      "colData": "Daten",
+      "colTotal": "Gesamt",
+      "colSize": "Größe",
+      "colAnalyzed": "Analysiert",
+      "unknownVersion": "unbekannt"
+    },
+    "transfer": {
+      "needScope": "Um Übertragungen durchzuführen, benötigen Sie den Bereich „state:transfer“.",
+      "source": "Quelle",
+      "destination": "Reiseziel",
+      "stateFile": "Statusdatei",
+      "noStatesInSource": "In dieser Quelle sind keine Statusdateien enthalten",
+      "mode": "Modus",
+      "modeBackup": "Sicherung (Kopie)",
+      "modeMigrate": "Migrieren (kopieren + Parität prüfen)",
+      "targetSource": "Zielquelle",
+      "targetKey": "Zielschlüssel",
+      "hcpTargetHint": "HCP-Ziel: Entscheidend ist der NAME des Arbeitsbereichs – ein fehlender Arbeitsbereich wird automatisch in der Organisation angelegt. Das Überschreiben eines bestehenden Arbeitsbereichs setzt voraus, dass die Seriennummer des Status erhöht wird und die Abstammung übereinstimmt; der Arbeitsbereich ist während des Schreibvorgangs gesperrt.",
+      "gitTargetHint": "Git-Ziel: Der Schreibvorgang wird in den konfigurierten Zweig festgeschrieben und direkt gepusht (niemals per Force-Push) – der Zweig muss direkte Pushes akzeptieren. Die Schlüssel müssen auf .tfstate enden.",
+      "targetKeyHelp": "Zielpfad/Schlüssel innerhalb der Zielquelle",
+      "sameTarget": "Der Zielzustand muss sich vom Ausgangszustand unterscheiden.",
+      "decommissionLabel": "Quelle nach erfolgreicher Migration deaktivieren (leert die ursprüngliche Quelle; wird zuvor gesichert)",
+      "confirmDecommission": "Geben Sie den Schlüssel des Quellzustands ein, um die Außerbetriebnahme zu bestätigen",
+      "newTransfer": "Neuer Transfer",
+      "runBackup": "Sicherung",
+      "runMigrate": "Migrieren",
+      "runMigrateDecommission": "Migration und Außerbetriebnahme",
+      "verified": "Verifiziert: {{value}}",
+      "sourceDecommissioned": "Quelle stillgelegt"
+    },
+    "login": {
+      "signIn": "Anmelden",
+      "signInWith": "Mit {{provider}} anmelden",
+      "signInWithSSO": "Mit SSO anmelden",
+      "signInWithAzureAD": "Mit Azure AD anmelden",
+      "signInWithLdap": "Mit LDAP anmelden",
+      "devLogin": "Entwickler-Login (Admin)",
+      "devModeNotice": "Entwicklermodus – Klicken Sie unten, um sich ohne OAuth anzumelden",
+      "devLoginFailed": "Die Entwickler-Anmeldung ist fehlgeschlagen. Überprüfen Sie die Serverprotokolle.",
+      "subtitle": "Bitte melden Sie sich an, um fortzufahren",
+      "noProviders": "Es sind keine SSO-Anbieter konfiguriert. Wenden Sie sich an Ihren Administrator.",
+      "or": "ODER",
+      "orUseProductionAuth": "ODER PRODUKTIONS-AUTH VERWENDEN",
+      "orSignInWithLdap": "ODER MIT LDAP ANMELDEN",
+      "loadingProviders": "Anmeldeanbieter werden geladen",
+      "username": "Benutzername",
+      "password": "Passwort",
+      "ldapError": "Ungültiger Benutzername oder ungültiges Passwort.",
+      "ssoInfo": "Diese Anwendung nutzt Single Sign-On zur Authentifizierung.",
+      "ssoContact": "Wenden Sie sich an Ihren Administrator, wenn Sie Zugriff benötigen."
+    },
+    "sso": {
+      "title": "SSO / Identität",
+      "description": "Nur-Lese-Ansicht der konfigurierten Single-Sign-On- und Provisioning-Einstellungen. Diese können Sie in der Serverkonfigurationsdatei bearbeiten.",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIM-Bereitstellung",
+      "scimNote": "Wenn diese Option aktiviert ist, akzeptiert /scim/v2 die Bereitstellung von Benutzern und Gruppen gemäß SCIM 2.0 von einem Bearer-Token-Client, der über den Geltungsbereich „scim:provision“ verfügt.",
+      "group": "Gruppe",
+      "groupDn": "Gruppen-DN",
+      "organization": "Organisation",
+      "role": "Rolle",
+      "subject": "Zertifikatsbetreff",
+      "scopes": "Anwendungsbereiche",
+      "idps": "Identitätsanbieter",
+      "idpInitiated": "Von einem Identitätsanbieter (IdP) initiiertes SSO",
+      "issuer": "URL des Emittenten",
+      "groupClaim": "Sammelklage",
+      "groupAttribute": "Gruppenattribut",
+      "entityId": "Entitäts-ID",
+      "acsUrl": "ACS-URL",
+      "host": "Gastgeber",
+      "baseDn": "Basis-DN",
+      "caFile": "CA-Datei des Clients",
+      "defaultRole": "Standardrolle",
+      "noMappings": "Es sind keine Gruppenzuordnungen konfiguriert."
+    },
+    "apiKeys": {
+      "title": "API-Schlüssel",
+      "description": "Schlüssel dienen zur Authentifizierung von CI-Pipelines und Skripten als Bearer-Token. Ein Schlüssel enthält nur die Bereiche, über die Sie verfügen; Administratoren können alle Schlüssel einsehen.",
+      "create": "Schlüssel erstellen",
+      "createTitle": "API-Schlüssel erstellen",
+      "editTitle": "API-Schlüssel bearbeiten",
+      "empty": "Es sind noch keine API-Schlüssel vorhanden. Erstellen Sie einen, um die API von CI aus (Drift-Ingest, Statusabfragen) ohne Browsersitzung aufzurufen.",
+      "prefix": "Schlüssel",
+      "scopes": "Anwendungsbereiche",
+      "scopesHelp": "Ein Schlüssel darf nur Gültigkeitsbereiche enthalten, die Sie selbst besitzen.",
+      "expires": "Gültig bis",
+      "expiresLabel": "Ablaufdatum (optional)",
+      "expiresHelp": "Für einen Schlüssel ohne Ablaufdatum bitte leer lassen.",
+      "expired": "Abgelaufen",
+      "never": "Niemals",
+      "lastUsed": "Zuletzt verwendet",
+      "neverUsed": "Niemals",
+      "descriptionLabel": "Beschreibung (optional)",
+      "secretTitle": "Ihr neuer API-Schlüssel",
+      "secretWarning": "Notieren Sie sich diesen Schlüssel jetzt – er wird nur einmal angezeigt und kann nicht wiederhergestellt werden.",
+      "secretStored": "Ich habe den Schlüssel aufbewahrt",
+      "rotate": "Drehen",
+      "rotateTitle": "„{{name}}“ drehen",
+      "rotateBody": "Es wird ein Ersatzschlüssel mit denselben Gültigkeitsbereichen erstellt. Widerrufen Sie den alten Schlüssel sofort oder lassen Sie ihn für eine Übergangsfrist gültig, während die Nutzer umstellen.",
+      "graceLabel": "Gültigkeitsdauer des alten Schlüssels",
+      "graceImmediate": "Sofort widerrufen",
+      "graceHours_one": "{{count}}-Stunden lang aufbewahren",
+      "graceHours_other": "{{count}}-Stunden aufbewahren",
+      "deleteTitle": "API-Schlüssel löschen",
+      "deleteBody": "„{{name}}“ löschen? Alles, was sich damit authentifiziert, funktioniert sofort nicht mehr."
+    }
+  },
+  "commandPalette": {
+    "title": "Befehlspalette",
+    "placeholder": "Suchseiten…",
+    "empty": "Keine Ergebnisse.",
+    "openButton": "Befehlspalette öffnen",
+    "hint": "Schnellnavigation (Strg/⌘K)",
+    "groups": {
+      "navigation": "Navigation"
+    }
+  },
+  "support": {
+    "title": "Support",
+    "contextHelp": "Kontext-Hilfe"
+  },
+  "session": {
+    "expiresSoon": "Ihre Sitzung läuft in {{minutes}} Minuten ab. Aktualisieren Sie die Seite, um angemeldet zu bleiben.",
+    "refresh": "Sitzung aktualisieren"
+  },
+  "consentBanner": {
+    "ariaLabel": "Einwilligung zur Verwendung von Cookies",
+    "title": "Der Schutz Ihrer Privatsphäre ist uns wichtig",
+    "essential": "Unverzichtbar (immer aktiv)",
+    "errorReporting": "Fehlermeldung",
+    "performanceMonitoring": "Leistungsüberwachung",
+    "analytics": "Analytik",
+    "hideDetails": "Details ausblenden",
+    "customize": "Anpassen",
+    "rejectAll": "Alle ablehnen",
+    "acceptAll": "Alle akzeptieren"
+  },
+  "a11y": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "openNavigation": "Navigation öffnen",
+    "mainNavigation": "Hauptnavigation",
+    "closeNavigation": "Navigation schließen",
+    "navigatedTo": "Weitergeleitet zu {{title}}",
+    "breadcrumbs": "Navigationspfad"
+  },
+  "errorBoundary": {
+    "title": "Es ist ein Fehler aufgetreten",
+    "description": "Beim Darstellen dieser Seite ist ein unerwarteter Fehler aufgetreten.",
+    "tryAgain": "Versuche es noch einmal",
+    "reloadPage": "Seite neu laden"
+  },
+  "empty": {
+    "default": "Hier steht noch nichts."
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "Benutzer",
+      "pageSubtitle": "Benutzerkonten und Berechtigungen verwalten",
+      "addUser": "Benutzer hinzufügen",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "create": "Erstellen",
+      "add": "Hinzufügen",
+      "delete": "Löschen",
+      "erase": "Löschen",
+      "errLoad": "Das Laden der Benutzer ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "errSave": "Der Benutzer konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
+      "errDelete": "Der Benutzer konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+      "userErased": "Benutzerdaten gelöscht.",
+      "errErase": "Das Löschen der Benutzerdaten ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "exportedData": "Exportierte Benutzerdaten für „{{email}}“.",
+      "errExport": "Der Export der Benutzerdaten ist fehlgeschlagen.",
+      "errAddMembership": "Das Hinzufügen der Organisationsmitgliedschaft ist fehlgeschlagen",
+      "errUpdateRole": "Die Aktualisierung der Rolle ist fehlgeschlagen",
+      "errRemoveMembership": "Das Entfernen aus der Organisation ist fehlgeschlagen",
+      "searchPlaceholder": "Benutzer suchen...",
+      "thName": "Name",
+      "thEmail": "E-Mail",
+      "thOrgRoles": "Organisationen und Funktionen",
+      "thCreated": "Erstellt",
+      "thActions": "Aktionen",
+      "emptyTitle": "Es wurden keine Benutzer gefunden",
+      "emptyDescription": "Benutzer werden hier angezeigt, nachdem sie sich zum ersten Mal angemeldet haben. Laden Sie Teamkollegen ein, indem Sie die App-URL sowie einen SSO- oder Dev-Login-Anbieter weitergeben.",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}: Keine Rolle zugewiesen",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "Keine Rolle",
+      "noOrganizations": "Keine Organisationen",
+      "tooltipEdit": "Benutzer bearbeiten",
+      "ariaEdit": "Benutzer bearbeiten",
+      "tooltipExport": "Benutzerdaten exportieren (DSGVO Artikel 15/20)",
+      "ariaExport": "Benutzerdaten exportieren",
+      "tooltipErase": "Löschung von Nutzerdaten (Artikel 17 DSGVO)",
+      "ariaErase": "Benutzerdaten löschen",
+      "tooltipDelete": "Benutzer löschen",
+      "ariaDelete": "Benutzer löschen",
+      "dialogTitleEdit": "Benutzer bearbeiten",
+      "dialogTitleAdd": "Benutzer hinzufügen",
+      "labelEmail": "E-Mail",
+      "helpEmail": "E-Mail-Adresse des Benutzers. Dient als Anmeldekennung und kann nach der Erstellung nicht mehr geändert werden.",
+      "labelName": "Name",
+      "helpName": "Der vollständige Anzeigename wird in der gesamten Benutzeroberfläche angezeigt",
+      "sectionOrgMembership": "Mitgliedschaft in einer Organisation",
+      "currentOrgs": "Aktuelle Organisationen:",
+      "addToOrg": "Zur Organisation hinzufügen",
+      "orgOptional": "Organisation (optional)",
+      "menuNone": "Keine",
+      "helpAssignOrg": "Weisen Sie diesen Benutzer einer Organisation zu, um zu steuern, auf welche Ressourcen er zugreifen kann.",
+      "labelRoleTemplate": "Rollenvorlage",
+      "helpRoleTemplate": "Legt die innerhalb der ausgewählten Organisation gewährten Berechtigungen fest. Verwalten Sie Vorlagen unter „Admin“ → „Rollen“.",
+      "ariaRemoveFromOrg": "Aus der Organisation entfernen",
+      "dialogTitleDelete": "Benutzer löschen",
+      "confirmDelete": "Möchten Sie den Benutzer „{{name}}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "eraseTitle": "Löschung von Nutzerdaten (Artikel 17 DSGVO)",
+      "eraseWarnPart1": "Dadurch wird dies dauerhaft anonymisiert ",
+      "eraseWarnPart2": "seiner personenbezogenen Daten. Der Benutzerdatensatz wird als „Tombstone“ markiert, API-Schlüssel und Organisationsmitgliedschaften werden gelöscht und alle Sitzungen werden widerrufen. Die Einträge im Prüfprotokoll bleiben mit anonymisierten Kennungen erhalten. ",
+      "eraseWarnCannotUndo": "Dieser Vorgang kann nicht rückgängig gemacht werden.",
+      "eraseConfirmPart1": "Geben Sie zur Bestätigung die E-Mail-Adresse des Benutzers ein (",
+      "eraseConfirmPart2": ") unten.",
+      "ariaConfirmErasure": "Bestätigen Sie die Löschung, indem Sie die E-Mail-Adresse des Benutzers eingeben"
+    },
+    "organizations": {
+      "pageTitle": "Organisationen",
+      "pageSubtitle": "Organisationen und deren Mitglieder verwalten",
+      "addOrganization": "Organisation hinzufügen",
+      "cancel": "Abbrechen",
+      "save": "Speichern",
+      "create": "Erstellen",
+      "close": "Schließen",
+      "delete": "Löschen",
+      "errLoad": "Das Laden der Organisationen ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "errSave": "Das Speichern der Organisation ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "errDelete": "Das Löschen der Organisation ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "errName": "Der Name der Organisation muss aus 1 bis 64 Zeichen bestehen, mit einem Kleinbuchstaben oder einer Ziffer beginnen und darf nur Kleinbuchstaben, Ziffern, Bindestriche oder Unterstriche enthalten.",
+      "errAddMember": "Das Hinzufügen des Mitglieds ist fehlgeschlagen",
+      "errUpdateRole": "Die Aktualisierung der Mitgliederrolle ist fehlgeschlagen",
+      "errRemoveMember": "Das Entfernen des Mitglieds ist fehlgeschlagen",
+      "emptyState": "Es wurden keine Organisationen gefunden",
+      "createFirst": "Erste Organisation anlegen",
+      "thName": "Name",
+      "thDisplayName": "Anzeigename",
+      "thIdentityProvider": "Identitätsanbieter",
+      "thMembers": "Mitglieder",
+      "thCreated": "Erstellt",
+      "thActions": "Aktionen",
+      "idpAny": "Beliebig",
+      "viewMembers": "Mitglieder anzeigen",
+      "tooltipEditOrg": "Organisation bearbeiten",
+      "ariaEditOrg": "Organisation bearbeiten",
+      "tooltipDeleteOrg": "Organisation löschen",
+      "ariaDeleteOrg": "Organisation löschen",
+      "dialogTitleEdit": "Organisation bearbeiten",
+      "dialogTitleAdd": "Organisation hinzufügen",
+      "labelName": "Name",
+      "helpNameInvalid": "Muss mit einem Kleinbuchstaben oder einer Ziffer beginnen; zulässig sind nur Kleinbuchstaben, Ziffern, Bindestriche und Unterstriche (max. 64 Zeichen)",
+      "helpName": "In den Registrierungs-URLs verwendeter Name der Organisation (z. B. myorg)",
+      "renameWarnPart1": "Durch die Umbenennung dieser Organisation werden alle Modul- und Anbieter-Namensräume aktualisiert, die derzeit ",
+      "renameWarnPart2": " zu ",
+      "renameWarnPart3": ". Die Benutzerkonten sind über ihre ID verknüpft und bleiben davon unberührt. Stellen Sie sicher, dass alle Terraform-Konfigurationen, die auf den alten Namen verweisen, aktualisiert werden.",
+      "labelDisplayName": "Anzeigename",
+      "helpDisplayName": "Anzeigename der Organisation",
+      "labelIdpType": "Identitätsanbieter-Typ",
+      "menuIdpAny": "Beliebig (keine Einschränkung)",
+      "labelIdpName": "Name des Identitätsanbieters",
+      "helpIdpName": "Name des Identitätsanbieters (z. B. SAML-IdP-Name aus der Konfiguration)",
+      "dialogTitleDelete": "Organisation löschen",
+      "confirmDelete": "Möchten Sie die Organisation „{{name}}“ wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+      "membersTitle": "Mitglieder der Organisation – {{name}}",
+      "addMember": "Mitglied hinzufügen",
+      "membersManageDesc": "Mitglieder und ihre Rollen in dieser Organisation verwalten",
+      "membersViewDesc": "Mitglieder und ihre Rollen in dieser Organisation anzeigen",
+      "noMembers": "Diese Organisation hat noch keine Mitglieder",
+      "addFirstMember": "Erstes Mitglied hinzufügen",
+      "thEmail": "E-Mail",
+      "thRole": "Rolle",
+      "noRole": "Keine Rolle",
+      "unknown": "Unbekannt",
+      "tooltipRemoveMember": "Mitglied entfernen",
+      "ariaRemoveMember": "Mitglied entfernen",
+      "addMemberTitle": "Mitglied zu „{{name}}“ hinzufügen",
+      "labelSelectUser": "Benutzer auswählen",
+      "placeholderSearchUsers": "Benutzer suchen...",
+      "labelRoleTemplate": "Rollenvorlage",
+      "menuNoRoleViewOnly": "Keine Rolle (nur Lesezugriff)"
+    },
+    "roles": {
+      "loadError": "Das Laden der Rollen ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "title": "Rollen und Berechtigungen",
+      "subtitle": "Zeigen Sie die verfügbaren Rollen und die ihnen zugeordneten Berechtigungsbereiche an. Systemrollen sind vordefiniert und können nicht geändert werden.",
+      "availableScopesReference": "Übersicht über die verfügbaren Bereiche",
+      "scopesDefine": "Gültigkeitsbereiche legen fest, welche Aktionen eine Rolle in der Anwendung ausführen kann.",
+      "thScope": "Geltungsbereich",
+      "thDescription": "Beschreibung",
+      "roleTemplates": "Rollenvorlagen",
+      "clickRole": "Klicken Sie auf eine Rolle, um deren vollständigen Umfang anzuzeigen.",
+      "noRoles": "Es wurden keine Rollen gefunden.",
+      "systemChip": "System",
+      "scopeCount_one": "{{count}} Geltungsbereich",
+      "scopeCount_other": "{{count}} Anwendungsbereiche",
+      "assignedScopes": "Zugewiesene Bereiche:",
+      "permissionsByCategory": "Berechtigungen nach Kategorie:",
+      "fullAccessViaAdmin": "Voller Zugriff (über den Administrator)",
+      "noAccess": "Kein Zugriff",
+      "metaRoleId": "Rollen-ID",
+      "metaCreated": "Erstellt",
+      "metaUpdated": "Aktualisiert"
+    },
+    "auditLog": {
+      "exportCsv": "Als CSV exportieren",
+      "exportJson": "Als JSON exportieren",
+      "labelStartDate": "Startdatum",
+      "labelEndDate": "Enddatum",
+      "labelResourceType": "Ressourcentyp",
+      "labelAction": "Aktion",
+      "labelUserEmail": "E-Mail-Adresse des Benutzers",
+      "placeholderUserEmail": "Nach E-Mail-Adresse suchen...",
+      "thTimestamp": "Zeitstempel",
+      "thAction": "Aktion",
+      "thResource": "Ressource",
+      "thUser": "Benutzer",
+      "thIpAddress": "IP-Adresse",
+      "emptyTitle": "Es wurden keine Prüfprotokolleinträge gefunden, die den aktuellen Filtern entsprechen",
+      "emptySubtitle": "Protokoll-Einträge werden angezeigt, wenn Benutzer Änderungen vornehmen. Passen Sie die Filter oben an oder veröffentlichen Sie ein Modul, um einen Eintrag anzuzeigen.",
+      "detailTitle": "Details zum Prüfprotokoll",
+      "close": "Schließen",
+      "pageTitle": "Prüfprotokolle",
+      "pageSubtitle": "Aktivitäten im System über alle Ressourcen und Benutzer hinweg nachverfolgen",
+      "export": "Exportieren",
+      "errExport": "Der Export der Audit-Protokolle ist fehlgeschlagen",
+      "allResourceTypes": "Alle Ressourcentypen",
+      "reset": "Zurücksetzen",
+      "detailId": "ID",
+      "detailResourceId": "Ressourcen-ID",
+      "detailOrgId": "Organisations-ID",
+      "detailMetadata": "Metadaten"
+    },
+    "oidcSettings": {
+      "pageTitle": "OIDC-Gruppen",
+      "pageSubtitle": "Konfigurieren Sie die Zuordnung von Gruppenansprüchen Ihres Identitätsanbieters zu Organisationen und Rollen in der Registrierungsdatenbank. Die Änderungen werden bei der nächsten Anmeldung wirksam, ohne dass ein Neustart des Servers erforderlich ist.",
+      "errLoad": "Die OIDC-Konfiguration konnte nicht geladen werden",
+      "msgSaved": "Die Einstellungen für die Gruppenzuordnung wurden erfolgreich gespeichert.",
+      "errSave": "Die Gruppenzuordnungseinstellungen konnten nicht gespeichert werden",
+      "activeProvider": "Aktiver OIDC-Anbieter",
+      "labelProvider": "Anbieter",
+      "labelIssuer": "Emittent",
+      "labelClientId": "Kunden-ID",
+      "labelStatus": "Status",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "groupClaimMapping": "Zuordnung von Gruppenansprüchen",
+      "groupClaimDescBefore": "Ordnen Sie die IDP-Gruppen-Claims den Registrierungsorganisationen und -rollen zu. Der Name des Gruppen-Claims muss mit dem Claim-Schlüssel in Ihrem OIDC-ID-Token übereinstimmen (z. B. ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "Name der Sammelklage",
+      "helpGroupClaimName": "Der ID-Token-Claim, der die Gruppenliste des Benutzers enthält",
+      "labelDefaultRole": "Standardrolle",
+      "menuNone": "Keine",
+      "groupMappings": "Gruppenzuordnungen",
+      "addMapping": "Zuordnung hinzufügen",
+      "emptyMappings": "Es sind keine Gruppenzuordnungen konfiguriert. Klicken Sie auf „Zuordnung hinzufügen“, um eine zu erstellen.",
+      "thIdpGroup": "IdP-Gruppe",
+      "thOrganization": "Organisation",
+      "thRole": "Rolle",
+      "thActions": "Aktionen",
+      "tooltipEdit": "Zuordnung von Ansprüchen bearbeiten",
+      "ariaEdit": "Zuordnung von Ansprüchen bearbeiten",
+      "tooltipDelete": "Zuordnung von Ansprüchen löschen",
+      "ariaDelete": "Zuordnung von Ansprüchen löschen",
+      "saving": "Wird gespeichert…",
+      "saveChanges": "Änderungen speichern",
+      "dialogTitleEdit": "Gruppenzuordnung bearbeiten",
+      "dialogTitleAdd": "Gruppenzuordnung hinzufügen",
+      "labelIdpGroup": "IdP-Gruppe",
+      "helpIdpGroup": "Der genaue Gruppenname, wie er im ID-Token-Claim erscheint",
+      "labelOrganization": "Organisation",
+      "helpOrganization": "Name der Registrierungsorganisation, der der Benutzer hinzugefügt wird",
+      "labelRole": "Rolle",
+      "cancel": "Abbrechen",
+      "update": "Aktualisierung",
+      "add": "Hinzufügen",
+      "removeTitle": "Gruppenzuordnung entfernen",
+      "removeTextBefore": "Zuordnung für Gruppe entfernen ",
+      "removeTextAfter": "? Dies hat keine Auswirkungen auf bestehende Mitgliedschaften – es wird lediglich verhindert, dass bei neuen Anmeldungen diese Mitgliedschaft automatisch eingerichtet wird.",
+      "remove": "Entfernen",
+      "notSet": "(nicht festgelegt)",
+      "none": "(keine)",
+      "samlGroupMappings": "SAML-Gruppenzuordnungen",
+      "samlReadOnly": "SAML-Gruppenzuordnungen werden in der Serverkonfigurationsdatei konfiguriert und sind schreibgeschützt.",
+      "chipGroupAttribute": "Gruppenattribut: {{value}}",
+      "chipDefaultRole": "Standardrolle: {{value}}",
+      "thSamlGroup": "SAML-Gruppe",
+      "noSamlMappings": "Es sind keine SAML-Gruppenzuordnungen konfiguriert.",
+      "ldapGroupMappings": "LDAP-Gruppenzuordnungen",
+      "ldapReadOnly": "LDAP-Gruppenzuordnungen werden in der Serverkonfigurationsdatei konfiguriert und sind schreibgeschützt.",
+      "thLdapGroupDn": "LDAP-Gruppen-DN",
+      "noLdapMappings": "Es sind keine LDAP-Gruppenzuordnungen konfiguriert."
+    }
+  },
+  "mtls": {
+    "pageTitle": "mTLS-Client-Zertifikat-Zuordnungen",
+    "pageSubtitle": "Gegenseitige Zuordnungen zwischen TLS-Zertifikaten und Subjekten. Diese werden in der Serverkonfigurationsdatei festgelegt und sind schreibgeschützt.",
+    "errLoad": "Die mTLS-Konfiguration konnte nicht geladen werden.",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "caFile": "CA-Datei",
+    "noMappings": "Es sind keine mTLS-Zertifikatszuordnungen konfiguriert.",
+    "certificateSubject": "Zertifikatsbetreff",
+    "scopes": "Anwendungsbereiche"
+  }
+}

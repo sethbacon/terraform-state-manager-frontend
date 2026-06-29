@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "ステートマネージャー",
+    "tagline": "すべてのバックエンドにわたって、Terraformの状態を分析、編集、および移動します。"
+  },
+  "nav": {
+    "groups": {
+      "main": "州",
+      "identity": "アイデンティティ",
+      "system": "システム"
+    },
+    "dashboard": "ホーム",
+    "dashboardTooltip": "概要と統計",
+    "sources": "出典",
+    "sourcesTooltip": "接続された状態のバックエンド",
+    "drift": "ドリフト",
+    "driftTooltip": "州の状況と法規制およびインフラを比較する",
+    "versionLab": "バージョン・ラボ",
+    "versionLabTooltip": "固定されたバージョンに対するテスト計画の健全性を確認する",
+    "schedules": "スケジュール",
+    "schedulesTooltip": "定期的なドリフト実行はcronスケジュールに従って実行されます",
+    "reports": "レポート",
+    "reportsTooltip": "アナライザーレポートの作成とダウンロード",
+    "transfer": "移籍",
+    "transferTooltip": "ソース間で状態をバックアップまたは移行する",
+    "apiDocs": "APIドキュメント",
+    "apiDocsTooltip": "インタラクティブな OpenAPI ドキュメント",
+    "admin": {
+      "dashboard": "ダッシュボード",
+      "dashboardTooltip": "ID管理の概要",
+      "users": "ユーザー",
+      "usersTooltip": "ユーザーと会員資格",
+      "organizations": "組織",
+      "organizationsTooltip": "組織とIdPのバインディング",
+      "roles": "役割",
+      "rolesTooltip": "ロールテンプレートと適用範囲",
+      "sso": "SSO",
+      "ssoTooltip": "シングルサインオンプロバイダーとマッピング",
+      "notifications": "通知",
+      "notificationsTooltip": "ドリフトおよび実行失敗に関するアラートチャネル",
+      "auditLogs": "監査ログ",
+      "auditLogsTooltip": "セキュリティおよびアクティビティの監査証跡",
+      "oidcGroups": "OIDCグループ",
+      "oidcGroupsTooltip": "IdPグループを組織およびロールにマッピングする",
+      "mtls": "mTLS証明書",
+      "mtlsTooltip": "スコープマッピングの対象となるクライアント証明書",
+      "apiKeys": "APIキー",
+      "apiKeysTooltip": "CIおよびスクリプト用のAPIキーの作成と管理",
+      "ciTemplates": "CIテンプレート",
+      "ciTemplatesTooltip": "drift および version-lab のパイプラインテンプレートの編集、追加、または置換"
+    }
+  },
+  "common": {
+    "loading": "読み込み中…",
+    "error": "何か問題が発生しました。",
+    "retry": "再試行",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "confirm": "確認",
+    "close": "閉じる",
+    "search": "検索",
+    "download": "ダウンロード",
+    "refresh": "更新",
+    "none": "なし",
+    "yes": "はい",
+    "no": "いいえ",
+    "actions": "アクション",
+    "created": "作成日",
+    "updated": "更新されました",
+    "status": "ステータス",
+    "name": "名前",
+    "type": "種類",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "all": "すべて",
+    "submit": "送信",
+    "add": "追加",
+    "remove": "削除",
+    "edit": "編集",
+    "view": "表示",
+    "copy": "コピー",
+    "copied": "コピーしました",
+    "required": "必須",
+    "optional": "任意",
+    "detail": "詳細",
+    "apply": "応募する",
+    "create": "作成",
+    "filter": "フィルター",
+    "ref": "Ref",
+    "provider": "プロバイダー",
+    "templateStyle": "テンプレートのスタイル",
+    "templateBuiltin": "組み込み（依存関係なし）",
+    "templateSuite": "Terraform スイート（アクション／拡張機能）"
+  },
+  "settings": {
+    "title": "設定",
+    "appearance": "外観",
+    "theme": "テーマ",
+    "themeLight": "光",
+    "themeDark": "ダーク",
+    "themeSystem": "システム",
+    "language": "言語"
+  },
+  "about": {
+    "title": "概要",
+    "description": "既存のバックエンド間でTerraformの状態を分析、安全に編集、および移行するためのWebアプリケーション。CIによるドリフト検出とバージョンテスト機能を備えています。",
+    "versionsHeading": "バージョン",
+    "frontend": "フロントエンド {{version}}",
+    "backend": "バックエンド {{version}}",
+    "backendUnavailable": "バックエンドが利用できません",
+    "built": "{{date}}で構築",
+    "licenseHeading": "ライセンス",
+    "licenseText": "以下のライセンスに基づき提供されています。",
+    "apache": "Apache License 2.0",
+    "sourceHeading": "出典",
+    "repoBackend": "バックエンドリポジトリ",
+    "repoFrontend": "フロントエンドのリポジトリ",
+    "close": "閉じる"
+  },
+  "auth": {
+    "account": "アカウント",
+    "signIn": "ログイン",
+    "signOut": "ログアウト",
+    "insufficientTitle": "権限が不十分です",
+    "insufficientBody": "このページを表示するには、必要なアクセス権限（{{scope}}）がありません。",
+    "completingSignIn": "ログイン処理中…"
+  },
+  "landing": {
+    "heroTitle": "Terraformの状態を確実に管理",
+    "heroSubtitle": "あらゆるバックエンドにわたるTerraform環境を管理し、ドリフトの検出、バージョンアップの検証、チェックのスケジュール設定、そして状態の安全な移行を行います。",
+    "signIn": "ログイン",
+    "apiDocs": "APIドキュメント",
+    "goToDashboard": "ダッシュボードへ移動",
+    "estateTitle": "ご遺産",
+    "estate": {
+      "sources": "出典",
+      "states": "州",
+      "rum": "ラム",
+      "rumHint": "運用資産",
+      "totalResources": "リソースの合計"
+    },
+    "featuresTitle": "できること",
+    "open": "開く",
+    "signInToUse": "ご利用にはログインが必要です",
+    "gettingStarted": "はじめに",
+    "step1Title": "1. ログイン",
+    "step1DescAuth": "ログイン済みです。ダッシュボードに移動して、保有資産のクロスソース概要をご確認ください。",
+    "step1DescUnauth": "所属組織のIDプロバイダーでサインインして、Terraform環境にアクセスしてください。",
+    "step2Title": "2. ソースを接続する",
+    "step2Desc": "アナライザーが状態ファイルをインデックス化できるよう、状態バックエンド（S3、Azure、GCS、Terraform Cloud など）を追加してください。",
+    "step3Title": "3. 監視と対応",
+    "step3Desc": "ドリフトチェックやバージョンラベルチェックを実行し、定期的な実行をスケジュールし、レポートを生成し、ソース間で状態を転送します。",
+    "features": {
+      "sources": {
+        "title": "出典",
+        "desc": "州のバックエンドに接続して閲覧できます。アナライザーはすべての州ファイルをインデックス化し、統一されたビューを提供します。"
+      },
+      "drift": {
+        "title": "ドリフト",
+        "desc": "コードや稼働中のインフラストラクチャと状態を比較し、管理対象外の変更を早期に検出します。"
+      },
+      "versionLab": {
+        "title": "バージョン・ラボ",
+        "desc": "アップグレードを行う前に、固定されたTerraformおよびプロバイダーのバージョンに対して、テスト計画の健全性を確認してください。"
+      },
+      "schedules": {
+        "title": "スケジュール",
+        "desc": "cronスケジュールに従ってドリフトチェックとヘルスチェックを実行し、何か変化があった際に通知を受け取ります。"
+      },
+      "reports": {
+        "title": "レポート",
+        "desc": "必要に応じてフィルタリングを行い、全資産にわたる分析レポートを生成・ダウンロードできます。"
+      },
+      "transfer": {
+        "title": "移籍",
+        "desc": "検証と廃止処理を行いながら、ソース間の状態を安全にバックアップまたは移行します。"
+      }
+    }
+  },
+  "help": {
+    "title": "ヘルプ",
+    "open": "ヘルプを開く",
+    "close": "ヘルプを閉じる",
+    "none": "このページに関するヘルプはまだ用意されていません。",
+    "pages": {
+      "dashboard": {
+        "title": "ホーム",
+        "body": "Terraform環境のソース横断的な概要：管理対象リソース（RUM）の総数、プロバイダーおよびリソースタイプ別の内訳、ならびにTerraformバージョンの分布状況。"
+      },
+      "sources": {
+        "title": "出典",
+        "body": "既存の状態管理バックエンドを連携させ、その状態ファイルを操作します。TSM を使用するために何かを移行する必要はなく、TSM は既存のバックエンドを読み込みます。"
+      },
+      "drift": {
+        "title": "ドリフト",
+        "body": "CIを通じてTerraformのプランを実行し、コードや実稼働中のインフラストラクチャとの状態を比較します。結果は署名付きの一回限りのコールバックを介して返され、リソースごとの差分として表示されます。"
+      },
+      "versionLab": {
+        "title": "バージョン・ラボ",
+        "body": "CIにinit/planを実行させることで、固定されたTerraformバージョン（および必要に応じて、固定されたプロバイダー／モジュールバージョンやレジストリミラー）に対して、Terraformコードのプランが正常に実行されるかどうかをテストします。"
+      },
+      "reports": {
+        "title": "レポート",
+        "body": "すべてのソースにわたる分析済みステートファイルを、Terraformのバージョン、プロバイダー、リソースの種類、サイズ、リソース数ごとにフィルタリングし、一致した結果をMarkdown、JSON、またはCSV形式でエクスポートします。"
+      },
+      "transfer": {
+        "title": "移籍",
+        "body": "状態ファイルをソース間でコピー（バックアップ）または移動（移行）します。たとえば、ローカルからS3へ、あるいはHCPから新しいバックエンドへなどです。"
+      },
+      "apiDocs": {
+        "title": "APIドキュメント",
+        "body": "バックエンドのハンドラ注釈から生成された、インタラクティブな OpenAPI ドキュメント。元の仕様："
+      },
+      "schedules": {
+        "title": "スケジュール",
+        "body": "Cronによる定期的なドリフト実行。各スケジュールは、設定されたドリフト目標を所定の間隔で実行し、直近の結果を記録します。"
+      },
+      "admin": {
+        "title": "管理者",
+        "body": "ID管理の概要 — 共有IDサービスに基づくユーザー、組織、およびロールの数。各カードは管理ページへのリンクとなっています。"
+      },
+      "adminUsers": {
+        "title": "ユーザー",
+        "body": "ユーザーアカウントの管理：編集ダイアログから、検索、作成、名前の変更、削除、および組織ごとのロールへの所属状況の管理を行うことができます。"
+      },
+      "adminOrganizations": {
+        "title": "組織",
+        "body": "組織、そのIdPバインディング、およびメンバーを作成・管理します。"
+      },
+      "adminRoles": {
+        "title": "役割",
+        "body": "ロールテンプレートと、それらが付与する権限の範囲。システムロール（閲覧者、アナリスト、オペレーター、編集者、管理者）はあらかじめ定義されています。"
+      },
+      "adminOidc": {
+        "title": "OIDCグループ",
+        "body": "IdPグループを組織のロールにマッピングします。これらのマッピングは実行時に編集可能で、次回のログイン時に有効になります。"
+      },
+      "adminMtls": {
+        "title": "mTLS証明書",
+        "body": "相互TLSクライアント証明書認証の読み取り専用ビュー：有効かどうか、クライアントCA、および証明書のサブジェクト→スコープのマッピング（サーバー設定ファイルで設定済み）。"
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "各IDプロバイダー（OIDC、SAML（IdPごと）、LDAP、mTLS）およびSCIMプロビジョニングの切り替え設定（有効状態、キー設定、グループマッピング）に関する読み取り専用の集計情報。シークレットは一切表示されません。"
+      },
+      "adminNotifications": {
+        "title": "通知",
+        "body": "ドリフトの検出や実行失敗のイベントが発生した際に、WebhookおよびSlackチャンネルが通知されます。"
+      },
+      "adminAudit": {
+        "title": "監査ログ",
+        "body": "アプリ全体で発生するあらゆる変更は、アクターとIPの帰属情報とともにここに記録されます。これには、IDの変更、ソース／状態／バックアップ／転送操作、レポート生成、実行のディスパッチ、スケジュール、通知チャネル、CI統合などが含まれます。"
+      },
+      "adminApiKeys": {
+        "title": "APIキー",
+        "body": "CIパイプラインおよびスクリプト用のセルフサービス型ベアラー認証情報（tsm_…）— ドリフトの取り込み、状態の読み取り、APIが提供するあらゆる機能に対応。 各ユーザーが自身のキーを管理し、管理者はすべてのキーを確認できます。キーに付与できるスコープは、その作成者が保有するスコープに限定されます。シークレットは作成時に一度だけ表示されます。キーのローテーション時には、利用者が新しいキーに切り替えるまでの間、最大72時間、古いキーを有効に保つことができます。"
+      }
+    }
+  },
+  "actions": {
+    "addSource": "ソースを追加",
+    "browseStates": "州を閲覧する",
+    "newDriftRun": "新しいドリフト走行",
+    "newHealthRun": "新しい健康ラン",
+    "addPipeline": "パイプラインを追加する",
+    "workflowTemplate": "ワークフローテンプレート",
+    "newTransfer": "新たな移籍"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "CIテンプレート",
+      "pageSubtitle": "リポジトリウィザードに提供される drift および version-lab パイプラインテンプレートを編集、追加、または置換します。各プロバイダー／種類の「default」プロファイルは、指定がない場合、組み込みのプロファイルが使用されます。",
+      "addTemplate": "テンプレートを追加",
+      "emptyState": "CIテンプレートはまだありません。",
+      "createFirst": "最初のテンプレートを追加する",
+      "thProvider": "プロバイダー",
+      "thKind": "種類",
+      "thProfile": "プロフィール",
+      "thName": "名前",
+      "thActions": "アクション",
+      "builtinChip": "組み込み",
+      "builtinNoDelete": "組み込みテンプレートは削除できません",
+      "tooltipEdit": "テンプレートを編集",
+      "tooltipDelete": "テンプレートを削除する",
+      "ariaEdit": "テンプレートを編集",
+      "ariaDelete": "テンプレートを削除する",
+      "dialogTitleAdd": "CIテンプレートを追加する",
+      "dialogTitleEdit": "CIテンプレートの編集",
+      "dialogTitleDelete": "テンプレートを削除する",
+      "confirmDelete": "テンプレート「{{name}}」を削除しますか？この操作は元に戻せません。",
+      "labelProvider": "プロバイダー",
+      "labelKind": "種類",
+      "labelProfile": "プロフィール",
+      "labelName": "名前",
+      "labelDescription": "説明",
+      "labelContent": "テンプレート（YAML）",
+      "helpProfile": "IDは小文字で指定してください（例：brunswick-azure）。使用できる文字は、英字、数字、ドット、ダッシュ、アンダースコアです。",
+      "cancel": "キャンセル",
+      "create": "作成",
+      "save": "保存",
+      "delete": "削除",
+      "errSave": "テンプレートの保存に失敗しました。",
+      "errDelete": "テンプレートの削除に失敗しました。",
+      "errProfile": "プロファイルは [A-Za-z0-9._-]+ に一致する必要があります"
+    },
+    "apiDocs": {
+      "sections": "セクション"
+    },
+    "admin": {
+      "identity": "アイデンティティ",
+      "overview": "ID管理の概要。ユーザー、組織、およびロールテンプレートは、共有IDサービスから提供されます。",
+      "users": "ユーザー",
+      "organizations": "組織",
+      "roles": "役割"
+    },
+    "dashboard": {
+      "rum": "ラム",
+      "rumHint": "運用資産",
+      "managed": "管理対象",
+      "dataSources": "データソース",
+      "totalInstances": "インスタンスの総数",
+      "sources": "出典",
+      "states": "州のファイル",
+      "providerDistribution": "プロバイダーの分布",
+      "topResourceTypes": "主なリソースの種類",
+      "terraformVersions": "Terraformのバージョン",
+      "count": "カウント：{{value}}",
+      "versionChartHint": "バージョンをクリックすると、その状態ファイルの一覧が表示されます。",
+      "versionStatesTitle": "Terraformのバージョン別ステートファイル",
+      "versionStatesError": "対応する状態ファイルの読み込みに失敗しました。",
+      "versionStatesEmpty": "このバージョンフィルターに一致するステートファイルはありません。",
+      "versionStatesCount_one": "{{count}} ステートファイル",
+      "versionStatesCount_other": "{{count}} ステートファイル",
+      "versionExportCsv": "CSVをエクスポート",
+      "versionStateRum": "ラム酒「{{count}}」",
+      "versionUnknown": "不明",
+      "versionOpAria": "バージョン比較",
+      "versionOpEq": "まさにこのバージョン",
+      "versionOpLte": "このバージョンまたはそれ以前のバージョン",
+      "versionOpLt": "このバージョンより古いもの",
+      "versionOpGte": "このバージョン以降",
+      "versionOpGt": "このバージョンより新しいもの",
+      "syncPartial": "これまでに、{{listed}}のステートファイルのうち{{stored}}件を分析しました。同期処理が進行中です。処理が完了するにつれて、合計数は増加します。",
+      "syncErrors_one": "{{count}} ソースは前回の同期時にエラーを報告しており、その数値は不完全である可能性があります。",
+      "syncErrors_other": "{{count}} 情報源によると、前回の同期時にエラーが発生したとのことです。そのため、その数値は不完全である可能性があります。",
+      "syncStatus": "ソース同期",
+      "syncStates": "{{stored}} / 分析対象となった{{listed}}州",
+      "syncedAt": "{{time}} を同期しました",
+      "syncReadErrors": "{{count}} 読み取りエラー",
+      "syncPending": "初回同期を待機中",
+      "empty": "まだステータスが表示されていません。データソースを接続すると、ここでフリートのメトリクスを確認できます。",
+      "goToSources": "ソースを追加する",
+      "asOf": "{{time}}時点のデータ"
+    },
+    "sources": {
+      "empty": "まだソースが接続されていません。ソースを追加して、その状態を確認・分析してください。",
+      "uploadAnalyze": "アップロードされた状態ファイルを分析する",
+      "loadFailed": "ソースの読み込みに失敗しました。",
+      "deleteSourceAria": "ソースを削除",
+      "browseStates": "州を閲覧する",
+      "analysisTitle": "分析 — {{name}}",
+      "deleteTitle": "ソースを削除",
+      "deleteBody": "ソース <1>{{name}}</3><!--1-->? を削除します。これにより、ステートマネージャーからの接続が切断されます。基盤となるステートバックエンドとそのファイルには <3>一切<!--3-->手を加えません。",
+      "deleteConfirmLabel": "ソースを削除",
+      "editSourceAria": "ソースを編集",
+      "editSourceTitle": "{{name}} を編集",
+      "keepCredentialHelper": "現在の認証情報を維持する場合は、空欄のままにしてください。",
+      "testConnection": "接続テスト",
+      "testOk": "OK · {{count}} states",
+      "testFailed": "接続に失敗しました",
+      "statesIn": "『{{name}}』に登場する州",
+      "stateCount_one": "{{count}} 状態",
+      "stateCount_other": "{{count}} 州",
+      "listFailed": "州の一覧表示に失敗しました。",
+      "noStateFiles": ".tfstate ファイルが見つかりませんでした。",
+      "filterStates": "{{count}}の状態をフィルタリング…",
+      "noStatesMatch": "「{{filter}}」に一致する州はありません。",
+      "selectState": "各州を選択して、その分析結果をご覧ください。",
+      "tabAnalysis": "分析",
+      "tabResources": "リソース",
+      "tabOutputs": "出力",
+      "tabRaw": "生",
+      "export": "エクスポート",
+      "exportReportHeader": "分析報告書",
+      "downloadState": "状態ファイル（.tfstate）をダウンロード",
+      "outputsFailed": "出力の読み込みに失敗しました。",
+      "noOutputs": "この状態では、ルートモジュールからの出力は一切行われません。",
+      "outputName": "名前",
+      "outputType": "種類",
+      "outputValue": "値",
+      "sensitiveValue": "機密 — 非表示",
+      "tabBackups": "バックアップ",
+      "tabModules": "モジュール",
+      "moduleSource": "モジュール",
+      "moduleVersion": "バージョン",
+      "registryHost": "レジストリ",
+      "constraintOnly": "制約のみ",
+      "moduleStatus": "ステータス",
+      "moduleUpToDate": "最新の情報",
+      "moduleUnknown": "不明",
+      "noModules": "この状態については、モジュールの出所情報が記録されていません。/drift/ingest に完全なプランをプッシュして、情報を登録してください。",
+      "modulesFailed": "モジュール「provenance」の読み込みに失敗しました。",
+      "stateOps": "州の業務",
+      "transfer": "移籍",
+      "deleteState": "削除",
+      "deleteStateTitle": "状態ファイルを削除する",
+      "deleteStateBody": "これにより、<1>{{name}}</1><!--1--> のライブ状態オブジェクトがバックエンドから完全に削除されます。",
+      "deleteStateBackupNote": "削除前にサーバー側で最終的なバックアップが作成され、その操作は監査記録に残されるため、「バックアップ」タブから復元することができます（ただし、以下で「完全削除」を行わない場合に限ります）。まずは「エクスポート」→「状態のダウンロード」の利用をご検討ください。",
+      "deleteStatePurgeLabel": "また、保存されているすべてのバックアップと履歴も削除します（この操作は元に戻せません）。",
+      "deleteStatePurgeWarning": "パージを実行すると、この状態の復元可能なコピーは一切残されません。この操作は元に戻せません。",
+      "deleteStateConfirmPrompt": "確認するには、<1>{{key}}</1><!--1--> と入力してください。",
+      "deleteStateConfirmAria": "削除する状態キーを確認してください",
+      "deleteStateConfirmLabel": "状態を削除",
+      "stateOpTitle": "州による運営",
+      "stateOpDesc": "<1>{{name}}</1> の構造<!--1-->化編集。まず現在のバージョンのバックアップを作成し、変更内容を監査します。",
+      "operation": "操作",
+      "opRemove": "削除 (terraform state rm)",
+      "opMove": "移動／名前変更 (terraform state mv)",
+      "resourceAddress": "リソースアドレス",
+      "newAddress": "新しい住所",
+      "analyzeFailed": "この状態ファイルの解析に失敗しました。",
+      "resourcesFailed": "リソースの読み込みに失敗しました。",
+      "filterResources": "タイプ、名前、モジュール、またはプロバイダーで絞り込む…",
+      "module": "モジュール",
+      "mode": "モード",
+      "instances": "インスタンス",
+      "rawFailed": "生の状態データを読み込めませんでした。",
+      "edit": "編集",
+      "save": "保存",
+      "notValidJson": "無効なJSONです",
+      "saveHelp": "保存時には、現在のバージョンがバックアップされ、変更内容が検証され、編集履歴が記録されます。",
+      "overwriteTitle": "状態を上書きしますか？",
+      "overwriteBody": "<1>{{name}}</1><!--1--> の現在のバージョンはバックアップされた後、置き換えられます。「バックアップ」タブから元に戻すことができます。",
+      "overwrite": "上書き",
+      "backupsFailed": "バックアップの読み込みに失敗しました。",
+      "noBackups": "まだバックアップはありません。編集や復元を行うたびに、自動的に1つずつバックアップが作成されます。",
+      "serialHeader": "連続",
+      "action": "アクション",
+      "restore": "復元",
+      "rum": "ラム",
+      "managed": "管理対象",
+      "dataSources": "データソース",
+      "totalInstances": "インスタンスの総数",
+      "terraform": "Terraform",
+      "serial": "連続",
+      "topResourceTypes": "主なリソースの種類",
+      "providers": "プロバイダー",
+      "count": "カウント",
+      "transferTitle": "転送状態",
+      "copyTo": "<1>{{name}}</1><!--1--> を別のソースにコピーします。",
+      "addSourceTitle": "状態ソースを追加",
+      "type": "種類",
+      "uploadError": "そのファイルを解析できませんでした。これは有効なTerraformの状態JSONファイルですか？",
+      "types": {
+        "local": "地域別ディレクトリ",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3（またはS3互換）",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Gitリポジトリ",
+        "consul": "KV領事",
+        "pg": "PostgreSQL バックエンド",
+        "kubernetes": "Kubernetesのシークレット",
+        "http": "HTTPバックエンド"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "ベースパス",
+            "helper": "ディレクトリ内の.tfstateファイルのスキャンが完了しました"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "組織"
+          },
+          "hostname": {
+            "label": "ホスト名"
+          },
+          "token": {
+            "label": "APIトークン",
+            "helper": "保存時には暗号化された状態で保管される"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "バケット"
+          },
+          "region": {
+            "label": "地域"
+          },
+          "prefix": {
+            "label": "キーの接頭辞"
+          },
+          "endpoint": {
+            "label": "エンドポイント（S3互換）"
+          },
+          "access_key_id": {
+            "label": "アクセスキーID"
+          },
+          "secret_access_key": {
+            "label": "秘密のアクセスキー"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "ストレージアカウント"
+          },
+          "container": {
+            "label": "コンテナ"
+          },
+          "prefix": {
+            "label": "ブロブ接頭辞"
+          },
+          "account_key": {
+            "label": "アカウントキー",
+            "helper": "保存時には暗号化された状態で保管される"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "バケット"
+          },
+          "prefix": {
+            "label": "オブジェクトのプレフィックス"
+          },
+          "credentials_json": {
+            "label": "サービスアカウントのJSON",
+            "helper": "キーのJSONを貼り付けるか、アプリケーションのデフォルトの認証情報を使用する場合は空白のままにしてください。"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "リポジトリのURL"
+          },
+          "ref": {
+            "label": "支店"
+          },
+          "prefix": {
+            "label": "パスプレフィックス"
+          },
+          "username": {
+            "label": "ユーザー名"
+          },
+          "token": {
+            "label": "トークン",
+            "helper": "プライベートリポジトリの場合：暗号化されて保存されます"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "住所"
+          },
+          "scheme": {
+            "label": "スキーム"
+          },
+          "path": {
+            "label": "KVパスプレフィックス"
+          },
+          "datacenter": {
+            "label": "データセンター"
+          },
+          "token": {
+            "label": "ACLトークン",
+            "helper": "保存時には暗号化された状態で保管される"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "接続文字列",
+            "helper": "保存時には暗号化された状態で保管される"
+          },
+          "schema_name": {
+            "label": "スキーマ"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "APIサーバーのURL"
+          },
+          "namespace": {
+            "label": "名前空間"
+          },
+          "labels": {
+            "label": "ラベル選択ツール"
+          },
+          "ca_cert": {
+            "label": "クラスター CA (PEM)"
+          },
+          "token": {
+            "label": "無記名トークン",
+            "helper": "保存時には暗号化された状態で保管される"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "URLを指定してください"
+          },
+          "lock_address": {
+            "label": "URLをロック",
+            "helper": "ネイティブの LOCK/UNLOCK ロック機能を有効にします"
+          },
+          "unlock_address": {
+            "label": "URLのロックを解除"
+          },
+          "update_method": {
+            "label": "更新方法"
+          },
+          "username": {
+            "label": "ユーザー名"
+          },
+          "password": {
+            "label": "パスワード",
+            "helper": "保存時には暗号化された状態で保管される"
+          }
+        }
+      },
+      "optionalField": "{{label}} （任意）",
+      "createFailed": "ソースの作成に失敗しました。",
+      "tabHistory": "沿革",
+      "historyEmpty": "まだ履歴はありません。同期サービスがこの状態の変化を検知するにつれて、スナップショットが蓄積されていきます。",
+      "historyError": "分析履歴の読み込みに失敗しました。",
+      "historyRum": "ラム",
+      "historyResources": "リソース",
+      "historySnapshots_one": "{{count}} スナップショット",
+      "historySnapshots_other": "{{count}} スナップショット",
+      "historyAnalyzedAt": "観測された",
+      "historySerial": "連続",
+      "historyTfVersion": "Terraform",
+      "historySize": "サイズ"
+    },
+    "drift": {
+      "pipelines": "パイプラインの接続",
+      "noPipelines": "まだパイプライン接続がありません。ドリフト実行をディスパッチするために、1つ追加してください。",
+      "noRuns": "まだドリフト走行は行っていません。",
+      "runs": "ドリフト走行",
+      "statusFailed": "失敗した",
+      "statusDriftDetected": "ドリフトが検出されました",
+      "statusNoDrift": "ドリフトなし",
+      "recentRuns": "最近の走行記録",
+      "dir": "Dir",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "リポジトリを設定する",
+      "ciSources": "CIの情報源",
+      "deletePipelineTitle": "パイプライン接続を削除する",
+      "deletePipelineBody": "パイプライン接続 <1> {{name}}</1> を削除<!--1-->します。これにより、Drift および version-lab の実行は、この接続を経由してディスパッチできなくなります。",
+      "editPipelineTitle": "パイプライン接続の編集",
+      "runDetailTitle": "ドリフト走行",
+      "defaultRef": "デフォルトの参照",
+      "pending": "保留中",
+      "addedChangedDestroyed": "{{added}} 追加 / {{changed}} 変更 / {{destroyed}} 削除",
+      "resource": "リソース",
+      "change": "変更",
+      "noResourceDrift": "リソースごとのドリフトは報告されなかった。",
+      "noDetailsYet": "詳細はまだ不明です。この実行の結果はまだ報告されていません。",
+      "addPipelineTitle": "パイプライン接続を追加する",
+      "ciSource": "CIソース",
+      "ciSourceHelp": "設定済みのCIソースを選択して、そのパイプラインまたはワークフローから選択するか、座標を手動で入力してください。",
+      "manualEntry": "手動入力",
+      "pipeline": "パイプライン",
+      "pipelineHelp": "TSMワークフローテンプレートから作成されたパイプラインを選択してください（「ワークフローテンプレート」ボタン）— 通常のCIパイプラインでは、ディスパッチパラメータが拒否されます",
+      "repository": "リポジトリ",
+      "repositoryHelp": "このソースから参照可能なリポジトリ",
+      "workflow": "ワークフロー",
+      "workflowHelp": "TSMワークフローテンプレート（例：tsm-drift.yml）から作成されたワークフローを選択してください。それ以外のワークフローでは、ディスパッチ入力が拒否されます。",
+      "defaultRefOptional": "デフォルトの参照（任意）",
+      "credentialInherited": "CIソースから継承された認証情報 — トークンをローテーションすることで、この接続はカバーされます。",
+      "apiToken": "APIトークン / PAT",
+      "tokenHelp": "保存時には暗号化された状態で保管される",
+      "tokenHelpEdit": "現在のトークンを維持する場合は、空欄のままにしてください。トークンをローテーションさせる場合は、新しい値を入力してください。",
+      "ciSourcesTitle": "CIの情報源",
+      "ciSourcesDesc": "組織レベルの CI 認証情報（Azure DevOps の組織/プロジェクト、または GitHub のオーナー）。ソースから作成されたパイプライン接続は、そのソースのパイプラインまたはワークフローから選択され、そのトークンを共有します。",
+      "noCiSources": "CIソースはまだありません — 以下に追加してください。",
+      "ownerLabel": "所有者（組織またはユーザー）",
+      "organization": "組織",
+      "project": "プロジェクト",
+      "sourceTokenHelp": "保存時には暗号化された状態で保持され、このソースから確立された接続を通じて共有される",
+      "addCiSource": "CIソースを追加する",
+      "authMethod": "認証方式",
+      "authMethodPat": "個人用アクセストークン",
+      "authMethodApp": "アプリの登録（Entra）",
+      "appAuthHelp": "Microsoft Entra アプリの登録（クライアント資格情報） — 定期的なドリフトに推奨。PAT の有効期限なし。",
+      "tenantId": "テナントID",
+      "clientId": "クライアントID",
+      "clientSecret": "クライアントシークレット",
+      "clientSecretHelp": "保存時には暗号化され、二度と表示されることはありません。",
+      "githubAppHelp": "GitHub Appのインストール（アクセストークンのインストール） — 定期的なドリフトに推奨。PATの有効期限なし。",
+      "githubAppId": "アプリID",
+      "githubInstallationId": "インストールID",
+      "appPrivateKey": "秘密鍵（PEM）",
+      "appPrivateKeyHelp": "GitHub Appの秘密鍵（PEM形式）を貼り付けてください。保存時は暗号化され、二度と表示されることはありません。",
+      "testConnection": "接続テスト",
+      "testConnectionOk": "接続が確認されました",
+      "deleteCiSourceTitle": "CIソースを削除する",
+      "deleteCiSourceBody": "「{{name}}」を削除しますか？これに基づいて構築されたパイプライン接続は、独自のトークンを保持していない限り、ディスパッチされなくなります。",
+      "newRunTitle": "新しいドリフト走行",
+      "gitRefOptional": "Git リファレンス（任意）",
+      "gitRefHelp": "パイプラインのデフォルトブランチから実行する場合は空のままにしておき、特定のブランチ/refを指定する場合はのみ設定してください。",
+      "workingDir": "作業ディレクトリ",
+      "dispatch": "配信",
+      "workflowTemplateTitle": "ドリフトのワークフローテンプレート",
+      "placeholderPipelineDefault": "パイプラインのデフォルトブランチ",
+      "wizard": {
+        "title": "リポジトリのドリフトを設定する",
+        "steps": {
+          "source": "出典およびリポジトリ",
+          "workflow": "ワークフローファイル",
+          "connect": "作成・連携"
+        },
+        "preflight": "CIのコールバックURLは <1>{{base}}</3><!--1--> です。ホスト型CIエージェントはローカル/プライベートアドレスにアクセスできないため、実行結果が報告されることはありません。このホストにアクセスできるセルフホスト型エージェントを使用するか、トンネルを開設して <3>TSM_SERVER_CALLBACK_URL を設定してください<!--3-->。",
+        "preflightUnset": "設定されていません",
+        "intro": "CIソースと、Terraformが含まれているリポジトリを選択してください。ウィザードがそれに基づいてTSMドリフトワークフローを生成し、パイプライン接続を作成します。",
+        "noSourcesHelp": "CIソースはまだ設定されていません。まず、Driftページの「CIソース」ボタンからCIソースを追加してください。",
+        "sourceHelp": "閲覧および作成に使用される組織レベルの認証情報。",
+        "repoHelp": "Terraform を含むリポジトリ",
+        "workingDir": "Terraform の作業ディレクトリ",
+        "workingDirHelp": "レポのルートに対する相対パス",
+        "serviceConnection": "サービス接続（オプション）",
+        "serviceConnectionErr": "サービス接続の一覧を取得できませんでした（PATのスコープが不足している可能性があります） — YAMLガイドライン内で名前が言及されているのみです。",
+        "serviceConnectionHelp": "生成されたYAMLの認証情報に関するガイダンスに記載されている",
+        "commitHeading": "このファイルを <1>{{file}}</1><!--1--> に、デフォルトブランチ {{branch}} へコミットしてください。手動で、またはプルリクエスト（PR）を通じて行ってください。",
+        "copy": "コピー",
+        "copied": "コピーしました",
+        "commitViaPR": "プルリクエストでコミットする",
+        "setupExists": "ワークフローファイルはすでにデフォルトブランチにあります。コミットする必要はありません。接続の作成を続けてください。",
+        "prMerged": "プルリクエストがマージされました。ワークフローはデフォルトブランチで実行されています。引き続き接続を作成してください。",
+        "prClosed": "プルリクエストはマージされずに閉じられました。PR経由でコミットを再実行するか、手動でコミットを行ってください。",
+        "prOpen": "<1>{{branch}}</3><!--1--> からプルリクエストが開かれました — <3>レビューしてマージしてください<!--3-->。マージされるのを待っています…",
+        "credsInfoAdo": "パイプラインでTerraformを実行するには、クラウドの認証情報が必要です。テンプレートで指定されている場所に、サービス接続またはワークロードIDを設定してください。認証情報はCI内にのみ保存され、TSMには一切保存されません。",
+        "credsInfoGh": "パイプラインでTerraformを実行するには、クラウドの認証情報が必要です。テンプレートで指定されている場所に、クラウドのOIDCロールまたはリポジトリのシークレットを設定してください。認証情報はCI内にのみ保存され、TSMには一切保存されません。",
+        "pipelineName": "パイプライン名",
+        "connectionName": "接続名",
+        "adoConnectDesc": "ファイルがコミットされると、TSM は、<1>{{path}}</1><!--1--> を指す Azure DevOps パイプライン定義を <3>{{repo}}</3><!--3--> に作成し、パイプライン接続も 1 ステップで作成します。注：初回実行時には、Azure DevOps での 1 回限りのリソース認証（サービス接続へのアクセス）が必要になる場合があります。",
+        "ghConnectDesc": "ファイルが <1>{{repo}}</3> のデフォルトブランチ<!--1-->にマージされると、GitHub が自動的にワークフローを登録します。その後、TSM が <3>tsm-drift.yml<!--3--> を検出し、接続を確立します。",
+        "ghMissing": "ワークフロー <1>tsm-drift.yml<!--1--> が、{{repo}} にはまだ見つかりません。デフォルトブランチにコミットし、GitHub が反映されるまで数秒待ってから、再度確認してください。",
+        "done": "パイプライン接続 <1>{{name}}</1><!--1--> が作成されました。これに対してドリフト実行をディスパッチできるようになりました。",
+        "existingPipeline": "このプロジェクトには、<1>{{name}}</1><!--1--> という名前のパイプラインがすでに存在します。重複して作成するのではなく、そちらに接続してください。",
+        "useExisting": "既存のものを活用する",
+        "createAnyway": "とにかく作成する",
+        "createBoth": "パイプラインと接続の作成",
+        "checkAgain": "もう一度確認してください",
+        "detectConnect": "検出・接続",
+        "includeVersionLab": "また、Version Labのワークフローも設定してください",
+        "includeVersionLabHelp": "driftワークフローとともに tsm-health.yml をコミットし、バージョンテスト用の 2 つ目のパイプライン接続を作成します。",
+        "driftFile": "ドリフトのワークフロー",
+        "versionLabFile": "Version Labのワークフロー",
+        "dispatchFirstRun": "接続後に最初のドリフト走行を実行する",
+        "firstRunDispatched": "最初のドリフト走行の映像が公開されました。このページでご覧ください。",
+        "firstRunFailed": "接続は確立されましたが、初回の実行でディスパッチに失敗しました：{{error}}",
+        "versionLabSuffix": "バージョン・ラボ"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "オーナー"
+          },
+          "repo": {
+            "label": "リポジトリ"
+          },
+          "workflow_id": {
+            "label": "ワークフローファイルまたはID"
+          },
+          "ref": {
+            "label": "デフォルトの参照"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "組織"
+          },
+          "project": {
+            "label": "プロジェクト"
+          },
+          "pipeline_id": {
+            "label": "パイプラインID"
+          },
+          "ref": {
+            "label": "デフォルトの参照"
+          }
+        }
+      },
+      "recordsTitle": "ドリフト記録",
+      "recordsFilter": "レコードフィルター",
+      "recordsActive": "アクティブ",
+      "recordsAll": "すべて",
+      "recordOpen": "開く",
+      "recordAcknowledged": "承認済み",
+      "recordResolved": "解決済み",
+      "recordSeverity": "重大度",
+      "recordState": "出典／状態",
+      "recordDetections": "検知件数",
+      "recordFirstDetected": "最初に検出された",
+      "recordLastDetected": "最終検出日時",
+      "noActiveRecords": "アクティブなドリフトなし — すべての状態がそのコードと一致している。",
+      "noRecords": "まだドリフトの記録はありません。ドリフトの実行やインジェストのレポートに変更があった場合に、記録が表示されます。",
+      "acknowledge": "謝辞",
+      "resolve": "解決",
+      "acknowledgeTitle": "ドリフトを認識する",
+      "acknowledgeBody": "このドリフトを「確認済み」としてマークしてください。この記録は、再検出時にも確認済みとして保持され、正常な実行が報告された際に自動的に解決されます。",
+      "ackNoteLabel": "注（任意）",
+      "ackedBy": "{{actor}} により承認されました",
+      "recordDetailTitle": "ドリフト記録"
+    },
+    "versionLab": {
+      "noPipelines": "まだパイプラインの接続はありません。Drift ページで接続を追加してから、ここに戻ってきてください。",
+      "noRuns": "まだ健康ランは行っていません。",
+      "terraform": "Terraform",
+      "checks": "小切手",
+      "statusDispatchFailed": "送信に失敗しました",
+      "statusHealthy": "健康な",
+      "statusUnhealthy": "不健康な",
+      "newRunTitle": "新バージョン - ヘルスラン",
+      "pipeline": "パイプライン",
+      "gitRef": "Git リファレンス",
+      "workingDir": "作業ディレクトリ",
+      "terraformVersion": "Terraformのバージョン",
+      "registryHost": "レジストリホスト（任意）",
+      "registryHostHelp": "モジュールのソースアドレスに表示されるレジストリのホスト名（例：registry.example.com）— ミラーURLやパスではありません。利用可能な場合は、接続済みのレジストリから自動入力されます。プロバイダーは、そのネットワークミラーから取得されます。",
+      "providerVersions": "プロバイダーのバージョン（任意）",
+      "moduleVersions": "モジュールのバージョン（任意）",
+      "dispatch": "配信",
+      "workflowTitle": "バージョン管理ワークフローテンプレート",
+      "showing": "{{from}}を表示中 – {{total}} の{{to}}件"
+    },
+    "schedules": {
+      "title": "スケジュール",
+      "description": "cronスケジュールに従ってドリフトチェックを自動的に実行します。各ファイアが発生するたびに、選択されたCIパイプライン上でドリフト実行がディスパッチされます。",
+      "add": "スケジュールを追加",
+      "edit": "スケジュールを編集する",
+      "cron": "スケジュール",
+      "cronHelp": "Cron式（例：「0 3 * * *」）またはキーワード：毎日、毎週、15分ごと。",
+      "pipeline": "CIパイプライン",
+      "sourceId": "ソースID（任意）",
+      "stateKey": "状態キー（任意）",
+      "repoRef": "リポジトリ参照（任意）",
+      "workingDir": "作業ディレクトリ（任意）",
+      "enabled": "有効",
+      "lastRun": "最後の走行",
+      "nextRun": "次の実行",
+      "runNow": "今すぐ実行",
+      "never": "決して走ってはいけない",
+      "noSchedules": "まだスケジュールはありません。ドリフトチェックを自動的に実行するようにスケジュールを追加してください。",
+      "deleteTitle": "スケジュールを削除する",
+      "deleteConfirm": "「{{name}}」というスケジュールを削除しますか？ 削除すると、そのスケジュールは実行されなくなります。"
+    },
+    "notifications": {
+      "title": "通知",
+      "description": "ドリフトの実行でドリフトが検出されたり、実行に失敗したりした際に、Webhook、Slack、Microsoft Teams、またはメールにアラートを送信します。送信先は暗号化されて保存され、二度と表示されることはありません。",
+      "add": "チャンネルを追加",
+      "edit": "チャンネルを編集",
+      "noChannels": "まだ通知チャネルはありません。ドリフトアラートを受け取るには、チャネルを追加してください。",
+      "events": "イベント",
+      "allEvents": "すべてのイベント",
+      "target": "リンク先のURL",
+      "targetHelp": "POSTリクエストを送信するWebhook、Slack、またはTeamsの着信Webhook URL。",
+      "targetKeep": "現在のURLを維持する場合は、空欄のままにしてください。",
+      "targetEmail": "受信者のメールアドレス",
+      "targetEmailHelp": "カンマ区切りのメールアドレス。設定されたSMTPリレー経由で送信されます。",
+      "targetEmailKeep": "現在の受信者を維持する場合は、空欄のままにしてください。",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "電子メール",
+      "eventsHelp": "すべてのイベントを受信するには、両方のチェックを外しておいてください。",
+      "test": "テストを送信",
+      "testSent": "テスト通知を送信しました。",
+      "lastDelivery": "最終配送",
+      "neverSent": "送信されなかった",
+      "deleteTitle": "チャンネルを削除する",
+      "deleteConfirm": "チャンネル「{{name}}」を削除しますか？",
+      "event": {
+        "drift_detected": "ドリフトが検出されました",
+        "run_failed": "実行に失敗しました"
+      }
+    },
+    "reports": {
+      "description": "すべてのソースにわたって分析済みの状態ファイルをフィルタリングし、一致した結果をMarkdown、JSON、またはCSV形式でエクスポートします。",
+      "filters": "フィルター",
+      "advanced": "高度なフィルター",
+      "sources": "出典",
+      "allSources": "すべての情報源",
+      "searchKey": "ステートキーには以下が含まれます",
+      "version": "Terraformのバージョン",
+      "versionOpAria": "バージョン比較",
+      "provider": "プロバイダー",
+      "resourceType": "リソースの種類",
+      "reset": "フィルターをリセット",
+      "refreshHint": "選択したソースを照合して再読み込みする — 何も選択されていない場合は、すべてのソースを再読み込みする",
+      "min": "分",
+      "max": "マックス",
+      "rumRange": "ラム",
+      "managedRange": "管理対象リソース",
+      "dataRange": "データソース",
+      "totalRange": "インスタンスの総数",
+      "sizeRange": "サイズ（バイト）",
+      "matched": "一致",
+      "rum": "ラム",
+      "managed": "管理対象",
+      "dataSources": "データソース",
+      "totalInstances": "インスタンスの総数",
+      "results": "結果",
+      "truncated": "{{total}}件の検索結果のうち、最初の{{shown}}件を表示しています。フィルタを絞り込むか、エクスポートして全件を表示してください。",
+      "empty": "この条件に一致する状態ファイルはありません。",
+      "loadFailed": "対応する状態ファイルの読み込みに失敗しました。",
+      "export": "エクスポート",
+      "exportError": "エクスポートに失敗しました。",
+      "colSource": "出典",
+      "colState": "ステートファイル",
+      "colVersion": "Terraform",
+      "colRum": "ラム",
+      "colManaged": "管理対象",
+      "colData": "データ",
+      "colTotal": "合計",
+      "colSize": "サイズ",
+      "colAnalyzed": "分析済み",
+      "unknownVersion": "不明"
+    },
+    "transfer": {
+      "needScope": "転送を実行するには、state:transfer スコープが必要です。",
+      "source": "出典",
+      "destination": "目的地",
+      "stateFile": "ステートファイル",
+      "noStatesInSource": "このソースにはステートファイルがありません",
+      "mode": "モード",
+      "modeBackup": "バックアップ（コピー）",
+      "modeMigrate": "移行（コピー＋パリティ検証）",
+      "targetSource": "対象ソース",
+      "targetKey": "ターゲットキー",
+      "hcpTargetHint": "HCPターゲット：重要なのはワークスペースの「NAME」です。指定されていないワークスペースは、組織内に自動的に作成されます。既存のワークスペースを上書きするには、そのステートのシリアル番号が更新され、リネージが一致している必要があります。書き込み中は、ワークスペースがロックされます。",
+      "gitTargetHint": "Git ターゲット：書き込み内容は設定されたブランチにコミットされ、直接プッシュされます（強制プッシュは行われません）。なお、そのブランチは直接プッシュを受け入れる必要があります。キー名は .tfstate で終わる必要があります。",
+      "targetKeyHelp": "ターゲットソース内の宛先パス／キー",
+      "sameTarget": "ターゲットはソースの状態とは異なっている必要があります。",
+      "decommissionLabel": "移行が正常に完了したことを確認した後、ソースを廃止する（元のデータを削除します。事前にバックアップを取ります）",
+      "confirmDecommission": "廃止を確定するには、ソース状態キーを入力してください",
+      "newTransfer": "新たな移籍",
+      "runBackup": "バックアップ",
+      "runMigrate": "移行する",
+      "runMigrateDecommission": "移行および廃止",
+      "verified": "確認済み：{{value}}",
+      "sourceDecommissioned": "ソースは廃止されました"
+    },
+    "login": {
+      "signIn": "ログイン",
+      "signInWith": "{{provider}}でログイン",
+      "signInWithSSO": "SSOでログイン",
+      "signInWithAzureAD": "Azure AD でサインインする",
+      "signInWithLdap": "LDAPでログイン",
+      "devLogin": "開発者ログイン（管理者）",
+      "devModeNotice": "開発モード - 以下のリンクをクリックして、OAuthを使用せずにログインしてください",
+      "devLoginFailed": "開発者ログインに失敗しました。サーバーのログを確認してください。",
+      "subtitle": "続行するにはログインしてください",
+      "noProviders": "SSOプロバイダーが設定されていません。管理者にお問い合わせください。",
+      "or": "または",
+      "orUseProductionAuth": "または、プロダクション認証を使用する",
+      "orSignInWithLdap": "または LDAP でログイン",
+      "loadingProviders": "サインインプロバイダーを読み込み中",
+      "username": "ユーザー名",
+      "password": "パスワード",
+      "ldapError": "ユーザー名またはパスワードが正しくありません。",
+      "ssoInfo": "このアプリケーションでは、認証にシングルサインオンを採用しています。",
+      "ssoContact": "アクセスが必要な場合は、管理者にお問い合わせください。"
+    },
+    "sso": {
+      "title": "SSO / アイデンティティ",
+      "description": "設定済みのシングルサインオンおよびプロビジョニングの読み取り専用ビューです。これらを編集するには、サーバーの設定ファイルで変更を行ってください。",
+      "enabled": "有効",
+      "disabled": "無効",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIMのプロビジョニング",
+      "scimNote": "有効にすると、/scim/v2 は、scim:provision スコープを持つベアラートークンクライアントからの SCIM 2.0 ユーザーおよびグループのプロビジョニングを受け付けます。",
+      "group": "グループ",
+      "groupDn": "グループ DN",
+      "organization": "組織",
+      "role": "役割",
+      "subject": "証明書のサブジェクト",
+      "scopes": "適用範囲",
+      "idps": "IDプロバイダー",
+      "idpInitiated": "IdP主導型SSO",
+      "issuer": "発行元URL",
+      "groupClaim": "集団請求",
+      "groupAttribute": "グループ属性",
+      "entityId": "エンティティID",
+      "acsUrl": "ACS URL",
+      "host": "ホスト",
+      "baseDn": "ベースDN",
+      "caFile": "クライアントCAファイル",
+      "defaultRole": "デフォルトの役割",
+      "noMappings": "グループのマッピングは設定されていません。"
+    },
+    "apiKeys": {
+      "title": "APIキー",
+      "description": "キーは、CIパイプラインやスクリプトをベアラートークンとして認証します。1つのキーには、そのユーザーが保有するスコープのみが含まれます。管理者はすべてのキーを確認できます。",
+      "create": "キーを作成する",
+      "createTitle": "APIキーを作成する",
+      "editTitle": "APIキーを編集する",
+      "empty": "まだAPIキーがありません。ブラウザセッションなしでCIからAPIを呼び出す（Driftのデータ取り込み、状態の読み取り）ために、APIキーを作成してください。",
+      "prefix": "キー",
+      "scopes": "適用範囲",
+      "scopesHelp": "キーには、自分が保有しているスコープのみを割り当てることができます。",
+      "expires": "有効期限",
+      "expiresLabel": "有効期限（任意）",
+      "expiresHelp": "有効期限のないキーにする場合は、空欄のままにしてください。",
+      "expired": "有効期限切れ",
+      "never": "決して",
+      "lastUsed": "最終使用日",
+      "neverUsed": "決して",
+      "descriptionLabel": "説明（任意）",
+      "secretTitle": "新しいAPIキー",
+      "secretWarning": "今すぐこのキーをコピーしてください。このキーは一度しか表示されず、復元することはできません。",
+      "secretStored": "鍵をしまっておきました",
+      "rotate": "回転",
+      "rotateTitle": "「{{name}}」を回転させる",
+      "rotateBody": "同じスコープを持つ代替キーが作成されます。古いキーは直ちに無効化するか、利用者が切り替えを行うまでの猶予期間中は有効なままにしておきます。",
+      "graceLabel": "古い鍵の有効期間",
+      "graceImmediate": "直ちに取り消す",
+      "graceHours_one": "{{count}}時間保管してください",
+      "graceHours_other": "{{count}}時間保管してください",
+      "deleteTitle": "APIキーを削除する",
+      "deleteBody": "「{{name}}」を削除しますか？これを使って認証を行っているものはすべて、直ちに動作しなくなります。"
+    }
+  },
+  "commandPalette": {
+    "title": "コマンドパレット",
+    "placeholder": "検索ページ…",
+    "empty": "結果はありません。",
+    "openButton": "コマンドパレットを開く",
+    "hint": "クイックナビゲーション (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "ナビゲーション"
+    }
+  },
+  "support": {
+    "title": "サポート",
+    "contextHelp": "コンテキストヘルプ"
+  },
+  "session": {
+    "expiresSoon": "セッションの有効期限まであと{{minutes}}分です。ログイン状態を維持するには、ページを更新してください。",
+    "refresh": "セッションを更新する"
+  },
+  "consentBanner": {
+    "ariaLabel": "クッキーに関する同意",
+    "title": "当社はお客様のプライバシーを尊重いたします",
+    "essential": "必須（常時稼働）",
+    "errorReporting": "エラーの報告",
+    "performanceMonitoring": "パフォーマンス監視",
+    "analytics": "アナリティクス",
+    "hideDetails": "詳細を非表示にする",
+    "customize": "カスタマイズ",
+    "rejectAll": "すべて却下する",
+    "acceptAll": "すべて受け入れる"
+  },
+  "a11y": {
+    "skipToContent": "メインコンテンツへスキップ",
+    "openNavigation": "ナビゲーションを開く",
+    "mainNavigation": "メインナビゲーション",
+    "closeNavigation": "ナビゲーションを閉じる",
+    "navigatedTo": "{{title}} に移動しました",
+    "breadcrumbs": "パンくずリスト"
+  },
+  "errorBoundary": {
+    "title": "何か問題が発生しました",
+    "description": "このページの表示中に予期せぬエラーが発生しました。",
+    "tryAgain": "もう一度試してみてください",
+    "reloadPage": "ページを再読み込み"
+  },
+  "empty": {
+    "default": "まだここには何もありません。"
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "ユーザー",
+      "pageSubtitle": "ユーザーアカウントと権限の管理",
+      "addUser": "ユーザーの追加",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "create": "作成",
+      "add": "追加",
+      "delete": "削除",
+      "erase": "消去",
+      "errLoad": "ユーザーの読み込みに失敗しました。もう一度お試しください。",
+      "errSave": "ユーザーの保存に失敗しました。もう一度お試しください。",
+      "errDelete": "ユーザーの削除に失敗しました。もう一度お試しください。",
+      "userErased": "ユーザーデータが消去されました。",
+      "errErase": "ユーザーデータの消去に失敗しました。もう一度お試しください。",
+      "exportedData": "{{email}}のユーザーデータをエクスポートしました。",
+      "errExport": "ユーザーデータのエクスポートに失敗しました。",
+      "errAddMembership": "組織への所属の追加に失敗しました",
+      "errUpdateRole": "ロールの更新に失敗しました",
+      "errRemoveMembership": "組織からの削除に失敗しました",
+      "searchPlaceholder": "ユーザーを検索...",
+      "thName": "名前",
+      "thEmail": "電子メール",
+      "thOrgRoles": "組織と役割",
+      "thCreated": "作成日",
+      "thActions": "アクション",
+      "emptyTitle": "該当するユーザーが見つかりませんでした",
+      "emptyDescription": "ユーザーは、初めてサインインするとここに表示されます。アプリのURLと、SSOまたは開発者用ログインプロバイダーを共有して、チームメンバーを招待してください。",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}：役割が割り当てられていません",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "役割なし",
+      "noOrganizations": "組織はありません",
+      "tooltipEdit": "ユーザーの編集",
+      "ariaEdit": "ユーザーの編集",
+      "tooltipExport": "ユーザーデータのエクスポート（GDPR第15条／第20条）",
+      "ariaExport": "ユーザーデータのエクスポート",
+      "tooltipErase": "ユーザーデータの消去（GDPR第17条）",
+      "ariaErase": "ユーザーデータを消去する",
+      "tooltipDelete": "ユーザーを削除する",
+      "ariaDelete": "ユーザーを削除する",
+      "dialogTitleEdit": "ユーザーの編集",
+      "dialogTitleAdd": "ユーザーの追加",
+      "labelEmail": "電子メール",
+      "helpEmail": "ユーザーのメールアドレス。ログインIDとして使用され、作成後は変更できません。",
+      "labelName": "名前",
+      "helpName": "インターフェース全体で表示される完全な表示名",
+      "sectionOrgMembership": "組織への加盟",
+      "currentOrgs": "現在の所属団体：",
+      "addToOrg": "組織に追加",
+      "orgOptional": "組織（任意）",
+      "menuNone": "なし",
+      "helpAssignOrg": "このユーザーを組織に割り当てて、アクセスできるリソースを管理してください。",
+      "labelRoleTemplate": "役割テンプレート",
+      "helpRoleTemplate": "選択した組織内で付与される権限を定義します。テンプレートの管理は、「管理」→「ロール」で行います。",
+      "ariaRemoveFromOrg": "組織から削除する",
+      "dialogTitleDelete": "ユーザーの削除",
+      "confirmDelete": "ユーザー「{{name}}」を削除してもよろしいですか？この操作は元に戻せません。",
+      "eraseTitle": "ユーザーデータの消去（GDPR第17条）",
+      "eraseWarnPart1": "これにより、永久に匿名化されます ",
+      "eraseWarnPart2": "の個人データ。ユーザーレコードは「トゥームストーン」処理され、APIキーおよび組織メンバーシップは削除され、すべてのセッションは失効します。監査ログのエントリは、匿名化された識別子とともに保持されます。 ",
+      "eraseWarnCannotUndo": "この操作は元に戻せません。",
+      "eraseConfirmPart1": "確認のため、ユーザーのメールアドレスを入力してください（",
+      "eraseConfirmPart2": ") 以下。",
+      "ariaConfirmErasure": "ユーザーのメールアドレスを入力して、削除を確認してください"
+    },
+    "organizations": {
+      "pageTitle": "組織",
+      "pageSubtitle": "組織とそのメンバーを管理する",
+      "addOrganization": "組織を追加する",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "create": "作成",
+      "close": "閉じる",
+      "delete": "削除",
+      "errLoad": "組織の読み込みに失敗しました。もう一度お試しください。",
+      "errSave": "組織の保存に失敗しました。もう一度お試しください。",
+      "errDelete": "組織の削除に失敗しました。もう一度お試しください。",
+      "errName": "組織名は1～64文字で、小文字または数字で始まり、小文字、数字、ハイフン、アンダースコアのみを含める必要があります。",
+      "errAddMember": "メンバーの追加に失敗しました",
+      "errUpdateRole": "メンバーの役割の更新に失敗しました",
+      "errRemoveMember": "メンバーの削除に失敗しました",
+      "emptyState": "該当する組織は見つかりませんでした",
+      "createFirst": "最初の組織を作成する",
+      "thName": "名前",
+      "thDisplayName": "表示名",
+      "thIdentityProvider": "IDプロバイダー",
+      "thMembers": "メンバー",
+      "thCreated": "作成日",
+      "thActions": "アクション",
+      "idpAny": "いずれか",
+      "viewMembers": "メンバー一覧を表示",
+      "tooltipEditOrg": "組織を編集する",
+      "ariaEditOrg": "組織を編集する",
+      "tooltipDeleteOrg": "組織を削除する",
+      "ariaDeleteOrg": "組織を削除する",
+      "dialogTitleEdit": "組織を編集する",
+      "dialogTitleAdd": "組織を追加する",
+      "labelName": "名前",
+      "helpNameInvalid": "先頭は小文字または数字でなければなりません。使用できるのは小文字、数字、ハイフン、アンダースコアのみです（最大64文字）。",
+      "helpName": "レジストリのURLで使用される組織名（例：myorg）",
+      "renameWarnPart1": "この組織の名前を変更すると、現在これを使用しているすべてのモジュールおよびプロバイダーのネームスペースが更新されます。 ",
+      "renameWarnPart2": " ～へ ",
+      "renameWarnPart3": ". ユーザーのメンバーシップはIDによって紐付けられているため、影響を受けることはありません。旧名称を参照しているTerraformの設定については、必ず更新してください。",
+      "labelDisplayName": "表示名",
+      "helpDisplayName": "組織の表示名",
+      "labelIdpType": "IDプロバイダーの種類",
+      "menuIdpAny": "任意（制限なし）",
+      "labelIdpName": "IdP名",
+      "helpIdpName": "IDプロバイダーの名前（例：設定ファイルに記載されているSAML IdP名）",
+      "dialogTitleDelete": "組織を削除する",
+      "confirmDelete": "組織「{{name}}」を削除してもよろしいですか？この操作は元に戻せません。",
+      "membersTitle": "組織のメンバー - {{name}}",
+      "addMember": "メンバーを追加",
+      "membersManageDesc": "この組織のメンバーとその役割を管理する",
+      "membersViewDesc": "この組織のメンバーとその役割を表示する",
+      "noMembers": "この組織にはまだメンバーがいません",
+      "addFirstMember": "最初のメンバーを追加する",
+      "thEmail": "電子メール",
+      "thRole": "役割",
+      "noRole": "役割なし",
+      "unknown": "不明",
+      "tooltipRemoveMember": "メンバーを削除する",
+      "ariaRemoveMember": "メンバーを削除する",
+      "addMemberTitle": "{{name}} にメンバーを追加する",
+      "labelSelectUser": "ユーザーを選択",
+      "placeholderSearchUsers": "ユーザーを検索...",
+      "labelRoleTemplate": "役割テンプレート",
+      "menuNoRoleViewOnly": "役割なし（閲覧のみ）"
+    },
+    "roles": {
+      "loadError": "ロールの読み込みに失敗しました。もう一度お試しください。",
+      "title": "役割と権限",
+      "subtitle": "利用可能なロールと、それに関連付けられた権限範囲を確認します。システムロールはあらかじめ定義されており、変更することはできません。",
+      "availableScopesReference": "利用可能なスコープのリファレンス",
+      "scopesDefine": "スコープは、アプリケーション内でロールが実行できるアクションを定義します。",
+      "thScope": "適用範囲",
+      "thDescription": "説明",
+      "roleTemplates": "役割テンプレート",
+      "clickRole": "役割をクリックすると、その役割の詳細な範囲を確認できます。",
+      "noRoles": "該当する役割が見つかりませんでした。",
+      "systemChip": "システム",
+      "scopeCount_one": "{{count}} 範囲",
+      "scopeCount_other": "{{count}} スコープ",
+      "assignedScopes": "割り当てられたスコープ：",
+      "permissionsByCategory": "カテゴリ別の権限：",
+      "fullAccessViaAdmin": "フルアクセス（管理者経由）",
+      "noAccess": "アクセス不可",
+      "metaRoleId": "役割ID",
+      "metaCreated": "作成日",
+      "metaUpdated": "更新されました"
+    },
+    "auditLog": {
+      "exportCsv": "CSVとしてエクスポート",
+      "exportJson": "JSONとしてエクスポート",
+      "labelStartDate": "開始日",
+      "labelEndDate": "終了日",
+      "labelResourceType": "リソースの種類",
+      "labelAction": "アクション",
+      "labelUserEmail": "ユーザーのメールアドレス",
+      "placeholderUserEmail": "メールアドレスで検索...",
+      "thTimestamp": "タイムスタンプ",
+      "thAction": "アクション",
+      "thResource": "リソース",
+      "thUser": "ユーザー",
+      "thIpAddress": "IPアドレス",
+      "emptyTitle": "現在のフィルタ条件に一致する監査エントリはありません",
+      "emptySubtitle": "ユーザーが変更を行うと、監査ログのエントリが表示されます。上のフィルターを調整するか、モジュールを公開して、エントリを確認してください。",
+      "detailTitle": "監査ログの詳細",
+      "close": "閉じる",
+      "pageTitle": "監査ログ",
+      "pageSubtitle": "すべてのリソースおよびユーザーにわたるシステムアクティビティを追跡する",
+      "export": "エクスポート",
+      "errExport": "監査ログのエクスポートに失敗しました",
+      "allResourceTypes": "すべてのリソースタイプ",
+      "reset": "リセット",
+      "detailId": "ID",
+      "detailResourceId": "リソースID",
+      "detailOrgId": "組織ID",
+      "detailMetadata": "メタデータ"
+    },
+    "oidcSettings": {
+      "pageTitle": "OIDCグループ",
+      "pageSubtitle": "IDプロバイダーからレジストリの組織およびロールへのグループクレームのマッピングを設定します。変更は、サーバーの再起動を必要とせず、次回のログイン時に反映されます。",
+      "errLoad": "OIDCの設定の読み込みに失敗しました",
+      "msgSaved": "グループのマッピング設定が正常に保存されました。",
+      "errSave": "グループのマッピング設定の保存に失敗しました",
+      "activeProvider": "アクティブな OIDC プロバイダー",
+      "labelProvider": "プロバイダー",
+      "labelIssuer": "発行者",
+      "labelClientId": "クライアントID",
+      "labelStatus": "ステータス",
+      "active": "アクティブ",
+      "inactive": "非アクティブ",
+      "groupClaimMapping": "グループクレームのマッピング",
+      "groupClaimDescBefore": "IDPグループのクレームを、レジストリの組織および役割にマッピングします。グループのクレーム名は、OIDC IDトークン内のクレームキーと一致している必要があります（例： ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "グループ請求名",
+      "helpGroupClaimName": "ユーザーのグループ一覧を含むIDトークンのクレーム",
+      "labelDefaultRole": "デフォルトの役割",
+      "menuNone": "なし",
+      "groupMappings": "グループのマッピング",
+      "addMapping": "マッピングを追加",
+      "emptyMappings": "グループのマッピングは設定されていません。「マッピングの追加」をクリックして作成してください。",
+      "thIdpGroup": "IdPグループ",
+      "thOrganization": "組織",
+      "thRole": "役割",
+      "thActions": "アクション",
+      "tooltipEdit": "クレームのマッピングを編集する",
+      "ariaEdit": "クレームのマッピングを編集する",
+      "tooltipDelete": "クレームのマッピングを削除する",
+      "ariaDelete": "クレームのマッピングを削除する",
+      "saving": "保存中…",
+      "saveChanges": "変更を保存",
+      "dialogTitleEdit": "グループのマッピングを編集",
+      "dialogTitleAdd": "グループのマッピングを追加",
+      "labelIdpGroup": "IdPグループ",
+      "helpIdpGroup": "IDトークンのクレームに表示される、正確なグループ名",
+      "labelOrganization": "組織",
+      "helpOrganization": "ユーザーが追加されるレジストリの組織名",
+      "labelRole": "役割",
+      "cancel": "キャンセル",
+      "update": "更新",
+      "add": "追加",
+      "removeTitle": "グループのマッピングを削除する",
+      "removeTextBefore": "グループのマッピングを削除する ",
+      "removeTextAfter": "？ これは既存のメンバーシップには影響しません。新しいログイン時にこのメンバーシップが自動的に設定されるのを防ぐだけです。",
+      "remove": "削除",
+      "notSet": "(未設定)",
+      "none": "(なし)",
+      "samlGroupMappings": "SAML グループのマッピング",
+      "samlReadOnly": "SAMLグループのマッピングは、サーバーの設定ファイルで設定され、読み取り専用です。",
+      "chipGroupAttribute": "グループ属性：{{value}}",
+      "chipDefaultRole": "デフォルトのロール：{{value}}",
+      "thSamlGroup": "SAMLグループ",
+      "noSamlMappings": "SAMLグループのマッピングが設定されていません。",
+      "ldapGroupMappings": "LDAP グループのマッピング",
+      "ldapReadOnly": "LDAP グループのマッピングは、サーバーの設定ファイルで設定され、読み取り専用です。",
+      "thLdapGroupDn": "LDAP グループ DN",
+      "noLdapMappings": "LDAPグループのマッピングは設定されていません。"
+    }
+  },
+  "mtls": {
+    "pageTitle": "mTLS クライアント証明書のマッピング",
+    "pageSubtitle": "相互のTLS証明書とサブジェクトのスコープ間のマッピング。これらはサーバーの設定ファイルで設定され、読み取り専用です。",
+    "errLoad": "mTLSの設定の読み込みに失敗しました。",
+    "enabled": "有効",
+    "disabled": "無効",
+    "caFile": "CAファイル",
+    "noMappings": "mTLS 証明書のマッピングが設定されていません。",
+    "certificateSubject": "証明書のサブジェクト",
+    "scopes": "適用範囲"
+  }
+}
