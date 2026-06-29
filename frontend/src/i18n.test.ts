@@ -9,11 +9,15 @@ describe('i18n', () => {
   })
 
   it('falls back to English for untranslated locales', () => {
-    // The stub locales are {} until DeepL fills them on the remote; every key
-    // must still resolve via the en fallback.
+    // Inject an English-only key so this assertion stays valid even after DeepL
+    // fills real keys into the non-English bundles. (Asserting on a real key like
+    // nav.dashboard breaks once it is translated, since it then resolves to its
+    // own translation instead of the en fallback.)
+    i18n.addResource('en', 'translation', 'test.enOnlyFallbackProbe', 'Probe Value')
     const en = i18n.getFixedT('en')
     const es = i18n.getFixedT('es')
-    expect(es('nav.dashboard')).toBe(en('nav.dashboard'))
+    expect(es('test.enOnlyFallbackProbe')).toBe(en('test.enOnlyFallbackProbe'))
+    expect(es('test.enOnlyFallbackProbe')).toBe('Probe Value')
   })
 
   it('resolves the core navigation strings in English', () => {
