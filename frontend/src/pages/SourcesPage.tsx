@@ -130,6 +130,7 @@ export default function SourcesPage() {
   return (
     <Box>
       <PageHeader
+        icon={<StorageIcon />}
         title={t('nav.sources')}
         description={t('help.pages.sources.body')}
         actions={
