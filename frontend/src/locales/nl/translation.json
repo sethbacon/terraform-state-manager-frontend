@@ -1,1 +1,1329 @@
-{}
+{
+  "app": {
+    "name": "Terraform State Manager",
+    "shortName": "Regiomanager",
+    "tagline": "Analyseer, bewerk en verplaats de Terraform-status tussen alle backends."
+  },
+  "nav": {
+    "groups": {
+      "main": "Staat",
+      "identity": "Identiteit",
+      "system": "Systeem"
+    },
+    "dashboard": "Home",
+    "dashboardTooltip": "Overzicht en statistieken",
+    "sources": "Bronnen",
+    "sourcesTooltip": "Aangesloten backends van de staat",
+    "drift": "Drift",
+    "driftTooltip": "Vergelijk de situatie met de voorschriften en de infrastructuur",
+    "versionLab": "Version Lab",
+    "versionLabTooltip": "De status van het testplan toetsen aan de vastgezette versies",
+    "schedules": "Dienstroosters",
+    "schedulesTooltip": "Terugkerende drift-runs volgens een cron-schema",
+    "reports": "Verslagen",
+    "reportsTooltip": "Analyseverslagen genereren en downloaden",
+    "transfer": "Overdracht",
+    "transferTooltip": "Een back-up maken van de status of deze migreren tussen bronnen",
+    "apiDocs": "API-documentatie",
+    "apiDocsTooltip": "Interactieve OpenAPI-documentatie",
+    "admin": {
+      "dashboard": "Dashboard",
+      "dashboardTooltip": "Overzicht van identiteitsbeheer",
+      "users": "Gebruikers",
+      "usersTooltip": "Gebruikers en lidmaatschappen",
+      "organizations": "Organisaties",
+      "organizationsTooltip": "Organisaties en IdP-koppelingen",
+      "roles": "Functies",
+      "rolesTooltip": "Rol-sjablonen en toepassingsgebieden",
+      "sso": "SSO",
+      "ssoTooltip": "Single sign-on-aanbieders en koppelingen",
+      "notifications": "Meldingen",
+      "notificationsTooltip": "Waarschuwingskanalen voor afwijkingen en storingen",
+      "auditLogs": "Controledagboek",
+      "auditLogsTooltip": "Beveiligings- en activiteitenlogboek",
+      "oidcGroups": "OIDC-groepen",
+      "oidcGroupsTooltip": "IdP-groepen toewijzen aan organisaties en rollen",
+      "mtls": "mTLS-certificaten",
+      "mtlsTooltip": "Toepassingsbereiktoewijzingen voor het onderwerp van het clientcertificaat",
+      "apiKeys": "API-sleutels",
+      "apiKeysTooltip": "API-sleutels aanmaken en beheren voor CI en scripts",
+      "ciTemplates": "CI-sjablonen",
+      "ciTemplatesTooltip": "Pijplijnsjablonen voor drift en version-lab bewerken, toevoegen of vervangen"
+    }
+  },
+  "common": {
+    "loading": "Bezig met laden…",
+    "error": "Er is iets misgegaan.",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "confirm": "Bevestigen",
+    "close": "Sluiten",
+    "search": "Zoeken",
+    "download": "Downloaden",
+    "refresh": "Vernieuwen",
+    "none": "Geen",
+    "yes": "Ja",
+    "no": "Nee",
+    "actions": "Acties",
+    "created": "Aangemaakt",
+    "updated": "Bijgewerkt",
+    "status": "Status",
+    "name": "Naam",
+    "type": "Type",
+    "back": "Terug",
+    "next": "Volgende",
+    "previous": "Vorige",
+    "all": "Alles",
+    "submit": "Verzenden",
+    "add": "Toevoegen",
+    "remove": "Verwijderen",
+    "edit": "Bewerken",
+    "view": "Bekijken",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "required": "Verplicht",
+    "optional": "Optioneel",
+    "detail": "Detail",
+    "apply": "Solliciteren",
+    "create": "Aanmaken",
+    "filter": "Filter",
+    "ref": "Ref",
+    "provider": "Aanbieder",
+    "templateStyle": "Sjabloonstijl",
+    "templateBuiltin": "Ingebouwd (geen afhankelijkheden)",
+    "templateSuite": "Terraform-suite (acties / uitbreiding)"
+  },
+  "settings": {
+    "title": "Instellingen",
+    "appearance": "Uiterlijk",
+    "theme": "Thema",
+    "themeLight": "Licht",
+    "themeDark": "Donker",
+    "themeSystem": "Systeem",
+    "language": "Taal"
+  },
+  "about": {
+    "title": "Over",
+    "description": "Een webapplicatie om de Terraform-status te analyseren, veilig te bewerken en over te zetten naar bestaande backends — met CI-gestuurde driftdetectie en versietests.",
+    "versionsHeading": "Versies",
+    "frontend": "Frontend-{{version}}",
+    "backend": "Backend-{{version}}",
+    "backendUnavailable": "Backend niet beschikbaar",
+    "built": "Gebouwd{{date}}",
+    "licenseHeading": "Licentie",
+    "licenseText": "Onder licentie van de",
+    "apache": "Apache-licentie 2.0",
+    "sourceHeading": "Bron",
+    "repoBackend": "Backend-repository",
+    "repoFrontend": "Frontend-repository",
+    "close": "Sluiten"
+  },
+  "auth": {
+    "account": "Account",
+    "signIn": "Inloggen",
+    "signOut": "Uitloggen",
+    "insufficientTitle": "Onvoldoende rechten",
+    "insufficientBody": "U beschikt niet over de vereiste toegangsrechten ({{scope}}) om deze pagina te bekijken.",
+    "completingSignIn": "Aanmelden wordt voltooid…"
+  },
+  "landing": {
+    "heroTitle": "Terraform-status, onder controle",
+    "heroSubtitle": "Houd uw Terraform-omgeving in de gaten voor alle backends — detecteer afwijkingen, valideer versie-upgrades, plan controles in en verplaats de status op een veilige manier.",
+    "signIn": "Inloggen",
+    "apiDocs": "API-documentatie",
+    "goToDashboard": "Ga naar het dashboard",
+    "estateTitle": "Uw nalatenschap",
+    "estate": {
+      "sources": "Bronnen",
+      "states": "Staten",
+      "rum": "RUM",
+      "rumHint": "Beheerd vermogen",
+      "totalResources": "Totale middelen"
+    },
+    "featuresTitle": "Wat je kunt doen",
+    "open": "Openen",
+    "signInToUse": "Log in om te gebruiken",
+    "gettingStarted": "Aan de slag",
+    "step1Title": "1. Inloggen",
+    "step1DescAuth": "Je bent ingelogd. Ga naar je dashboard voor een bronoverschrijdend overzicht van je vermogen.",
+    "step1DescUnauth": "Meld je aan via de identiteitsprovider van je organisatie om toegang te krijgen tot je Terraform-omgeving.",
+    "step2Title": "2. Sluit een bron aan",
+    "step2Desc": "Voeg een state-backend toe (S3, Azure, GCS, Terraform Cloud en meer), zodat de analyzer je state-bestanden kan indexeren.",
+    "step3Title": "3. Volgen en handelen",
+    "step3Desc": "Voer drift- en version-lab-controles uit, plan terugkerende runs, genereer rapporten en wissel de status uit tussen bronnen.",
+    "features": {
+      "sources": {
+        "title": "Bronnen",
+        "desc": "Maak verbinding met en doorzoek de backends van de staten; de analyzer indexeert elk staatsbestand voor een uniform overzicht."
+      },
+      "drift": {
+        "title": "Drift",
+        "desc": "Vergelijk de status met de code en de live-infrastructuur om onbeheerde wijzigingen in een vroeg stadium op te sporen."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "desc": "Controleer of het testplan nog steeds compatibel is met de vastgelegde Terraform- en providerversies voordat je de upgrade uitvoert."
+      },
+      "schedules": {
+        "title": "Dienstroosters",
+        "desc": "Voer drift- en statuscontroles uit volgens een cron-schema en ontvang een melding wanneer er iets verandert."
+      },
+      "reports": {
+        "title": "Verslagen",
+        "desc": "Genereer en download analyserapporten voor uw gehele vastgoedportefeuille, gefilterd op basis van uw wensen."
+      },
+      "transfer": {
+        "title": "Overdracht",
+        "desc": "Maak veilig een back-up van de status of migreer deze tussen bronnen, inclusief verificatie en buitengebruikstelling."
+      }
+    }
+  },
+  "help": {
+    "title": "Hulp",
+    "open": "Help openen",
+    "close": "Hulp sluiten",
+    "none": "Er is nog geen hulp beschikbaar voor deze pagina.",
+    "pages": {
+      "dashboard": {
+        "title": "Home",
+        "body": "Een bronoverschrijdend overzicht van uw Terraform-omgeving: het totale aantal beheerde resources (RUM), uitsplitsingen per provider en per resourcetype, en de spreiding van de Terraform-versies."
+      },
+      "sources": {
+        "title": "Bronnen",
+        "body": "Koppel bestaande status-backends aan en werk met hun statusbestanden — er hoeft niets te worden gemigreerd om TSM te kunnen gebruiken; het leest de backends die je al hebt."
+      },
+      "drift": {
+        "title": "Drift",
+        "body": "Verzend een Terraform-plan via je CI om de status te vergelijken met de code en de live-infrastructuur. De resultaten worden teruggestuurd via een ondertekende eenmalige callback en weergegeven als een verschiloverzicht per resource."
+      },
+      "versionLab": {
+        "title": "Version Lab",
+        "body": "Controleer of je Terraform-code correct plant tegen een vastgelegde Terraform-versie — en eventueel vastgelegde provider-/moduleversies of een registry-mirror — door `init/plan` naar CI te sturen."
+      },
+      "reports": {
+        "title": "Verslagen",
+        "body": "Filter de geanalyseerde statusbestanden uit alle bronnen — op Terraform-versie, provider, type resource, grootte en aantal resources — en exporteer vervolgens de resultaten als Markdown, JSON of CSV."
+      },
+      "transfer": {
+        "title": "Overdracht",
+        "body": "Een statusbestand kopiëren (back-up maken) of verplaatsen (migreren) tussen bronnen — bijvoorbeeld van lokaal naar S3, of van HCP naar een nieuwe backend."
+      },
+      "apiDocs": {
+        "title": "API-documentatie",
+        "body": "Interactieve OpenAPI-documentatie die is gegenereerd op basis van de handler-annotaties van de backend. Ruwe specificatie:"
+      },
+      "schedules": {
+        "title": "Dienstroosters",
+        "body": "Door Cron aangestuurde, terugkerende drift-runs. Elk schema voert het geconfigureerde drift-doel met een bepaalde frequentie uit en registreert het laatste resultaat."
+      },
+      "admin": {
+        "title": "Beheerder",
+        "body": "Overzicht identiteitsbeheer — aantallen gebruikers, organisaties en rollen uit de gedeelde identiteitsdienst. De kaarten bevatten links naar de beheerpagina’s."
+      },
+      "adminUsers": {
+        "title": "Gebruikers",
+        "body": "Gebruikersaccounts beheren: zoeken, aanmaken, hernoemen, verwijderen en het lidmaatschap van rollen per organisatie beheren vanuit het bewerkingsvenster."
+      },
+      "adminOrganizations": {
+        "title": "Organisaties",
+        "body": "Organisaties, hun IdP-koppelingen en hun leden aanmaken en beheren."
+      },
+      "adminRoles": {
+        "title": "Functies",
+        "body": "De rol-sjablonen en de bevoegdheidsbereiken die ze toekennen. Systeemrollen (kijker, analist, operator, redacteur, beheerder) zijn vooraf gedefinieerd."
+      },
+      "adminOidc": {
+        "title": "OIDC-groepen",
+        "body": "Koppel IdP-groepen aan organisatierollen. Deze koppelingen kunnen tijdens de uitvoering worden gewijzigd en worden van kracht bij de volgende aanmelding."
+      },
+      "adminMtls": {
+        "title": "mTLS-certificaten",
+        "body": "Alleen-lezen weergave van authenticatie via wederzijds TLS met clientcertificaat: of deze is ingeschakeld, de client-CA en de koppelingen tussen certificaatonderwerp en toepassingsgebied (geconfigureerd in het configuratiebestand van de server)."
+      },
+      "adminSso": {
+        "title": "SSO",
+        "body": "Alleen-lezen overzicht van elke identiteitsprovider: OIDC, SAML (per IdP), LDAP, mTLS en de SCIM-provisioning-schakelaar — ingeschakelde status, sleutelconfiguratie en groepstoewijzingen. Geheime gegevens worden nooit weergegeven."
+      },
+      "adminNotifications": {
+        "title": "Meldingen",
+        "body": "Webhooks en Slack-kanalen worden geactiveerd bij gebeurtenissen zoals gedetecteerde afwijkingen en mislukte uitvoeringen."
+      },
+      "adminAudit": {
+        "title": "Controledagboek",
+        "body": "Elke wijziging in de app wordt hier geregistreerd, inclusief de bijbehorende actor en IP-toewijzing: identiteitswijzigingen, bewerkingen met betrekking tot bronnen, statussen, back-ups en overdrachten, het genereren van rapporten, het verzenden van opdrachten, schema’s, meldingskanalen en CI-integraties."
+      },
+      "adminApiKeys": {
+        "title": "API-sleutels",
+        "body": "Zelfbedienings-Bearer-inloggegevens (tsm_…) voor CI-pijplijnen en -scripts — drift-invoer, statusopvragingen, alles wat de API biedt. Iedereen beheert zijn eigen sleutels; beheerders hebben inzicht in alle sleutels. Een sleutel kan alleen scopes bevatten waarover de maker beschikt. Het geheim wordt precies één keer weergegeven bij het aanmaken; door rotatie kan de oude sleutel tot 72 uur geldig blijven terwijl gebruikers overschakelen."
+      }
+    }
+  },
+  "actions": {
+    "addSource": "Bron toevoegen",
+    "browseStates": "Door staten bladeren",
+    "newDriftRun": "Nieuwe driftrun",
+    "newHealthRun": "Nieuwe hardloopsessie voor de gezondheid",
+    "addPipeline": "Pijplijn toevoegen",
+    "workflowTemplate": "Workflow-sjabloon",
+    "newTransfer": "Nieuwe transfer"
+  },
+  "pages": {
+    "ciTemplates": {
+      "pageTitle": "CI-sjablonen",
+      "pageSubtitle": "Bewerk, voeg toe of vervang de sjablonen voor de drift- en version-lab-pijplijnen die aan de repo-wizard worden aangeboden. Het 'standaard'-profiel van elke provider/soort valt terug op de ingebouwde optie wanneer het ontbreekt.",
+      "addTemplate": "Sjabloon toevoegen",
+      "emptyState": "Er zijn nog geen CI-sjablonen.",
+      "createFirst": "Voeg je eerste sjabloon toe",
+      "thProvider": "Aanbieder",
+      "thKind": "Soort",
+      "thProfile": "Profiel",
+      "thName": "Naam",
+      "thActions": "Acties",
+      "builtinChip": "ingebouwd",
+      "builtinNoDelete": "Ingebouwde sjablonen kunnen niet worden verwijderd",
+      "tooltipEdit": "Sjabloon bewerken",
+      "tooltipDelete": "Sjabloon verwijderen",
+      "ariaEdit": "Sjabloon bewerken",
+      "ariaDelete": "Sjabloon verwijderen",
+      "dialogTitleAdd": "CI-sjabloon toevoegen",
+      "dialogTitleEdit": "CI-sjabloon bewerken",
+      "dialogTitleDelete": "Sjabloon verwijderen",
+      "confirmDelete": "Sjabloon \"{{name}}\" verwijderen? Deze handeling kan niet ongedaan worden gemaakt.",
+      "labelProvider": "Aanbieder",
+      "labelKind": "Soort",
+      "labelProfile": "Profiel",
+      "labelName": "Naam",
+      "labelDescription": "Beschrijving",
+      "labelContent": "Sjabloon (YAML)",
+      "helpProfile": "ID in kleine letters, bijv. brunswick-azure. Letters, cijfers, punt, streepje, onderstrepingsteken.",
+      "cancel": "Annuleren",
+      "create": "Aanmaken",
+      "save": "Opslaan",
+      "delete": "Verwijderen",
+      "errSave": "Het opslaan van de sjabloon is mislukt.",
+      "errDelete": "Het verwijderen van de sjabloon is mislukt.",
+      "errProfile": "Het profiel moet voldoen aan [A-Za-z0-9._-]+"
+    },
+    "apiDocs": {
+      "sections": "Paragrafen"
+    },
+    "admin": {
+      "identity": "Identiteit",
+      "overview": "Overzicht van identiteitsbeheer. Gebruikers, organisaties en rol-sjablonen zijn afkomstig uit de gedeelde identiteitsdienst.",
+      "users": "Gebruikers",
+      "organizations": "Organisaties",
+      "roles": "Functies"
+    },
+    "dashboard": {
+      "rum": "RUM",
+      "rumHint": "Beheerd vermogen",
+      "managed": "Beheerd",
+      "dataSources": "Gegevensbronnen",
+      "totalInstances": "Totaal aantal gevallen",
+      "sources": "Bronnen",
+      "states": "Staatsbestanden",
+      "providerDistribution": "Verdeling per aanbieder",
+      "topResourceTypes": "Belangrijkste soorten bronnen",
+      "terraformVersions": "Terraform-versies",
+      "count": "Teller: {{value}}",
+      "versionChartHint": "Klik op een versie om de bijbehorende statusbestanden weer te geven.",
+      "versionStatesTitle": "Bestanden per Terraform-versie",
+      "versionStatesError": "Het laden van de bijbehorende statusbestanden is mislukt.",
+      "versionStatesEmpty": "Er zijn geen statusbestanden die aan dit versiefilter voldoen.",
+      "versionStatesCount_one": "{{count}} systeembestand",
+      "versionStatesCount_other": "{{count}} systeembestanden",
+      "versionExportCsv": "CSV exporteren",
+      "versionStateRum": "RUM-{{count}}",
+      "versionUnknown": "onbekend",
+      "versionOpAria": "Versievergelijking",
+      "versionOpEq": "Precies deze versie",
+      "versionOpLte": "Deze versie of een oudere versie",
+      "versionOpLt": "Ouder dan deze versie",
+      "versionOpGte": "Deze versie of nieuwer",
+      "versionOpGt": "Nieuwere versie dan deze",
+      "syncPartial": "Tot nu toe zijn {{stored}} van {{listed}} statusbestanden geanalyseerd — synchronisatie is bezig; de totalen zullen toenemen naarmate het proces vordert.",
+      "syncErrors_one": "{{count}} De bron heeft bij de laatste synchronisatie fouten gemeld; de cijfers zijn mogelijk onvolledig.",
+      "syncErrors_other": "{{count}} Bronnen hebben fouten gemeld bij hun laatste synchronisatie; hun cijfers zijn mogelijk onvolledig.",
+      "syncStatus": "Bron-synchronisatie",
+      "syncStates": "{{stored}} / {{listed}} geanalyseerde staten",
+      "syncedAt": "gesynchroniseerd {{time}}",
+      "syncReadErrors": "{{count}} leesfouten",
+      "syncPending": "Wachten op de eerste synchronisatie",
+      "empty": "Nog geen status. Sluit een bron aan om hier de statistieken van je vloot te bekijken.",
+      "goToSources": "Een bron toevoegen",
+      "asOf": "Gegevens per {{time}}"
+    },
+    "sources": {
+      "empty": "Er zijn nog geen bronnen gekoppeld. Voeg er een toe om de status ervan te bekijken en te analyseren.",
+      "uploadAnalyze": "Een geüpload statusbestand analyseren",
+      "loadFailed": "Het laden van de bronnen is mislukt.",
+      "deleteSourceAria": "bron verwijderen",
+      "browseStates": "Door staten bladeren",
+      "analysisTitle": "Analyse — {{name}}",
+      "deleteTitle": "Bron verwijderen",
+      "deleteBody": "De bron <1> {{name}}</3><!--1-->verwijderen? Hierdoor wordt de verbinding met de State Manager verbroken. De onderliggende status-backend en de bijbehorende bestanden blijven <3>onaangeroerd<!--3-->.",
+      "deleteConfirmLabel": "Bron verwijderen",
+      "editSourceAria": "Bron bewerken",
+      "editSourceTitle": "{{name}} bewerken",
+      "keepCredentialHelper": "Laat dit veld leeg om de huidige inloggegevens te behouden.",
+      "testConnection": "Verbinding testen",
+      "testOk": "OK · {{count}} states",
+      "testFailed": "Verbinding mislukt",
+      "statesIn": "Staten in {{name}}",
+      "stateCount_one": "{{count}} staat",
+      "stateCount_other": "{{count}} staten",
+      "listFailed": "Het weergeven van de staten is mislukt.",
+      "noStateFiles": "Er zijn geen .tfstate-bestanden gevonden.",
+      "filterStates": "Filter op de staten van{{count}}…",
+      "noStatesMatch": "Er is geen enkele staat die zich kan meten met „{{filter}}“.",
+      "selectState": "Kies een staat om de analyse ervan te bekijken.",
+      "tabAnalysis": "Analyse",
+      "tabResources": "Bronnen",
+      "tabOutputs": "Uitkomsten",
+      "tabRaw": "Rauw",
+      "export": "Exporteren",
+      "exportReportHeader": "Analyseverslag",
+      "downloadState": "Staatsbestand (.tfstate) downloaden",
+      "outputsFailed": "Het laden van de uitvoer is mislukt.",
+      "noOutputs": "Deze status geeft aan dat er geen uitvoer van de root-module is.",
+      "outputName": "Naam",
+      "outputType": "Type",
+      "outputValue": "Waarde",
+      "sensitiveValue": "Gevoelig — verborgen",
+      "tabBackups": "Back-ups",
+      "tabModules": "Modules",
+      "moduleSource": "Module",
+      "moduleVersion": "Versie",
+      "registryHost": "Register",
+      "constraintOnly": "alleen beperking",
+      "moduleStatus": "Status",
+      "moduleUpToDate": "Actueel",
+      "moduleUnknown": "Onbekend",
+      "noModules": "Er is geen moduleherkomst vastgelegd voor deze status. Plaats een volledig plan in /drift/ingest om deze informatie in te vullen.",
+      "modulesFailed": "Het laden van de module 'provenance' is mislukt.",
+      "stateOps": "Staatsoperaties",
+      "transfer": "Overdracht",
+      "deleteState": "Verwijderen",
+      "deleteStateTitle": "Statusbestand verwijderen",
+      "deleteStateBody": "Hiermee wordt het live-statusobject voor <1>{{name}}</1><!--1--> definitief uit de backend verwijderd.",
+      "deleteStateBackupNote": "Voorafgaand aan het verwijderen wordt er aan de serverzijde een laatste back-up gemaakt en wordt de handeling geregistreerd, zodat u de gegevens kunt herstellen via het tabblad Back-ups — tenzij u hieronder de gegevens definitief verwijdert. Overweeg eerst de optie Exporteren → Status downloaden te gebruiken.",
+      "deleteStatePurgeLabel": "Verwijder ook alle opgeslagen back-ups en de geschiedenis (dit kan niet ongedaan worden gemaakt)",
+      "deleteStatePurgeWarning": "Bij het wissen blijft er geen herstelbare kopie van deze status over. Dit is onomkeerbaar.",
+      "deleteStateConfirmPrompt": "Typ <1> {{key}}</1><!--1--> om te bevestigen.",
+      "deleteStateConfirmAria": "Bevestig de statuscode om te verwijderen",
+      "deleteStateConfirmLabel": "Status verwijderen",
+      "stateOpTitle": "Staatsbedrijf",
+      "stateOpDesc": "Gestructureerde bewerking van <1>{{name}}</1><!--1-->. Er wordt eerst een back-up gemaakt van de huidige versie en de wijziging wordt vastgelegd.",
+      "operation": "Werking",
+      "opRemove": "Verwijderen (terraform state rm)",
+      "opMove": "Verplaatsen / hernoemen (terraform state mv)",
+      "resourceAddress": "Adres van de bron",
+      "newAddress": "Nieuw adres",
+      "analyzeFailed": "Het is niet gelukt om dit statusbestand te analyseren.",
+      "resourcesFailed": "Het laden van de bronnen is mislukt.",
+      "filterResources": "Filter op type, naam, module of aanbieder…",
+      "module": "Module",
+      "mode": "Modus",
+      "instances": "Voorbeelden",
+      "rawFailed": "Het laden van de onbewerkte status is mislukt.",
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "notValidJson": "Ongeldige JSON",
+      "saveHelp": "Bij het opslaan wordt er een back-up gemaakt van de huidige versie, wordt de wijziging gevalideerd en wordt de bewerking geregistreerd.",
+      "overwriteTitle": "Status overschrijven?",
+      "overwriteBody": "Er wordt een back-up gemaakt van de huidige versie van <1>{{name}}</1><!--1-->, waarna deze wordt vervangen. Je kunt de wijzigingen ongedaan maken via het tabblad Back-ups.",
+      "overwrite": "Overschrijven",
+      "backupsFailed": "Het laden van de back-ups is mislukt.",
+      "noBackups": "Er zijn nog geen back-ups — er wordt automatisch een back-up gemaakt vóór elke bewerking of herstelactie.",
+      "serialHeader": "Serie",
+      "action": "Actie",
+      "restore": "Herstellen",
+      "rum": "RUM",
+      "managed": "Beheerd",
+      "dataSources": "Gegevensbronnen",
+      "totalInstances": "Totaal aantal gevallen",
+      "terraform": "Terraform",
+      "serial": "Serie",
+      "topResourceTypes": "Belangrijkste soorten bronnen",
+      "providers": "Aanbieders",
+      "count": "Aantal",
+      "transferTitle": "Overdrachtsstatus",
+      "copyTo": "Kopieer <1>{{name}}</1><!--1--> naar een andere bron.",
+      "addSourceTitle": "Bron van de staat toevoegen",
+      "type": "Type",
+      "uploadError": "Dat bestand kon niet worden geanalyseerd — is het een geldig Terraform-statusbestand in JSON-formaat?",
+      "types": {
+        "local": "Lokale gids",
+        "hcp": "HCP Terraform / Terraform Enterprise",
+        "s3": "AWS S3 (of S3-compatibel)",
+        "azureblob": "Azure Blob Storage",
+        "gcs": "Google Cloud Storage",
+        "git": "Git-repository",
+        "consul": "Consul KV",
+        "pg": "PostgreSQL-backend",
+        "kubernetes": "Kubernetes-geheimen",
+        "http": "HTTP-backend"
+      },
+      "fields": {
+        "local": {
+          "base_path": {
+            "label": "Basispad",
+            "helper": "De map is gescand op .tfstate-bestanden"
+          }
+        },
+        "hcp": {
+          "organization": {
+            "label": "Organisatie"
+          },
+          "hostname": {
+            "label": "Hostnaam"
+          },
+          "token": {
+            "label": "API-token",
+            "helper": "In rust versleuteld opgeslagen"
+          }
+        },
+        "s3": {
+          "bucket": {
+            "label": "Emmer"
+          },
+          "region": {
+            "label": "Regio"
+          },
+          "prefix": {
+            "label": "Sleutelvoorvoegsel"
+          },
+          "endpoint": {
+            "label": "Eindpunt (S3-compatibel)"
+          },
+          "access_key_id": {
+            "label": "Toegangssleutel-ID"
+          },
+          "secret_access_key": {
+            "label": "Geheime toegangssleutel"
+          }
+        },
+        "azureblob": {
+          "account": {
+            "label": "Opslagaccount"
+          },
+          "container": {
+            "label": "Container"
+          },
+          "prefix": {
+            "label": "Blob-voorvoegsel"
+          },
+          "account_key": {
+            "label": "Accountcode",
+            "helper": "In rust versleuteld opgeslagen"
+          }
+        },
+        "gcs": {
+          "bucket": {
+            "label": "Emmer"
+          },
+          "prefix": {
+            "label": "Voorvoegsel van het object"
+          },
+          "credentials_json": {
+            "label": "JSON-bestand voor serviceaccount",
+            "helper": "Plak de JSON-sleutel, of laat het veld leeg om de standaard inloggegevens van de applicatie te gebruiken"
+          }
+        },
+        "git": {
+          "repo_url": {
+            "label": "URL van de repository"
+          },
+          "ref": {
+            "label": "Vestiging"
+          },
+          "prefix": {
+            "label": "Padvoorvoegsel"
+          },
+          "username": {
+            "label": "Gebruikersnaam"
+          },
+          "token": {
+            "label": "Token",
+            "helper": "Voor privé-repositories; versleuteld opgeslagen"
+          }
+        },
+        "consul": {
+          "address": {
+            "label": "Adres"
+          },
+          "scheme": {
+            "label": "Schema"
+          },
+          "path": {
+            "label": "KV-padvoorvoegsel"
+          },
+          "datacenter": {
+            "label": "Datacenter"
+          },
+          "token": {
+            "label": "ACL-token",
+            "helper": "In rust versleuteld opgeslagen"
+          }
+        },
+        "pg": {
+          "conn_str": {
+            "label": "Verbindingsstring",
+            "helper": "In rust versleuteld opgeslagen"
+          },
+          "schema_name": {
+            "label": "Schema"
+          }
+        },
+        "kubernetes": {
+          "server": {
+            "label": "URL van de API-server"
+          },
+          "namespace": {
+            "label": "Naamruimte"
+          },
+          "labels": {
+            "label": "Labelkiezer"
+          },
+          "ca_cert": {
+            "label": "Cluster CA (PEM)"
+          },
+          "token": {
+            "label": "Token aan toonder",
+            "helper": "In rust versleuteld opgeslagen"
+          }
+        },
+        "http": {
+          "address": {
+            "label": "URL van de staat"
+          },
+          "lock_address": {
+            "label": "URL vergrendelen",
+            "helper": "Maakt native LOCK/UNLOCK-vergrendeling mogelijk"
+          },
+          "unlock_address": {
+            "label": "URL ontgrendelen"
+          },
+          "update_method": {
+            "label": "Update-methode"
+          },
+          "username": {
+            "label": "Gebruikersnaam"
+          },
+          "password": {
+            "label": "Wachtwoord",
+            "helper": "In rust versleuteld opgeslagen"
+          }
+        }
+      },
+      "optionalField": "{{label}} (optioneel)",
+      "createFailed": "Het is niet gelukt om de bron aan te maken.",
+      "tabHistory": "Geschiedenis",
+      "historyEmpty": "Er is nog geen geschiedenis. Er worden momentopnames opgeslagen zodra de synchronisatieservice deze statuswijziging registreert.",
+      "historyError": "Het laden van de analysegeschiedenis is mislukt.",
+      "historyRum": "RUM",
+      "historyResources": "Bronnen",
+      "historySnapshots_one": "{{count}} momentopname",
+      "historySnapshots_other": "{{count}} momentopnames",
+      "historyAnalyzedAt": "Waargenomen",
+      "historySerial": "Serie",
+      "historyTfVersion": "Terraform",
+      "historySize": "Afmetingen"
+    },
+    "drift": {
+      "pipelines": "Pijpleidingaansluitingen",
+      "noPipelines": "Er zijn nog geen pijplijnaansluitingen. Voeg er een toe om drift-runs te starten.",
+      "noRuns": "Er zijn nog geen drift-runs geweest.",
+      "runs": "Driftruns",
+      "statusFailed": "mislukt",
+      "statusDriftDetected": "drift gedetecteerd",
+      "statusNoDrift": "geen afwijking",
+      "recentRuns": "Recente hardloopsessies",
+      "dir": "Regisseur",
+      "plusTildeMinus": "+ / ~ / -",
+      "setUpRepo": "Repo instellen",
+      "ciSources": "CI-bronnen",
+      "deletePipelineTitle": "Pijplijnverbinding verwijderen",
+      "deletePipelineBody": "De pijplijnaansluiting <1> verwijderen{{name}}</1><!--1-->? Drift- en version-lab-runs kunnen dan niet langer via deze aansluiting worden verzonden.",
+      "editPipelineTitle": "Pijpleidingverbinding bewerken",
+      "runDetailTitle": "Driftrit",
+      "defaultRef": "standaardverwijzing",
+      "pending": "in behandeling",
+      "addedChangedDestroyed": "{{added}} toegevoegd / {{changed}} gewijzigd / {{destroyed}} verwijderd",
+      "resource": "Bron",
+      "change": "Wijzigen",
+      "noResourceDrift": "Er werd geen afwijking per hulpbron gemeld.",
+      "noDetailsYet": "Er zijn nog geen details bekend — de wedstrijd heeft nog geen resultaten bekendgemaakt.",
+      "addPipelineTitle": "Pijpleidingaansluiting toevoegen",
+      "ciSource": "CI-bron",
+      "ciSourceHelp": "Kies een geconfigureerde CI-bron om uit de bijbehorende pijplijnen of workflows te kiezen, of voer de coördinaten handmatig in.",
+      "manualEntry": "Handmatige invoer",
+      "pipeline": "Pijpleiding",
+      "pipelineHelp": "Kies de pijplijn die is aangemaakt op basis van de TSM-workflow-sjabloon (knop ‘Workflow-sjabloon’) — gewone CI-pijplijnen accepteren de verzendparameters niet",
+      "repository": "Repository",
+      "repositoryHelp": "Repositories die zichtbaar zijn voor deze bron",
+      "workflow": "Werkstroom",
+      "workflowHelp": "Kies de workflow die is aangemaakt op basis van de TSM-workflowsjabloon (bijv. tsm-drift.yml) — andere workflows weigeren de verzendgegevens",
+      "defaultRefOptional": "Standaardreferentie (optioneel)",
+      "credentialInherited": "Inloggegevens overgenomen van de CI-bron — het vernieuwen van het token is voldoende voor deze verbinding.",
+      "apiToken": "API-token / PAT",
+      "tokenHelp": "In rust versleuteld opgeslagen",
+      "tokenHelpEdit": "Laat dit veld leeg om het huidige token te behouden. Voer een nieuwe waarde in om het token te vernieuwen.",
+      "ciSourcesTitle": "CI-bronnen",
+      "ciSourcesDesc": "CI-inloggegevens op organisatieniveau (een Azure DevOps-organisatie/project of een GitHub-eigenaar). Pipelineverbindingen die zijn opgezet vanuit een bron, kiezen uit de pipelines of workflows van die bron en delen het token daarvan.",
+      "noCiSources": "Er zijn nog geen CI-bronnen — voeg er hieronder een toe.",
+      "ownerLabel": "Eigenaar (organisatie of gebruiker)",
+      "organization": "Organisatie",
+      "project": "Project",
+      "sourceTokenHelp": "Wordt in rust versleuteld opgeslagen; wordt gedeeld via verbindingen die vanuit deze bron tot stand zijn gebracht",
+      "addCiSource": "CI-bron toevoegen",
+      "authMethod": "Auth-methode",
+      "authMethodPat": "Persoonlijk toegangstoken",
+      "authMethodApp": "App-registratie (Entra)",
+      "appAuthHelp": "Registratie via de Microsoft Entra-app (clientreferenties) — aanbevolen voor geplande drift; geen PAT-vervaldatum.",
+      "tenantId": "Huurdersnummer",
+      "clientId": "Klant-ID",
+      "clientSecret": "Geheim van de klant",
+      "clientSecretHelp": "In versleutelde vorm opgeslagen; wordt nooit meer weergegeven.",
+      "githubAppHelp": "Installatie van de GitHub-app (toegangstokens voor installatie) — aanbevolen voor geplande drift; PAT verloopt niet.",
+      "githubAppId": "App-ID",
+      "githubInstallationId": "Installatie-ID",
+      "appPrivateKey": "Privésleutel (PEM)",
+      "appPrivateKeyHelp": "Plak de privésleutel (PEM) van de GitHub-app. Deze wordt in versleutelde vorm opgeslagen en wordt nooit meer weergegeven.",
+      "testConnection": "Verbinding testen",
+      "testConnectionOk": "Verbinding gecontroleerd",
+      "deleteCiSourceTitle": "CI-bron verwijderen",
+      "deleteCiSourceBody": "\"{{name}}\" verwijderen? De daarop gebaseerde pijplijnverbindingen zullen geen gegevens meer verzenden, tenzij ze hun eigen token bevatten.",
+      "newRunTitle": "Nieuwe driftrun",
+      "gitRefOptional": "Git-ref (optioneel)",
+      "gitRefHelp": "Laat dit veld leeg om vanuit de standaardbranch van de pipeline te draaien; vul dit alleen in om een specifieke branch/ref te selecteren",
+      "workingDir": "Werkmap",
+      "dispatch": "Verzending",
+      "workflowTemplateTitle": "Drift-workflow-sjabloon",
+      "placeholderPipelineDefault": "standaardtak van de pipeline",
+      "wizard": {
+        "title": "Drift instellen voor een repository",
+        "steps": {
+          "source": "Bron en opslagplaats",
+          "workflow": "Workflowbestand",
+          "connect": "Maken & verbinden"
+        },
+        "preflight": "De CI-callback-URL is <1>{{base}}</3><!--1--> — gehoste CI-agents kunnen geen verbinding maken met een lokaal/privéadres, waardoor runs nooit resultaten zouden rapporteren. Gebruik een zelfgehoste agent die deze host wel kan bereiken, of stel een tunnel in en stel <3>TSM_SERVER_CALLBACK_URL in<!--3-->.",
+        "preflightUnset": "niet geconfigureerd",
+        "intro": "Kies de CI-bron en de repository waarin je Terraform staat. De wizard genereert hiervoor de TSM-drift-workflow en maakt vervolgens de pijplijnverbinding aan.",
+        "noSourcesHelp": "Er zijn nog geen CI-bronnen geconfigureerd — voeg er eerst een toe via de knop ‘CI-bronnen’ op de Drift-pagina.",
+        "sourceHelp": "De inloggegevens op organisatieniveau die worden gebruikt voor het bekijken en aanmaken van items.",
+        "repoHelp": "Repository met de Terraform-bestanden",
+        "workingDir": "Werkmap van Terraform",
+        "workingDirHelp": "Ten opzichte van de repo-root",
+        "serviceConnection": "Aansluiting op de nutsvoorziening (optioneel)",
+        "serviceConnectionErr": "De serviceverbindingen konden niet worden weergegeven (PAT heeft mogelijk niet het juiste bereik) — wordt alleen bij naam genoemd in de YAML-richtlijnen.",
+        "serviceConnectionHelp": "Vermeld in de gegenereerde YAML-richtlijnen voor inloggegevens",
+        "commitHeading": "Plaats dit bestand in <1>{{file}}</1><!--1--> op de standaardtak {{branch}} — handmatig of via een PR",
+        "copy": "Kopiëren",
+        "copied": "Gekopieerd",
+        "commitViaPR": "Commit via PR",
+        "setupExists": "Het workflowbestand staat al op de standaardbranch — er hoeft niets te worden vastgelegd. Ga verder met het maken van de verbinding.",
+        "prMerged": "Pull-verzoek samengevoegd — de workflow bevindt zich op de standaardtak. Ga verder met het maken van de verbinding.",
+        "prClosed": "De pull-aanvraag is gesloten zonder dat deze is samengevoegd. Voer de commit opnieuw uit via de pull-aanvraag of voer handmatig een commit uit.",
+        "prOpen": "Er is een pull-verzoek aangemaakt door <1>{{branch}}</3><!--1--> — <3>bekijk en voeg het samen<!--3-->. Ik wacht op de samenvoeging…",
+        "credsInfoAdo": "De pijplijn heeft cloud-inloggegevens nodig om Terraform uit te voeren — stel een serviceverbinding of workload-identiteit in op de plaats die in het sjabloon wordt aangegeven. De inloggegevens blijven in CI, nooit in TSM.",
+        "credsInfoGh": "De pijplijn heeft cloud-inloggegevens nodig om Terraform uit te voeren — koppel een OIDC-rol in de cloud of geheimen uit de repository op de plaatsen die in het sjabloon worden aangegeven. De inloggegevens blijven in CI, nooit in TSM.",
+        "pipelineName": "Naam van de pijpleiding",
+        "connectionName": "Naam van de verbinding",
+        "adoConnectDesc": "Zodra het bestand is vastgelegd, maakt TSM in één stap de Azure DevOps-pijplijndefinitie aan die verwijst naar <1>{{path}}</1><!--1--> in <3>{{repo}}</3><!--3-->, evenals de pijplijnverbinding. Opmerking: bij de eerste uitvoering kan een eenmalige autorisatie van resources in Azure DevOps nodig zijn (toegang tot de serviceverbinding).",
+        "ghConnectDesc": "Zodra het bestand is samengevoegd met de standaardbranch van <1>{{repo}}</3><!--1-->, registreert GitHub de workflow automatisch — TSM detecteert vervolgens <3>tsm-drift.yml<!--3--> en brengt de verbinding tot stand.",
+        "ghMissing": "De workflow <1>tsm-drift.yml<!--1--> is nog niet gevonden in {{repo}}. Sla het op in de standaardbranch, wacht een paar seconden tot GitHub het heeft verwerkt en controleer het dan nogmaals.",
+        "done": "Pijplijnaansluiting <1>{{name}}</1><!--1--> is aangemaakt — je kunt er nu drift-runs op uitvoeren.",
+        "existingPipeline": "Er bestaat al een pijplijn met de naam <1>{{name}}</1><!--1--> in dit project — maak hier verbinding mee in plaats van een duplicaat aan te maken.",
+        "useExisting": "Gebruik bestaande",
+        "createAnyway": "Maak het toch maar",
+        "createBoth": "Pijpleiding en aansluiting aanmaken",
+        "checkAgain": "Controleer het nog eens",
+        "detectConnect": "Detecteren & verbinden",
+        "includeVersionLab": "Stel ook de Version Lab-workflow in",
+        "includeVersionLabHelp": "Voegt het bestand `tsm-health.yml` samen met de drift-workflow toe en maakt een tweede pijplijnverbinding aan voor het testen van versies.",
+        "driftFile": "Drift-workflow",
+        "versionLabFile": "Workflow van Version Lab",
+        "dispatchFirstRun": "Voer een eerste drift-run uit nadat je verbinding hebt gemaakt",
+        "firstRunDispatched": "De eerste driftrun is gestart — bekijk hem op deze pagina.",
+        "firstRunFailed": "Verbinding tot stand gebracht, maar de eerste uitvoering kon niet worden verzonden: {{error}}",
+        "versionLabSuffix": "Version Lab"
+      },
+      "fields": {
+        "github_actions": {
+          "owner": {
+            "label": "Eigenaar"
+          },
+          "repo": {
+            "label": "Repository"
+          },
+          "workflow_id": {
+            "label": "Workflowbestand of -id"
+          },
+          "ref": {
+            "label": "Standaardreferentie"
+          }
+        },
+        "azure_devops": {
+          "organization": {
+            "label": "Organisatie"
+          },
+          "project": {
+            "label": "Project"
+          },
+          "pipeline_id": {
+            "label": "Pijpleiding-ID"
+          },
+          "ref": {
+            "label": "Standaardreferentie"
+          }
+        }
+      },
+      "recordsTitle": "Drift-records",
+      "recordsFilter": "Recordfilter",
+      "recordsActive": "Actief",
+      "recordsAll": "Alles",
+      "recordOpen": "Openen",
+      "recordAcknowledged": "Erkend",
+      "recordResolved": "Besloten",
+      "recordSeverity": "Ernst",
+      "recordState": "Bron / status",
+      "recordDetections": "Detecties",
+      "recordFirstDetected": "Voor het eerst vastgesteld",
+      "recordLastDetected": "Laatst gedetecteerd",
+      "noActiveRecords": "Geen afwijkingen — elke status komt overeen met de bijbehorende code.",
+      "noRecords": "Er zijn nog geen driftgegevens. Gegevens verschijnen zodra er wijzigingen zijn in de rapporten over drift-runs of gegevensinvoer.",
+      "acknowledge": "Bevestig",
+      "resolve": "Oplossing",
+      "acknowledgeTitle": "Erken de afwijking",
+      "acknowledgeBody": "Markeer deze drift als waargenomen. De registratie blijft geldig bij herhaalde detecties en wordt automatisch opgelost wanneer een foutloze run wordt gemeld.",
+      "ackNoteLabel": "Opmerking (optioneel)",
+      "ackedBy": "Erkend door {{actor}}",
+      "recordDetailTitle": "Driftresultaat"
+    },
+    "versionLab": {
+      "noPipelines": "Er zijn nog geen pijplijnaansluitingen — voeg er een toe op de Drift-pagina en ga daarna terug naar deze pagina.",
+      "noRuns": "Er zijn nog geen gezondheidsruns geweest.",
+      "terraform": "Terraform",
+      "checks": "Cheques",
+      "statusDispatchFailed": "verzending mislukt",
+      "statusHealthy": "gezond",
+      "statusUnhealthy": "ongezond",
+      "newRunTitle": "Nieuwe versie – gezondheidsloop",
+      "pipeline": "Pijpleiding",
+      "gitRef": "Git-referentie",
+      "workingDir": "Werkmap",
+      "terraformVersion": "Terraform-versie",
+      "registryHost": "Registratiehost (optioneel)",
+      "registryHostHelp": "De host van het register zoals deze in de bronadressen van je module staat vermeld (bijv. registry.example.com) — geen mirror-URL of pad. Wordt automatisch ingevuld vanuit het gekoppelde register indien beschikbaar; providers worden opgehaald uit de netwerkmirror daarvan.",
+      "providerVersions": "Versies van de aanbieder (optioneel)",
+      "moduleVersions": "Moduleversies (optioneel)",
+      "dispatch": "Verzending",
+      "workflowTitle": "Workflow-sjabloon voor de status van versies",
+      "showing": "{{from}}wordt weergegeven –{{to}} van {{total}}"
+    },
+    "schedules": {
+      "title": "Dienstroosters",
+      "description": "Voer automatisch driftcontroles uit volgens een cron-schema. Bij elke brand wordt een driftcontrole gestart in de gekozen CI-pijplijn.",
+      "add": "Schema toevoegen",
+      "edit": "Schema bewerken",
+      "cron": "Schema",
+      "cronHelp": "Cron-uitdrukking (bijv. \"0 3 * * *\") of een trefwoord: dagelijks, wekelijks, om de 15 minuten.",
+      "pipeline": "CI-pijplijn",
+      "sourceId": "Bron-ID (optioneel)",
+      "stateKey": "Sleutel (optioneel)",
+      "repoRef": "Repo-referentie (optioneel)",
+      "workingDir": "Werkmap (optioneel)",
+      "enabled": "Ingeschakeld",
+      "lastRun": "Laatste rit",
+      "nextRun": "Volgende run",
+      "runNow": "Nu starten",
+      "never": "Nooit rennen",
+      "noSchedules": "Er zijn nog geen schema’s. Voeg er een toe om automatisch driftcontroles uit te voeren.",
+      "deleteTitle": "Schema verwijderen",
+      "deleteConfirm": "Het schema „{{name}}” verwijderen? Dan wordt de uitvoering ervan gestopt."
+    },
+    "notifications": {
+      "title": "Meldingen",
+      "description": "Stuur meldingen naar een webhook, Slack, Microsoft Teams of e-mail wanneer een drift-run een afwijking detecteert of mislukt. De bestemmingen worden versleuteld opgeslagen en worden nooit meer weergegeven.",
+      "add": "Kanaal toevoegen",
+      "edit": "Kanaal bewerken",
+      "noChannels": "Er zijn nog geen meldingskanalen. Voeg er een toe om driftwaarschuwingen te ontvangen.",
+      "events": "Evenementen",
+      "allEvents": "Alle evenementen",
+      "target": "Doel-URL",
+      "targetHelp": "De URL van de webhook, Slack of Teams waarnaar de POST-verzoek moet worden verzonden.",
+      "targetKeep": "Laat dit veld leeg om de huidige URL te behouden.",
+      "targetEmail": "E-mailadressen van ontvangers",
+      "targetEmailHelp": "E-mailadressen, gescheiden door komma’s. Verzonden via de geconfigureerde SMTP-relay.",
+      "targetEmailKeep": "Laat dit veld leeg om de huidige ontvangers te behouden.",
+      "typeWebhook": "Webhook (JSON)",
+      "typeSlack": "Slack",
+      "typeTeams": "Microsoft Teams",
+      "typeEmail": "E-mail",
+      "eventsHelp": "Laat beide vakjes leeg om alle gebeurtenissen te ontvangen.",
+      "test": "Test verzenden",
+      "testSent": "Testmelding verzonden.",
+      "lastDelivery": "Laatste levering",
+      "neverSent": "Nooit verzonden",
+      "deleteTitle": "Kanaal verwijderen",
+      "deleteConfirm": "Het kanaal \"{{name}}\" verwijderen?",
+      "event": {
+        "drift_detected": "Drift gedetecteerd",
+        "run_failed": "Uitvoering mislukt"
+      }
+    },
+    "reports": {
+      "description": "Filter de geanalyseerde statusbestanden uit alle bronnen en exporteer de overeenkomende resultaten vervolgens als Markdown, JSON of CSV.",
+      "filters": "Filters",
+      "advanced": "Geavanceerde filters",
+      "sources": "Bronnen",
+      "allSources": "Alle bronnen",
+      "searchKey": "De staatssleutel bevat",
+      "version": "Terraform-versie",
+      "versionOpAria": "Versievergelijking",
+      "provider": "Aanbieder",
+      "resourceType": "Type bron",
+      "reset": "Filters resetten",
+      "refreshHint": "De geselecteerde bron(nen) afstemmen en opnieuw laden — of alle bronnen als er geen is geselecteerd",
+      "min": "Min",
+      "max": "Max",
+      "rumRange": "RUM",
+      "managedRange": "Beheerde middelen",
+      "dataRange": "Gegevensbronnen",
+      "totalRange": "Totaal aantal gevallen",
+      "sizeRange": "Grootte (bytes)",
+      "matched": "Overeenkomend",
+      "rum": "RUM",
+      "managed": "Beheerd",
+      "dataSources": "Gegevensbronnen",
+      "totalInstances": "Totaal aantal gevallen",
+      "results": "Resultaten",
+      "truncated": "De eerste {{shown}} van {{total}} resultaten worden weergegeven — pas de filters aan of exporteer de volledige lijst.",
+      "empty": "Er zijn geen statusbestanden die aan deze filters voldoen.",
+      "loadFailed": "Het laden van de bijbehorende statusbestanden is mislukt.",
+      "export": "Exporteren",
+      "exportError": "Het exporteren is mislukt.",
+      "colSource": "Bron",
+      "colState": "Staatsbestand",
+      "colVersion": "Terraform",
+      "colRum": "RUM",
+      "colManaged": "Beheerd",
+      "colData": "Gegevens",
+      "colTotal": "Totaal",
+      "colSize": "Afmetingen",
+      "colAnalyzed": "Geanalyseerd",
+      "unknownVersion": "onbekend"
+    },
+    "transfer": {
+      "needScope": "Je hebt de scope `state:transfer` nodig om overdrachten uit te voeren.",
+      "source": "Bron",
+      "destination": "Bestemming",
+      "stateFile": "Staatsbestand",
+      "noStatesInSource": "Er zijn geen statusbestanden in deze bron",
+      "mode": "Modus",
+      "modeBackup": "Back-up (kopie)",
+      "modeMigrate": "Migreren (kopiëren + pariteit controleren)",
+      "targetSource": "Doelbron",
+      "targetKey": "Doelsleutel",
+      "hcpTargetHint": "HCP-doel: de sleutel is de NAAM van de werkruimte — als er geen werkruimte bestaat, wordt deze automatisch in de organisatie aangemaakt. Om een bestaande werkruimte te overschrijven, moet het serienummer van de status hoger zijn en moet de afstamming overeenkomen; de werkruimte wordt tijdens het schrijven vergrendeld.",
+      "gitTargetHint": "Git-doel: de wijzigingen worden vastgelegd in de geconfigureerde branch en direct gepusht (nooit met force-push) — de branch moet directe pushes toestaan. De sleutels moeten eindigen op .tfstate.",
+      "targetKeyHelp": "Bestemmingspad/sleutel binnen de doelbron",
+      "sameTarget": "De doeltoestand moet verschillen van de brontoestand.",
+      "decommissionLabel": "Bron buiten gebruik stellen na een geverifieerde migratie (de oorspronkelijke bron wordt leeggemaakt; er wordt eerst een back-up gemaakt)",
+      "confirmDecommission": "Typ de sleutel van de bronstatus om de buitengebruikstelling te bevestigen",
+      "newTransfer": "Nieuwe transfer",
+      "runBackup": "Back-up",
+      "runMigrate": "Migreren",
+      "runMigrateDecommission": "Migreren en buiten gebruik stellen",
+      "verified": "geverifieerd: {{value}}",
+      "sourceDecommissioned": "bron buiten gebruik gesteld"
+    },
+    "login": {
+      "signIn": "Inloggen",
+      "signInWith": "Log in met {{provider}}",
+      "signInWithSSO": "Aanmelden via SSO",
+      "signInWithAzureAD": "Aanmelden met Azure AD",
+      "signInWithLdap": "Aanmelden met LDAP",
+      "devLogin": "Beheerderslogin (Admin)",
+      "devModeNotice": "Ontwikkelingsmodus - Klik hieronder om in te loggen zonder OAuth",
+      "devLoginFailed": "Inloggen als ontwikkelaar is mislukt. Controleer de serverlogs.",
+      "subtitle": "Log in om verder te gaan",
+      "noProviders": "Er zijn geen SSO-providers geconfigureerd. Neem contact op met uw beheerder.",
+      "or": "OF",
+      "orUseProductionAuth": "OF GEBRUIK PRODUCTIE-AUTH",
+      "orSignInWithLdap": "OF LOG IN MET LDAP",
+      "loadingProviders": "Aanmeldingsproviders worden geladen",
+      "username": "Gebruikersnaam",
+      "password": "Wachtwoord",
+      "ldapError": "Ongeldige gebruikersnaam of wachtwoord.",
+      "ssoInfo": "Deze applicatie maakt gebruik van single sign-on voor authenticatie.",
+      "ssoContact": "Neem contact op met uw beheerder als u toegang nodig hebt."
+    },
+    "sso": {
+      "title": "SSO / Identiteit",
+      "description": "Overzicht (alleen-lezen) van de geconfigureerde Single Sign-On en provisioning. Bewerk deze instellingen in het configuratiebestand van de server.",
+      "enabled": "Ingeschakeld",
+      "disabled": "Gehandicapt",
+      "oidc": "OpenID Connect",
+      "saml": "SAML 2.0",
+      "ldap": "LDAP",
+      "mtls": "mTLS",
+      "scim": "SCIM-provisioning",
+      "scimNote": "Wanneer deze optie is ingeschakeld, accepteert /scim/v2 SCIM 2.0-provisioning van gebruikers en groepen vanuit een bearer-token-client die beschikt over het scim:provision-bereik.",
+      "group": "Groep",
+      "groupDn": "Groep DN",
+      "organization": "Organisatie",
+      "role": "Functie",
+      "subject": "Onderwerp van het certificaat",
+      "scopes": "Toepassingsgebieden",
+      "idps": "Identiteitsproviders",
+      "idpInitiated": "Door IdP geïnitieerde SSO",
+      "issuer": "URL van de uitgever",
+      "groupClaim": "Collectieve vordering",
+      "groupAttribute": "Groepsattribuut",
+      "entityId": "Entiteits-ID",
+      "acsUrl": "ACS-URL",
+      "host": "Gastheer",
+      "baseDn": "Basis-DN",
+      "caFile": "CA-bestand van de klant",
+      "defaultRole": "Standaardrol",
+      "noMappings": "Er zijn geen groepstoewijzingen geconfigureerd."
+    },
+    "apiKeys": {
+      "title": "API-sleutels",
+      "description": "Sleutels worden gebruikt om CI-pijplijnen en -scripts te verifiëren als Bearer-tokens. Een sleutel bevat alleen de scopes waarover je beschikt; beheerders kunnen alle sleutels inzien.",
+      "create": "Sleutel aanmaken",
+      "createTitle": "API-sleutel aanmaken",
+      "editTitle": "API-sleutel bewerken",
+      "empty": "Er zijn nog geen API-sleutels. Maak er een aan om de API vanuit CI aan te roepen (drift-ingest, statusopvragingen) zonder browsersessie.",
+      "prefix": "Legenda",
+      "scopes": "Toepassingsgebieden",
+      "scopesHelp": "Een sleutel mag alleen toepassingsgebieden bevatten die je zelf bezit.",
+      "expires": "Vervalt",
+      "expiresLabel": "Vervaldatum (optioneel)",
+      "expiresHelp": "Laat dit veld leeg als de sleutel geen vervaldatum heeft.",
+      "expired": "Verlopen",
+      "never": "Nooit",
+      "lastUsed": "Laatst gebruikt",
+      "neverUsed": "Nooit",
+      "descriptionLabel": "Beschrijving (optioneel)",
+      "secretTitle": "Je nieuwe API-sleutel",
+      "secretWarning": "Noteer deze sleutel nu — hij wordt slechts één keer weergegeven en kan niet worden hersteld.",
+      "secretStored": "Ik heb de sleutel bewaard",
+      "rotate": "Draaien",
+      "rotateTitle": "Draai ‘{{name}}’",
+      "rotateBody": "Er wordt een vervangende sleutel met dezelfde toepassingsgebieden aangemaakt. Trek de oude sleutel onmiddellijk in, of laat deze gedurende een overgangsperiode geldig blijven terwijl gebruikers overschakelen.",
+      "graceLabel": "Geldigheidsduur van oude sleutels",
+      "graceImmediate": "Onmiddellijk intrekken",
+      "graceHours_one": "{{count}} uur bewaren",
+      "graceHours_other": "{{count}} uur bewaren",
+      "deleteTitle": "API-sleutel verwijderen",
+      "deleteBody": "'{{name}}' verwijderen? Alles wat hiermee wordt geauthenticeerd, werkt dan onmiddellijk niet meer."
+    }
+  },
+  "commandPalette": {
+    "title": "Opdrachtpalet",
+    "placeholder": "Zoekpagina’s…",
+    "empty": "Geen resultaten.",
+    "openButton": "Open het opdrachtpalet",
+    "hint": "Snelle navigatie (Ctrl/⌘K)",
+    "groups": {
+      "navigation": "Navigatie"
+    }
+  },
+  "support": {
+    "title": "Ondersteuning",
+    "contextHelp": "Contextuele hulp"
+  },
+  "session": {
+    "expiresSoon": "Je sessie verloopt over {{minutes}} minuten. Vernieuw de pagina om ingelogd te blijven.",
+    "refresh": "Sessie vernieuwen"
+  },
+  "consentBanner": {
+    "ariaLabel": "Toestemming voor cookies",
+    "title": "Wij hechten veel waarde aan uw privacy",
+    "essential": "Essentieel (altijd actief)",
+    "errorReporting": "Foutmeldingen",
+    "performanceMonitoring": "Prestatiebewaking",
+    "analytics": "Analytics",
+    "hideDetails": "Details verbergen",
+    "customize": "Aanpassen",
+    "rejectAll": "Alles afwijzen",
+    "acceptAll": "Alles accepteren"
+  },
+  "a11y": {
+    "skipToContent": "Ga naar de hoofdinhoud",
+    "openNavigation": "Navigatie openen",
+    "mainNavigation": "Hoofdnavigatie",
+    "closeNavigation": "Navigatie sluiten",
+    "navigatedTo": "Ik ben naar {{title}} gegaan",
+    "breadcrumbs": "Navigatiepad"
+  },
+  "errorBoundary": {
+    "title": "Er is iets misgegaan",
+    "description": "Er is een onverwachte fout opgetreden bij het weergeven van deze pagina.",
+    "tryAgain": "Probeer het nog eens",
+    "reloadPage": "Pagina opnieuw laden"
+  },
+  "empty": {
+    "default": "Hier staat nog niets."
+  },
+  "admin": {
+    "users": {
+      "pageTitle": "Gebruikers",
+      "pageSubtitle": "Gebruikersaccounts en machtigingen beheren",
+      "addUser": "Gebruiker toevoegen",
+      "cancel": "Annuleren",
+      "save": "Opslaan",
+      "create": "Aanmaken",
+      "add": "Toevoegen",
+      "delete": "Verwijderen",
+      "erase": "Wissen",
+      "errLoad": "Het laden van gebruikers is mislukt. Probeer het nog eens.",
+      "errSave": "Het opslaan van de gebruiker is mislukt. Probeer het nog eens.",
+      "errDelete": "Het verwijderen van de gebruiker is mislukt. Probeer het nog eens.",
+      "userErased": "Gebruikersgegevens gewist.",
+      "errErase": "Het wissen van de gebruikersgegevens is mislukt. Probeer het nog eens.",
+      "exportedData": "Geëxporteerde gebruikersgegevens voor {{email}}.",
+      "errExport": "Het exporteren van gebruikersgegevens is mislukt.",
+      "errAddMembership": "Het toevoegen van het lidmaatschap van de organisatie is mislukt",
+      "errUpdateRole": "Het bijwerken van de rol is mislukt",
+      "errRemoveMembership": "Het verwijderen uit de organisatie is mislukt",
+      "searchPlaceholder": "Gebruikers zoeken...",
+      "thName": "Naam",
+      "thEmail": "E-mail",
+      "thOrgRoles": "Organisaties en functies",
+      "thCreated": "Aangemaakt",
+      "thActions": "Acties",
+      "emptyTitle": "Er zijn geen gebruikers gevonden",
+      "emptyDescription": "Gebruikers verschijnen hier nadat ze zich voor het eerst hebben aangemeld. Nodig teamgenoten uit door de URL van de app te delen en een SSO- of dev-login-provider te vermelden.",
+      "tooltipMembership": "{{org}}: {{role}}",
+      "tooltipMembershipNoRole": "{{org}}e: Geen rol toegewezen",
+      "chipMembership": "{{org}} ({{role}})",
+      "noRole": "Geen rol",
+      "noOrganizations": "Geen organisaties",
+      "tooltipEdit": "Gebruiker bewerken",
+      "ariaEdit": "Gebruiker bewerken",
+      "tooltipExport": "Gebruikersgegevens exporteren (AVG, artikel 15/20)",
+      "ariaExport": "Gebruikersgegevens exporteren",
+      "tooltipErase": "Gebruikersgegevens wissen (Artikel 17 van de AVG)",
+      "ariaErase": "Gebruikersgegevens wissen",
+      "tooltipDelete": "Gebruiker verwijderen",
+      "ariaDelete": "Gebruiker verwijderen",
+      "dialogTitleEdit": "Gebruiker bewerken",
+      "dialogTitleAdd": "Gebruiker toevoegen",
+      "labelEmail": "E-mail",
+      "helpEmail": "Het e-mailadres van de gebruiker. Dit wordt gebruikt als inlog-ID en kan na aanmaak niet meer worden gewijzigd.",
+      "labelName": "Naam",
+      "helpName": "De volledige weergavenaam wordt overal in de interface weergegeven",
+      "sectionOrgMembership": "Lidmaatschap van de organisatie",
+      "currentOrgs": "Huidige organisaties:",
+      "addToOrg": "Toevoegen aan organisatie",
+      "orgOptional": "Organisatie (optioneel)",
+      "menuNone": "Geen",
+      "helpAssignOrg": "Wijs deze gebruiker toe aan een organisatie om te bepalen tot welke middelen hij of zij toegang heeft.",
+      "labelRoleTemplate": "Functiesjabloon",
+      "helpRoleTemplate": "Hiermee worden de rechten gedefinieerd die binnen de geselecteerde organisatie zijn toegekend. Beheer sjablonen via Beheer → Rollen.",
+      "ariaRemoveFromOrg": "Uit de organisatie verwijderen",
+      "dialogTitleDelete": "Gebruiker verwijderen",
+      "confirmDelete": "Weet u zeker dat u de gebruiker \"{{name}}\" wilt verwijderen? Deze handeling kan niet ongedaan worden gemaakt.",
+      "eraseTitle": "Gebruikersgegevens wissen (Artikel 17 van de AVG)",
+      "eraseWarnPart1": "Hierdoor wordt het permanent geanonimiseerd ",
+      "eraseWarnPart2": "'s persoonsgegevens. Het gebruikersrecord wordt gemarkeerd als 'tombstone', API-sleutels en lidmaatschappen van organisaties worden verwijderd en alle sessies worden ingetrokken. De vermeldingen in het auditlogboek blijven bewaard met geanonimiseerde identificatiegegevens. ",
+      "eraseWarnCannotUndo": "Deze handeling kan niet ongedaan worden gemaakt.",
+      "eraseConfirmPart1": "Typ ter bevestiging het e-mailadres van de gebruiker (",
+      "eraseConfirmPart2": ") hieronder.",
+      "ariaConfirmErasure": "Bevestig het verwijderen door het e-mailadres van de gebruiker in te voeren"
+    },
+    "organizations": {
+      "pageTitle": "Organisaties",
+      "pageSubtitle": "Organisaties en hun leden beheren",
+      "addOrganization": "Organisatie toevoegen",
+      "cancel": "Annuleren",
+      "save": "Opslaan",
+      "create": "Aanmaken",
+      "close": "Sluiten",
+      "delete": "Verwijderen",
+      "errLoad": "Het laden van organisaties is mislukt. Probeer het nog eens.",
+      "errSave": "Het opslaan van de organisatie is mislukt. Probeer het nog eens.",
+      "errDelete": "Het verwijderen van de organisatie is mislukt. Probeer het nog eens.",
+      "errName": "De naam van de organisatie moet uit 1 tot en met 64 tekens bestaan, beginnen met een kleine letter of een cijfer, en mag alleen kleine letters, cijfers, koppeltekens of onderstrepingstekens bevatten.",
+      "errAddMember": "Het toevoegen van het lid is mislukt",
+      "errUpdateRole": "Het bijwerken van de ledenrol is mislukt",
+      "errRemoveMember": "Het verwijderen van het lid is mislukt",
+      "emptyState": "Er zijn geen organisaties gevonden",
+      "createFirst": "Eerste organisatie aanmaken",
+      "thName": "Naam",
+      "thDisplayName": "Weergavenaam",
+      "thIdentityProvider": "Identiteitsprovider",
+      "thMembers": "Leden",
+      "thCreated": "Aangemaakt",
+      "thActions": "Acties",
+      "idpAny": "Elke",
+      "viewMembers": "Leden bekijken",
+      "tooltipEditOrg": "Organisatie bewerken",
+      "ariaEditOrg": "Organisatie bewerken",
+      "tooltipDeleteOrg": "Organisatie verwijderen",
+      "ariaDeleteOrg": "Organisatie verwijderen",
+      "dialogTitleEdit": "Organisatie bewerken",
+      "dialogTitleAdd": "Organisatie toevoegen",
+      "labelName": "Naam",
+      "helpNameInvalid": "Moet beginnen met een kleine letter of een cijfer; alleen kleine letters, cijfers, koppeltekens en onderstrepingstekens zijn toegestaan (max. 64 tekens)",
+      "helpName": "Naam van de organisatie die in de URL’s van het register wordt gebruikt (bijv. myorg)",
+      "renameWarnPart1": "Door deze organisatie een andere naam te geven, worden alle naamruimten van modules en providers bijgewerkt die momenteel gebruikmaken van ",
+      "renameWarnPart2": " naar ",
+      "renameWarnPart3": ". Gebruikerslidmaatschappen zijn gekoppeld aan een ID en ondervinden hier geen gevolgen van. Zorg ervoor dat alle Terraform-configuraties waarin naar de oude naam wordt verwezen, worden bijgewerkt.",
+      "labelDisplayName": "Weergavenaam",
+      "helpDisplayName": "Weergavenaam voor de organisatie",
+      "labelIdpType": "Type identiteitsprovider",
+      "menuIdpAny": "Elk (geen beperking)",
+      "labelIdpName": "Naam van de IdP",
+      "helpIdpName": "Naam van de identiteitsprovider (bijv. SAML IdP-naam uit de configuratie)",
+      "dialogTitleDelete": "Organisatie verwijderen",
+      "confirmDelete": "Weet u zeker dat u de organisatie „{{name}}” wilt verwijderen? Deze handeling kan niet ongedaan worden gemaakt.",
+      "membersTitle": "Leden van de organisatie - {{name}}",
+      "addMember": "Lid toevoegen",
+      "membersManageDesc": "Beheer de leden en hun rollen binnen deze organisatie",
+      "membersViewDesc": "Bekijk de leden en hun functies binnen deze organisatie",
+      "noMembers": "Er zijn nog geen leden in deze organisatie",
+      "addFirstMember": "Eerste lid toevoegen",
+      "thEmail": "E-mail",
+      "thRole": "Functie",
+      "noRole": "Geen rol",
+      "unknown": "Onbekend",
+      "tooltipRemoveMember": "Lid verwijderen",
+      "ariaRemoveMember": "Lid verwijderen",
+      "addMemberTitle": "Lid toevoegen aan {{name}}",
+      "labelSelectUser": "Gebruiker selecteren",
+      "placeholderSearchUsers": "Gebruikers zoeken...",
+      "labelRoleTemplate": "Functiesjabloon",
+      "menuNoRoleViewOnly": "Geen rol (alleen-lezen)"
+    },
+    "roles": {
+      "loadError": "Het laden van de rollen is mislukt. Probeer het nog eens.",
+      "title": "Rollen en rechten",
+      "subtitle": "Bekijk de beschikbare rollen en de bijbehorende machtigingsbereiken. Systeemrollen zijn vooraf gedefinieerd en kunnen niet worden gewijzigd.",
+      "availableScopesReference": "Overzicht van beschikbare scopes",
+      "scopesDefine": "Scopes bepalen welke acties een rol binnen de applicatie kan uitvoeren.",
+      "thScope": "Toepassingsgebied",
+      "thDescription": "Beschrijving",
+      "roleTemplates": "Rol-sjablonen",
+      "clickRole": "Klik op een rol om de volledige omvang ervan te bekijken.",
+      "noRoles": "Er zijn geen rollen gevonden.",
+      "systemChip": "Systeem",
+      "scopeCount_one": "{{count}} toepassingsgebied",
+      "scopeCount_other": "{{count}} toepassingsgebieden",
+      "assignedScopes": "Toegewezen werkgebieden:",
+      "permissionsByCategory": "Rechten per categorie:",
+      "fullAccessViaAdmin": "Volledige toegang (via beheerder)",
+      "noAccess": "Geen toegang",
+      "metaRoleId": "Functie-ID",
+      "metaCreated": "Aangemaakt",
+      "metaUpdated": "Bijgewerkt"
+    },
+    "auditLog": {
+      "exportCsv": "Exporteren als CSV",
+      "exportJson": "Exporteren als JSON",
+      "labelStartDate": "Startdatum",
+      "labelEndDate": "Einddatum",
+      "labelResourceType": "Type bron",
+      "labelAction": "Actie",
+      "labelUserEmail": "E-mailadres van de gebruiker",
+      "placeholderUserEmail": "Zoeken op e-mailadres...",
+      "thTimestamp": "Tijdstempel",
+      "thAction": "Actie",
+      "thResource": "Bron",
+      "thUser": "Gebruiker",
+      "thIpAddress": "IP-adres",
+      "emptyTitle": "Er zijn geen auditvermeldingen die aan de huidige filters voldoen",
+      "emptySubtitle": "Er verschijnen logboekvermeldingen wanneer gebruikers wijzigingen aanbrengen. Pas de bovenstaande filters aan of publiceer een module om er een te bekijken.",
+      "detailTitle": "Details van het auditlogboek",
+      "close": "Sluiten",
+      "pageTitle": "Auditlogboeken",
+      "pageSubtitle": "De systeemactiviteit bijhouden voor alle bronnen en gebruikers",
+      "export": "Exporteren",
+      "errExport": "Het exporteren van auditlogboeken is mislukt",
+      "allResourceTypes": "Alle soorten bronnen",
+      "reset": "Opnieuw instellen",
+      "detailId": "ID",
+      "detailResourceId": "Bron-ID",
+      "detailOrgId": "Organisatie-ID",
+      "detailMetadata": "Metadata"
+    },
+    "oidcSettings": {
+      "pageTitle": "OIDC-groepen",
+      "pageSubtitle": "Stel de toewijzing van groepsclaims van uw identiteitsprovider aan organisaties en rollen in het register in. Wijzigingen worden van kracht bij de volgende aanmelding, zonder dat de server opnieuw hoeft te worden opgestart.",
+      "errLoad": "De OIDC-configuratie kon niet worden geladen",
+      "msgSaved": "De instellingen voor groepsweergave zijn succesvol opgeslagen.",
+      "errSave": "Het opslaan van de instellingen voor de groepstoewijzing is mislukt",
+      "activeProvider": "Actieve OIDC-provider",
+      "labelProvider": "Aanbieder",
+      "labelIssuer": "Uitgever",
+      "labelClientId": "Klant-ID",
+      "labelStatus": "Status",
+      "active": "Actief",
+      "inactive": "Inactief",
+      "groupClaimMapping": "In kaart brengen van collectieve vorderingen",
+      "groupClaimDescBefore": "Koppel de claims van de IDP-groep aan registratieorganisaties en rollen. De naam van de groepclaim moet overeenkomen met de claimcode in uw OIDC-ID-token (bijv. ",
+      "groupClaimDescAfter": ").",
+      "labelGroupClaimName": "Naam van de collectieve vordering",
+      "helpGroupClaimName": "De ID-token-claim die de groepslijst van de gebruiker bevat",
+      "labelDefaultRole": "Standaardrol",
+      "menuNone": "Geen",
+      "groupMappings": "Groepstoewijzingen",
+      "addMapping": "Toewijzing toevoegen",
+      "emptyMappings": "Er zijn geen groepstoewijzingen geconfigureerd. Klik op „Toewijzing toevoegen“ om er een aan te maken.",
+      "thIdpGroup": "IdP Group",
+      "thOrganization": "Organisatie",
+      "thRole": "Functie",
+      "thActions": "Acties",
+      "tooltipEdit": "Toewijzing van claims bewerken",
+      "ariaEdit": "Toewijzing van claims bewerken",
+      "tooltipDelete": "Toewijzing van vordering verwijderen",
+      "ariaDelete": "Toewijzing van vordering verwijderen",
+      "saving": "Bezig met opslaan…",
+      "saveChanges": "Wijzigingen opslaan",
+      "dialogTitleEdit": "Groepstoewijzing bewerken",
+      "dialogTitleAdd": "Groepstoewijzing toevoegen",
+      "labelIdpGroup": "IdP Group",
+      "helpIdpGroup": "De exacte groepsnaam zoals deze in de ID-tokenclaim staat vermeld",
+      "labelOrganization": "Organisatie",
+      "helpOrganization": "Naam van de registergroep waaraan de gebruiker wordt toegevoegd",
+      "labelRole": "Functie",
+      "cancel": "Annuleren",
+      "update": "Update",
+      "add": "Toevoegen",
+      "removeTitle": "Groepstoewijzing verwijderen",
+      "removeTextBefore": "Verwijder de koppeling voor de groep ",
+      "removeTextAfter": "? Dit heeft geen invloed op bestaande lidmaatschappen — het zorgt er alleen voor dat bij nieuwe aanmeldingen dit lidmaatschap niet automatisch wordt ingesteld.",
+      "remove": "Verwijderen",
+      "notSet": "(niet ingesteld)",
+      "none": "(geen)",
+      "samlGroupMappings": "SAML-groepstoewijzingen",
+      "samlReadOnly": "SAML-groepstoewijzingen worden geconfigureerd in het configuratiebestand van de server en zijn alleen-lezen.",
+      "chipGroupAttribute": "Groepsattribuut: {{value}}",
+      "chipDefaultRole": "Standaardrol: {{value}}",
+      "thSamlGroup": "SAML-groep",
+      "noSamlMappings": "Er zijn geen SAML-groepstoewijzingen geconfigureerd.",
+      "ldapGroupMappings": "LDAP-groepstoewijzingen",
+      "ldapReadOnly": "LDAP-groepstoewijzingen worden geconfigureerd in het configuratiebestand van de server en zijn alleen-lezen.",
+      "thLdapGroupDn": "LDAP-groep-DN",
+      "noLdapMappings": "Er zijn geen LDAP-groepstoewijzingen geconfigureerd."
+    }
+  },
+  "mtls": {
+    "pageTitle": "mTLS-clientcertificaattoewijzingen",
+    "pageSubtitle": "Wederzijdse koppelingen tussen TLS-certificaatonderwerpen en toepassingsgebieden. Deze worden ingesteld in het configuratiebestand van de server en zijn alleen-lezen.",
+    "errLoad": "Het laden van de mTLS-configuratie is mislukt.",
+    "enabled": "Ingeschakeld",
+    "disabled": "Gehandicapt",
+    "caFile": "CA-bestand",
+    "noMappings": "Er zijn geen mTLS-certificaatkoppelingen geconfigureerd.",
+    "certificateSubject": "Onderwerp van het certificaat",
+    "scopes": "Toepassingsgebieden"
+  }
+}
