@@ -6,11 +6,17 @@ WORKDIR /app
 # .npmrc carries legacy-peer-deps=true (eslint-plugin-jsx-a11y hasn't declared
 # ESLint 10 support yet); npm ci needs it to resolve the dependency tree.
 COPY package*.json .npmrc ./
-RUN npm ci
+# NODE_AUTH_TOKEN (a GitHub Packages read token) is injected as a BuildKit secret so npm
+# can install the private @sethbacon/* dependency without baking the token into a layer.
+RUN --mount=type=secret,id=node_auth_token \
+    NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" npm ci
 # Auto-fix what we can, then gate on PRODUCTION-dependency vulnerabilities only.
 # Dev-only tooling (vite/vitest/eslint) is not present in the final nginx image
 # and is excluded so it cannot fail the build.
-RUN npm audit fix || true && npm audit --audit-level=high --omit=dev
+RUN --mount=type=secret,id=node_auth_token \
+    export NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" && \
+    npm audit fix || true && \
+    npm audit --audit-level=high --omit=dev
 COPY . .
 RUN npm run build
 
