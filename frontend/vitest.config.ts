@@ -35,10 +35,13 @@ export default defineConfig({
         // 88.3/82.2/84.5/90.5 (vitest 4) with no test changes. Floors set just
         // under the new actuals; still stricter than the registry FE (80/70/70/80).
         // Prior peak (vitest 3): 80/85/85/80 (F3+F4, 2026-06-11).
+        // lines lowered 88->87 (2026-06-29): the @sethbacon/terraform-suite-ui
+        // shim migration relocated tested logic (theme/consent/auth/SuiteSwitcher)
+        // into the package, so app-level line coverage trends down as code moves out.
         statements: 85,
         branches: 80,
         functions: 82,
-        lines: 88,
+        lines: 87,
       },
     },
   },
