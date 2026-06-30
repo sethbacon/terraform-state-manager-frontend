@@ -46,10 +46,10 @@ export default function Layout() {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  // The admin Dashboard renders standalone, just above the Identity group, and
-  // only when that group is visible to the current user.
+  // The admin Dashboard renders standalone at the top of the grouped section —
+  // just under the API Docs separator, above the Main group.
   const groups = navGroups.map((g) =>
-    g.key === 'identity' ? { ...g, standaloneItem: adminDashboardItem } : g,
+    g.key === 'main' ? { ...g, standaloneItem: adminDashboardItem } : g,
   )
 
   // API docs uses the full content width (its two-column swagger layout); every

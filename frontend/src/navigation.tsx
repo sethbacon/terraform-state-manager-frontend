@@ -90,7 +90,8 @@ export const navGroups: NavGroup[] = [
   },
 ]
 
-// Admin dashboard — standalone above the Identity group (registry pattern).
+// Admin dashboard — standalone at the top of the grouped section, just under
+// the API Docs separator (above the Main group); mirrors the registry sidebar.
 export const adminDashboardItem: NavItem = {
   path: '/admin',
   labelKey: 'nav.admin.dashboard',
