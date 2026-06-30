@@ -8,6 +8,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from '../components/Layout'
+import { AuthProvider, type AuthApi } from '@sethbacon/terraform-suite-ui'
 import { AppThemeProvider } from '../contexts/ThemeContext'
 import { HelpProvider, useHelp } from '../contexts/HelpContext'
 import UsersPage from './admin/UsersPage'
@@ -41,6 +42,23 @@ function escapeDialog(dialog: HTMLElement) {
   fireEvent.keyDown(dialog, { key: 'Escape', code: 'Escape' })
 }
 
+// SuiteLayout reads the package's own useAuth, so the Layout render paths need a
+// real package AuthProvider (the app-level useAuth mock does not reach it).
+function layoutAuthApi(): AuthApi {
+  return {
+    getCurrentUser: vi.fn().mockResolvedValue({
+      user: { id: 'u1', email: 'alice@example.com', name: 'Alice' },
+      memberships: [],
+      allowed_scopes: ['admin'],
+    }),
+    login: vi.fn(),
+    devLogin: vi.fn().mockResolvedValue(undefined),
+    ldapLogin: vi.fn().mockResolvedValue(undefined),
+    logout: vi.fn(),
+    refreshToken: vi.fn().mockResolvedValue({ expires_in: 3600 }),
+  }
+}
+
 beforeEach(() => {
   vi.clearAllMocks()
   localStorage.clear()
@@ -66,15 +84,17 @@ describe('Layout keyboard and dismiss paths', () => {
     return render(
       <QueryClientProvider client={client}>
         <AppThemeProvider>
-          <HelpProvider>
-            <MemoryRouter initialEntries={['/']}>
-              <Routes>
-                <Route element={<Layout />}>
-                  <Route path="/" element={<div>home outlet</div>} />
-                </Route>
-              </Routes>
-            </MemoryRouter>
-          </HelpProvider>
+          <AuthProvider api={layoutAuthApi()}>
+            <HelpProvider>
+              <MemoryRouter initialEntries={['/']}>
+                <Routes>
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<div>home outlet</div>} />
+                  </Route>
+                </Routes>
+              </MemoryRouter>
+            </HelpProvider>
+          </AuthProvider>
         </AppThemeProvider>
       </QueryClientProvider>,
     )
@@ -90,8 +110,13 @@ describe('Layout keyboard and dismiss paths', () => {
 
   it('dismisses the settings, support, and account menus with Escape', async () => {
     renderLayout()
-    for (const label of ['settings.title', 'support.title', 'auth.account']) {
-      fireEvent.click(screen.getByLabelText(i18n.t(label) as string))
+    const labels = [
+      i18n.t('settings.title') as string,
+      i18n.t('support.title') as string,
+      i18n.t('header.account', { defaultValue: 'Account' }) as string,
+    ]
+    for (const label of labels) {
+      fireEvent.click(await screen.findByLabelText(label))
       const menu = await screen.findByRole('menu')
       escapeDialog(menu)
       await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
@@ -120,7 +145,7 @@ describe('Layout keyboard and dismiss paths', () => {
     // Force the md-down breakpoint so Layout takes its mobile branch (AppBar menu
     // button + temporary Drawer).
     window.matchMedia = vi.fn().mockImplementation((query: string) => ({
-      matches: true,
+      matches: !query.includes('min-width'), // mobile: useMediaQuery(up('md')) is false
       media: query,
       onchange: null,
       addEventListener: vi.fn(),
@@ -131,10 +156,12 @@ describe('Layout keyboard and dismiss paths', () => {
     })) as unknown as typeof window.matchMedia
     try {
       renderLayout()
-      // The mobile AppBar menu button opens the temporary drawer.
-      fireEvent.click(screen.getByLabelText(i18n.t('a11y.openNavigation') as string))
+      // The mobile AppBar menu button toggles the temporary drawer.
+      fireEvent.click(
+        screen.getByLabelText(i18n.t('nav.toggle', { defaultValue: 'Toggle navigation' }) as string),
+      )
       expect(
-        await screen.findByRole('navigation', { name: i18n.t('a11y.mainNavigation') as string }),
+        await screen.findByRole('link', { name: i18n.t('nav.dashboard') as string }),
       ).toBeInTheDocument()
     } finally {
       window.matchMedia = original
