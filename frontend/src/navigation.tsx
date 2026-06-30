@@ -8,7 +8,7 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import ScheduleIcon from '@mui/icons-material/Schedule'
 import DescriptionIcon from '@mui/icons-material/Description'
 import KeyIcon from '@mui/icons-material/Key'
-import DashboardCustomizeIcon from '@mui/icons-material/DashboardCustomize'
+import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
 import BusinessIcon from '@mui/icons-material/Business'
 import BadgeIcon from '@mui/icons-material/Badge'
@@ -95,7 +95,7 @@ export const adminDashboardItem: NavItem = {
   path: '/admin',
   labelKey: 'nav.admin.dashboard',
   tooltipKey: 'nav.admin.dashboardTooltip',
-  icon: <DashboardCustomizeIcon />,
+  icon: <DashboardIcon />,
   // The dashboard index shows the estate overview to any authenticated user; the
   // identity counts inside are admin-gated. Child /admin/* pages stay admin-only.
   scope: null,
