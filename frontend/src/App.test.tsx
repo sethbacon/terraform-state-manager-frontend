@@ -14,14 +14,33 @@ vi.mock('./services/api', async (importOriginal) => {
   const fns: Record<string, ReturnType<typeof vi.fn>> = {}
   // Pending promises keep every page in its loading state, where the page
   // header is already rendered — no per-page fixtures needed.
-  for (const k of Object.keys(actual.api)) fns[k] = vi.fn(() => new Promise(() => {}))
+  for (const k of Object.keys(actual.api)) fns[k] = vi.fn(() => new Promise(() => { }))
   return { ...actual, api: fns }
 })
 vi.mock('./contexts/AuthContext', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./contexts/AuthContext')>()
+  const { AuthProvider: SuiteAuthProvider } = await import('@sethbacon/terraform-suite-ui')
+  // SuiteLayout reads the package's own auth context, so back the provider with a
+  // real package AuthProvider that resolves an authenticated admin. The app-level
+  // useAuth (used by ProtectedRoute) stays mocked below.
+  const authApi = {
+    getCurrentUser: () =>
+      Promise.resolve({
+        user: { id: 'u1', email: 'alice@example.com', name: 'Alice' },
+        memberships: [],
+        allowed_scopes: ['admin'],
+      }),
+    login: () => { },
+    devLogin: () => Promise.resolve(),
+    ldapLogin: () => Promise.resolve(),
+    logout: () => { },
+    refreshToken: () => Promise.resolve({ expires_in: 3600 }),
+  }
   return {
     ...actual,
-    AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    AuthProvider: ({ children }: { children: React.ReactNode }) => (
+      <SuiteAuthProvider api={authApi}>{children}</SuiteAuthProvider>
+    ),
     useAuth: vi.fn(),
   }
 })
@@ -73,9 +92,9 @@ beforeEach(() => {
   vi.stubGlobal(
     'IntersectionObserver',
     class {
-      observe() {}
-      disconnect() {}
-      unobserve() {}
+      observe() { }
+      disconnect() { }
+      unobserve() { }
     },
   )
 })
