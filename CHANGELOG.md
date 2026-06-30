@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.1...v1.18.2) (2026-06-30)
+
+
+### Bug Fixes
+
+* **nav:** match the admin Dashboard page-title icon to the nav icon ([#151](https://github.com/sethbacon/terraform-state-manager-frontend/issues/151)) ([0a61c0f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0a61c0fa65ae4ced644d2cfdc36856c398bec799))
+
 ## [1.18.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.0...v1.18.1) (2026-06-30)
 
 
