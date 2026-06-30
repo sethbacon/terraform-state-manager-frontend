@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.18.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.0...v1.18.1) (2026-06-30)
+
+
+### Refactor
+
+* consume suite-ui consent, theme & identity ([#145](https://github.com/sethbacon/terraform-state-manager-frontend/issues/145)) ([e1cfcd7](https://github.com/sethbacon/terraform-state-manager-frontend/commit/e1cfcd7285b807f5d0d5ad4ef9684e0733efd85a))
+* **shell:** consume SuiteLayout from @sethbacon/terraform-suite-ui ([#150](https://github.com/sethbacon/terraform-state-manager-frontend/issues/150)) ([54f0c4f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/54f0c4fc9820b21defa77ef89ea0f8af8b6856f9))
+* **shell:** consume SuiteSwitcher from @sethbacon/terraform-suite-ui ([#149](https://github.com/sethbacon/terraform-state-manager-frontend/issues/149)) ([7fbd209](https://github.com/sethbacon/terraform-state-manager-frontend/commit/7fbd209be12a06edfc7f02b68e2ff828f91f6242))
+
 ## [1.18.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.17.0...v1.18.0) (2026-06-28)
 
 
