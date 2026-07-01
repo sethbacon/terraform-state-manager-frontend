@@ -364,6 +364,9 @@ export interface ResourceSummary {
   name: string
   provider: string
   instances: number
+  // Per-instance index keys (for_each strings / count numbers) so a single
+  // instance can be targeted for rm/mv. Omitted for un-indexed singletons.
+  instance_keys?: (string | number)[]
 }
 
 // StateModule is one registry module a state calls, captured from an ingested
