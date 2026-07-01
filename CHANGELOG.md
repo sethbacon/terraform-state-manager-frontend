@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.2...v1.18.3) (2026-06-30)
+
+
+### Bug Fixes
+
+* **nav:** move the admin Dashboard to the top of the grouped nav ([#154](https://github.com/sethbacon/terraform-state-manager-frontend/issues/154)) ([83b3a03](https://github.com/sethbacon/terraform-state-manager-frontend/commit/83b3a033d113f471c4800323eee82c31c5a0e883))
+
 ## [1.18.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.1...v1.18.2) (2026-06-30)
 
 
