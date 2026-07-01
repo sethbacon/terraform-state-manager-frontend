@@ -67,6 +67,13 @@ function errMsg(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
 }
 
+// indexToken renders a resource instance key as the bracket suffix the backend
+// parses: for_each string keys are JSON-quoted (`["a"]`), count indexes are bare
+// (`[0]`). JSON.stringify escapes embedded quotes/backslashes to match the API.
+function indexToken(key: string | number): string {
+  return typeof key === 'number' ? `[${key}]` : `[${JSON.stringify(key)}]`
+}
+
 export default function SourcesPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -773,6 +780,7 @@ function StateOpsDialog({
   const queryClient = useQueryClient()
   const [op, setOp] = useState<'rm' | 'mv'>('rm')
   const [address, setAddress] = useState('')
+  const [instanceIdx, setInstanceIdx] = useState('')
   const [to, setTo] = useState('')
 
   // Resources in this state, so the address can be picked instead of typed.
@@ -784,20 +792,33 @@ function StateOpsDialog({
   })
 
   // Addresses in the exact form the backend parses: "[module.X.]type.name"
-  // (no prefix for the root module). Deduped; meta drives the option display.
+  // (no prefix for the root module). Deduped; meta drives the option display and
+  // the per-instance (for_each/count) picker.
   const { addressOptions, addressMeta } = useMemo(() => {
-    const meta = new Map<string, { mode: string; instances: number; module: string }>()
+    const meta = new Map<string, { mode: string; instances: number; module: string; instanceKeys: (string | number)[] }>()
     for (const r of resourcesQuery.data ?? []) {
       const addr = `${r.module === 'root' ? '' : `${r.module}.`}${r.type}.${r.name}`
-      if (!meta.has(addr)) meta.set(addr, { mode: r.mode, instances: r.instances, module: r.module })
+      if (!meta.has(addr))
+        meta.set(addr, { mode: r.mode, instances: r.instances, module: r.module, instanceKeys: r.instance_keys ?? [] })
     }
     return { addressOptions: [...meta.keys()], addressMeta: meta }
   }, [resourcesQuery.data])
 
+  // Instance keys for the currently-selected base address (empty for singletons
+  // or a free-typed address). Selecting one appends its index to the address.
+  const instanceKeys = addressMeta.get(address)?.instanceKeys ?? []
+  const effectiveAddress = instanceIdx ? `${address}${instanceIdx}` : address
+
+  // Picking a different base address clears any stale instance selection.
+  useEffect(() => {
+    setInstanceIdx('')
+  }, [address])
+
   const mutation = useMutation({
-    mutationFn: () => api.stateOperation(sourceId, stateKey, op, address, op === 'mv' ? to : undefined),
+    mutationFn: () => api.stateOperation(sourceId, stateKey, op, effectiveAddress, op === 'mv' ? to : undefined),
     onSuccess: () => {
       setAddress('')
+      setInstanceIdx('')
       setTo('')
       for (const key of [
         queryKeys.sources.raw(sourceId, stateKey),
@@ -859,12 +880,30 @@ function StateOpsDialog({
               />
             )}
           />
+          {instanceKeys.length > 0 && (
+            <TextField
+              select
+              label={t('pages.sources.instance')}
+              value={instanceIdx}
+              onChange={(e) => setInstanceIdx(e.target.value)}
+              helperText={t('pages.sources.instanceHelper')}
+              fullWidth
+            >
+              <MenuItem value="">{t('pages.sources.instanceAll')}</MenuItem>
+              {instanceKeys.map((key) => (
+                <MenuItem key={String(key)} value={indexToken(key)}>
+                  {String(key)}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
           {op === 'mv' && (
             <TextField
               label={t('pages.sources.newAddress')}
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              placeholder="aws_instance.web2"
+              placeholder={instanceIdx ? 'aws_instance.web2["b"]' : 'aws_instance.web2'}
+              helperText={instanceIdx ? t('pages.sources.newAddressInstanceHelper') : undefined}
               fullWidth
             />
           )}

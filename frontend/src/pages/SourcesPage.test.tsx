@@ -395,6 +395,108 @@ describe('SourcesPage', () => {
     )
   })
 
+  it('targets a single for_each instance with a quoted index', async () => {
+    mocked.listStateResources.mockResolvedValue([
+      { module: 'module.m', mode: 'managed', type: 'aws_prefix_list', name: 'this', provider: 'aws', instances: 3, instance_keys: ['a', 'b', 'c'] },
+    ] as Awaited<ReturnType<typeof api.listStateResources>>)
+    mocked.stateOperation.mockResolvedValue({ status: 'applied', op: 'rm', backup_id: 'b9', serial: 8 } as Awaited<
+      ReturnType<typeof api.stateOperation>
+    >)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.stateOps') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    const addressBox = within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.sources.resourceAddress')}`))
+    fireEvent.mouseDown(addressBox)
+    fireEvent.change(addressBox, { target: { value: 'aws_prefix' } })
+    fireEvent.click(await screen.findByText('module.m.aws_prefix_list.this'))
+
+    // The instance picker appears only for indexed resources; pick key "b".
+    fireEvent.mouseDown(within(dialog).getByRole('combobox', { name: new RegExp(i18n.t('pages.sources.instance') as string) }))
+    fireEvent.click(await screen.findByRole('option', { name: 'b' }))
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Apply' }))
+    await waitFor(() =>
+      expect(mocked.stateOperation).toHaveBeenCalledWith(
+        's1',
+        'app.tfstate',
+        'rm',
+        'module.m.aws_prefix_list.this["b"]',
+        undefined,
+      ),
+    )
+  })
+
+  it('targets a single count instance with a bare index', async () => {
+    mocked.listStateResources.mockResolvedValue([
+      { module: 'root', mode: 'managed', type: 'aws_instance', name: 'web', provider: 'aws', instances: 2, instance_keys: [0, 1] },
+    ] as Awaited<ReturnType<typeof api.listStateResources>>)
+    mocked.stateOperation.mockResolvedValue({ status: 'applied', op: 'rm', backup_id: 'b9', serial: 8 } as Awaited<
+      ReturnType<typeof api.stateOperation>
+    >)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.stateOps') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    const addressBox = within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.sources.resourceAddress')}`))
+    fireEvent.mouseDown(addressBox)
+    fireEvent.change(addressBox, { target: { value: 'aws_instance' } })
+    fireEvent.click(await screen.findByText('aws_instance.web'))
+
+    fireEvent.mouseDown(within(dialog).getByRole('combobox', { name: new RegExp(i18n.t('pages.sources.instance') as string) }))
+    fireEvent.click(await screen.findByRole('option', { name: '1' }))
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Apply' }))
+    await waitFor(() =>
+      expect(mocked.stateOperation).toHaveBeenCalledWith('s1', 'app.tfstate', 'rm', 'aws_instance.web[1]', undefined),
+    )
+  })
+
+  it('moves a single instance to a re-keyed indexed address', async () => {
+    mocked.listStateResources.mockResolvedValue([
+      { module: 'module.m', mode: 'managed', type: 'aws_prefix_list', name: 'this', provider: 'aws', instances: 3, instance_keys: ['a', 'b', 'c'] },
+    ] as Awaited<ReturnType<typeof api.listStateResources>>)
+    mocked.stateOperation.mockResolvedValue({ status: 'applied', op: 'mv', backup_id: 'b9', serial: 8 } as Awaited<
+      ReturnType<typeof api.stateOperation>
+    >)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.stateOps') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    // Switch to mv first (select interactions hide the dialog while open).
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.sources.opMove') as string }))
+
+    // Pick the base address, then a single instance as the move source.
+    const addressBox = within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.sources.resourceAddress')}`))
+    fireEvent.mouseDown(addressBox)
+    fireEvent.change(addressBox, { target: { value: 'aws_prefix' } })
+    fireEvent.click(await screen.findByText('module.m.aws_prefix_list.this'))
+
+    fireEvent.mouseDown(within(dialog).getByRole('combobox', { name: new RegExp(i18n.t('pages.sources.instance') as string) }))
+    fireEvent.click(await screen.findByRole('option', { name: 'a' }))
+
+    // The indexed-target hint appears once an instance is chosen.
+    expect(within(dialog).getByText(i18n.t('pages.sources.newAddressInstanceHelper') as string)).toBeInTheDocument()
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.sources.newAddress')}`)), {
+      target: { value: 'module.m.aws_prefix_list.this["z"]' },
+    })
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Apply' }))
+    await waitFor(() =>
+      expect(mocked.stateOperation).toHaveBeenCalledWith(
+        's1',
+        'app.tfstate',
+        'mv',
+        'module.m.aws_prefix_list.this["a"]',
+        'module.m.aws_prefix_list.this["z"]',
+      ),
+    )
+  })
+
   it('requires a destination for mv operations', async () => {
     mocked.stateOperation.mockResolvedValue({ status: 'applied', op: 'mv', backup_id: 'b9', serial: 8 } as Awaited<
       ReturnType<typeof api.stateOperation>
