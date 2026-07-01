@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.18.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.3...v1.18.4) (2026-07-01)
+
+
+### Bug Fixes
+
+* **sources:** let state ops target a single resource instance ([#156](https://github.com/sethbacon/terraform-state-manager-frontend/issues/156)) ([6cd0c34](https://github.com/sethbacon/terraform-state-manager-frontend/commit/6cd0c3404c37b8d0a8cb7106549d5b60c52bc53a))
+
 ## [1.18.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.2...v1.18.3) (2026-06-30)
 
 
