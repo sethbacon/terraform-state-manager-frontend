@@ -24,6 +24,8 @@ vi.mock('../services/api', async (importOriginal) => {
       editState: vi.fn(),
       listBackups: vi.fn(),
       restoreBackup: vi.fn(),
+      getBackupContent: vi.fn(),
+      getBackupDiff: vi.fn(),
       listStateLocks: vi.fn(),
       forceUnlock: vi.fn(),
       downloadReport: vi.fn(),
@@ -308,7 +310,79 @@ describe('SourcesPage', () => {
     fireEvent.click(saveBtn ?? screen.getByText(i18n.t('common.save') as string))
 
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
-    await waitFor(() => expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}'))
+    await waitFor(() =>
+      expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}', false),
+    )
+  })
+
+  it('offers a force override when the save hits a serial/lineage 409', async () => {
+    mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.editState
+      .mockRejectedValueOnce({
+        response: { status: 409, data: { error: 'new serial 8 is lower than current 9; pass force=true to override' } },
+      })
+      .mockResolvedValueOnce({ status: 'written', serial: 8 } as Awaited<ReturnType<typeof api.editState>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabRaw') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.edit') as string }))
+    fireEvent.change(screen.getByDisplayValue(/"serial": 9/), { target: { value: '{"version":4,"serial":8}' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
+
+    // The 409 surfaces the backend's conflict message in an explicit dialog.
+    expect(await screen.findByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).toBeInTheDocument()
+    expect(screen.getByText(/lower than current 9/)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.forceOverwrite') as string }))
+    await waitFor(() =>
+      expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}', true),
+    )
+  })
+
+  it('declines the force-overwrite dialog without retrying the write', async () => {
+    mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.editState.mockRejectedValue({
+      response: { status: 409, data: { error: 'new serial 8 is lower than current 9; pass force=true to override' } },
+    })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabRaw') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.edit') as string }))
+    fireEvent.change(screen.getByDisplayValue(/"serial": 9/), { target: { value: '{"version":4,"serial":8}' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
+
+    // The rejection and the force dialog opening happen after the click
+    // resolves asynchronously — wait for its title before querying dialogs.
+    await screen.findByText(i18n.t('pages.sources.forceOverwriteTitle') as string)
+
+    // The underlying overwrite-confirmation dialog stays mounted alongside the
+    // force dialog, so scope the Cancel click to the force dialog specifically.
+    const forceDialog = screen
+      .getAllByRole('dialog')
+      .find((d) => within(d).queryByText(i18n.t('pages.sources.forceOverwriteTitle') as string))!
+    fireEvent.click(within(forceDialog).getByRole('button', { name: i18n.t('common.cancel') as string }))
+
+    await waitFor(() =>
+      expect(screen.queryByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).not.toBeInTheDocument(),
+    )
+    expect(mocked.editState).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows only the plain alert for non-409 save failures', async () => {
+    mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.editState.mockRejectedValue({ response: { status: 502, data: { error: 'backend write failed' } } })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabRaw') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.edit') as string }))
+    fireEvent.change(screen.getByDisplayValue(/"serial": 9/), { target: { value: '{"version":4,"serial":10}' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
+
+    expect(await screen.findByText('backend write failed')).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).not.toBeInTheDocument()
   })
 
   it('lists backups and restores one', async () => {
@@ -321,6 +395,133 @@ describe('SourcesPage', () => {
     fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.restore') as string }))
     await waitFor(() => expect(mocked.restoreBackup).toHaveBeenCalledWith('s1', 'b1', 'app.tfstate'))
+  })
+
+  it('views backup content in a dialog', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupContent.mockResolvedValue('{"version":4,"serial":6}')
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.viewBackup') as string }))
+
+    await waitFor(() => expect(mocked.getBackupContent).toHaveBeenCalledWith('s1', 'b1'))
+    expect(await screen.findByText(/"serial": 6/)).toBeInTheDocument()
+  })
+
+  it('previews a restore diff and restores from the dialog', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupDiff.mockResolvedValue({
+      key: 'app.tfstate',
+      backup_serial: 6,
+      current_serial: 9,
+      added: [
+        { module: 'root', mode: 'managed', type: 'aws_s3_bucket', name: 'logs', provider: 'aws', instances: 1 },
+      ],
+      removed: [
+        { module: 'root', mode: 'managed', type: 'aws_vpc', name: 'main', provider: 'aws', instances: 1 },
+      ],
+      changed: [],
+      approximate_changed: true,
+    } as Awaited<ReturnType<typeof api.getBackupDiff>>)
+    mocked.restoreBackup.mockResolvedValue(undefined)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.previewRestore') as string }))
+
+    await waitFor(() => expect(mocked.getBackupDiff).toHaveBeenCalledWith('s1', 'b1'))
+    expect(await screen.findByText(/aws_s3_bucket\.logs/)).toBeInTheDocument()
+    expect(screen.getByText(/aws_vpc\.main/)).toBeInTheDocument()
+
+    // The dialog's Restore drives the same restore mutation.
+    fireEvent.click(screen.getByTestId('diff-restore-button'))
+    await waitFor(() => expect(mocked.restoreBackup).toHaveBeenCalledWith('s1', 'b1', 'app.tfstate'))
+  })
+
+  it('shows an error and can be closed when backup content fails to load', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupContent.mockRejectedValue({ response: { status: 500 } })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.viewBackup') as string }))
+
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByText(i18n.t('pages.sources.backupsFailed') as string)).toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.close') as string }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('shows an error when the restore diff preview fails to load', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupDiff.mockRejectedValue({ response: { data: { error: 'diff failed: backup missing' } } })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.previewRestore') as string }))
+
+    expect(await screen.findByText('diff failed: backup missing')).toBeInTheDocument()
+  })
+
+  it('shows the no-changes message when a restore diff has no changes, and closes', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupDiff.mockResolvedValue({
+      key: 'app.tfstate',
+      backup_serial: 6,
+      current_serial: 6,
+      added: [],
+      removed: [],
+      changed: [],
+      approximate_changed: false,
+    } as Awaited<ReturnType<typeof api.getBackupDiff>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.previewRestore') as string }))
+
+    const dialog = await screen.findByRole('dialog')
+    expect(await within(dialog).findByText(i18n.t('pages.sources.diffNoChanges') as string)).toBeInTheDocument()
+    expect(within(dialog).queryByText(i18n.t('pages.sources.diffApproxNote') as string)).not.toBeInTheDocument()
+
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.close') as string }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+  })
+
+  it('flags changed instances with an approximate-comparison note', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupDiff.mockResolvedValue({
+      key: 'app.tfstate',
+      backup_serial: 6,
+      current_serial: 9,
+      added: [],
+      removed: [],
+      changed: [
+        { module: 'root', mode: 'managed', type: 'aws_instance', name: 'web', provider: 'aws', instances: 3 },
+      ],
+      approximate_changed: true,
+    } as Awaited<ReturnType<typeof api.getBackupDiff>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.previewRestore') as string }))
+
+    expect(await screen.findByText(i18n.t('pages.sources.diffChanged') as string)).toBeInTheDocument()
+    expect(screen.getByText(/aws_instance\.web/)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.sources.diffApproxNote') as string)).toBeInTheDocument()
   })
 
   it('downloads reports in each format from the download menu', async () => {

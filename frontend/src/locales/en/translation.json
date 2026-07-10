@@ -797,7 +797,20 @@
       "lockStale": "Stale",
       "forceUnlock": "Force unlock",
       "forceUnlockTitle": "Force-unlock this state?",
-      "forceUnlockBody": "This releases the advisory lock on {{key}} regardless of who holds it. Only do this when the holding operation has crashed - unlocking under a live operation risks concurrent writes."
+      "forceUnlockBody": "This releases the advisory lock on {{key}} regardless of who holds it. Only do this when the holding operation has crashed - unlocking under a live operation risks concurrent writes.",
+      "viewBackup": "View",
+      "previewRestore": "Preview restore",
+      "restoreDiffTitle": "Restore preview: {{key}}",
+      "restoreDiffSerials": "Backup serial {{backup}} vs current {{current}}",
+      "diffAdded": "Restored (re-created in state)",
+      "diffRemoved": "Dropped from state",
+      "diffChanged": "Instances change",
+      "diffApproxNote": "Changed entries compare instance counts and keys, not attribute values - review the backup content for the exact resource attributes.",
+      "diffNoChanges": "Restoring this backup would not change the resource inventory.",
+      "backupContentTitle": "Backup content",
+      "forceOverwriteTitle": "Overwrite conflict",
+      "forceOverwriteBody": "The backend refused this write to protect the state. Forcing past it can lose newer changes or split lineage - only continue if you are certain this content is correct.",
+      "forceOverwrite": "Force overwrite"
     },
     "drift": {
       "pipelines": "Pipeline connections",
