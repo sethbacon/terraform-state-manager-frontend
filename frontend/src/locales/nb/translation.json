@@ -641,7 +641,20 @@
       "lockStale": "Gammelt",
       "forceUnlock": "Tving opplåsing",
       "forceUnlockTitle": "Tvinge opplåsing av denne tilstanden?",
-      "forceUnlockBody": "Dette opphever rådgivningslåsen på {{key}}, uavhengig av hvem som har den. Gjør dette kun når operasjonen som holder låsen har krasjet – å oppheve låsen mens operasjonen pågår medfører risiko for samtidige skrivninger."
+      "forceUnlockBody": "Dette opphever rådgivningslåsen på {{key}}, uavhengig av hvem som har den. Gjør dette kun når operasjonen som holder låsen har krasjet – å oppheve låsen mens operasjonen pågår medfører risiko for samtidige skrivninger.",
+      "viewBackup": "Vis",
+      "previewRestore": "Forhåndsvisning av gjenoppretting",
+      "restoreDiffTitle": "Forhåndsvisning av gjenoppretting: {{key}}",
+      "restoreDiffSerials": "Sikkerhetskopi av serienummer {{backup}} sammenlignet med gjeldende {{current}}",
+      "diffAdded": "Restaurert (gjenopprettet til opprinnelig tilstand)",
+      "diffRemoved": "Fjernet fra delstatslisten",
+      "diffChanged": "Forholdene endrer seg",
+      "diffApproxNote": "Endrede oppføringer sammenligner antall forekomster og nøkler, ikke attributtverdier – sjekk innholdet i sikkerhetskopien for å finne de nøyaktige ressursattributtene.",
+      "diffNoChanges": "Å gjenopprette denne sikkerhetskopien vil ikke endre ressursoversikten.",
+      "backupContentTitle": "Sikkerhetskopiere innhold",
+      "forceOverwriteTitle": "Overskrivingskonflikt",
+      "forceOverwriteBody": "Backenden avviste denne skriveoperasjonen for å beskytte tilstanden. Hvis du tvinger gjennom endringen, kan nyere endringer gå tapt eller linjen kan splittes – fortsett bare hvis du er sikker på at dette innholdet er korrekt.",
+      "forceOverwrite": "Tving overskriving"
     },
     "drift": {
       "pipelines": "Rørledningsforbindelser",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Merk denne driften som observert. Registreringen forblir bekreftet ved gjentatte registreringer og løses automatisk når det rapporteres om en feilfri kjøring.",
       "ackNoteLabel": "Merknad (valgfritt)",
       "ackedBy": "Omtalt av {{actor}}",
-      "recordDetailTitle": "Driftrekord"
+      "recordDetailTitle": "Driftrekord",
+      "severityFilter": "Alvorlighetsgrad",
+      "severityAll": "Alle alvorlighetsgrader",
+      "sourceFilter": "Kilde",
+      "allSources": "Alle kilder",
+      "selectedCount": "{{count}} valgt",
+      "acknowledgeSelected": "Bekreft valg",
+      "resolveSelected": "Løs valgt",
+      "bulkPartialFailure": "{{count}} kunne ikke oppdateres",
+      "sourceOptional": "Kilde (valgfritt)",
+      "stateOptional": "Delstat (valgfritt)"
     },
     "versionLab": {
       "noPipelines": "Ingen rørledningsforbindelser ennå — legg til en på Drift-siden, og gå deretter tilbake hit.",
@@ -844,8 +867,6 @@
       "cron": "Tidsplan",
       "cronHelp": "Cron-uttrykk (f.eks. «0 3 * * *») eller et nøkkelord: daglig, ukentlig, hvert 15. minutt.",
       "pipeline": "CI-prosess",
-      "sourceId": "Kilde-ID (valgfritt)",
-      "stateKey": "Statlig nøkkel (valgfritt)",
       "repoRef": "Repo-referanse (valgfritt)",
       "workingDir": "Arbeidskatalog (valgfritt)",
       "enabled": "Aktivert",
@@ -855,7 +876,9 @@
       "never": "Løp aldri",
       "noSchedules": "Det finnes ingen tidsplaner ennå. Legg til en for å kjøre driftkontroller automatisk.",
       "deleteTitle": "Slett tidsplan",
-      "deleteConfirm": "Skal du slette tidsplanen «{{name}}»? Da vil den slutte å kjøre."
+      "deleteConfirm": "Skal du slette tidsplanen «{{name}}»? Da vil den slutte å kjøre.",
+      "sourceOptional": "Kilde (valgfritt)",
+      "stateOptional": "Delstat (valgfritt)"
     },
     "notifications": {
       "title": "Varsler",

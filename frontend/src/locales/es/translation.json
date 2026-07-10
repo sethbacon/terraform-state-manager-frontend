@@ -641,7 +641,20 @@
       "lockStale": "Rancio",
       "forceUnlock": "Desbloqueo forzado",
       "forceUnlockTitle": "¿Deseas forzar el desbloqueo de este estado?",
-      "forceUnlockBody": "Esto libera el bloqueo de aviso en {{key}}, independientemente de quién lo tenga. Hazlo solo cuando la operación que lo mantiene se haya bloqueado; desbloquearlo mientras la operación está en curso conlleva el riesgo de que se produzcan escrituras simultáneas."
+      "forceUnlockBody": "Esto libera el bloqueo de aviso en {{key}}, independientemente de quién lo tenga. Hazlo solo cuando la operación que lo mantiene se haya bloqueado; desbloquearlo mientras la operación está en curso conlleva el riesgo de que se produzcan escrituras simultáneas.",
+      "viewBackup": "Ver",
+      "previewRestore": "Vista previa de la restauración",
+      "restoreDiffTitle": "Vista previa de «Restore»: {{key}}",
+      "restoreDiffSerials": "{{backup}} de la copia de seguridad frente a {{current}} actual",
+      "diffAdded": "Restaurado (recreado en su estado original)",
+      "diffRemoved": "Excluido del estado",
+      "diffChanged": "Las instancias cambian",
+      "diffApproxNote": "Las entradas modificadas comparan el número de instancias y las claves, no los valores de los atributos: comprueba el contenido de la copia de seguridad para conocer los atributos exactos de los recursos.",
+      "diffNoChanges": "La restauración de esta copia de seguridad no modificaría el inventario de recursos.",
+      "backupContentTitle": "Contenido de respaldo",
+      "forceOverwriteTitle": "Conflicto de sobrescritura",
+      "forceOverwriteBody": "El backend ha rechazado esta operación de escritura para proteger el estado. Si se fuerza la operación, se pueden perder los cambios más recientes o dividirse el linaje; continúa solo si estás seguro de que este contenido es correcto.",
+      "forceOverwrite": "Forzar sobrescritura"
     },
     "drift": {
       "pipelines": "Conexiones de tuberías",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Marca este desplazamiento como visto. El registro se mantiene validado en las nuevas detecciones y se resuelve automáticamente cuando se notifica una ejecución sin errores.",
       "ackNoteLabel": "Nota (opcional)",
       "ackedBy": "Reconocido por {{actor}}",
-      "recordDetailTitle": "Récord de derrape"
+      "recordDetailTitle": "Récord de derrape",
+      "severityFilter": "Gravedad",
+      "severityAll": "Todos los niveles de gravedad",
+      "sourceFilter": "Fuente",
+      "allSources": "Todas las fuentes",
+      "selectedCount": "{{count}} seleccionado",
+      "acknowledgeSelected": "Confirmar selección",
+      "resolveSelected": "Resolver selección",
+      "bulkPartialFailure": "{{count}} no se ha podido actualizar",
+      "sourceOptional": "Fuente (opcional)",
+      "stateOptional": "Estado (opcional)"
     },
     "versionLab": {
       "noPipelines": "Aún no hay conexiones de tuberías: añade una en la página «Drift» y, a continuación, vuelve aquí.",
@@ -844,8 +867,6 @@
       "cron": "Calendario",
       "cronHelp": "Expresión Cron (por ejemplo, «0 3 * * *») o una palabra clave: diario, semanal, cada 15 minutos.",
       "pipeline": "Proceso de integración continua",
-      "sourceId": "ID de origen (opcional)",
-      "stateKey": "Clave de estado (opcional)",
       "repoRef": "Referencia de repositorio (opcional)",
       "workingDir": "Directorio de trabajo (opcional)",
       "enabled": "Activado",
@@ -855,7 +876,9 @@
       "never": "Nunca corras",
       "noSchedules": "Aún no hay programaciones. Añade una para que se realicen comprobaciones de desviación de forma automática.",
       "deleteTitle": "Eliminar programación",
-      "deleteConfirm": "¿Quieres eliminar la tarea programada «{{name}}»? Dejará de ejecutarse."
+      "deleteConfirm": "¿Quieres eliminar la tarea programada «{{name}}»? Dejará de ejecutarse.",
+      "sourceOptional": "Fuente (opcional)",
+      "stateOptional": "Estado (opcional)"
     },
     "notifications": {
       "title": "Notificaciones",

@@ -641,7 +641,20 @@
       "lockStale": "Périmé",
       "forceUnlock": "Déverrouillage forcé",
       "forceUnlockTitle": "Forcer le déverrouillage de cet état ?",
-      "forceUnlockBody": "Cette opération libère le verrou de consultation sur {{key}}, quel que soit l'utilisateur qui le détient. N'effectuez cette opération que si l'opération en cours a échoué ; le déverrouillage pendant une opération en cours risque d'entraîner des écritures simultanées."
+      "forceUnlockBody": "Cette opération libère le verrou de consultation sur {{key}}, quel que soit l'utilisateur qui le détient. N'effectuez cette opération que si l'opération en cours a échoué ; le déverrouillage pendant une opération en cours risque d'entraîner des écritures simultanées.",
+      "viewBackup": "Afficher",
+      "previewRestore": "Aperçu de la restauration",
+      "restoreDiffTitle": "Aperçu de la restauration : {{key}}",
+      "restoreDiffSerials": "{{backup}} de série de sauvegarde par rapport à l'actuel {{current}}",
+      "diffAdded": "Restauré (reconstitué dans son état d'origine)",
+      "diffRemoved": "Retiré de la liste des États",
+      "diffChanged": "Les instances changent",
+      "diffApproxNote": "Les entrées modifiées comparent le nombre d'instances et les clés, et non les valeurs des attributs. Vérifiez le contenu de la sauvegarde pour connaître les attributs exacts des ressources.",
+      "diffNoChanges": "La restauration de cette sauvegarde n'aurait aucune incidence sur l'inventaire des ressources.",
+      "backupContentTitle": "Contenu de sauvegarde",
+      "forceOverwriteTitle": "Conflit de remplacement",
+      "forceOverwriteBody": "Le backend a refusé cette écriture afin de protéger l'état. Le forcer pourrait entraîner la perte des modifications les plus récentes ou une fragmentation de la lignée ; ne continuez que si vous êtes certain que ce contenu est correct.",
+      "forceOverwrite": "Forcer la réécriture"
     },
     "drift": {
       "pipelines": "Raccordements de canalisations",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Marquez ce drift comme « vu ». L'enregistrement reste validé lors des détections ultérieures et est automatiquement résolu lorsqu'un cycle sans anomalie est signalé.",
       "ackNoteLabel": "Remarque (facultative)",
       "ackedBy": "Source : {{actor}}",
-      "recordDetailTitle": "Record de drift"
+      "recordDetailTitle": "Record de drift",
+      "severityFilter": "Gravité",
+      "severityAll": "Tous les niveaux de gravité",
+      "sourceFilter": "Source",
+      "allSources": "Toutes les sources",
+      "selectedCount": "{{count}} sélectionné",
+      "acknowledgeSelected": "Confirmer la sélection",
+      "resolveSelected": "Résolution sélectionnée",
+      "bulkPartialFailure": "{{count}} n'a pas pu être mis à jour",
+      "sourceOptional": "Source (facultatif)",
+      "stateOptional": "État (facultatif)"
     },
     "versionLab": {
       "noPipelines": "Il n'y a pas encore de liens vers des pipelines — ajoutez-en un sur la page « Drift », puis revenez ici.",
@@ -844,8 +867,6 @@
       "cron": "Calendrier",
       "cronHelp": "Expression Cron (par exemple « 0 3 * * * ») ou mot-clé : quotidien, hebdomadaire, toutes les 15 minutes.",
       "pipeline": "Pipeline d'intégration continue",
-      "sourceId": "Identifiant de la source (facultatif)",
-      "stateKey": "Clé d'état (facultative)",
       "repoRef": "Référence de la opération de pension (facultatif)",
       "workingDir": "Répertoire de travail (facultatif)",
       "enabled": "Activé",
@@ -855,7 +876,9 @@
       "never": "Ne cours jamais",
       "noSchedules": "Il n'y a pas encore de planification. Ajoutez-en une pour lancer automatiquement les contrôles de dérive.",
       "deleteTitle": "Supprimer la planification",
-      "deleteConfirm": "Supprimer la tâche planifiée « {{name}} » ? Elle cessera alors de s'exécuter."
+      "deleteConfirm": "Supprimer la tâche planifiée « {{name}} » ? Elle cessera alors de s'exécuter.",
+      "sourceOptional": "Source (facultatif)",
+      "stateOptional": "État (facultatif)"
     },
     "notifications": {
       "title": "Notifications",

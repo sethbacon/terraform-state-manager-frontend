@@ -641,7 +641,20 @@
       "lockStale": "Abgelaufen",
       "forceUnlock": "Erzwungene Entsperrung",
       "forceUnlockTitle": "Diesen Zustand zwangsweise aufheben?",
-      "forceUnlockBody": "Dadurch wird die Beratungssperre für „{{key}}“ aufgehoben, unabhängig davon, wer sie hält. Führen Sie diesen Schritt nur durch, wenn der Vorgang, der die Sperre hält, abgestürzt ist – eine Aufhebung der Sperre während eines laufenden Vorgangs birgt das Risiko gleichzeitiger Schreibvorgänge."
+      "forceUnlockBody": "Dadurch wird die Beratungssperre für „{{key}}“ aufgehoben, unabhängig davon, wer sie hält. Führen Sie diesen Schritt nur durch, wenn der Vorgang, der die Sperre hält, abgestürzt ist – eine Aufhebung der Sperre während eines laufenden Vorgangs birgt das Risiko gleichzeitiger Schreibvorgänge.",
+      "viewBackup": "Anzeigen",
+      "previewRestore": "Vorschau der Wiederherstellung",
+      "restoreDiffTitle": "Vorschau der Wiederherstellung: {{key}}",
+      "restoreDiffSerials": "Seriennummer im Backup: {{backup}} im Vergleich zur aktuellen: {{current}}",
+      "diffAdded": "Restauriert (in den ursprünglichen Zustand zurückversetzt)",
+      "diffRemoved": "Aus dem Bundesstaat gestrichen",
+      "diffChanged": "Instanzen ändern sich",
+      "diffApproxNote": "Bei geänderten Einträgen werden die Anzahl der Instanzen und die Schlüssel verglichen, nicht die Attributwerte – überprüfen Sie den Inhalt der Sicherung auf die genauen Ressourcenattribute.",
+      "diffNoChanges": "Das Wiederherstellen dieser Sicherung hätte keine Auswirkungen auf den Ressourcenbestand.",
+      "backupContentTitle": "Inhalt der Sicherungskopie",
+      "forceOverwriteTitle": "Überschreibkonflikt",
+      "forceOverwriteBody": "Das Backend hat diesen Schreibvorgang abgelehnt, um den Zustand zu schützen. Wenn Sie den Vorgang dennoch erzwingen, können neuere Änderungen verloren gehen oder die Versionskette unterbrochen werden – fahren Sie nur fort, wenn Sie sicher sind, dass dieser Inhalt korrekt ist.",
+      "forceOverwrite": "Überschreiben erzwingen"
     },
     "drift": {
       "pipelines": "Rohrleitungsanschlüsse",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Markieren Sie diese Abweichung als gesehen. Der Datensatz bleibt auch bei erneuter Erkennung bestätigt und wird automatisch aufgelöst, sobald ein fehlerfreier Durchlauf gemeldet wird.",
       "ackNoteLabel": "Anmerkung (optional)",
       "ackedBy": "Anerkannt von {{actor}}",
-      "recordDetailTitle": "Drift-Rekord"
+      "recordDetailTitle": "Drift-Rekord",
+      "severityFilter": "Schweregrad",
+      "severityAll": "Alle Schweregrade",
+      "sourceFilter": "Quelle",
+      "allSources": "Alle Quellen",
+      "selectedCount": "{{count}} ausgewählt",
+      "acknowledgeSelected": "Ausgewählt bestätigen",
+      "resolveSelected": "Ausgewählte auflösen",
+      "bulkPartialFailure": "{{count}} konnte nicht aktualisiert werden",
+      "sourceOptional": "Quelle (optional)",
+      "stateOptional": "Bundesland (optional)"
     },
     "versionLab": {
       "noPipelines": "Es gibt noch keine Pipeline-Verbindungen – fügen Sie eine auf der Seite „Drift“ hinzu und kehren Sie dann hierher zurück.",
@@ -844,8 +867,6 @@
       "cron": "Zeitplan",
       "cronHelp": "Cron-Ausdruck (z. B. „0 3 * * *“) oder ein Schlüsselwort: täglich, wöchentlich, alle 15 Minuten.",
       "pipeline": "CI-Pipeline",
-      "sourceId": "Quell-ID (optional)",
-      "stateKey": "Zustandsschlüssel (optional)",
       "repoRef": "Repo-Referenz (optional)",
       "workingDir": "Arbeitsverzeichnis (optional)",
       "enabled": "Aktiviert",
@@ -855,7 +876,9 @@
       "never": "Niemals laufen",
       "noSchedules": "Es gibt noch keine Zeitpläne. Fügen Sie einen hinzu, um Drift-Prüfungen automatisch durchzuführen.",
       "deleteTitle": "Zeitplan löschen",
-      "deleteConfirm": "Den Zeitplan „{{name}}“ löschen? Dann wird die Ausführung beendet."
+      "deleteConfirm": "Den Zeitplan „{{name}}“ löschen? Dann wird die Ausführung beendet.",
+      "sourceOptional": "Quelle (optional)",
+      "stateOptional": "Bundesland (optional)"
     },
     "notifications": {
       "title": "Benachrichtigungen",
