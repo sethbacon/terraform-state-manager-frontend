@@ -462,6 +462,19 @@ export interface Backup {
   created_at: string
 }
 
+// Restore preview: resources restoring a backup would re-create (added), drop
+// (removed), or alter (changed) vs the current state. changed is an
+// instance-count/key approximation, flagged by approximate_changed.
+export interface BackupDiff {
+  key: string
+  backup_serial: number | null
+  current_serial: number | null
+  added: ResourceSummary[]
+  removed: ResourceSummary[]
+  changed: ResourceSummary[]
+  approximate_changed: boolean
+}
+
 // An app-level advisory lock currently held on a state key. Age judgement
 // (vs the backend's 15-minute stale TTL) is up to the caller.
 export interface StateLock {
@@ -1070,6 +1083,18 @@ export const api = {
   restoreBackup: async (id: string, backupId: string, key: string): Promise<void> => {
     await apiClient.post(`/api/v1/sources/${id}/state/backups/${backupId}/restore`, null, { params: { key } })
   },
+  // The stored backup's full state JSON, returned raw (list responses omit it).
+  getBackupContent: async (id: string, backupId: string): Promise<string> =>
+    (
+      await apiClient.get<string>(`/api/v1/sources/${id}/state/backups/${backupId}`, {
+        responseType: 'text',
+        transformResponse: [(d) => d], // keep the exact stored bytes, no JSON parse
+      })
+    ).data,
+  // Restore preview: what restoring the backup would add/remove/change vs the
+  // current state. "changed" is an instance-count/key approximation.
+  getBackupDiff: async (id: string, backupId: string): Promise<BackupDiff> =>
+    (await apiClient.get<BackupDiff>(`/api/v1/sources/${id}/state/backups/${backupId}/diff`)).data,
   listStateLocks: async (id: string): Promise<StateLock[]> =>
     (await apiClient.get<{ locks: StateLock[] }>(`/api/v1/sources/${id}/state/locks`)).data.locks,
   // Admin-only: release the app-level advisory lock on a key regardless of

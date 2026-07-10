@@ -24,6 +24,8 @@ vi.mock('../services/api', async (importOriginal) => {
       editState: vi.fn(),
       listBackups: vi.fn(),
       restoreBackup: vi.fn(),
+      getBackupContent: vi.fn(),
+      getBackupDiff: vi.fn(),
       listStateLocks: vi.fn(),
       forceUnlock: vi.fn(),
       downloadReport: vi.fn(),
@@ -308,7 +310,49 @@ describe('SourcesPage', () => {
     fireEvent.click(saveBtn ?? screen.getByText(i18n.t('common.save') as string))
 
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
-    await waitFor(() => expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}'))
+    await waitFor(() =>
+      expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}', false),
+    )
+  })
+
+  it('offers a force override when the save hits a serial/lineage 409', async () => {
+    mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.editState
+      .mockRejectedValueOnce({
+        response: { status: 409, data: { error: 'new serial 8 is lower than current 9; pass force=true to override' } },
+      })
+      .mockResolvedValueOnce({ status: 'written', serial: 8 } as Awaited<ReturnType<typeof api.editState>>)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabRaw') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.edit') as string }))
+    fireEvent.change(screen.getByDisplayValue(/"serial": 9/), { target: { value: '{"version":4,"serial":8}' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
+
+    // The 409 surfaces the backend's conflict message in an explicit dialog.
+    expect(await screen.findByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).toBeInTheDocument()
+    expect(screen.getByText(/lower than current 9/)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.forceOverwrite') as string }))
+    await waitFor(() =>
+      expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}', true),
+    )
+  })
+
+  it('shows only the plain alert for non-409 save failures', async () => {
+    mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.editState.mockRejectedValue({ response: { status: 502, data: { error: 'backend write failed' } } })
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabRaw') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.edit') as string }))
+    fireEvent.change(screen.getByDisplayValue(/"serial": 9/), { target: { value: '{"version":4,"serial":10}' } })
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.overwrite') as string }))
+
+    expect(await screen.findByText('backend write failed')).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).not.toBeInTheDocument()
   })
 
   it('lists backups and restores one', async () => {
@@ -320,6 +364,52 @@ describe('SourcesPage', () => {
 
     fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
     fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.restore') as string }))
+    await waitFor(() => expect(mocked.restoreBackup).toHaveBeenCalledWith('s1', 'b1', 'app.tfstate'))
+  })
+
+  it('views backup content in a dialog', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupContent.mockResolvedValue('{"version":4,"serial":6}')
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.viewBackup') as string }))
+
+    await waitFor(() => expect(mocked.getBackupContent).toHaveBeenCalledWith('s1', 'b1'))
+    expect(await screen.findByText(/"serial": 6/)).toBeInTheDocument()
+  })
+
+  it('previews a restore diff and restores from the dialog', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', source_id: 's1', state_key: 'app.tfstate', serial: 6, created_by: 'alice', created_at: '2026-06-10T00:00:00Z' },
+    ] as Awaited<ReturnType<typeof api.listBackups>>)
+    mocked.getBackupDiff.mockResolvedValue({
+      key: 'app.tfstate',
+      backup_serial: 6,
+      current_serial: 9,
+      added: [
+        { module: 'root', mode: 'managed', type: 'aws_s3_bucket', name: 'logs', provider: 'aws', instances: 1 },
+      ],
+      removed: [
+        { module: 'root', mode: 'managed', type: 'aws_vpc', name: 'main', provider: 'aws', instances: 1 },
+      ],
+      changed: [],
+      approximate_changed: true,
+    } as Awaited<ReturnType<typeof api.getBackupDiff>>)
+    mocked.restoreBackup.mockResolvedValue(undefined)
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('pages.sources.previewRestore') as string }))
+
+    await waitFor(() => expect(mocked.getBackupDiff).toHaveBeenCalledWith('s1', 'b1'))
+    expect(await screen.findByText(/aws_s3_bucket\.logs/)).toBeInTheDocument()
+    expect(screen.getByText(/aws_vpc\.main/)).toBeInTheDocument()
+
+    // The dialog's Restore drives the same restore mutation.
+    fireEvent.click(screen.getByTestId('diff-restore-button'))
     await waitFor(() => expect(mocked.restoreBackup).toHaveBeenCalledWith('s1', 'b1', 'app.tfstate'))
   })
 

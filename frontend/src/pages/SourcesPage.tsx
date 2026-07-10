@@ -51,6 +51,7 @@ import {
   api,
   type AnalysisResult,
   type ModuleFreshness,
+  type ResourceSummary,
   type StateSource,
   type TransferResult,
 } from '../services/api'
@@ -1131,6 +1132,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [forceConfirmOpen, setForceConfirmOpen] = useState(false)
 
   const q = useQuery({
     queryKey: queryKeys.sources.raw(sourceId, stateKey),
@@ -1151,11 +1153,19 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
   }
 
   const saveMutation = useMutation({
-    mutationFn: () => api.editState(sourceId, stateKey, draft),
+    mutationFn: (vars?: { force?: boolean }) => api.editState(sourceId, stateKey, draft, vars?.force ?? false),
     onSuccess: () => {
       setEditing(false)
       setConfirmOpen(false)
+      setForceConfirmOpen(false)
       invalidateState()
+    },
+    onError: (e) => {
+      // A serial/lineage conflict is recoverable: the backend supports
+      // ?force=true, so offer it explicitly instead of dead-ending.
+      if ((e as { response?: { status?: number } })?.response?.status === 409) {
+        setForceConfirmOpen(true)
+      }
     },
   })
 
@@ -1218,7 +1228,7 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
             sx={{ '& textarea': { fontFamily: 'monospace', fontSize: 12 } }}
             fullWidth
           />
-          {saveMutation.isError && <Alert severity="error">{errMsg(saveMutation.error)}</Alert>}
+          {saveMutation.isError && !forceConfirmOpen && <Alert severity="error">{errMsg(saveMutation.error)}</Alert>}
         </>
       ) : (
         <Box
@@ -1251,8 +1261,29 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)}>{t('common.cancel')}</Button>
-          <Button color="warning" variant="contained" disabled={saveMutation.isPending} onClick={() => saveMutation.mutate()}>
+          <Button color="warning" variant="contained" disabled={saveMutation.isPending} onClick={() => saveMutation.mutate(undefined)}>
             {t('pages.sources.overwrite')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={forceConfirmOpen} onClose={() => setForceConfirmOpen(false)}>
+        <DialogTitle>{t('pages.sources.forceOverwriteTitle')}</DialogTitle>
+        <DialogContent>
+          <Stack spacing={2}>
+            <Alert severity="warning">{errMsg(saveMutation.error)}</Alert>
+            <Typography>{t('pages.sources.forceOverwriteBody')}</Typography>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setForceConfirmOpen(false)}>{t('common.cancel')}</Button>
+          <Button
+            color="error"
+            variant="contained"
+            disabled={saveMutation.isPending}
+            onClick={() => saveMutation.mutate({ force: true })}
+          >
+            {t('pages.sources.forceOverwrite')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -1265,6 +1296,8 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
   const queryClient = useQueryClient()
   const { hasScope } = useAuth()
   const canEdit = hasScope('state:write')
+  const [viewBackupId, setViewBackupId] = useState<string | null>(null)
+  const [diffBackupId, setDiffBackupId] = useState<string | null>(null)
 
   const q = useQuery({
     queryKey: queryKeys.sources.backups(sourceId, stateKey),
@@ -1316,6 +1349,12 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
               <TableCell align="right">{b.serial ?? '—'}</TableCell>
               <TableCell sx={{ wordBreak: 'break-all' }}>{b.created_by || '—'}</TableCell>
               <TableCell align="right">
+                <Button size="small" onClick={() => setViewBackupId(b.id)}>
+                  {t('pages.sources.viewBackup')}
+                </Button>
+                <Button size="small" onClick={() => setDiffBackupId(b.id)}>
+                  {t('pages.sources.previewRestore')}
+                </Button>
                 <Button
                   size="small"
                   disabled={!canEdit || restoreMutation.isPending}
@@ -1328,7 +1367,174 @@ function BackupsTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
           ))}
         </TableBody>
       </Table>
+
+      <BackupContentDialog
+        sourceId={sourceId}
+        backupId={viewBackupId}
+        onClose={() => setViewBackupId(null)}
+      />
+      <BackupDiffDialog
+        sourceId={sourceId}
+        stateKey={stateKey}
+        backupId={diffBackupId}
+        canRestore={canEdit && !restoreMutation.isPending}
+        onRestore={(backupId) => {
+          setDiffBackupId(null)
+          restoreMutation.mutate(backupId)
+        }}
+        onClose={() => setDiffBackupId(null)}
+      />
     </Stack>
+  )
+}
+
+// BackupContentDialog shows a stored backup's full state JSON (pretty-printed
+// like the Raw tab), fetched only while open.
+function BackupContentDialog({
+  sourceId,
+  backupId,
+  onClose,
+}: {
+  sourceId: string
+  backupId: string | null
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const q = useQuery({
+    queryKey: queryKeys.sources.backupContent(sourceId, backupId ?? ''),
+    queryFn: () => api.getBackupContent(sourceId, backupId ?? ''),
+    enabled: backupId !== null,
+  })
+
+  let pretty = q.data ?? ''
+  try {
+    pretty = JSON.stringify(JSON.parse(pretty), null, 2)
+  } catch {
+    // not valid JSON — show as-is
+  }
+
+  return (
+    <Dialog open={backupId !== null} onClose={onClose} maxWidth="md" fullWidth>
+      <DialogTitle>{t('pages.sources.backupContentTitle')}</DialogTitle>
+      <DialogContent>
+        {q.isLoading && <CircularProgress size={20} />}
+        {q.isError && <Alert severity="error">{t('pages.sources.backupsFailed')}</Alert>}
+        {q.data !== undefined && (
+          <Box
+            component="pre"
+            sx={{
+              m: 0,
+              p: 2,
+              maxHeight: 480,
+              overflow: 'auto',
+              fontSize: 12,
+              bgcolor: 'action.hover',
+              borderRadius: 1,
+              whiteSpace: 'pre-wrap',
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {pretty}
+          </Box>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.close')}</Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+// BackupDiffDialog previews what restoring a backup would change, with a
+// restore button so the preview doubles as the confirmation step.
+function BackupDiffDialog({
+  sourceId,
+  stateKey,
+  backupId,
+  canRestore,
+  onRestore,
+  onClose,
+}: {
+  sourceId: string
+  stateKey: string
+  backupId: string | null
+  canRestore: boolean
+  onRestore: (backupId: string) => void
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const q = useQuery({
+    queryKey: queryKeys.sources.backupDiff(sourceId, backupId ?? ''),
+    queryFn: () => api.getBackupDiff(sourceId, backupId ?? ''),
+    enabled: backupId !== null,
+  })
+
+  const address = (r: ResourceSummary) =>
+    `${r.module && r.module !== 'root' ? r.module + '.' : ''}${r.type}.${r.name}`
+
+  const buckets: { key: string; title: string; color: 'success' | 'error' | 'warning'; sign: string; rows: ResourceSummary[] }[] =
+    q.data
+      ? [
+        { key: 'added', title: t('pages.sources.diffAdded'), color: 'success', sign: '+', rows: q.data.added },
+        { key: 'removed', title: t('pages.sources.diffRemoved'), color: 'error', sign: '−', rows: q.data.removed },
+        { key: 'changed', title: t('pages.sources.diffChanged'), color: 'warning', sign: '~', rows: q.data.changed },
+      ]
+      : []
+  const noChanges = q.data && buckets.every((b) => b.rows.length === 0)
+
+  return (
+    <Dialog open={backupId !== null} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{t('pages.sources.restoreDiffTitle', { key: stateKey })}</DialogTitle>
+      <DialogContent>
+        {q.isLoading && <CircularProgress size={20} />}
+        {q.isError && <Alert severity="error">{errMsg(q.error)}</Alert>}
+        {q.data && (
+          <Stack spacing={2}>
+            <Typography variant="body2" color="text.secondary">
+              {t('pages.sources.restoreDiffSerials', {
+                backup: q.data.backup_serial ?? '—',
+                current: q.data.current_serial ?? '—',
+              })}
+            </Typography>
+            {noChanges && <Alert severity="info">{t('pages.sources.diffNoChanges')}</Alert>}
+            {buckets
+              .filter((b) => b.rows.length > 0)
+              .map((b) => (
+                <Box key={b.key}>
+                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
+                    {b.title}
+                  </Typography>
+                  <Stack spacing={0.5}>
+                    {b.rows.map((r) => (
+                      <Stack key={address(r)} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                        <Chip size="small" color={b.color} variant="outlined" label={b.sign} />
+                        <Typography variant="body2" sx={{ fontFamily: 'monospace' }}>
+                          {address(r)}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Box>
+              ))}
+            {q.data.changed.length > 0 && (
+              <Alert severity="info">{t('pages.sources.diffApproxNote')}</Alert>
+            )}
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.close')}</Button>
+        <Button
+          color="warning"
+          variant="contained"
+          disabled={!canRestore || !backupId}
+          onClick={() => backupId && onRestore(backupId)}
+          data-testid="diff-restore-button"
+        >
+          {t('pages.sources.restore')}
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
