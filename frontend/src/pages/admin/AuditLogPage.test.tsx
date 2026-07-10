@@ -7,7 +7,7 @@ import i18n from '../../i18n'
 
 vi.mock('../../services/api', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../services/api')>()
-  return { ...actual, api: { listAuditLogs: vi.fn() } }
+  return { ...actual, api: { listAuditLogs: vi.fn(), exportAuditLogs: vi.fn() } }
 })
 
 const mocked = vi.mocked(api)
@@ -101,23 +101,32 @@ describe('AuditLogPage', () => {
     await waitFor(() => expect(screen.queryByText(/app\.tfstate/)).not.toBeInTheDocument())
   })
 
-  it('exports the filtered rows as CSV and JSON', async () => {
+  it('exports server-side with the active filters', async () => {
     const createObjectURL = vi.fn(() => 'blob:audit')
     const revokeObjectURL = vi.fn()
     // Subclass URL so it stays constructable: link.click() triggers happy-dom
     // navigation that calls `new URL` on a microtask, which a plain object stub
     // can't satisfy (leaks an unhandled TypeError under --coverage).
     vi.stubGlobal('URL', Object.assign(class extends URL { }, { createObjectURL, revokeObjectURL }))
+    mocked.exportAuditLogs.mockResolvedValue(new Blob(['csv'], { type: 'text/csv' }))
 
     renderPage()
     await screen.findByText('state.edit')
 
+    // Narrow by resource type so the export must carry the active filter.
+    fireEvent.mouseDown(screen.getByLabelText(new RegExp(i18n.t('admin.auditLog.labelResourceType') as string)))
+    fireEvent.click(await screen.findByRole('option', { name: 'state' }))
+
     fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('admin.auditLog.export') as string, 'i') }))
     fireEvent.click(await screen.findByText(i18n.t('admin.auditLog.exportCsv') as string))
-    await waitFor(() => expect(createObjectURL).toHaveBeenCalledTimes(1)) // export re-fetches before serializing
+    await waitFor(() =>
+      expect(mocked.exportAuditLogs).toHaveBeenCalledWith('csv', expect.objectContaining({ resource_type: 'state' })),
+    )
+    await waitFor(() => expect(createObjectURL).toHaveBeenCalledTimes(1))
 
     fireEvent.click(screen.getByRole('button', { name: new RegExp(i18n.t('admin.auditLog.export') as string, 'i') }))
     fireEvent.click(await screen.findByText(i18n.t('admin.auditLog.exportJson') as string))
+    await waitFor(() => expect(mocked.exportAuditLogs).toHaveBeenCalledWith('json', expect.anything()))
     await waitFor(() => expect(createObjectURL).toHaveBeenCalledTimes(2))
     expect(revokeObjectURL).toHaveBeenCalledTimes(2)
     vi.unstubAllGlobals()

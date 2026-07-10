@@ -50,10 +50,8 @@ const RESOURCE_TYPES = [
   'sso',
 ]
 
-// Client-side export helpers (registry pattern): serialize the currently
-// filtered rows and trigger a browser download via a temporary blob URL.
-function download(filename: string, mime: string, content: string) {
-  const blob = new Blob([content], { type: mime })
+// Trigger a browser download of a served blob via a temporary object URL.
+function download(filename: string, blob: Blob) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -62,19 +60,6 @@ function download(filename: string, mime: string, content: string) {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
-}
-
-function exportCSV(logs: AuditLogEntry[]) {
-  const header = ['created_at', 'action', 'resource_type', 'resource_id', 'user_email', 'user_name', 'ip_address']
-  const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-  const rows = logs.map((l) =>
-    [l.created_at, l.action, l.resource_type, l.resource_id, l.user_email, l.user_name, l.ip_address].map(esc).join(','),
-  )
-  download('audit-logs.csv', 'text/csv', [header.join(','), ...rows].join('\n'))
-}
-
-function exportJSON(logs: AuditLogEntry[]) {
-  download('audit-logs.json', 'application/json', JSON.stringify(logs, null, 2))
 }
 
 export default function AuditLogPage() {
@@ -139,9 +124,10 @@ export default function AuditLogPage() {
   const handleExport = async (format: 'csv' | 'json') => {
     setExportAnchor(null)
     try {
-      const result = await api.listAuditLogs({ per_page: 1000, ...filterParams })
-      if (format === 'csv') exportCSV(result.logs ?? [])
-      else exportJSON(result.logs ?? [])
+      // Server-side export: complete filtered extract, not just one page (the
+      // old client-side path was silently capped at a single 50-row page).
+      const blob = await api.exportAuditLogs(format, filterParams)
+      download(`audit-logs.${format}`, blob)
     } catch {
       setError(t('admin.auditLog.errExport'))
     }
