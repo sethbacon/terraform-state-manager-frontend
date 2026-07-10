@@ -641,7 +641,20 @@
       "lockStale": "Vecchio",
       "forceUnlock": "Sblocco forzato",
       "forceUnlockTitle": "Sbloccare forzatamente questo stato?",
-      "forceUnlockBody": "Questa operazione sblocca il blocco di advisory su {{key}}, indipendentemente da chi lo detiene. Eseguire questa operazione solo se l'operazione di detenzione si è interrotta: lo sblocco durante un'operazione in corso comporta il rischio di scritture concorrenti."
+      "forceUnlockBody": "Questa operazione sblocca il blocco di advisory su {{key}}, indipendentemente da chi lo detiene. Eseguire questa operazione solo se l'operazione di detenzione si è interrotta: lo sblocco durante un'operazione in corso comporta il rischio di scritture concorrenti.",
+      "viewBackup": "Visualizza",
+      "previewRestore": "Anteprima del ripristino",
+      "restoreDiffTitle": "Anteprima del ripristino: {{key}}",
+      "restoreDiffSerials": "{{backup}} seriale di backup rispetto a quello attuale {{current}}",
+      "diffAdded": "Restaurato (ricreato nello stato originario)",
+      "diffRemoved": "Escluso dallo Stato",
+      "diffChanged": "Le istanze cambiano",
+      "diffApproxNote": "Le voci modificate mettono a confronto il numero di istanze e le chiavi, non i valori degli attributi: verificare il contenuto del backup per conoscere gli attributi esatti delle risorse.",
+      "diffNoChanges": "Il ripristino di questo backup non modificherebbe l'inventario delle risorse.",
+      "backupContentTitle": "Contenuti di backup",
+      "forceOverwriteTitle": "Conflitto di sovrascrittura",
+      "forceOverwriteBody": "Il backend ha rifiutato questa operazione di scrittura per proteggere lo stato del sistema. Se si forza l'operazione, si rischia di perdere le modifiche più recenti o di frammentare la genealogia; procedere solo se si è certi che il contenuto sia corretto.",
+      "forceOverwrite": "Sovrascrittura forzata"
     },
     "drift": {
       "pipelines": "Collegamenti delle condutture",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Contrassegna questo drift come rilevato. Il record rimane contrassegnato anche in caso di nuovi rilevamenti e viene risolto automaticamente quando viene segnalato un ciclo di funzionamento regolare.",
       "ackNoteLabel": "Nota (facoltativa)",
       "ackedBy": "Riconoscimento a cura di {{actor}}",
-      "recordDetailTitle": "Record di drift"
+      "recordDetailTitle": "Record di drift",
+      "severityFilter": "Gravità",
+      "severityAll": "Tutti i livelli di gravità",
+      "sourceFilter": "Fonte",
+      "allSources": "Tutte le fonti",
+      "selectedCount": "{{count}} selezionato",
+      "acknowledgeSelected": "Selezionato: Conferma",
+      "resolveSelected": "Seleziona \"Risolvi\"",
+      "bulkPartialFailure": "{{count}} non è stato possibile aggiornarlo",
+      "sourceOptional": "Fonte (facoltativa)",
+      "stateOptional": "Stato (facoltativo)"
     },
     "versionLab": {
       "noPipelines": "Non ci sono ancora collegamenti alla pipeline: aggiungine uno nella pagina Drift, poi torna qui.",
@@ -844,8 +867,6 @@
       "cron": "Programma",
       "cronHelp": "Espressione Cron (ad es. \"0 3 * * *\") o una parola chiave: giornaliera, settimanale, ogni 15 minuti.",
       "pipeline": "Pipeline CI",
-      "sourceId": "ID sorgente (facoltativo)",
-      "stateKey": "Chiave di stato (facoltativa)",
       "repoRef": "Riferimento al repo (facoltativo)",
       "workingDir": "Directory di lavoro (facoltativa)",
       "enabled": "Abilitato",
@@ -855,7 +876,9 @@
       "never": "Non correre mai",
       "noSchedules": "Non ci sono ancora pianificazioni. Aggiungine una per eseguire automaticamente i controlli di deriva.",
       "deleteTitle": "Elimina programma",
-      "deleteConfirm": "Elimina la pianificazione “{{name}}”? La sua esecuzione verrà interrotta."
+      "deleteConfirm": "Elimina la pianificazione “{{name}}”? La sua esecuzione verrà interrotta.",
+      "sourceOptional": "Fonte (facoltativa)",
+      "stateOptional": "Stato (facoltativo)"
     },
     "notifications": {
       "title": "Notifiche",
