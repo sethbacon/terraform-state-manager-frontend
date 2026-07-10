@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "観測された",
       "historySerial": "連続",
       "historyTfVersion": "Terraform",
-      "historySize": "サイズ"
+      "historySize": "サイズ",
+      "locksTitle": "アクティブ・ロック ({{count}})",
+      "lockHeldBy": "{{since}} 以降、{{actor}} が運営しています。",
+      "lockUnknownActor": "不明",
+      "lockStale": "古くなった",
+      "forceUnlock": "強制アンロック",
+      "forceUnlockTitle": "この状態を強制的に解除しますか？",
+      "forceUnlockBody": "これにより、{{key}} に対するアドバイザリロックが解除されます。ロックを保持しているユーザーが誰であるかには関係ありません。この操作は、ロック保持操作がクラッシュした場合にのみ実行してください。稼働中の操作中にロックを解除すると、同時書き込みが発生するリスクがあります。"
     },
     "drift": {
       "pipelines": "パイプラインの接続",
