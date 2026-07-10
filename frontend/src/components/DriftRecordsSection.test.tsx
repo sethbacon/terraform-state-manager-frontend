@@ -76,6 +76,7 @@ beforeEach(() => {
   mocked.listDriftRecords.mockResolvedValue({
     records: [openRecord, ackedRecord],
     counts: { open: 1, acknowledged: 1 },
+    total: 2,
   })
 })
 
@@ -87,11 +88,13 @@ describe('DriftRecordsSection', () => {
     expect(screen.getByText(`${i18n.t('pages.drift.recordOpen')}: 1`)).toBeInTheDocument()
     expect(screen.getByText(`${i18n.t('pages.drift.recordAcknowledged')}: 1`)).toBeInTheDocument()
     // Active view requests only open+acknowledged.
-    expect(mocked.listDriftRecords).toHaveBeenCalledWith(['open', 'acknowledged'])
+    expect(mocked.listDriftRecords).toHaveBeenCalledWith(
+      expect.objectContaining({ statuses: ['open', 'acknowledged'] }),
+    )
   })
 
   it('shows the all-clear state when nothing is drifted', async () => {
-    mocked.listDriftRecords.mockResolvedValue({ records: [], counts: {} })
+    mocked.listDriftRecords.mockResolvedValue({ records: [], counts: {}, total: 0 })
     renderSection()
     expect(await screen.findByText(i18n.t('pages.drift.noActiveRecords') as string)).toBeInTheDocument()
   })
@@ -131,7 +134,68 @@ describe('DriftRecordsSection', () => {
     renderSection()
     await screen.findByText(/estate \/ envs\/prod.tfstate/)
     fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.recordsAll') as string }))
-    await waitFor(() => expect(mocked.listDriftRecords).toHaveBeenCalledWith(undefined))
+    await waitFor(() =>
+      expect(mocked.listDriftRecords).toHaveBeenLastCalledWith(expect.objectContaining({ statuses: undefined })),
+    )
+  })
+
+  it('filters by severity and source', async () => {
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+
+    fireEvent.click(screen.getByRole('button', { name: /critical/i }))
+    await waitFor(() =>
+      expect(mocked.listDriftRecords).toHaveBeenLastCalledWith(expect.objectContaining({ severity: 'critical' })),
+    )
+
+    fireEvent.mouseDown(screen.getByLabelText(i18n.t('pages.drift.sourceFilter') as string))
+    fireEvent.click(await screen.findByRole('option', { name: 'estate' }))
+    await waitFor(() =>
+      expect(mocked.listDriftRecords).toHaveBeenLastCalledWith(expect.objectContaining({ sourceId: 's1' })),
+    )
+  })
+
+  it('paginates server-side', async () => {
+    mocked.listDriftRecords.mockResolvedValue({
+      records: [openRecord, ackedRecord],
+      counts: { open: 1, acknowledged: 1 },
+      total: 60,
+    })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+
+    fireEvent.click(screen.getByRole('button', { name: /next page/i }))
+    await waitFor(() => expect(mocked.listDriftRecords).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2 })))
+  })
+
+  it('bulk-acknowledges the selected open records', async () => {
+    mocked.acknowledgeDriftRecord.mockResolvedValue({ ...openRecord, status: 'acknowledged' })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+
+    fireEvent.click(screen.getAllByRole('checkbox')[1]) // row 0 (index 0 is header select-all)
+    expect(screen.getByText(i18n.t('pages.drift.selectedCount', { count: 1 }) as string)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.acknowledgeSelected') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.acknowledge') as string }))
+    await waitFor(() => expect(mocked.acknowledgeDriftRecord).toHaveBeenCalledWith('r1', ''))
+    expect(mocked.acknowledgeDriftRecord).toHaveBeenCalledTimes(1)
+  })
+
+  it('bulk-resolves the selected records and reports partial failure', async () => {
+    mocked.resolveDriftRecord.mockResolvedValueOnce({ ...openRecord, status: 'resolved' })
+    mocked.resolveDriftRecord.mockRejectedValueOnce({ response: { data: { error: 'already resolved' } } })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+
+    const rowCheckboxes = screen.getAllByRole('checkbox').slice(1)
+    fireEvent.click(rowCheckboxes[0])
+    fireEvent.click(rowCheckboxes[1])
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.resolveSelected') as string }))
+    await waitFor(() => expect(mocked.resolveDriftRecord).toHaveBeenCalledTimes(2))
+    expect(await screen.findByText(i18n.t('pages.drift.bulkPartialFailure', { count: 1 }) as string)).toBeInTheDocument()
   })
 
   it('surfaces and dismisses API errors from a failed resolve', async () => {

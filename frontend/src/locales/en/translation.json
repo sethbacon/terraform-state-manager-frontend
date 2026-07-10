@@ -982,7 +982,17 @@
       "acknowledgeBody": "Mark this drift as seen. The record stays acknowledged across re-detections and auto-resolves when a clean run is reported.",
       "ackNoteLabel": "Note (optional)",
       "ackedBy": "Acknowledged by {{actor}}",
-      "recordDetailTitle": "Drift record"
+      "recordDetailTitle": "Drift record",
+      "severityFilter": "Severity",
+      "severityAll": "All severities",
+      "sourceFilter": "Source",
+      "allSources": "All sources",
+      "selectedCount": "{{count}} selected",
+      "acknowledgeSelected": "Acknowledge selected",
+      "resolveSelected": "Resolve selected",
+      "bulkPartialFailure": "{{count}} could not be updated",
+      "sourceOptional": "Source (optional)",
+      "stateOptional": "State (optional)"
     },
     "versionLab": {
       "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",
@@ -1013,8 +1023,6 @@
       "cron": "Schedule",
       "cronHelp": "Cron expression (e.g. \"0 3 * * *\") or a keyword: daily, weekly, every 15m.",
       "pipeline": "CI pipeline",
-      "sourceId": "Source ID (optional)",
-      "stateKey": "State key (optional)",
       "repoRef": "Repo ref (optional)",
       "workingDir": "Working directory (optional)",
       "enabled": "Enabled",
@@ -1024,7 +1032,9 @@
       "never": "Never run",
       "noSchedules": "No schedules yet. Add one to run drift checks automatically.",
       "deleteTitle": "Delete schedule",
-      "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running."
+      "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running.",
+      "sourceOptional": "Source (optional)",
+      "stateOptional": "State (optional)"
     },
     "notifications": {
       "title": "Notifications",

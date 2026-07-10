@@ -690,6 +690,17 @@ export interface DriftRecord {
 export interface DriftRecordsResponse {
   records: DriftRecord[]
   counts: Record<string, number>
+  total: number
+}
+
+export interface ListDriftRecordsParams {
+  statuses?: string[]
+  sourceId?: string
+  severity?: string
+  page?: number
+  perPage?: number
+  startDate?: string
+  endDate?: string
 }
 
 export interface ScheduleTargetConfig {
@@ -1206,14 +1217,32 @@ export const api = {
         `/api/v1/ci-sources/${id}/repos/${encodeURIComponent(repo)}/prs/${pr}`,
       )
     ).data,
-  listDriftRuns: async (): Promise<DriftRun[]> =>
-    (await apiClient.get<{ runs: DriftRun[] }>('/api/v1/drift/runs')).data.runs,
+  listDriftRuns: async (
+    params?: { limit?: number; offset?: number; status?: string },
+  ): Promise<{ runs: DriftRun[]; total: number }> => {
+    const q = new URLSearchParams()
+    if (params?.limit != null) q.set('limit', String(params.limit))
+    if (params?.offset != null) q.set('offset', String(params.offset))
+    if (params?.status) q.set('status', params.status)
+    const qs = q.toString()
+    const data = (await apiClient.get<{ runs: DriftRun[]; total?: number }>(`/api/v1/drift/runs${qs ? `?${qs}` : ''}`))
+      .data
+    return { runs: data.runs, total: data.total ?? data.runs.length }
+  },
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
     (await apiClient.post<DriftRun>('/api/v1/drift/runs', input)).data,
-  listDriftRecords: async (statuses?: string[]): Promise<DriftRecordsResponse> =>
+  listDriftRecords: async (params?: ListDriftRecordsParams): Promise<DriftRecordsResponse> =>
     (
       await apiClient.get<DriftRecordsResponse>('/api/v1/drift/records', {
-        params: statuses?.length ? { status: statuses.join(',') } : undefined,
+        params: {
+          status: params?.statuses?.length ? params.statuses.join(',') : undefined,
+          source_id: params?.sourceId || undefined,
+          severity: params?.severity || undefined,
+          page: params?.page,
+          per_page: params?.perPage,
+          start_date: params?.startDate,
+          end_date: params?.endDate,
+        },
       })
     ).data,
   acknowledgeDriftRecord: async (id: string, note: string): Promise<DriftRecord> =>

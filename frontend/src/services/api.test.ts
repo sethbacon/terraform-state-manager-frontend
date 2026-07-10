@@ -437,11 +437,31 @@ describe('pipelines + CI sources', () => {
   })
 
   it('drift records, state history, and API keys', async () => {
-    get.mockReturnValue(ok({ records: [], counts: {} }))
-    await api.listDriftRecords(['open', 'acknowledged'])
-    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', { params: { status: 'open,acknowledged' } })
+    get.mockReturnValue(ok({ records: [], counts: {}, total: 0 }))
+    await api.listDriftRecords({ statuses: ['open', 'acknowledged'] })
+    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', {
+      params: {
+        status: 'open,acknowledged',
+        source_id: undefined,
+        severity: undefined,
+        page: undefined,
+        per_page: undefined,
+        start_date: undefined,
+        end_date: undefined,
+      },
+    })
     await api.listDriftRecords()
-    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', { params: undefined })
+    expect(get).toHaveBeenCalledWith('/api/v1/drift/records', {
+      params: {
+        status: undefined,
+        source_id: undefined,
+        severity: undefined,
+        page: undefined,
+        per_page: undefined,
+        start_date: undefined,
+        end_date: undefined,
+      },
+    })
 
     post.mockReturnValue(ok({ id: 'rec1' }))
     await api.acknowledgeDriftRecord('rec1', 'expected')

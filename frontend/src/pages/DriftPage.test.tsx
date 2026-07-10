@@ -32,6 +32,7 @@ vi.mock('../services/api', async (importOriginal) => {
       getCISourcePRState: vi.fn(),
       createCISourcePipeline: vi.fn(),
       listSources: vi.fn(),
+      listStates: vi.fn(),
       listDriftRecords: vi.fn(),
       acknowledgeDriftRecord: vi.fn(),
       resolveDriftRecord: vi.fn(),
@@ -141,13 +142,16 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockedUseAuth.mockReturnValue({ hasScope: () => true } as unknown as AuthShape)
   mocked.listPipelines.mockResolvedValue(pipelines as Awaited<ReturnType<typeof api.listPipelines>>)
-  mocked.listDriftRuns.mockResolvedValue(runs as unknown as Awaited<ReturnType<typeof api.listDriftRuns>>)
+  mocked.listDriftRuns.mockResolvedValue({ runs, total: runs.length } as unknown as Awaited<
+    ReturnType<typeof api.listDriftRuns>
+  >)
   mocked.listCISources.mockResolvedValue(ciSources as Awaited<ReturnType<typeof api.listCISources>>)
   mocked.getCallbackPreflight.mockResolvedValue({ likely_unreachable: false } as Awaited<
     ReturnType<typeof api.getCallbackPreflight>
   >)
   mocked.listSources.mockResolvedValue([])
-  mocked.listDriftRecords.mockResolvedValue({ records: [], counts: {} })
+  mocked.listStates.mockResolvedValue([])
+  mocked.listDriftRecords.mockResolvedValue({ records: [], counts: {}, total: 0 })
 })
 
 describe('DriftPage', () => {
@@ -160,9 +164,66 @@ describe('DriftPage', () => {
   })
 
   it('shows the no-runs hint', async () => {
-    mocked.listDriftRuns.mockResolvedValue([])
+    mocked.listDriftRuns.mockResolvedValue({ runs: [], total: 0 })
     renderPage()
     expect(await screen.findByText(i18n.t('pages.drift.noRuns') as string)).toBeInTheDocument()
+  })
+
+  it('filters runs by status and paginates', async () => {
+    mocked.listDriftRuns.mockResolvedValue({ runs: [runs[0]], total: 25 } as unknown as Awaited<
+      ReturnType<typeof api.listDriftRuns>
+    >)
+    renderPage()
+    await screen.findByText('envs/prod')
+
+    const statusSelect = screen.getByLabelText(i18n.t('common.status') as string)
+    fireEvent.mouseDown(statusSelect)
+    fireEvent.click(await screen.findByRole('option', { name: 'failed' }))
+    await waitFor(() =>
+      expect(mocked.listDriftRuns).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'failed', offset: 0 })),
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: i18n.t('common.next') as string }))
+    await waitFor(() =>
+      expect(mocked.listDriftRuns).toHaveBeenLastCalledWith(expect.objectContaining({ offset: 20 })),
+    )
+  })
+
+  it('optionally links a new run to a picked source and state', async () => {
+    mocked.listSources.mockResolvedValue([
+      { id: 's1', name: 'estate', type: 'local', config: {} },
+    ] as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    mocked.listStates.mockResolvedValue([
+      { key: 'app.tfstate', name: 'app.tfstate', size: 10 },
+    ] as unknown as Awaited<ReturnType<typeof api.listStates>>)
+    mocked.createDriftRun.mockResolvedValue(runs[2] as unknown as Awaited<ReturnType<typeof api.createDriftRun>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newDriftRun') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: /drift-ci/ }))
+
+    fireEvent.mouseDown(within(dialog).getByLabelText(i18n.t('pages.drift.sourceOptional') as string))
+    fireEvent.click(await screen.findByRole('option', { name: 'estate' }))
+    await waitFor(() => expect(mocked.listStates).toHaveBeenCalledWith('s1'))
+
+    // The state Autocomplete is disabled while its query is loading; wait for
+    // it to become interactive before opening it, rather than racing the fetch.
+    await waitFor(() =>
+      expect(within(dialog).getByLabelText(i18n.t('pages.drift.stateOptional') as string)).not.toBeDisabled(),
+    )
+    const stateBox = within(dialog).getByLabelText(i18n.t('pages.drift.stateOptional') as string)
+    fireEvent.mouseDown(stateBox)
+    fireEvent.click(await screen.findByText('app.tfstate'))
+
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.dispatch') as string }))
+    await waitFor(() =>
+      expect(mocked.createDriftRun).toHaveBeenCalledWith(
+        expect.objectContaining({ source_id: 's1', state_key: 'app.tfstate' }),
+      ),
+    )
   })
 
   it('hides run/manage actions without their scopes', async () => {
