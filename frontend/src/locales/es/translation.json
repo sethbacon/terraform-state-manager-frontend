@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Observado",
       "historySerial": "Serie",
       "historyTfVersion": "Terraform",
-      "historySize": "Tamaño"
+      "historySize": "Tamaño",
+      "locksTitle": "Cerraduras activas ({{count}})",
+      "lockHeldBy": "Organizado por «{{actor}}» desde {{since}}",
+      "lockUnknownActor": "desconocido",
+      "lockStale": "Rancio",
+      "forceUnlock": "Desbloqueo forzado",
+      "forceUnlockTitle": "¿Deseas forzar el desbloqueo de este estado?",
+      "forceUnlockBody": "Esto libera el bloqueo de aviso en {{key}}, independientemente de quién lo tenga. Hazlo solo cuando la operación que lo mantiene se haya bloqueado; desbloquearlo mientras la operación está en curso conlleva el riesgo de que se produzcan escrituras simultáneas."
     },
     "drift": {
       "pipelines": "Conexiones de tuberías",
