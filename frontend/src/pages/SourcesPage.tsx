@@ -60,6 +60,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import ConfirmDialog from '../components/ConfirmDialog'
 import PageHeader from '../components/PageHeader'
 import StateHistoryTab from '../components/StateHistoryTab'
+import StateLocksPanel from '../components/StateLocksPanel'
 import CardGridSkeleton from '../components/skeletons/CardGridSkeleton'
 import TargetBackendHint from '../components/TargetBackendHint'
 
@@ -462,6 +463,7 @@ function StatesBrowser({
         {t('pages.sources.statesIn', { name: source.name })}
       </Typography>
       <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '320px 1fr' } }}>
+        <Box>
         <Card variant="outlined">
           {statesQuery.isLoading && (
             <Box sx={{ p: 2 }}>
@@ -508,6 +510,8 @@ function StatesBrowser({
             ))}
           </List>
         </Card>
+        <StateLocksPanel sourceId={source.id} />
+        </Box>
 
         <Box>
           {selectedKey ? (

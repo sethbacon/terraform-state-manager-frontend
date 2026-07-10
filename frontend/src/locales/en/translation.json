@@ -790,7 +790,14 @@
       "historyAnalyzedAt": "Observed",
       "historySerial": "Serial",
       "historyTfVersion": "Terraform",
-      "historySize": "Size"
+      "historySize": "Size",
+      "locksTitle": "Active locks ({{count}})",
+      "lockHeldBy": "Held by {{actor}} since {{since}}",
+      "lockUnknownActor": "unknown",
+      "lockStale": "Stale",
+      "forceUnlock": "Force unlock",
+      "forceUnlockTitle": "Force-unlock this state?",
+      "forceUnlockBody": "This releases the advisory lock on {{key}} regardless of who holds it. Only do this when the holding operation has crashed - unlocking under a live operation risks concurrent writes."
     },
     "drift": {
       "pipelines": "Pipeline connections",
