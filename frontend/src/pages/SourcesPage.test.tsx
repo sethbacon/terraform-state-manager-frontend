@@ -24,6 +24,8 @@ vi.mock('../services/api', async (importOriginal) => {
       editState: vi.fn(),
       listBackups: vi.fn(),
       restoreBackup: vi.fn(),
+      listStateLocks: vi.fn(),
+      forceUnlock: vi.fn(),
       downloadReport: vi.fn(),
       downloadRawState: vi.fn(),
       updateSource: vi.fn(),
@@ -101,6 +103,7 @@ beforeEach(() => {
   mocked.listStates.mockResolvedValue(states as Awaited<ReturnType<typeof api.listStates>>)
   mocked.analyzeState.mockResolvedValue(analysis as Awaited<ReturnType<typeof api.analyzeState>>)
   mocked.listStateResources.mockResolvedValue(resources as Awaited<ReturnType<typeof api.listStateResources>>)
+  mocked.listStateLocks.mockResolvedValue([])
 })
 
 describe('SourcesPage', () => {

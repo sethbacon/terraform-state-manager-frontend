@@ -462,6 +462,16 @@ export interface Backup {
   created_at: string
 }
 
+// An app-level advisory lock currently held on a state key. Age judgement
+// (vs the backend's 15-minute stale TTL) is up to the caller.
+export interface StateLock {
+  id: string
+  source_id: string
+  state_key: string
+  actor: string
+  acquired_at: string
+}
+
 export interface TransferResult {
   id: string
   mode: string
@@ -1060,6 +1070,12 @@ export const api = {
   restoreBackup: async (id: string, backupId: string, key: string): Promise<void> => {
     await apiClient.post(`/api/v1/sources/${id}/state/backups/${backupId}/restore`, null, { params: { key } })
   },
+  listStateLocks: async (id: string): Promise<StateLock[]> =>
+    (await apiClient.get<{ locks: StateLock[] }>(`/api/v1/sources/${id}/state/locks`)).data.locks,
+  // Admin-only: release the app-level advisory lock on a key regardless of
+  // holder. Native backend locks are unaffected.
+  forceUnlock: async (id: string, key: string): Promise<{ released: boolean }> =>
+    (await apiClient.delete<{ released: boolean }>(`/api/v1/sources/${id}/state/lock`, { params: { key } })).data,
 
   // Transfer plane (Phase 2)
   backupToSource: async (
