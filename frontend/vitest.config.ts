@@ -12,7 +12,16 @@ export default defineConfig({
     globals: true,
     // Registry parity: heavy MUI dialog renders exceed the 5s default on
     // shared CI runners (first Actions run timed out two gapfill tests).
+    // Paired with the asyncUtilTimeout raise in setupTests.ts — that governs
+    // individual findBy*/waitFor polling, this governs the whole test.
     testTimeout: 15_000,
+    // Vitest's default for `run` mode is cpus-1 workers, which on an 8-core
+    // dev machine leaves near-zero headroom once the OS, editor, and browser
+    // are also competing for CPU — MUI/happy-dom renders then blow past both
+    // timeouts above under contention (flaky failures on full-suite local
+    // runs that don't reproduce running a file in isolation). Cap at half the
+    // cores so individual test files still get enough CPU to render on time.
+    maxWorkers: '50%',
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     coverage: {
       provider: 'v8',
