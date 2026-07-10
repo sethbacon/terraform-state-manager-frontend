@@ -641,7 +641,20 @@
       "lockStale": "Oudbakken",
       "forceUnlock": "Geforceerd ontgrendelen",
       "forceUnlockTitle": "Deze status met geweld ontgrendelen?",
-      "forceUnlockBody": "Hiermee wordt de adviesvergrendeling op {{key}} opgeheven, ongeacht wie deze in bezit heeft. Doe dit alleen als de bewerkingsoperatie is vastgelopen – het ontgrendelen terwijl er een actieve bewerking gaande is, brengt het risico op gelijktijdige schrijfbewerkingen met zich mee."
+      "forceUnlockBody": "Hiermee wordt de adviesvergrendeling op {{key}} opgeheven, ongeacht wie deze in bezit heeft. Doe dit alleen als de bewerkingsoperatie is vastgelopen – het ontgrendelen terwijl er een actieve bewerking gaande is, brengt het risico op gelijktijdige schrijfbewerkingen met zich mee.",
+      "viewBackup": "Bekijken",
+      "previewRestore": "Voorbeeld van het herstel",
+      "restoreDiffTitle": "Voorbeeld van het herstel: {{key}}",
+      "restoreDiffSerials": "Back-up seriële {{backup}} versus huidige {{current}}",
+      "diffAdded": "Gerestaureerd (in oorspronkelijke staat hersteld)",
+      "diffRemoved": "Uit de staat geschrapt",
+      "diffChanged": "Situaties veranderen",
+      "diffApproxNote": "Gewijzigde vermeldingen vergelijken het aantal instanties en sleutels, niet de attribuutwaarden – controleer de inhoud van de back-up voor de exacte attributen van de bronnen.",
+      "diffNoChanges": "Het terugzetten van deze back-up zou geen invloed hebben op de inventaris van de middelen.",
+      "backupContentTitle": "Back-upinhoud",
+      "forceOverwriteTitle": "Overschrijvingsconflict",
+      "forceOverwriteBody": "De backend heeft deze schrijfbewerking geweigerd om de status te beschermen. Als je deze weigering negeert, kunnen recentere wijzigingen verloren gaan of kan de afstamming worden gesplitst – ga alleen door als je zeker weet dat deze inhoud correct is.",
+      "forceOverwrite": "Overschrijven afdwingen"
     },
     "drift": {
       "pipelines": "Pijpleidingaansluitingen",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Markeer deze drift als waargenomen. De registratie blijft geldig bij herhaalde detecties en wordt automatisch opgelost wanneer een foutloze run wordt gemeld.",
       "ackNoteLabel": "Opmerking (optioneel)",
       "ackedBy": "Erkend door {{actor}}",
-      "recordDetailTitle": "Driftresultaat"
+      "recordDetailTitle": "Driftresultaat",
+      "severityFilter": "Ernst",
+      "severityAll": "Alle ernstniveaus",
+      "sourceFilter": "Bron",
+      "allSources": "Alle bronnen",
+      "selectedCount": "{{count}} geselecteerd",
+      "acknowledgeSelected": "Bevestig selectie",
+      "resolveSelected": "Geselecteerd oplossen",
+      "bulkPartialFailure": "{{count}} kon niet worden bijgewerkt",
+      "sourceOptional": "Bron (optioneel)",
+      "stateOptional": "Provincie (optioneel)"
     },
     "versionLab": {
       "noPipelines": "Er zijn nog geen pijplijnaansluitingen — voeg er een toe op de Drift-pagina en ga daarna terug naar deze pagina.",
@@ -844,8 +867,6 @@
       "cron": "Schema",
       "cronHelp": "Cron-uitdrukking (bijv. \"0 3 * * *\") of een trefwoord: dagelijks, wekelijks, om de 15 minuten.",
       "pipeline": "CI-pijplijn",
-      "sourceId": "Bron-ID (optioneel)",
-      "stateKey": "Sleutel (optioneel)",
       "repoRef": "Repo-referentie (optioneel)",
       "workingDir": "Werkmap (optioneel)",
       "enabled": "Ingeschakeld",
@@ -855,7 +876,9 @@
       "never": "Nooit rennen",
       "noSchedules": "Er zijn nog geen schema’s. Voeg er een toe om automatisch driftcontroles uit te voeren.",
       "deleteTitle": "Schema verwijderen",
-      "deleteConfirm": "Het schema „{{name}}” verwijderen? Dan wordt de uitvoering ervan gestopt."
+      "deleteConfirm": "Het schema „{{name}}” verwijderen? Dan wordt de uitvoering ervan gestopt.",
+      "sourceOptional": "Bron (optioneel)",
+      "stateOptional": "Provincie (optioneel)"
     },
     "notifications": {
       "title": "Meldingen",

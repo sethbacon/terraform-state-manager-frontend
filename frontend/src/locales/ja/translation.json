@@ -641,7 +641,20 @@
       "lockStale": "古くなった",
       "forceUnlock": "強制アンロック",
       "forceUnlockTitle": "この状態を強制的に解除しますか？",
-      "forceUnlockBody": "これにより、{{key}} に対するアドバイザリロックが解除されます。ロックを保持しているユーザーが誰であるかには関係ありません。この操作は、ロック保持操作がクラッシュした場合にのみ実行してください。稼働中の操作中にロックを解除すると、同時書き込みが発生するリスクがあります。"
+      "forceUnlockBody": "これにより、{{key}} に対するアドバイザリロックが解除されます。ロックを保持しているユーザーが誰であるかには関係ありません。この操作は、ロック保持操作がクラッシュした場合にのみ実行してください。稼働中の操作中にロックを解除すると、同時書き込みが発生するリスクがあります。",
+      "viewBackup": "表示",
+      "previewRestore": "復元プレビュー",
+      "restoreDiffTitle": "復元プレビュー：{{key}}",
+      "restoreDiffSerials": "バックアップのシリアル番号 {{backup}} と現在のシリアル番号 {{current}} の比較",
+      "diffAdded": "復元（状態を再現）",
+      "diffRemoved": "州から除外された",
+      "diffChanged": "インスタンスは変化する",
+      "diffApproxNote": "変更されたエントリでは、属性値ではなくインスタンス数とキーが比較されます。正確なリソース属性については、バックアップの内容を確認してください。",
+      "diffNoChanges": "このバックアップを復元しても、リソースの在庫状況は変わりません。",
+      "backupContentTitle": "バックアップ対象のコンテンツ",
+      "forceOverwriteTitle": "上書きの競合",
+      "forceOverwriteBody": "バックエンドは、状態を保護するためにこの書き込みを拒否しました。これを強制すると、新しい変更が失われたり、リビジョン履歴が分岐したりする可能性があります。この内容が正しいと確信している場合のみ、続行してください。",
+      "forceOverwrite": "強制上書き"
     },
     "drift": {
       "pipelines": "パイプラインの接続",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "このドリフトを「確認済み」としてマークしてください。この記録は、再検出時にも確認済みとして保持され、正常な実行が報告された際に自動的に解決されます。",
       "ackNoteLabel": "注（任意）",
       "ackedBy": "{{actor}} により承認されました",
-      "recordDetailTitle": "ドリフト記録"
+      "recordDetailTitle": "ドリフト記録",
+      "severityFilter": "重大度",
+      "severityAll": "すべての深刻度",
+      "sourceFilter": "出典",
+      "allSources": "すべての情報源",
+      "selectedCount": "{{count}} 選択済み",
+      "acknowledgeSelected": "「選択した項目を確認」",
+      "resolveSelected": "選択した項目を解決",
+      "bulkPartialFailure": "{{count}} 更新できませんでした",
+      "sourceOptional": "出典（任意）",
+      "stateOptional": "州（任意）"
     },
     "versionLab": {
       "noPipelines": "まだパイプラインの接続はありません。Drift ページで接続を追加してから、ここに戻ってきてください。",
@@ -844,8 +867,6 @@
       "cron": "スケジュール",
       "cronHelp": "Cron式（例：「0 3 * * *」）またはキーワード：毎日、毎週、15分ごと。",
       "pipeline": "CIパイプライン",
-      "sourceId": "ソースID（任意）",
-      "stateKey": "状態キー（任意）",
       "repoRef": "リポジトリ参照（任意）",
       "workingDir": "作業ディレクトリ（任意）",
       "enabled": "有効",
@@ -855,7 +876,9 @@
       "never": "決して走ってはいけない",
       "noSchedules": "まだスケジュールはありません。ドリフトチェックを自動的に実行するようにスケジュールを追加してください。",
       "deleteTitle": "スケジュールを削除する",
-      "deleteConfirm": "「{{name}}」というスケジュールを削除しますか？ 削除すると、そのスケジュールは実行されなくなります。"
+      "deleteConfirm": "「{{name}}」というスケジュールを削除しますか？ 削除すると、そのスケジュールは実行されなくなります。",
+      "sourceOptional": "出典（任意）",
+      "stateOptional": "州（任意）"
     },
     "notifications": {
       "title": "通知",

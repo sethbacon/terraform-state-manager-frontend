@@ -641,7 +641,20 @@
       "lockStale": "过期",
       "forceUnlock": "强制解锁",
       "forceUnlockTitle": "强制解除此状态？",
-      "forceUnlockBody": "此操作将释放{{key}}上的建议锁，无论当前由谁持有该锁。仅在持有操作发生崩溃时才执行此操作——在运行中的操作下解锁可能会导致并发写入风险。"
+      "forceUnlockBody": "此操作将释放{{key}}上的建议锁，无论当前由谁持有该锁。仅在持有操作发生崩溃时才执行此操作——在运行中的操作下解锁可能会导致并发写入风险。",
+      "viewBackup": "查看",
+      "previewRestore": "预览还原",
+      "restoreDiffTitle": "恢复预览：{{key}}",
+      "restoreDiffSerials": "备份序列 {{backup}} 与当前序列 {{current}} 的对比",
+      "diffAdded": "已恢复（已按原状态重建）",
+      "diffRemoved": "从州级名单中剔除",
+      "diffChanged": "实例会发生变化",
+      "diffApproxNote": "已修改的条目比较的是实例数量和键，而非属性值——请检查备份内容以确认确切的资源属性。",
+      "diffNoChanges": "还原此备份不会改变资源清单。",
+      "backupContentTitle": "备份内容",
+      "forceOverwriteTitle": "覆盖冲突",
+      "forceOverwriteBody": "后端拒绝了此次写入操作，以保护状态。强行覆盖可能会导致较新的更改丢失或导致血统分裂——请仅在确信此内容正确时继续。",
+      "forceOverwrite": "强制覆盖"
     },
     "drift": {
       "pipelines": "管道连接",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "将此漂移标记为“已观察到”。当报告运行正常时，该记录在重新检测和自动解析过程中仍会被视为已确认。",
       "ackNoteLabel": "注（可选）",
       "ackedBy": "经 {{actor}} 确认",
-      "recordDetailTitle": "漂移记录"
+      "recordDetailTitle": "漂移记录",
+      "severityFilter": "严重程度",
+      "severityAll": "所有严重程度",
+      "sourceFilter": "来源",
+      "allSources": "所有来源",
+      "selectedCount": "{{count}} 已选中",
+      "acknowledgeSelected": "已确认选中",
+      "resolveSelected": "已选定“Resolve”",
+      "bulkPartialFailure": "{{count}} 无法更新",
+      "sourceOptional": "来源（可选）",
+      "stateOptional": "州（可选）"
     },
     "versionLab": {
       "noPipelines": "目前尚无管道连接——请在“Drift”页面添加一个，然后返回此处。",
@@ -844,8 +867,6 @@
       "cron": "日程安排",
       "cronHelp": "Cron 表达式（例如“0 3 * * *”）或关键字：每天、每周、每 15 分钟。",
       "pipeline": "CI 管道",
-      "sourceId": "源ID（可选）",
-      "stateKey": "状态键（可选）",
       "repoRef": "Repo 引用（可选）",
       "workingDir": "工作目录（可选）",
       "enabled": "已启用",
@@ -855,7 +876,9 @@
       "never": "切勿奔跑",
       "noSchedules": "目前还没有计划任务。请添加一个计划任务，用于自动运行漂移检查。",
       "deleteTitle": "删除计划",
-      "deleteConfirm": "删除计划任务“{{name}}”？这将停止其运行。"
+      "deleteConfirm": "删除计划任务“{{name}}”？这将停止其运行。",
+      "sourceOptional": "来源（可选）",
+      "stateOptional": "州（可选）"
     },
     "notifications": {
       "title": "通知",

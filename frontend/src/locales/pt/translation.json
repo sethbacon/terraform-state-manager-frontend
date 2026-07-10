@@ -641,7 +641,20 @@
       "lockStale": "Envelhecido",
       "forceUnlock": "Desbloqueio forçado",
       "forceUnlockTitle": "Deseja forçar o desbloqueio deste estado?",
-      "forceUnlockBody": "Isto liberta o bloqueio de aviso em {{key}}, independentemente de quem o detenha. Só deve fazer isto se a operação que o detém tiver falhado — desbloquear enquanto a operação está em curso implica o risco de gravações simultâneas."
+      "forceUnlockBody": "Isto liberta o bloqueio de aviso em {{key}}, independentemente de quem o detenha. Só deve fazer isto se a operação que o detém tiver falhado — desbloquear enquanto a operação está em curso implica o risco de gravações simultâneas.",
+      "viewBackup": "Ver",
+      "previewRestore": "Pré-visualização da restauração",
+      "restoreDiffTitle": "Pré-visualização da restauração: {{key}}",
+      "restoreDiffSerials": "{{backup}} da cópia de segurança vs {{current}} atual",
+      "diffAdded": "Restaurado (recriado no seu estado original)",
+      "diffRemoved": "Excluído do estado",
+      "diffChanged": "As instâncias mudam",
+      "diffApproxNote": "As entradas alteradas comparam o número de instâncias e as chaves, e não os valores dos atributos — verifique o conteúdo da cópia de segurança para conhecer os atributos exatos dos recursos.",
+      "diffNoChanges": "A restauração desta cópia de segurança não alteraria o inventário de recursos.",
+      "backupContentTitle": "Conteúdo de reserva",
+      "forceOverwriteTitle": "Conflito de substituição",
+      "forceOverwriteBody": "O backend recusou esta gravação para proteger o estado. Forçar a gravação pode fazer com que se percam alterações mais recentes ou que a linhagem fique fragmentada — só deve continuar se tiver a certeza de que este conteúdo está correto.",
+      "forceOverwrite": "Forçar substituição"
     },
     "drift": {
       "pipelines": "Ligações de condutas",
@@ -813,7 +826,17 @@
       "acknowledgeBody": "Marque esta deriva como observada. O registo permanece marcado como confirmado mesmo em caso de novas deteções e é resolvido automaticamente quando for comunicada uma execução sem erros.",
       "ackNoteLabel": "Nota (opcional)",
       "ackedBy": "Reconhecido por {{actor}}",
-      "recordDetailTitle": "Recorde de derrapagem"
+      "recordDetailTitle": "Recorde de derrapagem",
+      "severityFilter": "Gravidade",
+      "severityAll": "Todas as gravidades",
+      "sourceFilter": "Fonte",
+      "allSources": "Todas as fontes",
+      "selectedCount": "{{count}} selecionado",
+      "acknowledgeSelected": "Confirmar seleção",
+      "resolveSelected": "Resolução selecionada",
+      "bulkPartialFailure": "{{count}} não foi possível atualizar",
+      "sourceOptional": "Fonte (opcional)",
+      "stateOptional": "Estado (opcional)"
     },
     "versionLab": {
       "noPipelines": "Ainda não há ligações de pipeline — adicione uma na página do Drift e, em seguida, volte aqui.",
@@ -844,8 +867,6 @@
       "cron": "Calendário",
       "cronHelp": "Expressão Cron (por exemplo, «0 3 * * *») ou uma palavra-chave: diariamente, semanalmente, a cada 15 minutos.",
       "pipeline": "Pipeline de CI",
-      "sourceId": "ID da fonte (opcional)",
-      "stateKey": "Chave de estado (opcional)",
       "repoRef": "Referência do repo (opcional)",
       "workingDir": "Diretório de trabalho (opcional)",
       "enabled": "Ativado",
@@ -855,7 +876,9 @@
       "never": "Nunca corras",
       "noSchedules": "Ainda não há agendamentos. Adicione um para executar verificações de desvio automaticamente.",
       "deleteTitle": "Eliminar agendamento",
-      "deleteConfirm": "Apagar a tarefa agendada «{{name}}»? Isso fará com que deixe de ser executada."
+      "deleteConfirm": "Apagar a tarefa agendada «{{name}}»? Isso fará com que deixe de ser executada.",
+      "sourceOptional": "Fonte (opcional)",
+      "stateOptional": "Estado (opcional)"
     },
     "notifications": {
       "title": "Notificações",
