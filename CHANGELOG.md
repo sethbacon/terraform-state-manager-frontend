@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.19.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.4...v1.19.0) (2026-07-10)
+
+
+### Features
+
+* backup content viewer, restore-preview diff, and 409 force-override flow ([#161](https://github.com/sethbacon/terraform-state-manager-frontend/issues/161)) ([ab91eee](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ab91eeee8fc1510d29a571af1c09fcbe16254c30))
+* drift runs/records pagination, filtering, bulk actions, and source/state pickers ([#165](https://github.com/sethbacon/terraform-state-manager-frontend/issues/165)) ([0d01cf9](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0d01cf902a0d549232a81cfd38d55a55197e4da8))
+* show active state locks with admin force-unlock ([#159](https://github.com/sethbacon/terraform-state-manager-frontend/issues/159)) ([8b31a1e](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8b31a1e1ea3d1dd40ecec1c6810ea0f780d6473c))
+
+
+### Bug Fixes
+
+* align vitest async timeouts to stop flaky full-suite failures ([b86f5ac](https://github.com/sethbacon/terraform-state-manager-frontend/commit/b86f5acdd5f0bc2222cd139c57902a611dc0d070))
+* audit export was silently capped at 50 rows ([#160](https://github.com/sethbacon/terraform-state-manager-frontend/issues/160)) ([013e039](https://github.com/sethbacon/terraform-state-manager-frontend/commit/013e039949b9a6023bc94490dc6eccfaa61bc565))
+
 ## [1.18.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.3...v1.18.4) (2026-07-01)
 
 
