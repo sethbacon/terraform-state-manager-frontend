@@ -870,6 +870,15 @@ export const api = {
     (await apiClient.get<{ roles: RoleTemplate[] }>('/api/v1/admin/roles')).data.roles,
   listAuditLogs: async (params?: AuditLogFilters): Promise<{ logs: AuditLogEntry[]; total: number }> =>
     (await apiClient.get<{ logs: AuditLogEntry[]; total: number }>('/api/v1/admin/audit-logs', { params })).data,
+  // Server-side export: walks every matching page (the list endpoint caps
+  // pages at 200 rows), so the extract is complete rather than one page.
+  exportAuditLogs: async (format: 'csv' | 'json', filters?: AuditLogFilters): Promise<Blob> =>
+    (
+      await apiClient.get<Blob>('/api/v1/admin/audit-logs/export', {
+        params: { format, ...filters },
+        responseType: 'blob',
+      })
+    ).data,
   getSSOConfig: async (): Promise<SSOConfig> =>
     (await apiClient.get<SSOConfig>('/api/v1/admin/sso')).data,
   getAdminOIDCConfig: async (): Promise<OIDCConfigResponse> =>
