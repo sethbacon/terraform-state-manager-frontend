@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -262,6 +263,13 @@ function ScheduleFormDialog({
   }
   if (!open && seededFor !== null) setSeededFor(null)
 
+  const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources, enabled: open })
+  const statesQuery = useQuery({
+    queryKey: queryKeys.sources.states(sourceId),
+    queryFn: () => api.listStates(sourceId),
+    enabled: Boolean(sourceId),
+  })
+
   const mutation = useMutation({
     mutationFn: () => {
       const input: ScheduleInput = {
@@ -336,18 +344,33 @@ function ScheduleFormDialog({
             size="small"
           />
           <TextField
-            label={t('pages.schedules.sourceId')}
+            select
+            label={t('pages.schedules.sourceOptional')}
             value={sourceId}
-            onChange={(e) => setSourceId(e.target.value)}
+            onChange={(e) => {
+              setSourceId(e.target.value)
+              setStateKey('')
+            }}
             fullWidth
             size="small"
-          />
-          <TextField
-            label={t('pages.schedules.stateKey')}
-            value={stateKey}
-            onChange={(e) => setStateKey(e.target.value)}
-            fullWidth
+          >
+            <MenuItem value="">{t('common.none')}</MenuItem>
+            {(sourcesQuery.data ?? []).map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Autocomplete
             size="small"
+            options={statesQuery.data ?? []}
+            loading={statesQuery.isLoading}
+            getOptionLabel={(st) => st.name || st.key}
+            value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
+            onChange={(_, v) => setStateKey(v?.key ?? '')}
+            disabled={!sourceId || statesQuery.isLoading}
+            fullWidth
+            renderInput={(params) => <TextField {...params} label={t('pages.schedules.stateOptional')} />}
           />
           <FormControlLabel
             control={<Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />}

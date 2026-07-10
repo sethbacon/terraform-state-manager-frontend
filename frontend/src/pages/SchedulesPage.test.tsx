@@ -16,6 +16,8 @@ vi.mock('../services/api', async (importOriginal) => {
       updateSchedule: vi.fn(),
       deleteSchedule: vi.fn(),
       runSchedule: vi.fn(),
+      listSources: vi.fn(),
+      listStates: vi.fn(),
     },
   }
 })
@@ -52,6 +54,8 @@ beforeEach(() => {
   vi.clearAllMocks()
   mocked.listSchedules.mockResolvedValue([schedule] as Awaited<ReturnType<typeof api.listSchedules>>)
   mocked.listPipelines.mockResolvedValue(pipelines as Awaited<ReturnType<typeof api.listPipelines>>)
+  mocked.listSources.mockResolvedValue([])
+  mocked.listStates.mockResolvedValue([])
 })
 
 describe('SchedulesPage', () => {
@@ -97,6 +101,47 @@ describe('SchedulesPage', () => {
     )
   })
 
+  it('links a new schedule to a picked source and state', async () => {
+    mocked.createSchedule.mockResolvedValue(schedule as Awaited<ReturnType<typeof api.createSchedule>>)
+    mocked.listSources.mockResolvedValue([
+      { id: 's1', name: 'estate', type: 'local', config: {} },
+    ] as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    mocked.listStates.mockResolvedValue([
+      { key: 'app.tfstate', name: 'app.tfstate', size: 10 },
+    ] as unknown as Awaited<ReturnType<typeof api.listStates>>)
+    renderPage()
+    await screen.findByText('nightly drift')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.schedules.add') as string }))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'weekly health' },
+    })
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.schedules.cron')}`)), {
+      target: { value: 'weekly' },
+    })
+    fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('pages.schedules.pipeline')}`)))
+    fireEvent.click(await screen.findByRole('option', { name: /drift-ci/ }))
+
+    fireEvent.mouseDown(screen.getByLabelText(i18n.t('pages.schedules.sourceOptional') as string))
+    fireEvent.click(await screen.findByRole('option', { name: 'estate' }))
+    await waitFor(() => expect(mocked.listStates).toHaveBeenCalledWith('s1'))
+
+    await waitFor(() =>
+      expect(screen.getByLabelText(i18n.t('pages.schedules.stateOptional') as string)).not.toBeDisabled(),
+    )
+    fireEvent.mouseDown(screen.getByLabelText(i18n.t('pages.schedules.stateOptional') as string))
+    fireEvent.click(await screen.findByText('app.tfstate'))
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.createSchedule).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target_config: expect.objectContaining({ source_id: 's1', state_key: 'app.tfstate' }),
+        }),
+      ),
+    )
+  })
+
   it('edits an existing schedule with its values seeded', async () => {
     mocked.updateSchedule.mockResolvedValue(schedule as Awaited<ReturnType<typeof api.updateSchedule>>)
     renderPage()
@@ -110,6 +155,28 @@ describe('SchedulesPage', () => {
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
     await waitFor(() =>
       expect(mocked.updateSchedule).toHaveBeenCalledWith('sc1', expect.objectContaining({ name: 'nightly drift v2' })),
+    )
+  })
+
+  it('preserves an edited schedule source id that no longer resolves to a listed source', async () => {
+    const orphaned = {
+      ...schedule,
+      id: 'sc2',
+      target_config: { pipeline_connection_id: 'p1', source_id: 's-gone', state_key: 'app.tfstate' },
+    }
+    mocked.listSchedules.mockResolvedValue([orphaned] as unknown as Awaited<ReturnType<typeof api.listSchedules>>)
+    mocked.updateSchedule.mockResolvedValue(orphaned as unknown as Awaited<ReturnType<typeof api.updateSchedule>>)
+    renderPage()
+    await screen.findByText('nightly drift')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.edit') as string }))
+    await screen.findByLabelText(new RegExp(`^${i18n.t('common.name')}`))
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.updateSchedule).toHaveBeenCalledWith(
+        'sc2',
+        expect.objectContaining({ target_config: expect.objectContaining({ source_id: 's-gone', state_key: 'app.tfstate' }) }),
+      ),
     )
   })
 

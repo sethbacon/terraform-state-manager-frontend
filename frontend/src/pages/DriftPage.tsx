@@ -56,6 +56,8 @@ function apiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
 }
 
+const RUNS_PAGE_SIZE = 20
+
 const PROVIDERS: { value: string; label: string; fields: { key: string; label: string; optional?: boolean; placeholder?: string }[] }[] = [
   {
     value: 'github_actions',
@@ -106,6 +108,8 @@ export default function DriftPage() {
   const [selectedRun, setSelectedRun] = useState<DriftRun | null>(null)
   const [deletePipelineTarget, setDeletePipelineTarget] = useState<PipelineConnection | null>(null)
   const [editPipelineTarget, setEditPipelineTarget] = useState<PipelineConnection | null>(null)
+  const [runsPage, setRunsPage] = useState(0)
+  const [runsStatus, setRunsStatus] = useState('')
 
   const pipelinesQuery = useQuery({ queryKey: queryKeys.pipelines.list(), queryFn: api.listPipelines })
 
@@ -114,12 +118,15 @@ export default function DriftPage() {
   const sourceNames = Object.fromEntries((sourcesQuery.data ?? []).map((s) => [s.id, s.name]))
 
   const runsQuery = useQuery({
-    queryKey: queryKeys.drift.runs(),
-    queryFn: api.listDriftRuns,
+    queryKey: queryKeys.drift.runs(runsPage, runsStatus),
+    queryFn: () =>
+      api.listDriftRuns({ limit: RUNS_PAGE_SIZE, offset: runsPage * RUNS_PAGE_SIZE, status: runsStatus || undefined }),
     // Poll while any run is still in flight so results appear when the CI job calls back.
     refetchInterval: (q) =>
-      (q.state.data ?? []).some((r) => r.status === 'dispatched' || r.status === 'running') ? 4000 : false,
+      (q.state.data?.runs ?? []).some((r) => r.status === 'dispatched' || r.status === 'running') ? 4000 : false,
   })
+  const runs = runsQuery.data?.runs ?? []
+  const runsTotal = runsQuery.data?.total ?? 0
 
   const deletePipeline = useMutation({
     mutationFn: api.deletePipeline,
@@ -205,40 +212,81 @@ export default function DriftPage() {
       </Box>
 
       {/* Drift runs */}
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        {t('pages.drift.recentRuns')}
-      </Typography>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }} spacing={1}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          {t('pages.drift.recentRuns')}
+        </Typography>
+        <TextField
+          select
+          size="small"
+          label={t('common.status')}
+          value={runsStatus}
+          onChange={(e) => {
+            setRunsStatus(e.target.value)
+            setRunsPage(0)
+          }}
+          sx={{ minWidth: 180 }}
+        >
+          <MenuItem value="">{t('common.all')}</MenuItem>
+          {['dispatched', 'running', 'completed', 'failed'].map((s) => (
+            <MenuItem key={s} value={s}>
+              {s}
+            </MenuItem>
+          ))}
+        </TextField>
+      </Stack>
       {runsQuery.isLoading && <TableSkeleton rows={4} columns={6} />}
-      {runsQuery.data && runsQuery.data.length === 0 && <Alert severity="info">{t('pages.drift.noRuns')}</Alert>}
-      {runsQuery.data && runsQuery.data.length > 0 && (
-        <Card variant="outlined">
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>{t('common.status')}</TableCell>
-                <TableCell>{t('common.ref')}</TableCell>
-                <TableCell>{t('pages.drift.dir')}</TableCell>
-                <TableCell align="right">+ / ~ / -</TableCell>
-                <TableCell>{t('common.created')}</TableCell>
-                <TableCell>{t('common.detail')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {runsQuery.data.map((r) => (
-                <TableRow key={r.id} hover sx={{ cursor: 'pointer' }} onClick={() => setSelectedRun(r)}>
-                  <TableCell>{statusChip(r, t)}</TableCell>
-                  <TableCell>{r.repo_ref || '—'}</TableCell>
-                  <TableCell>{r.working_dir || '.'}</TableCell>
-                  <TableCell align="right">
-                    {r.added != null ? `${r.added} / ${r.changed} / ${r.destroyed}` : '—'}
-                  </TableCell>
-                  <TableCell>{new Date(r.created_at).toLocaleString()}</TableCell>
-                  <TableCell sx={{ maxWidth: 220, wordBreak: 'break-word' }}>{r.detail || '—'}</TableCell>
+      {!runsQuery.isLoading && runsTotal === 0 && <Alert severity="info">{t('pages.drift.noRuns')}</Alert>}
+      {!runsQuery.isLoading && runsTotal > 0 && (
+        <>
+          <Card variant="outlined">
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>{t('common.status')}</TableCell>
+                  <TableCell>{t('common.ref')}</TableCell>
+                  <TableCell>{t('pages.drift.dir')}</TableCell>
+                  <TableCell align="right">+ / ~ / -</TableCell>
+                  <TableCell>{t('common.created')}</TableCell>
+                  <TableCell>{t('common.detail')}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Card>
+              </TableHead>
+              <TableBody>
+                {runs.map((r) => (
+                  <TableRow key={r.id} hover sx={{ cursor: 'pointer' }} onClick={() => setSelectedRun(r)}>
+                    <TableCell>{statusChip(r, t)}</TableCell>
+                    <TableCell>{r.repo_ref || '—'}</TableCell>
+                    <TableCell>{r.working_dir || '.'}</TableCell>
+                    <TableCell align="right">
+                      {r.added != null ? `${r.added} / ${r.changed} / ${r.destroyed}` : '—'}
+                    </TableCell>
+                    <TableCell>{new Date(r.created_at).toLocaleString()}</TableCell>
+                    <TableCell sx={{ maxWidth: 220, wordBreak: 'break-word' }}>{r.detail || '—'}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Card>
+          <Stack direction="row" spacing={1} sx={{ mt: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Typography variant="body2" color="text.secondary">
+              {t('pages.versionLab.showing', {
+                from: runsPage * RUNS_PAGE_SIZE + 1,
+                to: Math.min((runsPage + 1) * RUNS_PAGE_SIZE, runsTotal),
+                total: runsTotal,
+              })}
+            </Typography>
+            <Button size="small" disabled={runsPage === 0} onClick={() => setRunsPage((p) => Math.max(0, p - 1))}>
+              {t('common.previous')}
+            </Button>
+            <Button
+              size="small"
+              disabled={(runsPage + 1) * RUNS_PAGE_SIZE >= runsTotal}
+              onClick={() => setRunsPage((p) => p + 1)}
+            >
+              {t('common.next')}
+            </Button>
+          </Stack>
+        </>
       )}
 
       <AddPipelineDialog
@@ -1019,6 +1067,15 @@ function NewRunDialog({
   const [pipelineId, setPipelineId] = useState('')
   const [repoRef, setRepoRef] = useState('')
   const [workingDir, setWorkingDir] = useState('.')
+  const [sourceId, setSourceId] = useState('')
+  const [stateKey, setStateKey] = useState('')
+
+  const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources, enabled: open })
+  const statesQuery = useQuery({
+    queryKey: queryKeys.sources.states(sourceId),
+    queryFn: () => api.listStates(sourceId),
+    enabled: Boolean(sourceId),
+  })
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -1026,9 +1083,13 @@ function NewRunDialog({
         pipeline_connection_id: pipelineId,
         repo_ref: repoRef || undefined,
         working_dir: workingDir || undefined,
+        source_id: sourceId || undefined,
+        state_key: stateKey || undefined,
       }),
     onSuccess: () => {
       setRepoRef('')
+      setSourceId('')
+      setStateKey('')
       onCreated()
     },
   })
@@ -1058,6 +1119,33 @@ function NewRunDialog({
             value={workingDir}
             onChange={(e) => setWorkingDir(e.target.value)}
             fullWidth
+          />
+          <TextField
+            select
+            label={t('pages.drift.sourceOptional')}
+            value={sourceId}
+            onChange={(e) => {
+              setSourceId(e.target.value)
+              setStateKey('')
+            }}
+            fullWidth
+          >
+            <MenuItem value="">{t('common.none')}</MenuItem>
+            {(sourcesQuery.data ?? []).map((s) => (
+              <MenuItem key={s.id} value={s.id}>
+                {s.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Autocomplete
+            options={statesQuery.data ?? []}
+            loading={statesQuery.isLoading}
+            getOptionLabel={(st) => st.name || st.key}
+            value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
+            onChange={(_, v) => setStateKey(v?.key ?? '')}
+            disabled={!sourceId || statesQuery.isLoading}
+            fullWidth
+            renderInput={(params) => <TextField {...params} label={t('pages.drift.stateOptional')} />}
           />
           {mutation.isError && <Alert severity="error">{apiErr(mutation.error)}</Alert>}
         </Stack>

@@ -5,16 +5,23 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  type SelectChangeEvent,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   ToggleButton,
@@ -29,6 +36,8 @@ import { api, type DriftRecord } from '../services/api'
 import TableSkeleton from './skeletons/TableSkeleton'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
+
+const RECORDS_PAGE_SIZE = 25
 
 function recordApiErr(e: unknown): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
@@ -55,15 +64,29 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
   const canAct = hasScope('state:drift')
 
   const [view, setView] = useState<'active' | 'all'>('active')
+  const [severity, setSeverity] = useState<'' | 'critical' | 'warning'>('')
+  const [sourceFilter, setSourceFilter] = useState('')
+  const [page, setPage] = useState(0)
   const [ackTarget, setAckTarget] = useState<DriftRecord | null>(null)
   const [ackNote, setAckNote] = useState('')
   const [detail, setDetail] = useState<DriftRecord | null>(null)
   const [notice, setNotice] = useState('')
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bulkAckOpen, setBulkAckOpen] = useState(false)
+  const [bulkAckNote, setBulkAckNote] = useState('')
+  const [bulkPending, setBulkPending] = useState(false)
 
   const statuses = view === 'active' ? ['open', 'acknowledged'] : undefined
+  const queryParams = {
+    statuses,
+    severity: severity || undefined,
+    sourceId: sourceFilter || undefined,
+    page: page + 1,
+    perPage: RECORDS_PAGE_SIZE,
+  }
   const recordsQuery = useQuery({
-    queryKey: queryKeys.drift.records(statuses),
-    queryFn: () => api.listDriftRecords(statuses),
+    queryKey: queryKeys.drift.records(queryParams),
+    queryFn: () => api.listDriftRecords(queryParams),
   })
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.drift.all })
@@ -85,7 +108,32 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
 
   const records = recordsQuery.data?.records ?? []
   const counts = recordsQuery.data?.counts ?? {}
+  const total = recordsQuery.data?.total ?? 0
   const sourceLabel = (r: DriftRecord) => (r.source_id ? (sourceNames[r.source_id] ?? r.source_id) : '—')
+
+  const toggleSelected = (id: string) =>
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  const selectableIds = records.map((r) => r.id)
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selected.has(id))
+  const clearSelection = () => setSelected(new Set())
+
+  const runBulk = async (ids: string[], action: (id: string) => Promise<unknown>) => {
+    setBulkPending(true)
+    const results = await Promise.allSettled(ids.map(action))
+    const failed = results.filter((r) => r.status === 'rejected').length
+    setBulkPending(false)
+    clearSelection()
+    invalidate()
+    if (failed > 0) setNotice(t('pages.drift.bulkPartialFailure', { count: failed }))
+  }
+
+  const bulkAckIds = records.filter((r) => r.status === 'open' && selected.has(r.id)).map((r) => r.id)
+  const bulkResolveIds = records.filter((r) => r.status !== 'resolved' && selected.has(r.id)).map((r) => r.id)
 
   return (
     <Box sx={{ mb: 4 }}>
@@ -112,10 +160,71 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
         </ToggleButtonGroup>
       </Stack>
 
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }} spacing={1}>
+        <ToggleButtonGroup
+          size="small"
+          exclusive
+          value={severity}
+          onChange={(_, v: '' | 'critical' | 'warning' | null) => {
+            if (v !== null) {
+              setSeverity(v)
+              setPage(0)
+            }
+          }}
+          aria-label={t('pages.drift.severityFilter')}
+        >
+          <ToggleButton value="">{t('pages.drift.severityAll')}</ToggleButton>
+          <ToggleButton value="critical">Critical</ToggleButton>
+          <ToggleButton value="warning">Warning</ToggleButton>
+        </ToggleButtonGroup>
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel id="drift-records-source-label">{t('pages.drift.sourceFilter')}</InputLabel>
+          <Select
+            labelId="drift-records-source-label"
+            label={t('pages.drift.sourceFilter')}
+            value={sourceFilter}
+            onChange={(e: SelectChangeEvent) => {
+              setSourceFilter(e.target.value)
+              setPage(0)
+            }}
+          >
+            <MenuItem value="">{t('pages.drift.allSources')}</MenuItem>
+            {Object.entries(sourceNames).map(([id, name]) => (
+              <MenuItem key={id} value={id}>
+                {name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+
       {notice && (
         <Alert severity="error" onClose={() => setNotice('')} sx={{ mb: 1 }}>
           {notice}
         </Alert>
+      )}
+
+      {canAct && selected.size > 0 && (
+        <Stack direction="row" spacing={1} sx={{ mb: 1, alignItems: 'center' }}>
+          <Typography variant="body2">{t('pages.drift.selectedCount', { count: selected.size })}</Typography>
+          <Button
+            size="small"
+            disabled={bulkAckIds.length === 0 || bulkPending}
+            onClick={() => {
+              setBulkAckNote('')
+              setBulkAckOpen(true)
+            }}
+          >
+            {t('pages.drift.acknowledgeSelected')}
+          </Button>
+          <Button
+            size="small"
+            disabled={bulkResolveIds.length === 0 || bulkPending}
+            onClick={() => runBulk(bulkResolveIds, (id) => resolve.mutateAsync(id))}
+          >
+            {t('pages.drift.resolveSelected')}
+          </Button>
+        </Stack>
       )}
 
       {recordsQuery.isLoading && <TableSkeleton rows={3} columns={7} />}
@@ -127,6 +236,17 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
           <Table size="small">
             <TableHead>
               <TableRow>
+                {canAct && (
+                  <TableCell padding="checkbox">
+                    <Checkbox
+                      checked={allSelected}
+                      indeterminate={selected.size > 0 && !allSelected}
+                      onChange={() =>
+                        setSelected(allSelected ? new Set() : new Set(selectableIds))
+                      }
+                    />
+                  </TableCell>
+                )}
                 <TableCell>{t('common.status')}</TableCell>
                 <TableCell>{t('pages.drift.recordSeverity')}</TableCell>
                 <TableCell>{t('pages.drift.recordState')}</TableCell>
@@ -139,6 +259,11 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
             <TableBody>
               {records.map((r) => (
                 <TableRow key={r.id} hover sx={{ cursor: 'pointer' }} onClick={() => setDetail(r)}>
+                  {canAct && (
+                    <TableCell padding="checkbox" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox checked={selected.has(r.id)} onChange={() => toggleSelected(r.id)} />
+                    </TableCell>
+                  )}
                   <TableCell>{recordStatusChip(r.status, t)}</TableCell>
                   <TableCell>
                     <Chip
@@ -181,8 +306,48 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
               ))}
             </TableBody>
           </Table>
+          <TablePagination
+            component="div"
+            count={total}
+            page={page}
+            onPageChange={(_, p) => setPage(p)}
+            rowsPerPage={RECORDS_PAGE_SIZE}
+            rowsPerPageOptions={[RECORDS_PAGE_SIZE]}
+          />
         </Card>
       )}
+
+      {/* Bulk acknowledge dialog */}
+      <Dialog open={bulkAckOpen} onClose={() => setBulkAckOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>{t('pages.drift.acknowledgeTitle')}</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {t('pages.drift.acknowledgeBody')}
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            minRows={2}
+            label={t('pages.drift.ackNoteLabel')}
+            value={bulkAckNote}
+            onChange={(e) => setBulkAckNote(e.target.value)}
+            slotProps={{ htmlInput: { maxLength: 1000 } }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBulkAckOpen(false)}>{t('common.cancel')}</Button>
+          <Button
+            variant="contained"
+            disabled={bulkPending}
+            onClick={() => {
+              setBulkAckOpen(false)
+              void runBulk(bulkAckIds, (id) => acknowledge.mutateAsync({ id, note: bulkAckNote }))
+            }}
+          >
+            {t('pages.drift.acknowledge')}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Acknowledge dialog */}
       <Dialog open={Boolean(ackTarget)} onClose={() => setAckTarget(null)} fullWidth maxWidth="sm">

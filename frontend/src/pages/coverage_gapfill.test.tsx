@@ -251,7 +251,7 @@ describe('DriftPage secondary paths', () => {
 
   beforeEach(() => {
     mocked.listPipelines.mockResolvedValue(pipelines as never)
-    mocked.listDriftRuns.mockResolvedValue([failedRun, driftedWithSummary] as never)
+    mocked.listDriftRuns.mockResolvedValue({ runs: [failedRun, driftedWithSummary], total: 2 } as never)
     mocked.listCISources.mockResolvedValue([
       { id: 'c2', name: 'corp-gh', provider: 'github_actions', organization: 'corp', project: null, has_token: true },
     ] as never)

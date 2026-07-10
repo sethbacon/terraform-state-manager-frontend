@@ -63,8 +63,8 @@ export const queryKeys = {
   callbackPreflight: () => ['pipelines', 'callback-preflight'] as const,
   drift: {
     all: ['drift'] as const,
-    runs: () => ['drift', 'runs'] as const,
-    records: (statuses?: string[]) => ['drift', 'records', ...(statuses ?? [])] as const,
+    runs: (page = 0, status = '') => ['drift', 'runs', page, status] as const,
+    records: (params?: Record<string, unknown>) => ['drift', 'records', params ?? {}] as const,
   },
   apiKeys: {
     all: ['apiKeys'] as const,
