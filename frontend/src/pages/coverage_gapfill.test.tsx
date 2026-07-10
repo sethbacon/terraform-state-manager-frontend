@@ -71,6 +71,9 @@ beforeEach(() => {
 })
 
 describe('AddSourceDialog field definitions', () => {
+  // 10 sequential MUI select open/close cycles — legitimately slow under the
+  // CPU contention of a full parallel test run, so it gets its own budget
+  // above the file-wide testTimeout rather than a weaker per-query wait.
   it('renders the field set for every connector type', async () => {
     renderWith(<SourcesPage />)
     await screen.findByText('demo-local')
@@ -90,7 +93,7 @@ describe('AddSourceDialog field definitions', () => {
     }
     expect(within(dialog).getByRole('button', { name: 'Create' })).toBeDisabled()
     fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
-  })
+  }, 30_000)
 })
 
 describe('SourcesPage secondary paths', () => {
