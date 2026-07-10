@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Observé",
       "historySerial": "Série",
       "historyTfVersion": "Terraform",
-      "historySize": "Taille"
+      "historySize": "Taille",
+      "locksTitle": "Verrous actifs ({{count}})",
+      "lockHeldBy": "Publié par {{actor}} depuis le {{since}}",
+      "lockUnknownActor": "inconnu",
+      "lockStale": "Périmé",
+      "forceUnlock": "Déverrouillage forcé",
+      "forceUnlockTitle": "Forcer le déverrouillage de cet état ?",
+      "forceUnlockBody": "Cette opération libère le verrou de consultation sur {{key}}, quel que soit l'utilisateur qui le détient. N'effectuez cette opération que si l'opération en cours a échoué ; le déverrouillage pendant une opération en cours risque d'entraîner des écritures simultanées."
     },
     "drift": {
       "pipelines": "Raccordements de canalisations",

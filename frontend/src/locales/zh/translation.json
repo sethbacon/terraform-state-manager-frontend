@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "观察到",
       "historySerial": "连续剧",
       "historyTfVersion": "Terraform",
-      "historySize": "尺寸"
+      "historySize": "尺寸",
+      "locksTitle": "活动锁（{{count}}）",
+      "lockHeldBy": "由 {{actor}} 自 {{since}} 起托管",
+      "lockUnknownActor": "未知",
+      "lockStale": "过期",
+      "forceUnlock": "强制解锁",
+      "forceUnlockTitle": "强制解除此状态？",
+      "forceUnlockBody": "此操作将释放{{key}}上的建议锁，无论当前由谁持有该锁。仅在持有操作发生崩溃时才执行此操作——在运行中的操作下解锁可能会导致并发写入风险。"
     },
     "drift": {
       "pipelines": "管道连接",

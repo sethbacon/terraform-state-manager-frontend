@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Osservato",
       "historySerial": "Seriale",
       "historyTfVersion": "Terraform",
-      "historySize": "Dimensioni"
+      "historySize": "Dimensioni",
+      "locksTitle": "Blocchi attivi ({{count}})",
+      "lockHeldBy": "Di proprietà di {{actor}} dal {{since}}",
+      "lockUnknownActor": "sconosciuto",
+      "lockStale": "Vecchio",
+      "forceUnlock": "Sblocco forzato",
+      "forceUnlockTitle": "Sbloccare forzatamente questo stato?",
+      "forceUnlockBody": "Questa operazione sblocca il blocco di advisory su {{key}}, indipendentemente da chi lo detiene. Eseguire questa operazione solo se l'operazione di detenzione si è interrotta: lo sblocco durante un'operazione in corso comporta il rischio di scritture concorrenti."
     },
     "drift": {
       "pipelines": "Collegamenti delle condutture",

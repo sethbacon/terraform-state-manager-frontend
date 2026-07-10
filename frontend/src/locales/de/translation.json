@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Beobachtet",
       "historySerial": "Serien",
       "historyTfVersion": "Terraform",
-      "historySize": "Größe"
+      "historySize": "Größe",
+      "locksTitle": "Aktive Sperren ({{count}})",
+      "lockHeldBy": "Veröffentlicht von {{actor}} seit {{since}}",
+      "lockUnknownActor": "unbekannt",
+      "lockStale": "Abgelaufen",
+      "forceUnlock": "Erzwungene Entsperrung",
+      "forceUnlockTitle": "Diesen Zustand zwangsweise aufheben?",
+      "forceUnlockBody": "Dadurch wird die Beratungssperre für „{{key}}“ aufgehoben, unabhängig davon, wer sie hält. Führen Sie diesen Schritt nur durch, wenn der Vorgang, der die Sperre hält, abgestürzt ist – eine Aufhebung der Sperre während eines laufenden Vorgangs birgt das Risiko gleichzeitiger Schreibvorgänge."
     },
     "drift": {
       "pipelines": "Rohrleitungsanschlüsse",

@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Waargenomen",
       "historySerial": "Serie",
       "historyTfVersion": "Terraform",
-      "historySize": "Afmetingen"
+      "historySize": "Afmetingen",
+      "locksTitle": "Actieve sloten ({{count}})",
+      "lockHeldBy": "In het bezit van {{actor}} sinds {{since}}",
+      "lockUnknownActor": "onbekend",
+      "lockStale": "Oudbakken",
+      "forceUnlock": "Geforceerd ontgrendelen",
+      "forceUnlockTitle": "Deze status met geweld ontgrendelen?",
+      "forceUnlockBody": "Hiermee wordt de adviesvergrendeling op {{key}} opgeheven, ongeacht wie deze in bezit heeft. Doe dit alleen als de bewerkingsoperatie is vastgelopen – het ontgrendelen terwijl er een actieve bewerking gaande is, brengt het risico op gelijktijdige schrijfbewerkingen met zich mee."
     },
     "drift": {
       "pipelines": "Pijpleidingaansluitingen",

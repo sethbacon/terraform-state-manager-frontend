@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Observert",
       "historySerial": "Serie",
       "historyTfVersion": "Terraform",
-      "historySize": "Størrelse"
+      "historySize": "Størrelse",
+      "locksTitle": "Aktive låser ({{count}})",
+      "lockHeldBy": "Eid av {{actor}} siden {{since}}",
+      "lockUnknownActor": "ukjent",
+      "lockStale": "Gammelt",
+      "forceUnlock": "Tving opplåsing",
+      "forceUnlockTitle": "Tvinge opplåsing av denne tilstanden?",
+      "forceUnlockBody": "Dette opphever rådgivningslåsen på {{key}}, uavhengig av hvem som har den. Gjør dette kun når operasjonen som holder låsen har krasjet – å oppheve låsen mens operasjonen pågår medfører risiko for samtidige skrivninger."
     },
     "drift": {
       "pipelines": "Rørledningsforbindelser",

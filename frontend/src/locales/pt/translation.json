@@ -634,7 +634,14 @@
       "historyAnalyzedAt": "Observado",
       "historySerial": "Série",
       "historyTfVersion": "Terraform",
-      "historySize": "Tamanho"
+      "historySize": "Tamanho",
+      "locksTitle": "Bloqueios ativos ({{count}})",
+      "lockHeldBy": "Organizado por {{actor}} desde {{since}}",
+      "lockUnknownActor": "desconhecido",
+      "lockStale": "Envelhecido",
+      "forceUnlock": "Desbloqueio forçado",
+      "forceUnlockTitle": "Deseja forçar o desbloqueio deste estado?",
+      "forceUnlockBody": "Isto liberta o bloqueio de aviso em {{key}}, independentemente de quem o detenha. Só deve fazer isto se a operação que o detém tiver falhado — desbloquear enquanto a operação está em curso implica o risco de gravações simultâneas."
     },
     "drift": {
       "pipelines": "Ligações de condutas",
