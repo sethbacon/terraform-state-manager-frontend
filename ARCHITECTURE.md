@@ -252,6 +252,29 @@ This app's error reporter is a **minimal console-only shim**: `captureError(erro
 
 In production the SPA is served by nginx (`frontend/nginx.conf`) with a SPA fallback (`try_files ... /index.html`) and a proxy for `/api`, `/health`, `/ready`, and `/swagger.(json|yaml)`. nginx sets strict security headers including a **Content-Security-Policy with a per-request style nonce**. The nonce is derived once via an nginx `map` (so the header and body agree across the `try_files` internal redirect), and `sub_filter` swaps the `__CSP_NONCE__` placeholder in `index.html`. `main.tsx` reads `<meta name="csp-nonce">` and feeds the nonce to the emotion cache; `ApiDocumentation.tsx` applies the same nonce to its injected `<style>` so Swagger UI's theme survives the policy. In development the placeholder is left literal and treated as "no nonce".
 
+## Shared Suite Package (`@sethbacon/terraform-suite-ui`)
+
+Cross-cutting concerns shared with the other Terraform Suite apps live in the
+private package [`@sethbacon/terraform-suite-ui`](https://github.com/sethbacon/terraform-suite-ui),
+published to the GitHub Packages npm registry and pinned to an **exact**
+version in `package.json` (see the "Shared private package" section of
+`SECURITY.md` for the audit/provenance/update policy — the package carries the
+auth/session provider and is treated as load-bearing security code).
+
+The following local files are thin wrappers or re-exports around it:
+
+| Local file                    | Wraps / re-exports from the package                                |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `contexts/AuthContext.tsx`     | `AuthProvider` (as `SuiteAuthProvider`), `useAuth`, `SESSION_WARNING_LEAD_MS` |
+| `contexts/ConsentContext.tsx`  | `ConsentProvider` (as `SuiteConsentProvider`), `useConsent`, `ConsentPreferences` type |
+| `contexts/ThemeContext.tsx`    | `SuiteThemeProvider`, `useThemeMode`                                |
+| `components/Layout.tsx`        | `SuiteLayout` (sidebar/topbar app shell)                            |
+| `components/PageHeader.tsx`    | `PageHeader` + `PageHeaderProps`                                    |
+| `components/DashboardCard.tsx` | `DashboardCard` + `DashboardCardProps`                              |
+| `components/ConsentBanner.tsx` | `ConsentBanner`                                                     |
+| `components/SuiteSwitcher.tsx` | `SuiteSwitcher` (as `SuiteSwitcherBase`, cross-app switcher)        |
+| `theme.ts`                     | `createAppTheme`, `BRAND_PRIMARY`, `ThemeMode`/`ThemeOverrides` types |
+
 ## Shared Components
 
 | Component               | Purpose                                                                                       |
