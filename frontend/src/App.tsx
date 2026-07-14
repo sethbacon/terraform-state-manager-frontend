@@ -1,7 +1,8 @@
 import { lazy, type ReactNode } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { queryClient } from './queryClient'
 import { AppThemeProvider } from './contexts/ThemeContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { AnnouncerProvider } from './contexts/AnnouncerContext'
@@ -61,12 +62,6 @@ const realPages: Record<string, ReactNode> = {
   '/admin/audit-logs': <AuditLogPage />,
   '/admin/ci-templates': <CITemplatesPage />,
 }
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 30_000, retry: 1, refetchOnWindowFocus: false },
-  },
-})
 
 export default function App() {
   return (
