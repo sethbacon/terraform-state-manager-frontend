@@ -15,6 +15,9 @@ vi.mock('../../services/api', async (importOriginal) => {
       updateNotificationChannel: vi.fn(),
       deleteNotificationChannel: vi.fn(),
       testNotificationChannel: vi.fn(),
+      getNotificationsSMTPConfig: vi.fn(),
+      saveNotificationsSMTPConfig: vi.fn(),
+      sendNotificationsTestEmail: vi.fn(),
     },
   }
 })
@@ -47,6 +50,14 @@ function renderPage() {
 beforeEach(() => {
   vi.clearAllMocks()
   mocked.listNotificationChannels.mockResolvedValue([channel] as Awaited<ReturnType<typeof api.listNotificationChannels>>)
+  mocked.getNotificationsSMTPConfig.mockResolvedValue({
+    host: '',
+    port: 587,
+    username: '',
+    from: '',
+    use_tls: true,
+    password_configured: false,
+  } as Awaited<ReturnType<typeof api.getNotificationsSMTPConfig>>)
 })
 
 describe('NotificationsPage', () => {
@@ -196,7 +207,7 @@ describe('NotificationsPage', () => {
     renderPage()
     await screen.findByText('ops-webhook')
 
-    fireEvent.click(screen.getByRole('switch'))
+    fireEvent.click(screen.getByRole('switch', { name: i18n.t('pages.schedules.enabled') as string }))
     await waitFor(() =>
       expect(mocked.updateNotificationChannel).toHaveBeenCalledWith('n1', expect.objectContaining({ enabled: false })),
     )

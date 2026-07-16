@@ -1064,6 +1064,25 @@
       "event": {
         "drift_detected": "Drift detected",
         "run_failed": "Run failed"
+      },
+      "smtp": {
+        "title": "SMTP Relay Settings",
+        "description": "The shared outbound mail server used by every \"email\" notification channel.",
+        "host": "Host",
+        "port": "Port",
+        "username": "Username",
+        "password": "Password",
+        "passwordPlaceholder": "Leave blank to keep existing password",
+        "passwordConfigured": "A password is currently configured",
+        "from": "From Address",
+        "useTls": "Use TLS",
+        "saveSuccess": "SMTP settings saved",
+        "saveError": "Failed to save SMTP settings",
+        "test": "Send Test Email",
+        "testRecipients": "Recipients (comma-separated)",
+        "testSuccess": "Test email sent successfully",
+        "testError": "Failed to send test email",
+        "loadError": "Failed to load SMTP settings"
       }
     },
     "reports": {

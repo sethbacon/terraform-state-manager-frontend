@@ -756,6 +756,36 @@ export interface NotificationChannelInput {
   enabled: boolean
 }
 
+// Shared SMTP relay configuration backing every "email" notification channel.
+// Mirrors terraform-registry's admin notifications SMTP config shape for parity.
+export interface NotificationsSMTPConfig {
+  host: string
+  port: number
+  username: string
+  from: string
+  use_tls: boolean
+  password_configured: boolean
+}
+
+export interface NotificationsSMTPConfigInput {
+  host: string
+  port: number
+  username: string
+  password: string
+  from: string
+  use_tls: boolean
+}
+
+export interface NotificationsTestEmailRequest {
+  recipients: string[]
+  subject?: string
+}
+
+export interface NotificationsTestEmailResult {
+  success: boolean
+  message: string
+}
+
 export interface HealthRun {
   id: string
   pipeline_connection_id: string | null
@@ -1292,6 +1322,18 @@ export const api = {
   },
   testNotificationChannel: async (id: string): Promise<{ status: string }> =>
     (await apiClient.post<{ status: string }>(`/api/v1/notifications/channels/${id}/test`)).data,
+
+  // Shared SMTP relay settings (admin) — backs every "email" channel.
+  getNotificationsSMTPConfig: async (): Promise<NotificationsSMTPConfig> =>
+    (await apiClient.get<NotificationsSMTPConfig>('/api/v1/notifications/smtp-config')).data,
+  saveNotificationsSMTPConfig: async (
+    input: NotificationsSMTPConfigInput,
+  ): Promise<NotificationsSMTPConfig> =>
+    (await apiClient.put<NotificationsSMTPConfig>('/api/v1/notifications/smtp-config', input)).data,
+  sendNotificationsTestEmail: async (
+    input: NotificationsTestEmailRequest,
+  ): Promise<NotificationsTestEmailResult> =>
+    (await apiClient.post<NotificationsTestEmailResult>('/api/v1/notifications/test-email', input)).data,
   getDriftWorkflow: async (provider: string, profile = 'default'): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/drift/workflow', {
