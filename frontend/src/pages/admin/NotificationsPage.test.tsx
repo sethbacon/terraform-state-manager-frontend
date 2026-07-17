@@ -213,3 +213,83 @@ describe('NotificationsPage', () => {
     )
   })
 })
+
+describe('SMTPSettingsPanel', () => {
+  const smtpLabel = (k: string) => i18n.t(`pages.notifications.smtp.${k}`) as string
+
+  it('seeds the form from the saved config, edits every field, and saves', async () => {
+    mocked.getNotificationsSMTPConfig.mockResolvedValue({
+      host: 'smtp.example.com',
+      port: 465,
+      username: 'relay',
+      from: 'tsm@example.com',
+      use_tls: true,
+      password_configured: true,
+    } as Awaited<ReturnType<typeof api.getNotificationsSMTPConfig>>)
+    mocked.saveNotificationsSMTPConfig.mockResolvedValue(
+      undefined as Awaited<ReturnType<typeof api.saveNotificationsSMTPConfig>>,
+    )
+    renderPage()
+
+    // The form seeds from the query once it resolves.
+    const host = await screen.findByLabelText(smtpLabel('host'))
+    await waitFor(() => expect((host as HTMLInputElement).value).toBe('smtp.example.com'))
+
+    // Exercise every field's change handler.
+    fireEvent.change(host, { target: { value: 'relay.internal' } })
+    fireEvent.change(screen.getByLabelText(smtpLabel('port')), { target: { value: '2525' } })
+    fireEvent.change(screen.getByLabelText(smtpLabel('username')), { target: { value: 'svc' } })
+    fireEvent.change(screen.getByLabelText(smtpLabel('password')), { target: { value: 'secret' } })
+    fireEvent.change(screen.getByLabelText(smtpLabel('from')), { target: { value: 'noreply@x.io' } })
+    fireEvent.click(screen.getByLabelText(smtpLabel('useTls')))
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    await waitFor(() =>
+      expect(mocked.saveNotificationsSMTPConfig).toHaveBeenCalledWith(
+        expect.objectContaining({
+          host: 'relay.internal',
+          port: 2525,
+          username: 'svc',
+          password: 'secret',
+          from: 'noreply@x.io',
+          use_tls: false,
+        }),
+      ),
+    )
+    expect(await screen.findByText(smtpLabel('saveSuccess'))).toBeInTheDocument()
+  })
+
+  it('shows an error notice when saving the SMTP config fails', async () => {
+    mocked.saveNotificationsSMTPConfig.mockRejectedValue({ response: { data: { error: 'relay unreachable' } } })
+    renderPage()
+    await screen.findByLabelText(smtpLabel('host'))
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
+    expect(await screen.findByText('relay unreachable')).toBeInTheDocument()
+  })
+
+  it('sends a test email to the parsed recipient list and reports success', async () => {
+    mocked.sendNotificationsTestEmail.mockResolvedValue({ success: true, message: 'test email sent' })
+    renderPage()
+    await screen.findByLabelText(smtpLabel('host'))
+
+    fireEvent.change(screen.getByLabelText(smtpLabel('testRecipients')), {
+      target: { value: 'a@x.io, b@x.io ,' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: smtpLabel('test') }))
+    await waitFor(() =>
+      expect(mocked.sendNotificationsTestEmail).toHaveBeenCalledWith({ recipients: ['a@x.io', 'b@x.io'] }),
+    )
+    expect(await screen.findByText('test email sent')).toBeInTheDocument()
+  })
+
+  it('reports a failed test email from a success:false response', async () => {
+    mocked.sendNotificationsTestEmail.mockResolvedValue({ success: false, message: 'smtp host is not configured' })
+    renderPage()
+    await screen.findByLabelText(smtpLabel('host'))
+
+    fireEvent.change(screen.getByLabelText(smtpLabel('testRecipients')), { target: { value: 'ops@x.io' } })
+    fireEvent.click(screen.getByRole('button', { name: smtpLabel('test') }))
+    expect(await screen.findByText('smtp host is not configured')).toBeInTheDocument()
+  })
+})
