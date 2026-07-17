@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Drift gedetecteerd",
         "run_failed": "Uitvoering mislukt"
+      },
+      "smtp": {
+        "title": "SMTP-relay-instellingen",
+        "description": "De gedeelde uitgaande e-mailserver die door elk „e-mail”-meldingskanaal wordt gebruikt.",
+        "host": "Gastheer",
+        "port": "Haven",
+        "username": "Gebruikersnaam",
+        "password": "Wachtwoord",
+        "passwordPlaceholder": "Laat dit veld leeg om het huidige wachtwoord te behouden",
+        "passwordConfigured": "Er is momenteel een wachtwoord ingesteld",
+        "from": "Van: Adres",
+        "useTls": "Gebruik TLS",
+        "saveSuccess": "SMTP-instellingen opgeslagen",
+        "saveError": "Het opslaan van de SMTP-instellingen is mislukt",
+        "test": "Test-e-mail verzenden",
+        "testRecipients": "Ontvangers (gescheiden door komma’s)",
+        "testSuccess": "Test-e-mail succesvol verzonden",
+        "testError": "Het verzenden van de test-e-mail is mislukt",
+        "loadError": "SMTP-instellingen kunnen niet worden geladen"
       }
     },
     "reports": {

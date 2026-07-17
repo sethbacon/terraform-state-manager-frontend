@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Rilevata deriva",
         "run_failed": "Esecuzione non riuscita"
+      },
+      "smtp": {
+        "title": "Impostazioni del relay SMTP",
+        "description": "Il server di posta in uscita condiviso utilizzato da tutti i canali di notifica \"e-mail\".",
+        "host": "Presentatore",
+        "port": "Porto",
+        "username": "Nome utente",
+        "password": "Password",
+        "passwordPlaceholder": "Lasciare vuoto per mantenere la password attuale",
+        "passwordConfigured": "Al momento è configurata una password",
+        "from": "Indirizzo del mittente",
+        "useTls": "Utilizza TLS",
+        "saveSuccess": "Impostazioni SMTP salvate",
+        "saveError": "Impossibile salvare le impostazioni SMTP",
+        "test": "Invia email di prova",
+        "testRecipients": "Destinatari (separati da virgola)",
+        "testSuccess": "L'e-mail di prova è stata inviata con successo",
+        "testError": "Impossibile inviare l'e-mail di prova",
+        "loadError": "Impossibile caricare le impostazioni SMTP"
       }
     },
     "reports": {

@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "ドリフトが検出されました",
         "run_failed": "実行に失敗しました"
+      },
+      "smtp": {
+        "title": "SMTPリレーの設定",
+        "description": "すべての「メール」通知チャネルで共有されている送信メールサーバー。",
+        "host": "ホスト",
+        "port": "ポート",
+        "username": "ユーザー名",
+        "password": "パスワード",
+        "passwordPlaceholder": "現在のパスワードを維持する場合は、空欄のままにしてください",
+        "passwordConfigured": "現在、パスワードが設定されています",
+        "from": "差出人住所",
+        "useTls": "TLS を使用する",
+        "saveSuccess": "SMTP設定が保存されました",
+        "saveError": "SMTP設定の保存に失敗しました",
+        "test": "テストメールを送信",
+        "testRecipients": "受信者（カンマ区切り）",
+        "testSuccess": "テストメールの送信に成功しました",
+        "testError": "テストメールの送信に失敗しました",
+        "loadError": "SMTP設定の読み込みに失敗しました"
       }
     },
     "reports": {
