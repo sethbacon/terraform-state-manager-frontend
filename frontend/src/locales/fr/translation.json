@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Dérive détectée",
         "run_failed": "Échec de l'exécution"
+      },
+      "smtp": {
+        "title": "Paramètres de relais SMTP",
+        "description": "Le serveur de courrier sortant partagé utilisé par tous les canaux de notification par « e-mail ».",
+        "host": "Hôte",
+        "port": "Port",
+        "username": "Nom d'utilisateur",
+        "password": "Mot de passe",
+        "passwordPlaceholder": "Ne rien indiquer pour conserver le mot de passe actuel",
+        "passwordConfigured": "Un mot de passe est actuellement configuré",
+        "from": "Adresse de l'expéditeur",
+        "useTls": "Utiliser TLS",
+        "saveSuccess": "Paramètres SMTP enregistrés",
+        "saveError": "Échec de l'enregistrement des paramètres SMTP",
+        "test": "Envoyer un e-mail de test",
+        "testRecipients": "Destinataires (séparés par des virgules)",
+        "testSuccess": "L'e-mail de test a bien été envoyé",
+        "testError": "Échec de l'envoi de l'e-mail de test",
+        "loadError": "Échec du chargement des paramètres SMTP"
       }
     },
     "reports": {

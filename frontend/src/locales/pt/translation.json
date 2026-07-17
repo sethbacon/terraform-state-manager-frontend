@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Detetou-se desvio",
         "run_failed": "A execução falhou"
+      },
+      "smtp": {
+        "title": "Definições de retransmissão SMTP",
+        "description": "O servidor de correio de saída partilhado utilizado por todos os canais de notificação por «e-mail».",
+        "host": "Anfitrião",
+        "port": "Porto",
+        "username": "Nome de utilizador",
+        "password": "Palavra-passe",
+        "passwordPlaceholder": "Deixe em branco para manter a palavra-passe atual",
+        "passwordConfigured": "De momento, está configurada uma palavra-passe",
+        "from": "Endereço de origem",
+        "useTls": "Utilizar TLS",
+        "saveSuccess": "Definições SMTP guardadas",
+        "saveError": "Não foi possível guardar as definições SMTP",
+        "test": "Enviar e-mail de teste",
+        "testRecipients": "Destinatários (separados por vírgulas)",
+        "testSuccess": "O e-mail de teste foi enviado com sucesso",
+        "testError": "Não foi possível enviar o e-mail de teste",
+        "loadError": "Não foi possível carregar as definições SMTP"
       }
     },
     "reports": {

@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Se ha detectado una deriva",
         "run_failed": "La ejecución ha fallado"
+      },
+      "smtp": {
+        "title": "Configuración del relé SMTP",
+        "description": "El servidor de correo saliente compartido que utilizan todos los canales de notificación por «correo electrónico».",
+        "host": "Anfitrión",
+        "port": "Puerto",
+        "username": "Nombre de usuario",
+        "password": "Contraseña",
+        "passwordPlaceholder": "Délo en blanco para mantener la contraseña actual",
+        "passwordConfigured": "Actualmente hay una contraseña configurada",
+        "from": "Dirección del remitente",
+        "useTls": "Utiliza TLS",
+        "saveSuccess": "Configuración de SMTP guardada",
+        "saveError": "No se han podido guardar los ajustes de SMTP",
+        "test": "Enviar correo electrónico de prueba",
+        "testRecipients": "Destinatarios (separados por comas)",
+        "testSuccess": "El correo electrónico de prueba se ha enviado correctamente",
+        "testError": "No se ha podido enviar el correo electrónico de prueba",
+        "loadError": "No se han podido cargar los ajustes de SMTP"
       }
     },
     "reports": {
