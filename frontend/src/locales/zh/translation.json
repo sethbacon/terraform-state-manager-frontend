@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "检测到漂移",
         "run_failed": "运行失败"
+      },
+      "smtp": {
+        "title": "SMTP 中继设置",
+        "description": "所有“电子邮件”通知通道共用的外发邮件服务器。",
+        "host": "主持人",
+        "port": "港口",
+        "username": "用户名",
+        "password": "密码",
+        "passwordPlaceholder": "如需保留现有密码，请留空",
+        "passwordConfigured": "当前已设置密码",
+        "from": "发件人地址",
+        "useTls": "使用 TLS",
+        "saveSuccess": "SMTP 设置已保存",
+        "saveError": "无法保存 SMTP 设置",
+        "test": "发送测试邮件",
+        "testRecipients": "收件人（以逗号分隔）",
+        "testSuccess": "测试邮件已成功发送",
+        "testError": "发送测试邮件失败",
+        "loadError": "无法加载 SMTP 设置"
       }
     },
     "reports": {

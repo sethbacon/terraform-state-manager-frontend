@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Abweichung festgestellt",
         "run_failed": "Ausführung fehlgeschlagen"
+      },
+      "smtp": {
+        "title": "SMTP-Relay-Einstellungen",
+        "description": "Der gemeinsam genutzte Postausgangsserver, der von allen „E-Mail“-Benachrichtigungskanälen verwendet wird.",
+        "host": "Gastgeber",
+        "port": "Hafen",
+        "username": "Benutzername",
+        "password": "Passwort",
+        "passwordPlaceholder": "Lassen Sie das Feld leer, um das bestehende Passwort beizubehalten.",
+        "passwordConfigured": "Derzeit ist ein Passwort eingerichtet.",
+        "from": "Absenderadresse",
+        "useTls": "TLS verwenden",
+        "saveSuccess": "SMTP-Einstellungen gespeichert",
+        "saveError": "SMTP-Einstellungen konnten nicht gespeichert werden",
+        "test": "Test-E-Mail senden",
+        "testRecipients": "Empfänger (durch Kommas getrennt)",
+        "testSuccess": "Test-E-Mail erfolgreich versendet",
+        "testError": "Das Versenden der Test-E-Mail ist fehlgeschlagen",
+        "loadError": "SMTP-Einstellungen konnten nicht geladen werden"
       }
     },
     "reports": {

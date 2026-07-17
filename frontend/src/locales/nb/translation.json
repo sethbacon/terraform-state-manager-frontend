@@ -908,6 +908,25 @@
       "event": {
         "drift_detected": "Drift oppdaget",
         "run_failed": "Kjøringen mislyktes"
+      },
+      "smtp": {
+        "title": "Innstillinger for SMTP-videresending",
+        "description": "Den felles utgående e-postserveren som brukes av alle «e-post»-varslingskanaler.",
+        "host": "Vert",
+        "port": "Havn",
+        "username": "Brukernavn",
+        "password": "Passord",
+        "passwordPlaceholder": "La feltet stå tomt for å beholde det nåværende passordet",
+        "passwordConfigured": "Det er for øyeblikket konfigurert et passord",
+        "from": "Avsenderadresse",
+        "useTls": "Bruk TLS",
+        "saveSuccess": "SMTP-innstillingene er lagret",
+        "saveError": "Det gikk ikke å lagre SMTP-innstillingene",
+        "test": "Send test-e-post",
+        "testRecipients": "Mottakere (kommaseparert)",
+        "testSuccess": "Test-e-posten er sendt",
+        "testError": "Det lyktes ikke å sende test-e-posten",
+        "loadError": "Det lyktes ikke å laste inn SMTP-innstillingene"
       }
     },
     "reports": {
