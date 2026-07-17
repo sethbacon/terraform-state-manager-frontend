@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.20.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.19.0...v1.20.0) (2026-07-17)
+
+
+### Features
+
+* **notifications:** SMTP relay settings UI ([#175](https://github.com/sethbacon/terraform-state-manager-frontend/issues/175)) ([2faa4a7](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2faa4a76278415708f4a368733883fcf38923f23))
+
+
+### Bug Fixes
+
+* **ci:** add blocking Trivy image scan to the release pipeline ([#170](https://github.com/sethbacon/terraform-state-manager-frontend/issues/170)) ([4562235](https://github.com/sethbacon/terraform-state-manager-frontend/commit/456223550e494ea7ad32bfef4204b742fad1d5f0))
+* **docker:** apk upgrade to patch nginx base-image OS CVEs ([#176](https://github.com/sethbacon/terraform-state-manager-frontend/issues/176)) ([e9466a4](https://github.com/sethbacon/terraform-state-manager-frontend/commit/e9466a4b3eb918bd812b802c30f96825da736c3f))
+* exact-pin @sethbacon/terraform-suite-ui and disclose it in SECURITY.md/ARCHITECTURE.md ([#168](https://github.com/sethbacon/terraform-state-manager-frontend/issues/168)) ([e2e290f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/e2e290f9421681169c0c98acfd0b91633e4585bb))
+* validate backend URLs, add error boundary, and clear query cache on logout ([#174](https://github.com/sethbacon/terraform-state-manager-frontend/issues/174)) ([06cab12](https://github.com/sethbacon/terraform-state-manager-frontend/commit/06cab123fda10e3251bdd6c7eda0fb3b187d82ee))
+
 ## [1.19.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.18.4...v1.19.0) (2026-07-10)
 
 
