@@ -225,10 +225,15 @@ describe('SMTPSettingsPanel', () => {
       from: 'tsm@example.com',
       use_tls: true,
       password_configured: true,
-    } as Awaited<ReturnType<typeof api.getNotificationsSMTPConfig>>)
-    mocked.saveNotificationsSMTPConfig.mockResolvedValue(
-      undefined as Awaited<ReturnType<typeof api.saveNotificationsSMTPConfig>>,
-    )
+    })
+    mocked.saveNotificationsSMTPConfig.mockResolvedValue({
+      host: 'relay.internal',
+      port: 2525,
+      username: 'svc',
+      from: 'noreply@x.io',
+      use_tls: false,
+      password_configured: true,
+    })
     renderPage()
 
     // The form seeds from the query once it resolves.
