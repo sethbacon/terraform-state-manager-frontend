@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.21.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.20.0...v1.21.0) (2026-07-18)
+
+
+### Features
+
+* **notifications:** adopt shared NotificationChannelsSection and ApiKeyExpirySettingsCard ([0358bb8](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0358bb894399214dfb85ebc34a484d15a7a73290))
+
 ## [1.20.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.19.0...v1.20.0) (2026-07-17)
 
 
