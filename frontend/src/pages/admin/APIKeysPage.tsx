@@ -31,6 +31,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import { useTranslation } from 'react-i18next'
+import { ApiKeyExpirySettingsCard, type ApiKeyExpirySettingsInput } from '@sethbacon/terraform-suite-ui'
 import { api, type APIKey, type APIKeyInput } from '../../services/api'
 import ConfirmDialog from '../../components/ConfirmDialog'
 import PageHeader from '../../components/PageHeader'
@@ -69,6 +70,7 @@ function expiryStatus(key: APIKey): 'never' | 'active' | 'expired' {
 export default function APIKeysPage() {
   const { t } = useTranslation()
   const { hasScope } = useAuth()
+  const isAdmin = hasScope('admin')
   const queryClient = useQueryClient()
 
   const [editorOpen, setEditorOpen] = useState(false)
@@ -80,6 +82,22 @@ export default function APIKeysPage() {
 
   const keysQuery = useQuery({ queryKey: queryKeys.apiKeys.list(), queryFn: api.listAPIKeys })
   const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.apiKeys.all })
+
+  // API-key-expiry notification settings (admin-only).
+  const expiryConfigQuery = useQuery({
+    queryKey: queryKeys.admin.notificationsAPIKeyExpiry(),
+    queryFn: () => api.getAPIKeyExpiryConfig(),
+    enabled: isAdmin,
+  })
+  const saveExpiryMutation = useMutation({
+    mutationFn: (input: ApiKeyExpirySettingsInput) =>
+      api.saveAPIKeyExpiryConfig({
+        api_key_expiring: input.apiKeyExpiring,
+        api_key_expiry_warning_days: input.warningDays,
+        api_key_expiry_check_interval_hours: input.checkIntervalHours,
+      }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.admin.notificationsAPIKeyExpiry() }),
+  })
 
   const deleteKey = useMutation({
     mutationFn: (id: string) => api.deleteAPIKey(id),
@@ -120,6 +138,21 @@ export default function APIKeysPage() {
         <Alert severity="error" onClose={() => setNotice('')} sx={{ mb: 2 }}>
           {notice}
         </Alert>
+      )}
+
+      {isAdmin && (
+        <ApiKeyExpirySettingsCard
+          value={{
+            enabled: expiryConfigQuery.data?.enabled ?? false,
+            apiKeyExpiring: expiryConfigQuery.data?.api_key_expiring ?? false,
+            warningDays: expiryConfigQuery.data?.api_key_expiry_warning_days ?? 7,
+            checkIntervalHours: expiryConfigQuery.data?.api_key_expiry_check_interval_hours ?? 24,
+          }}
+          isLoading={expiryConfigQuery.isLoading}
+          onSave={async (input) => {
+            await saveExpiryMutation.mutateAsync(input)
+          }}
+        />
       )}
 
       {keysQuery.isLoading && <TableSkeleton rows={4} columns={6} />}

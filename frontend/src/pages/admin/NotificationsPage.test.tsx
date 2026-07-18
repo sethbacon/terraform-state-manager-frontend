@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import NotificationsPage from './NotificationsPage'
 import { api } from '../../services/api'
@@ -79,7 +79,7 @@ describe('NotificationsPage', () => {
   it('shows the empty hint when no channels exist', async () => {
     mocked.listNotificationChannels.mockResolvedValue([])
     renderPage()
-    expect(await screen.findByText(i18n.t('pages.notifications.noChannels') as string)).toBeInTheDocument()
+    expect(await screen.findByText('No notification channels configured yet.')).toBeInTheDocument()
   })
 
   it('creates a channel with type, target, and selected events', async () => {
@@ -93,7 +93,7 @@ describe('NotificationsPage', () => {
     })
     fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('common.type')}`)))
     fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.notifications.typeSlack') as string }))
-    fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.notifications.target')}`)), {
+    fireEvent.change(screen.getByLabelText(/^Target URL/), {
       target: { value: 'https://hooks.slack.com/services/x' },
     })
     fireEvent.click(screen.getByLabelText(i18n.t('pages.notifications.event.run_failed') as string))
@@ -122,7 +122,7 @@ describe('NotificationsPage', () => {
     })
     fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('common.type')}`)))
     fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.notifications.typeTeams') as string }))
-    fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.notifications.target')}`)), {
+    fireEvent.change(screen.getByLabelText(/^Target URL/), {
       target: { value: 'https://example.webhook.office.com/webhookb2/x' },
     })
 
@@ -150,7 +150,7 @@ describe('NotificationsPage', () => {
     fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('common.type')}`)))
     fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.notifications.typeEmail') as string }))
     // The target field relabels to the email recipient label once Email is chosen.
-    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.notifications.targetEmail')}`)), {
+    fireEvent.change(await screen.findByLabelText(/^Recipient address\(es\)/), {
       target: { value: 'ops@example.com, oncall@example.com' },
     })
 
@@ -172,7 +172,7 @@ describe('NotificationsPage', () => {
     await screen.findByText('ops-webhook')
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.edit') as string }))
-    expect(await screen.findByText(i18n.t('pages.notifications.targetKeep') as string)).toBeInTheDocument()
+    expect(await screen.findByText('Leave blank to keep the existing target.')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
     await waitFor(() =>
@@ -198,7 +198,8 @@ describe('NotificationsPage', () => {
     await screen.findByText('ops-webhook')
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.delete') as string }))
-    fireEvent.click(await screen.findByTestId('confirm-dialog-confirm'))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
     await waitFor(() => expect(mocked.deleteNotificationChannel.mock.calls[0]?.[0]).toBe('n1'))
   })
 

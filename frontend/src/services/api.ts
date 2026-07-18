@@ -786,6 +786,22 @@ export interface NotificationsTestEmailResult {
   message: string
 }
 
+// API-key-expiry notification settings. Mirrors terraform-registry's
+// equivalent fields (folded into its combined notifications config) for
+// parity; here it is a dedicated endpoint.
+export interface NotificationsAPIKeyExpiryConfig {
+  enabled: boolean
+  api_key_expiring: boolean
+  api_key_expiry_warning_days: number
+  api_key_expiry_check_interval_hours: number
+}
+
+export interface NotificationsAPIKeyExpiryConfigInput {
+  api_key_expiring: boolean
+  api_key_expiry_warning_days: number
+  api_key_expiry_check_interval_hours: number
+}
+
 export interface HealthRun {
   id: string
   pipeline_connection_id: string | null
@@ -1334,6 +1350,12 @@ export const api = {
     input: NotificationsTestEmailRequest,
   ): Promise<NotificationsTestEmailResult> =>
     (await apiClient.post<NotificationsTestEmailResult>('/api/v1/notifications/test-email', input)).data,
+  getAPIKeyExpiryConfig: async (): Promise<NotificationsAPIKeyExpiryConfig> =>
+    (await apiClient.get<NotificationsAPIKeyExpiryConfig>('/api/v1/notifications/api-key-expiry')).data,
+  saveAPIKeyExpiryConfig: async (
+    input: NotificationsAPIKeyExpiryConfigInput,
+  ): Promise<NotificationsAPIKeyExpiryConfig> =>
+    (await apiClient.put<NotificationsAPIKeyExpiryConfig>('/api/v1/notifications/api-key-expiry', input)).data,
   getDriftWorkflow: async (provider: string, profile = 'default'): Promise<string> =>
     (
       await apiClient.get<string>('/api/v1/drift/workflow', {
