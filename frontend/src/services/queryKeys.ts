@@ -29,6 +29,7 @@ export const queryKeys = {
     mtls: () => ['admin', 'mtls'] as const,
     notifications: () => ['admin', 'notifications'] as const,
     notificationsSMTP: () => ['admin', 'notifications', 'smtp-config'] as const,
+    notificationsAPIKeyExpiry: () => ['admin', 'notifications', 'api-key-expiry'] as const,
     ciTemplates: () => ['admin', 'ci-templates'] as const,
     ciTemplate: (id: string) => ['admin', 'ci-templates', id] as const,
   },

@@ -16,6 +16,8 @@ vi.mock('../../services/api', async (importOriginal) => {
       updateAPIKey: vi.fn(),
       deleteAPIKey: vi.fn(),
       rotateAPIKey: vi.fn(),
+      getAPIKeyExpiryConfig: vi.fn(),
+      saveAPIKeyExpiryConfig: vi.fn(),
     },
   }
 })
@@ -201,5 +203,47 @@ describe('APIKeysPage', () => {
     fireEvent.click(within(dialog).getByLabelText('state:read'))
     fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.apiKeys.create') as string }))
     expect(await within(dialog).findByText(/cannot grant scope/)).toBeInTheDocument()
+  })
+})
+
+describe('API key expiry settings (admin)', () => {
+  it('is hidden for a non-admin user', async () => {
+    renderPage()
+    await screen.findByText('ci-drift')
+    expect(screen.queryByText('API key expiry notifications')).not.toBeInTheDocument()
+  })
+
+  it('renders the current settings and saves an edit for an admin user', async () => {
+    mockedUseAuth.mockReturnValue({
+      hasScope: (s: string) => s === 'admin',
+    } as unknown as AuthShape)
+    mocked.getAPIKeyExpiryConfig.mockResolvedValue({
+      enabled: true,
+      api_key_expiring: true,
+      api_key_expiry_warning_days: 7,
+      api_key_expiry_check_interval_hours: 24,
+    })
+    mocked.saveAPIKeyExpiryConfig.mockResolvedValue({
+      enabled: true,
+      api_key_expiring: true,
+      api_key_expiry_warning_days: 14,
+      api_key_expiry_check_interval_hours: 24,
+    })
+    renderPage()
+    await screen.findByText('ci-drift')
+
+    const warningDaysInput = await screen.findByLabelText(/Warn this many days before expiry/)
+    await waitFor(() => expect((warningDaysInput as HTMLInputElement).value).toBe('7'))
+
+    fireEvent.change(warningDaysInput, { target: { value: '14' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() =>
+      expect(mocked.saveAPIKeyExpiryConfig).toHaveBeenCalledWith({
+        api_key_expiring: true,
+        api_key_expiry_warning_days: 14,
+        api_key_expiry_check_interval_hours: 24,
+      }),
+    )
   })
 })
