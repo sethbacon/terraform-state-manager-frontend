@@ -219,6 +219,46 @@ describe('SourcesPage', () => {
     )
   })
 
+  it('preserves config keys the edit form does not model (e.g. git author fields)', async () => {
+    mocked.listSources.mockResolvedValue([
+      {
+        id: 'g1',
+        name: 'repo-src',
+        type: 'git',
+        config: {
+          repo_url: 'https://github.com/org/repo.git',
+          ref: 'main',
+          author_name: 'Platform Bot',
+          author_email: 'platform@example.com',
+        },
+      },
+    ] as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    mocked.updateSource.mockResolvedValue({} as never)
+    renderPage()
+    await screen.findByText('repo-src')
+
+    fireEvent.click(screen.getByLabelText(i18n.t('pages.sources.editSourceAria') as string))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText(i18n.t('common.name') as string), {
+      target: { value: 'repo-renamed' },
+    })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.save') as string }))
+
+    // The backend replaces config wholesale, so author_name/author_email — set
+    // out-of-band and not shown by the edit form — must survive an unrelated edit.
+    await waitFor(() =>
+      expect(mocked.updateSource).toHaveBeenCalledWith('g1', {
+        name: 'repo-renamed',
+        config: {
+          repo_url: 'https://github.com/org/repo.git',
+          ref: 'main',
+          author_name: 'Platform Bot',
+          author_email: 'platform@example.com',
+        },
+      }),
+    )
+  })
+
   it('tests a connection and shows the outcome chip', async () => {
     mocked.testSource.mockResolvedValue({ status: 'ok', states: 3 } as Awaited<
       ReturnType<typeof api.testSource>
