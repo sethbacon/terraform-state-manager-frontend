@@ -32,6 +32,8 @@ vi.mock('../services/api', async (importOriginal) => {
       downloadRawState: vi.fn(),
       updateSource: vi.fn(),
       testSource: vi.fn(),
+      testSourceConfig: vi.fn(),
+      getDashboardOverview: vi.fn(),
       stateOperation: vi.fn(),
       deleteState: vi.fn(),
       backupToSource: vi.fn(),
@@ -106,6 +108,9 @@ beforeEach(() => {
   mocked.analyzeState.mockResolvedValue(analysis as Awaited<ReturnType<typeof api.analyzeState>>)
   mocked.listStateResources.mockResolvedValue(resources as Awaited<ReturnType<typeof api.listStateResources>>)
   mocked.listStateLocks.mockResolvedValue([])
+  // Default: all sources synced with no errors (no badges) so existing tests are
+  // unaffected; sync-badge tests override this.
+  mocked.getDashboardOverview.mockResolvedValue({ sync: [] } as unknown as Awaited<ReturnType<typeof api.getDashboardOverview>>)
 })
 
 describe('SourcesPage', () => {
@@ -884,6 +889,83 @@ describe('SourcesPage', () => {
         }),
       ),
     )
+  })
+
+  it('tests an unsaved config from the Add dialog before creating', async () => {
+    mocked.testSourceConfig.mockResolvedValue({ status: 'ok', states: 4 })
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.addSource') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'local-2' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(/path/i), { target: { value: '/data/states' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.sources.testConnection') as string }))
+
+    await waitFor(() =>
+      expect(mocked.testSourceConfig).toHaveBeenCalledWith(
+        expect.objectContaining({ type: 'local', config: expect.objectContaining({ base_path: '/data/states' }) }),
+      ),
+    )
+    // Nothing is persisted by a test.
+    expect(mocked.createSource).not.toHaveBeenCalled()
+    expect(await within(dialog).findByText(i18n.t('pages.sources.testOk', { count: 4 }) as string)).toBeInTheDocument()
+  })
+
+  it('shows the failure chip when the Add-dialog test connection fails', async () => {
+    mocked.testSourceConfig.mockRejectedValue({ response: { data: { error: 'base_path is not a directory' } } })
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.addSource') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'bad' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(/path/i), { target: { value: '/nope' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.sources.testConnection') as string }))
+
+    expect(await within(dialog).findByText(i18n.t('pages.sources.testFailed') as string)).toBeInTheDocument()
+    expect(mocked.createSource).not.toHaveBeenCalled()
+  })
+
+  it('tests from the Edit dialog, reusing stored credentials via source_id', async () => {
+    mocked.testSourceConfig.mockResolvedValue({ status: 'ok', states: 2 })
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getAllByLabelText(i18n.t('pages.sources.editSourceAria') as string)[0])
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.sources.testConnection') as string }))
+
+    await waitFor(() =>
+      expect(mocked.testSourceConfig).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'local',
+          source_id: 's1',
+          config: expect.objectContaining({ base_path: '/data/states' }),
+        }),
+      ),
+    )
+    // Blank credentials are not sent, so the stored secret is reused server-side.
+    expect(mocked.testSourceConfig.mock.calls[0]?.[0]).not.toHaveProperty('credentials')
+  })
+
+  it('shows per-source sync status and errors on the cards from the dashboard overview', async () => {
+    mocked.getDashboardOverview.mockResolvedValue({
+      sync: [
+        { source_id: 's1', name: 'demo-local', type: 'local', synced: false },
+        { source_id: 's2', name: 'archive', type: 's3', synced: true, last_error: 'AccessDenied', read_errors: 2 },
+      ],
+    } as unknown as Awaited<ReturnType<typeof api.getDashboardOverview>>)
+    renderPage()
+    await screen.findByText('demo-local')
+
+    expect(await screen.findByText(i18n.t('pages.sources.syncPending') as string)).toBeInTheDocument()
+    expect(await screen.findByText(i18n.t('pages.sources.syncError') as string)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.sources.syncReadErrors', { count: 2 }) as string)).toBeInTheDocument()
   })
 
   it('surfaces the backend error when source creation fails', async () => {

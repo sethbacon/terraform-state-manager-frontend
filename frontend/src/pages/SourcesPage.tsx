@@ -52,7 +52,9 @@ import {
   type AnalysisResult,
   type ModuleFreshness,
   type ResourceSummary,
+  type SourceSyncInfo,
   type StateSource,
+  type TestSourceConfigInput,
   type TransferResult,
 } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
@@ -86,6 +88,32 @@ export default function SourcesPage() {
   const [editTarget, setEditTarget] = useState<StateSource | null>(null)
 
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources })
+
+  // Per-source sync health (synced flag, last_error, read errors) comes from the
+  // dashboard overview. Poll while any source's first sync is still pending so a
+  // freshly-added source's status — and its state count — appear on their own,
+  // without the operator having to re-navigate. Stops polling once all synced.
+  const syncQuery = useQuery({
+    queryKey: queryKeys.dashboard.overview(),
+    queryFn: () => api.getDashboardOverview(),
+    refetchInterval: (q) => ((q.state.data?.sync ?? []).some((s) => !s.synced) ? 5000 : false),
+  })
+  const syncBySource = useMemo(
+    () => new Map((syncQuery.data?.sync ?? []).map((s) => [s.source_id, s])),
+    [syncQuery.data],
+  )
+  // When a source finishes its first sync, refresh its live state count so a card
+  // that briefly showed nothing (or an error) reflects the now-reconciled source.
+  const syncedIds = (syncQuery.data?.sync ?? [])
+    .filter((s) => s.synced)
+    .map((s) => s.source_id)
+    .join(',')
+  useEffect(() => {
+    if (!syncedIds) return
+    for (const id of syncedIds.split(',')) {
+      queryClient.invalidateQueries({ queryKey: queryKeys.sources.states(id) })
+    }
+  }, [syncedIds, queryClient])
 
   // Deep link from the dashboard's version drill-down: ?source=<id>&state=<key>
   // preselects that source and state once the source list has loaded. Applied
@@ -186,6 +214,7 @@ export default function SourcesPage() {
                 </Typography>
                 <Chip size="small" color="primary" label={s.type} />
                 <StateCountChip sourceId={s.id} />
+                <SourceSyncBadge sync={syncBySource.get(s.id)} />
               </Stack>
               {typeof s.config?.base_path === 'string' && (
                 <Typography variant="caption" color="text.secondary" sx={{ wordBreak: 'break-all' }}>
@@ -322,6 +351,64 @@ function TestConnectionAction({ sourceId }: { sourceId: string }) {
   )
 }
 
+// SourceSyncBadge surfaces per-source sync health on the card, so a source that
+// silently listed nothing (e.g. a bad credential) shows its actual state and
+// error rather than just an empty count. Data comes from the dashboard overview.
+function SourceSyncBadge({ sync }: { sync?: SourceSyncInfo }) {
+  const { t } = useTranslation()
+  if (!sync) return null
+  if (!sync.synced) {
+    return <Chip size="small" color="info" variant="outlined" label={t('pages.sources.syncPending')} />
+  }
+  return (
+    <>
+      {(sync.read_errors ?? 0) > 0 && (
+        <Chip
+          size="small"
+          color="warning"
+          variant="outlined"
+          label={t('pages.sources.syncReadErrors', { count: sync.read_errors })}
+        />
+      )}
+      {sync.last_error && (
+        <Tooltip title={sync.last_error}>
+          <Chip size="small" color="error" variant="outlined" label={t('pages.sources.syncError')} />
+        </Tooltip>
+      )}
+    </>
+  )
+}
+
+// DialogTestConnection is the "test before save" control shared by the Add and
+// Edit dialogs: it validates the connectivity of the config the operator is
+// about to save (build() returns null while required fields are blank) without
+// persisting anything, mirroring the per-card TestConnectionAction.
+function DialogTestConnection({ build }: { build: () => TestSourceConfigInput | null }) {
+  const { t } = useTranslation()
+  const m = useMutation({ mutationFn: (input: TestSourceConfigInput) => api.testSourceConfig(input) })
+  const input = build()
+  return (
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center', mr: 'auto' }}>
+      <Button
+        size="small"
+        onClick={() => input && m.mutate(input)}
+        disabled={!input || m.isPending}
+        startIcon={m.isPending ? <CircularProgress size={14} /> : <PlayCircleOutlineIcon fontSize="small" />}
+      >
+        {t('pages.sources.testConnection')}
+      </Button>
+      {m.isSuccess && (
+        <Chip size="small" color="success" variant="outlined" label={t('pages.sources.testOk', { count: m.data.states ?? 0 })} />
+      )}
+      {m.isError && (
+        <Tooltip title={errMsg(m.error)}>
+          <Chip size="small" color="error" variant="outlined" label={t('pages.sources.testFailed')} />
+        </Tooltip>
+      )}
+    </Stack>
+  )
+}
+
 // Edit dialog: same field definitions as Add, but the type is immutable and
 // credential fields left blank keep the stored secret.
 function EditSourceDialog({
@@ -373,6 +460,27 @@ function EditSourceDialog({
   const valid =
     Boolean(name) && def.fields.filter((f) => !f.optional && !f.credential).every((f) => values[f.key]?.trim())
 
+  // Test the config the operator is about to save; blank credentials reuse the
+  // source's stored secret via source_id (mirroring UpdateSource). Null until
+  // the required non-credential fields are filled.
+  const buildTestInput = (): TestSourceConfigInput | null => {
+    if (!source || !valid) return null
+    const config: Record<string, unknown> = {}
+    const credentials: Record<string, unknown> = {}
+    for (const f of def.fields) {
+      const v = values[f.key]?.trim()
+      if (!v) continue
+      if (f.credential) credentials[f.key] = v
+      else config[f.key] = v
+    }
+    return {
+      type,
+      config,
+      source_id: source.id,
+      ...(Object.keys(credentials).length ? { credentials } : {}),
+    }
+  }
+
   return (
     <Dialog open={Boolean(source)} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{t('pages.sources.editSourceTitle', { name: source?.name })}</DialogTitle>
@@ -409,6 +517,7 @@ function EditSourceDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
+        <DialogTestConnection build={buildTestInput} />
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" onClick={() => saveMutation.mutate()} disabled={!valid || saveMutation.isPending}>
           {t('common.save')}
@@ -1904,6 +2013,21 @@ function AddSourceDialog({
 
   const valid = Boolean(name) && def.fields.filter((f) => !f.optional).every((f) => values[f.key]?.trim())
 
+  // Test the config being entered before it is persisted; null until the
+  // required fields are filled so the button stays disabled.
+  const buildTestInput = (): TestSourceConfigInput | null => {
+    if (!valid) return null
+    const config: Record<string, unknown> = {}
+    const credentials: Record<string, unknown> = {}
+    for (const f of def.fields) {
+      const v = values[f.key]?.trim()
+      if (!v) continue
+      if (f.credential) credentials[f.key] = v
+      else config[f.key] = v
+    }
+    return { type, config, ...(Object.keys(credentials).length ? { credentials } : {}) }
+  }
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{t('pages.sources.addSourceTitle')}</DialogTitle>
@@ -1952,9 +2076,10 @@ function AddSourceDialog({
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <DialogTestConnection build={buildTestInput} />
+        <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button variant="contained" onClick={() => createMutation.mutate()} disabled={!valid || createMutation.isPending}>
-          Create
+          {t('common.create')}
         </Button>
       </DialogActions>
     </Dialog>
