@@ -5,6 +5,10 @@ import { AuthProvider, useAuth } from './AuthContext'
 import { api } from '../services/api'
 import { USER_KEY } from '../utils/authStorage'
 
+// Captures the handler the SessionExpiryBridge registers with the api module, so
+// a test can invoke it as the 401 interceptor would.
+const unauth = vi.hoisted(() => ({ handler: null as (() => void) | null }))
+
 vi.mock('../services/api', () => ({
   api: {
     getCurrentUser: vi.fn(),
@@ -14,6 +18,9 @@ vi.mock('../services/api', () => ({
     login: vi.fn(),
     logout: vi.fn(),
   },
+  setUnauthorizedHandler: vi.fn((h: (() => void) | null) => {
+    unauth.handler = h
+  }),
 }))
 
 const mocked = vi.mocked(api)
@@ -141,6 +148,26 @@ describe('AuthProvider', () => {
 
     expect(result.current.isAuthenticated).toBe(true)
     expect(result.current.sessionExpiresSoon).toBe(false)
+    expect(mocked.logout).not.toHaveBeenCalled()
+  })
+
+  it('a mid-session 401 while authenticated logs the user out', async () => {
+    mocked.getCurrentUser.mockResolvedValue(me as Awaited<ReturnType<typeof api.getCurrentUser>>)
+    const { result } = await renderAuth()
+    expect(result.current.isAuthenticated).toBe(true)
+    expect(unauth.handler).toBeTypeOf('function')
+
+    // What the 401 interceptor does on an expired/revoked session mid-use.
+    act(() => unauth.handler?.())
+    expect(mocked.logout).toHaveBeenCalled()
+  })
+
+  it('a 401 while anonymous does not log out (no bootstrap loop)', async () => {
+    mocked.getCurrentUser.mockRejectedValue(new Error('401'))
+    const { result } = await renderAuth()
+    expect(result.current.isAuthenticated).toBe(false)
+
+    act(() => unauth.handler?.())
     expect(mocked.logout).not.toHaveBeenCalled()
   })
 })

@@ -2,9 +2,9 @@
 // The provider is cookie/`/me`-driven and derives the role template from the
 // primary membership — matching this app's previous behaviour. SESSION_WARNING_LEAD_MS
 // and useAuth are re-exported so existing imports keep working.
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { AuthProvider as SuiteAuthProvider, useAuth, SESSION_WARNING_LEAD_MS } from '@sethbacon/terraform-suite-ui'
-import { api } from '../services/api'
+import { api, setUnauthorizedHandler } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
 import { queryClient } from '../queryClient'
 
@@ -15,9 +15,29 @@ function handleClearStorage(): void {
   queryClient.clear()
 }
 
+// Bridges the axios 401 interceptor to the auth state. A 401 that happens while
+// the user IS authenticated (a mid-session expiry or admin revocation) triggers a
+// logout, which resets the in-memory session so ProtectedRoute redirects to
+// /login — instead of leaving the SPA in a broken authenticated shell where every
+// query 401s. Gated on isAuthenticated so the expected anonymous 401s (the
+// bootstrap /me probe, requests from the login page) are ignored and cannot loop.
+function SessionExpiryBridge() {
+  const { isAuthenticated, logout } = useAuth()
+  const authedRef = useRef(isAuthenticated)
+  authedRef.current = isAuthenticated
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      if (authedRef.current) logout()
+    })
+    return () => setUnauthorizedHandler(null)
+  }, [logout])
+  return null
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <SuiteAuthProvider api={api} onClearStorage={handleClearStorage}>
+      <SessionExpiryBridge />
       {children}
     </SuiteAuthProvider>
   )

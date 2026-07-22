@@ -48,13 +48,25 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-// On 401, drop any stale local auth state. Route guards handle the redirect, so we
-// don't navigate here (avoids loops on anonymous probes like the initial /me call).
+// Optional hook the auth layer registers to react to a 401. It is responsible
+// for gating on whether a session was actually established, so this module can
+// call it unconditionally without looping on the anonymous probes (the bootstrap
+// /me call, the login page). See SessionExpiryBridge in contexts/AuthContext.
+let onUnauthorized: (() => void) | null = null
+export function setUnauthorizedHandler(handler: (() => void) | null): void {
+  onUnauthorized = handler
+}
+
+// On 401, drop any stale local auth state and notify the auth layer. Without the
+// notification a 401 that happens AFTER mount (an expired or admin-revoked
+// session) left the in-memory auth state authenticated, stranding the SPA in a
+// logged-in-looking shell where every query 401s until a manual reload.
 apiClient.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error.response?.status === 401) {
       clearAuthStorage()
+      onUnauthorized?.()
     }
     return Promise.reject(error)
   },
