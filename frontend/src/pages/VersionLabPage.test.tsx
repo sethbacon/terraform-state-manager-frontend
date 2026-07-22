@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import VersionLabPage from './VersionLabPage'
 import { api } from '../services/api'
@@ -93,6 +93,30 @@ describe('VersionLabPage', () => {
     expect(screen.getByText(i18n.t('pages.versionLab.statusUnhealthy') as string)).toBeInTheDocument()
     expect(screen.getByText('1.9.5')).toBeInTheDocument()
     expect(screen.getByText(/plan failed: provider mismatch/)).toBeInTheDocument()
+  })
+
+  it('opens a run detail dialog with the full detail and version matrix (issue #186)', async () => {
+    // The healthy run h1 exercised terraform 1.9.5 + aws 5.0.0.
+    mocked.listHealthRuns.mockResolvedValue({
+      runs: [
+        {
+          ...runs[0],
+          detail: 'a very long init/plan error '.repeat(20).trim(),
+        },
+        runs[1],
+      ],
+      total: 2,
+    } as Awaited<ReturnType<typeof api.listHealthRuns>>)
+    renderPage()
+
+    fireEvent.click(await screen.findByText('1.9.5'))
+    const dialog = await screen.findByRole('dialog')
+    // The tested version matrix is shown (provider that a truncated row never revealed).
+    expect(within(dialog).getByText(i18n.t('pages.versionLab.versionMatrix') as string)).toBeInTheDocument()
+    expect(within(dialog).getByText('aws')).toBeInTheDocument()
+    expect(within(dialog).getByText('5.0.0')).toBeInTheDocument()
+    // The full, untruncated detail is readable in the dialog.
+    expect(within(dialog).getByText(/a very long init\/plan error/)).toBeInTheDocument()
   })
 
   it('paginates and filters health runs server-side', async () => {
