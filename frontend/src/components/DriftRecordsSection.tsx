@@ -152,7 +152,16 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
           size="small"
           exclusive
           value={view}
-          onChange={(_, v: 'active' | 'all' | null) => v && setView(v)}
+          onChange={(_, v: 'active' | 'all' | null) => {
+            if (v) {
+              setView(v)
+              // Selection is scoped to the visible rows: bulk actions only touch
+              // ids present on the current page, so a selection carried across a
+              // view/filter/page change would silently under-act ("5 selected"
+              // but only the visible ones processed). Reset it instead.
+              clearSelection()
+            }
+          }}
           aria-label={t('pages.drift.recordsFilter')}
         >
           <ToggleButton value="active">{t('pages.drift.recordsActive')}</ToggleButton>
@@ -169,6 +178,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
             if (v !== null) {
               setSeverity(v)
               setPage(0)
+              clearSelection()
             }
           }}
           aria-label={t('pages.drift.severityFilter')}
@@ -186,6 +196,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
             onChange={(e: SelectChangeEvent) => {
               setSourceFilter(e.target.value)
               setPage(0)
+              clearSelection()
             }}
           >
             <MenuItem value="">{t('pages.drift.allSources')}</MenuItem>
@@ -310,7 +321,10 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
             component="div"
             count={total}
             page={page}
-            onPageChange={(_, p) => setPage(p)}
+            onPageChange={(_, p) => {
+              setPage(p)
+              clearSelection()
+            }}
             rowsPerPage={RECORDS_PAGE_SIZE}
             rowsPerPageOptions={[RECORDS_PAGE_SIZE]}
           />
