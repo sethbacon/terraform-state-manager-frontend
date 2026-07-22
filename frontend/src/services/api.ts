@@ -357,6 +357,15 @@ export interface SourceTestResult {
   error?: string
 }
 
+export interface TestSourceConfigInput {
+  type: string
+  config: Record<string, unknown>
+  credentials?: Record<string, unknown>
+  /** When set with blank credentials, the stored source's credentials are reused
+   * (the edit-dialog "blank = keep existing" contract). */
+  source_id?: string
+}
+
 export interface ResourceSummary {
   module: string
   mode: string
@@ -989,6 +998,9 @@ export const api = {
     (await apiClient.put<StateSource>(`/api/v1/sources/${id}`, input)).data,
   testSource: async (id: string): Promise<SourceTestResult> =>
     (await apiClient.post<SourceTestResult>(`/api/v1/sources/${id}/test`)).data,
+  // Test an UNSAVED source configuration (add/edit dialogs) before persisting.
+  testSourceConfig: async (input: TestSourceConfigInput): Promise<SourceTestResult> =>
+    (await apiClient.post<SourceTestResult>('/api/v1/sources/test', input)).data,
   createSource: async (input: CreateSourceInput): Promise<StateSource> =>
     (await apiClient.post<StateSource>('/api/v1/sources', input)).data,
   deleteSource: async (id: string): Promise<void> => {
