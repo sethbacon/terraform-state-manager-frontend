@@ -439,13 +439,22 @@ function EditSourceDialog({
 
   const saveMutation = useMutation({
     mutationFn: () => {
-      const config: Record<string, unknown> = {}
+      // The backend replaces config wholesale on update, so start from the
+      // existing config and overlay only the known fields — otherwise config
+      // keys the UI does not model (e.g. a git source's author_name/
+      // author_email set out-of-band) would be silently dropped on any edit.
+      const config: Record<string, unknown> = { ...(source?.config ?? {}) }
       const credentials: Record<string, unknown> = {}
       for (const f of def.fields) {
         const v = values[f.key]?.trim()
-        if (!v) continue
-        if (f.credential) credentials[f.key] = v
-        else config[f.key] = v
+        if (f.credential) {
+          // Credentials never live in config; keep them out of the config blob.
+          delete config[f.key]
+          if (v) credentials[f.key] = v
+          continue
+        }
+        if (v) config[f.key] = v
+        else delete config[f.key]
       }
       return api.updateSource(source!.id, {
         name,
