@@ -168,6 +168,37 @@ describe('DriftRecordsSection', () => {
     await waitFor(() => expect(mocked.listDriftRecords).toHaveBeenLastCalledWith(expect.objectContaining({ page: 2 })))
   })
 
+  it('clears the bulk selection when the page or a filter changes (issue #187)', async () => {
+    mocked.listDriftRecords.mockResolvedValue({
+      records: [openRecord, ackedRecord],
+      counts: { open: 1, acknowledged: 1 },
+      total: 60,
+    })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+
+    // Select a row: the bulk bar reports 1 selected.
+    fireEvent.click(screen.getAllByRole('checkbox')[1])
+    expect(screen.getByText(i18n.t('pages.drift.selectedCount', { count: 1 }) as string)).toBeInTheDocument()
+
+    // Changing page must clear the selection — a carried-over selection would
+    // report "N selected" while bulk actions only touch the visible page.
+    fireEvent.click(screen.getByRole('button', { name: /next page/i }))
+    await waitFor(() =>
+      expect(screen.queryByText(i18n.t('pages.drift.selectedCount', { count: 1 }) as string)).not.toBeInTheDocument(),
+    )
+
+    // Same for a severity filter change — await the refetched rows first, since
+    // the page change swapped the query key and the table re-renders async.
+    const checkboxes = await screen.findAllByRole('checkbox')
+    fireEvent.click(checkboxes[1])
+    expect(screen.getByText(i18n.t('pages.drift.selectedCount', { count: 1 }) as string)).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Critical' }))
+    await waitFor(() =>
+      expect(screen.queryByText(i18n.t('pages.drift.selectedCount', { count: 1 }) as string)).not.toBeInTheDocument(),
+    )
+  })
+
   it('bulk-acknowledges the selected open records', async () => {
     mocked.acknowledgeDriftRecord.mockResolvedValue({ ...openRecord, status: 'acknowledged' })
     renderSection()

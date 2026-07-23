@@ -87,6 +87,7 @@ export default function VersionLabPage() {
 
   const [newRunOpen, setNewRunOpen] = useState(false)
   const [workflowOpen, setWorkflowOpen] = useState(false)
+  const [detailRun, setDetailRun] = useState<HealthRun | null>(null)
   const [page, setPage] = useState(0)
   const [status, setStatus] = useState('')
 
@@ -169,7 +170,13 @@ export default function VersionLabPage() {
             </TableHead>
             <TableBody>
               {runs.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow
+                  key={r.id}
+                  hover
+                  onClick={() => setDetailRun(r)}
+                  sx={{ cursor: 'pointer' }}
+                  aria-label={t('pages.versionLab.openRunDetail')}
+                >
                   <TableCell>{statusChip(r, t)}</TableCell>
                   <TableCell>{r.terraform_version || 'latest'}</TableCell>
                   <TableCell>
@@ -211,7 +218,88 @@ export default function VersionLabPage() {
         }}
       />
       <WorkflowDialog open={workflowOpen} onClose={() => setWorkflowOpen(false)} />
+      <HealthRunDetailDialog run={detailRun} onClose={() => setDetailRun(null)} />
     </Box>
+  )
+}
+
+// HealthRunDetailDialog shows a version-lab run's full status, checks, the exact
+// version matrix it exercised (Terraform + each provider), and — crucially — the
+// UNTRUNCATED detail message, so a failed init/plan (the case the feature exists
+// to diagnose) is readable instead of clipped to the 220px table cell. Mirrors
+// DriftRunDetailDialog on the Drift page.
+function HealthRunDetailDialog({ run, onClose }: { run: HealthRun | null; onClose: () => void }) {
+  const { t } = useTranslation()
+  const providerVersions = Object.entries(run?.provider_versions ?? {})
+  return (
+    <Dialog open={Boolean(run)} onClose={onClose} fullWidth maxWidth="md">
+      <DialogTitle>{t('pages.versionLab.runDetailTitle')}</DialogTitle>
+      <DialogContent>
+        {run && (
+          <Stack spacing={2} sx={{ mt: 1 }}>
+            <Box>
+              {statusChip(run, t)}
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {run.repo_ref || t('pages.versionLab.defaultRef')} · {run.working_dir || '.'}
+              </Typography>
+              <Box sx={{ mt: 0.5 }}>
+                {okText('init', run.init_ok)}
+                {okText('plan', run.plan_ok)}
+              </Box>
+            </Box>
+
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('pages.versionLab.versionMatrix')}
+              </Typography>
+              <Table size="small">
+                <TableBody>
+                  <TableRow>
+                    <TableCell sx={{ width: 200, color: 'text.secondary' }}>{t('pages.versionLab.terraform')}</TableCell>
+                    <TableCell>{run.terraform_version || 'latest'}</TableCell>
+                  </TableRow>
+                  {providerVersions.length > 0 ? (
+                    providerVersions.map(([name, version]) => (
+                      <TableRow key={name}>
+                        <TableCell sx={{ color: 'text.secondary', wordBreak: 'break-all' }}>{name}</TableCell>
+                        <TableCell>{version || 'latest'}</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell sx={{ color: 'text.secondary' }}>{t('pages.versionLab.providers')}</TableCell>
+                      <TableCell>{t('pages.versionLab.providersLatest')}</TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </Box>
+
+            {run.registry_host && (
+              <Typography variant="body2" color="text.secondary">
+                {t('pages.versionLab.registryHost')}: {run.registry_host}
+              </Typography>
+            )}
+
+            <Box>
+              <Typography variant="subtitle2" gutterBottom>
+                {t('common.detail')}
+              </Typography>
+              <Typography
+                variant="body2"
+                component="pre"
+                sx={{ m: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontFamily: 'monospace', fontSize: '0.78rem' }}
+              >
+                {run.detail || t('pages.versionLab.noDetailsYet')}
+              </Typography>
+            </Box>
+          </Stack>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>{t('common.close')}</Button>
+      </DialogActions>
+    </Dialog>
   )
 }
 
