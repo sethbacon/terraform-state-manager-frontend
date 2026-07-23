@@ -554,6 +554,12 @@ function StateCountChip({ sourceId }: { sourceId: string }) {
   )
 }
 
+// Windowing geometry for the states list: fixed-height rows inside the fixed
+// 480px viewport let the visible slice be computed from scrollTop alone.
+const STATE_ROW_HEIGHT = 60
+const STATES_VIEWPORT_HEIGHT = 480
+const STATES_VIRTUALIZE_THRESHOLD = 100
+
 function StatesBrowser({
   source,
   selectedKey,
@@ -575,6 +581,25 @@ function StatesBrowser({
   const visibleStates = stateFilter
     ? allStates.filter((st) => (st.name || st.key).toLowerCase().includes(stateFilter.toLowerCase()))
     : allStates
+
+  // Windowing keeps the DOM bounded at fleet scale: above the threshold only
+  // the rows inside the 480px viewport (plus a small overscan) render, with
+  // spacer boxes preserving scroll geometry. Below it, rows render plainly so
+  // small lists keep natural heights.
+  const virtualize = visibleStates.length > STATES_VIRTUALIZE_THRESHOLD
+  const [scrollTop, setScrollTop] = useState(0)
+  const listRef = useRef<HTMLUListElement | null>(null)
+  useEffect(() => {
+    // A filter change re-shapes the list; stale scroll offsets would show a
+    // window past the end, so snap back to the top.
+    listRef.current?.scrollTo({ top: 0 })
+    setScrollTop(0)
+  }, [stateFilter])
+  const winStart = virtualize ? Math.max(0, Math.floor(scrollTop / STATE_ROW_HEIGHT) - 5) : 0
+  const winEnd = virtualize
+    ? Math.min(visibleStates.length, Math.ceil((scrollTop + STATES_VIEWPORT_HEIGHT) / STATE_ROW_HEIGHT) + 5)
+    : visibleStates.length
+  const windowStates = visibleStates.slice(winStart, winEnd)
 
   return (
     <Box sx={{ mt: 4 }} id="states-browser">
@@ -613,12 +638,20 @@ function StatesBrowser({
               </Typography>
             </Box>
           )}
-          <List dense disablePadding sx={{ maxHeight: 480, overflow: 'auto' }}>
-            {visibleStates.map((st) => (
+          <List
+            dense
+            disablePadding
+            ref={listRef}
+            sx={{ maxHeight: STATES_VIEWPORT_HEIGHT, overflow: 'auto' }}
+            onScroll={virtualize ? (e) => setScrollTop((e.target as HTMLElement).scrollTop) : undefined}
+          >
+            {virtualize && <Box sx={{ height: winStart * STATE_ROW_HEIGHT }} />}
+            {windowStates.map((st) => (
               <ListItemButton
                 key={st.key}
                 selected={selectedKey === st.key}
                 onClick={() => onSelectKey(st.key)}
+                sx={virtualize ? { height: STATE_ROW_HEIGHT } : undefined}
               >
                 <ListItemText
                   primary={st.name}
@@ -627,6 +660,7 @@ function StatesBrowser({
                 />
               </ListItemButton>
             ))}
+            {virtualize && <Box sx={{ height: (visibleStates.length - winEnd) * STATE_ROW_HEIGHT }} />}
           </List>
         </Card>
         <StateLocksPanel sourceId={source.id} />

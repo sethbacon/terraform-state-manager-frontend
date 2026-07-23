@@ -59,6 +59,37 @@ beforeEach(() => {
   mocked.listReportStates.mockResolvedValue(result as Awaited<ReturnType<typeof api.listReportStates>>)
 })
 
+describe('pagination', () => {
+  it('pages large result sets and resets to page one on re-sort', async () => {
+    const many = {
+      total: 120,
+      truncated: false,
+      summary: { matched: 120, rum: 0, managed_resources: 0, data_sources: 0, total_resources: 0 },
+      states: Array.from({ length: 120 }, (_, i) => ({
+        source_id: 's1', source_name: 'prod', source_type: 's3',
+        state_key: `envs/k-${String(i).padStart(3, '0')}.tfstate`,
+        terraform_version: '1.5.7', serial: 1, size: 1024, rum: i, managed_resources: i,
+        data_sources: 0, total_resources: i, analyzed_at: '2026-06-18T00:00:00Z',
+      })),
+    }
+    mocked.listReportStates.mockResolvedValue(many as Awaited<ReturnType<typeof api.listReportStates>>)
+    renderPage()
+
+    // Default sort is rum desc: rows 119..70 are page one; row 69 is not.
+    expect(await screen.findByText('envs/k-119.tfstate')).toBeInTheDocument()
+    expect(screen.queryByText('envs/k-069.tfstate')).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: /next page/i }))
+    expect(await screen.findByText('envs/k-069.tfstate')).toBeInTheDocument()
+    expect(screen.queryByText('envs/k-119.tfstate')).not.toBeInTheDocument()
+
+    // Re-sorting snaps back to the first page of the new order.
+    fireEvent.click(screen.getByText(i18n.t('pages.reports.colState') as string))
+    expect(await screen.findByText('envs/k-000.tfstate')).toBeInTheDocument()
+    expect(screen.queryByText('envs/k-069.tfstate')).not.toBeInTheDocument()
+  })
+})
+
 describe('reportFilterParams', () => {
   it('omits unset fields', () => {
     expect(reportFilterParams({}).toString()).toBe('')
