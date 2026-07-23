@@ -48,7 +48,9 @@
       "apiKeys": "Chiavi API",
       "apiKeysTooltip": "Creare e gestire le chiavi API per la CI e gli script",
       "ciTemplates": "Modelli CI",
-      "ciTemplatesTooltip": "Modifica, aggiungi o sostituisci i modelli di pipeline di Drift e Version-Lab"
+      "ciTemplatesTooltip": "Modifica, aggiungi o sostituisci i modelli di pipeline di Drift e Version-Lab",
+      "branding": "Branding",
+      "brandingTooltip": "Personalizza il nome del prodotto, i colori e il logo con il marchio del cliente"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Notifiche",
         "body": "Webhook e canali Slack attivati in caso di rilevamento di scostamenti e di errori nell'esecuzione."
+      },
+      "adminBranding": {
+        "title": "Branding",
+        "body": "Personalizzazione dell'app con marchio bianco: nome del prodotto, palette di colori e immagini relative a logo, favicon e banner di accesso, visualizzate a tutti i visitatori, compresa la pagina di accesso."
       },
       "adminAudit": {
         "title": "Registro di controllo",
@@ -893,6 +899,25 @@
       "deleteConfirm": "Elimina la pianificazione “{{name}}”? La sua esecuzione verrà interrotta.",
       "sourceOptional": "Fonte (facoltativa)",
       "stateOptional": "Stato (facoltativo)"
+    },
+    "branding": {
+      "title": "Branding",
+      "description": "Personalizza l'app con il marchio della tua organizzazione: nome del prodotto, palette di colori, logo, favicon e immagini di login-hero.",
+      "loadFailed": "Impossibile caricare il branding corrente.",
+      "productName": "Nome del prodotto",
+      "productNameHelp": "Fino a 100 caratteri.",
+      "primaryColor": "Colore primario",
+      "secondaryColorLight": "Colore secondario (modalità chiara)",
+      "secondaryColorDark": "Colore secondario (modalità scura)",
+      "colorHelp": "Utilizza la notazione esadecimale (#0a6e31) o rgb()/hsl().",
+      "logoUrl": "URL del logo",
+      "faviconUrl": "URL della favicon",
+      "loginHeroUrl": "URL dell'immagine principale della pagina di accesso",
+      "urlHelp": "Deve trattarsi di un URL https:// o di un percorso relativo alla radice (/branding/logo.svg).",
+      "savedReloadHint": "Il branding è stato salvato. Aggiorna la pagina per vedere le modifiche applicate.",
+      "reloadNow": "Aggiorna ora",
+      "resetDefaults": "Ripristina impostazioni predefinite",
+      "securityNote": "I valori vengono convalidati al momento del salvataggio: i colori devono essere validi e gli URL delle immagini devono essere https o provenire da questo host. Il tema viene caricato una sola volta all'avvio dell'app, quindi le modifiche vengono applicate dopo il ricaricamento della pagina."
     },
     "notifications": {
       "title": "Notifiche",

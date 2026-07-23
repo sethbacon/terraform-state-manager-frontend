@@ -48,7 +48,9 @@
       "apiKeys": "Clés API",
       "apiKeysTooltip": "Créer et gérer des clés API pour l'intégration continue (CI) et les scripts",
       "ciTemplates": "Modèles CI",
-      "ciTemplatesTooltip": "Modifier, ajouter ou remplacer les modèles de pipeline Drift et Version-Lab"
+      "ciTemplatesTooltip": "Modifier, ajouter ou remplacer les modèles de pipeline Drift et Version-Lab",
+      "branding": "Image de marque",
+      "brandingTooltip": "Personnaliser le nom du produit, les couleurs et le logo"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Notifications",
         "body": "Déclenchement de webhooks et de canaux Slack lors de la détection d'un écart ou d'un échec d'exécution."
+      },
+      "adminBranding": {
+        "title": "Image de marque",
+        "body": "Personnalisation de l'application : nom du produit, palette de couleurs, logo, favicon et images de la page d'accueil de connexion, affichés à chaque visiteur, y compris sur la page de connexion."
       },
       "adminAudit": {
         "title": "Journal d'audit",
@@ -893,6 +899,25 @@
       "deleteConfirm": "Supprimer la tâche planifiée « {{name}} » ? Elle cessera alors de s'exécuter.",
       "sourceOptional": "Source (facultatif)",
       "stateOptional": "État (facultatif)"
+    },
+    "branding": {
+      "title": "Image de marque",
+      "description": "Personnalisez l'application aux couleurs de votre organisation : nom du produit, palette de couleurs, logo, favicon et images de la page d'accueil.",
+      "loadFailed": "Impossible de charger l'identité visuelle actuelle.",
+      "productName": "Nom du produit",
+      "productNameHelp": "100 caractères maximum.",
+      "primaryColor": "Couleur primaire",
+      "secondaryColorLight": "Couleur secondaire (mode clair)",
+      "secondaryColorDark": "Couleur secondaire (mode sombre)",
+      "colorHelp": "Utilisez la notation hexadécimale (#0a6e31) ou la notation rgb()/hsl().",
+      "logoUrl": "URL du logo",
+      "faviconUrl": "URL de la favicon",
+      "loginHeroUrl": "URL de l'image principale de la page de connexion",
+      "urlHelp": "Il doit s'agir d'une URL de type https:// ou d'un chemin relatif à la racine (/branding/logo.svg).",
+      "savedReloadHint": "L'identité visuelle a été enregistrée. Actualisez la page pour voir les modifications.",
+      "reloadNow": "Recharger maintenant",
+      "resetDefaults": "Rétablir les paramètres par défaut",
+      "securityNote": "Les valeurs sont validées lors de l'enregistrement : les couleurs doivent pouvoir être interprétées, et les URL d'images doivent commencer par « https » ou provenir de cet hébergeur. Le thème se charge une seule fois au démarrage de l'application ; les modifications s'appliquent donc après un rafraîchissement de la page."
     },
     "notifications": {
       "title": "Notifications",

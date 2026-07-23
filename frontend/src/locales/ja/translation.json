@@ -48,7 +48,9 @@
       "apiKeys": "APIキー",
       "apiKeysTooltip": "CIおよびスクリプト用のAPIキーの作成と管理",
       "ciTemplates": "CIテンプレート",
-      "ciTemplatesTooltip": "drift および version-lab のパイプラインテンプレートの編集、追加、または置換"
+      "ciTemplatesTooltip": "drift および version-lab のパイプラインテンプレートの編集、追加、または置換",
+      "branding": "ブランディング",
+      "brandingTooltip": "製品名、カラー、ロゴをホワイトラベル化する"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "通知",
         "body": "ドリフトの検出や実行失敗のイベントが発生した際に、WebhookおよびSlackチャンネルが通知されます。"
+      },
+      "adminBranding": {
+        "title": "ブランディング",
+        "body": "アプリのホワイトラベル化：製品名、カラーパレット、ロゴ／ファビコン／ログイン用ヘッダー画像を、ログインページを含めすべての訪問者に表示します。"
       },
       "adminAudit": {
         "title": "監査ログ",
@@ -893,6 +899,25 @@
       "deleteConfirm": "「{{name}}」というスケジュールを削除しますか？ 削除すると、そのスケジュールは実行されなくなります。",
       "sourceOptional": "出典（任意）",
       "stateOptional": "州（任意）"
+    },
+    "branding": {
+      "title": "ブランディング",
+      "description": "組織に合わせてアプリをホワイトラベル化しましょう：製品名、カラーパレット、ロゴ、ファビコン、ログイン画面のヘッダー画像などをカスタマイズできます。",
+      "loadFailed": "現在のブランディングを読み込めませんでした。",
+      "productName": "製品名",
+      "productNameHelp": "最大100文字。",
+      "primaryColor": "原色",
+      "secondaryColorLight": "セカンダリーカラー（ライトモード）",
+      "secondaryColorDark": "セカンダリカラー（ダークモード）",
+      "colorHelp": "16進数（#0a6e31）または rgb()/hsl() 表記を使用してください。",
+      "logoUrl": "ロゴのURL",
+      "faviconUrl": "ファビコンのURL",
+      "loginHeroUrl": "ログイン用ヒーロー画像のURL",
+      "urlHelp": "https://形式のURL、またはルート相対パス（/branding/logo.svg）である必要があります。",
+      "savedReloadHint": "ブランディングが保存されました。変更を反映させるには、ページを再読み込みしてください。",
+      "reloadNow": "今すぐ再読み込み",
+      "resetDefaults": "デフォルト設定に戻す",
+      "securityNote": "値は保存時に検証されます。色は正しく解析される必要があり、画像のURLはhttpsであるか、このホストから提供されている必要があります。テーマはアプリの起動時に一度読み込まれるため、変更は再読み込み後に反映されます。"
     },
     "notifications": {
       "title": "通知",

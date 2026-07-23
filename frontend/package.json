@@ -26,7 +26,7 @@
     "@fontsource/inter": "^5.2.8",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",
-    "@sethbacon/terraform-suite-ui": "0.6.1",
+    "@sethbacon/terraform-suite-ui": "0.7.0",
     "@tanstack/react-query": "^5.99.2",
     "@tanstack/react-query-devtools": "^5.101.2",
     "axios": "^1.18.1",
@@ -38,7 +38,7 @@
     "react-i18next": "^15.4.1",
     "react-router-dom": "^6.30.3",
     "recharts": "^2.15.4",
-    "swagger-ui-react": "^5.32.6"
+    "swagger-ui-react": "^5.32.11"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
