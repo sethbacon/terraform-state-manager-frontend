@@ -48,7 +48,9 @@
       "apiKeys": "API密钥",
       "apiKeysTooltip": "为持续集成（CI）和脚本创建并管理 API 密钥",
       "ciTemplates": "CI 模板",
-      "ciTemplatesTooltip": "编辑、添加或替换 drift 和 version-lab 管道模板"
+      "ciTemplatesTooltip": "编辑、添加或替换 drift 和 version-lab 管道模板",
+      "branding": "品牌建设",
+      "brandingTooltip": "将产品名称、颜色和徽标进行白标处理"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "通知",
         "body": "在检测到漂移和运行失败事件时，会触发 Webhook 和 Slack 频道。"
+      },
+      "adminBranding": {
+        "title": "品牌建设",
+        "body": "对应用进行白标定制：产品名称、配色方案以及徽标/网站图标/登录主视觉图，这些内容将展示给每位访问者，包括登录页面。"
       },
       "adminAudit": {
         "title": "审计日志",
@@ -893,6 +899,25 @@
       "deleteConfirm": "删除计划任务“{{name}}”？这将停止其运行。",
       "sourceOptional": "来源（可选）",
       "stateOptional": "州（可选）"
+    },
+    "branding": {
+      "title": "品牌建设",
+      "description": "为您的组织对该应用进行白标定制：产品名称、配色方案、徽标、网站图标以及登录页头图。",
+      "loadFailed": "无法加载当前的品牌样式。",
+      "productName": "产品名称",
+      "productNameHelp": "最多100个字符。",
+      "primaryColor": "原色",
+      "secondaryColorLight": "次要颜色（浅色模式）",
+      "secondaryColorDark": "辅助颜色（深色模式）",
+      "colorHelp": "请使用十六进制（#0a6e31）或 rgb()/hsl() 表示法。",
+      "logoUrl": "徽标网址",
+      "faviconUrl": "网站图标网址",
+      "loginHeroUrl": "登录主图网址",
+      "urlHelp": "必须是 https:// 格式的 URL 或相对于根目录的路径（/branding/logo.svg）。",
+      "savedReloadHint": "品牌设置已保存。请刷新页面以查看更改效果。",
+      "reloadNow": "立即刷新",
+      "resetDefaults": "恢复默认设置",
+      "securityNote": "值将在保存时进行验证：颜色必须能解析，图片 URL 必须为 https 格式或来自本主机。主题在应用启动时加载一次，因此更改将在重新加载后生效。"
     },
     "notifications": {
       "title": "通知",

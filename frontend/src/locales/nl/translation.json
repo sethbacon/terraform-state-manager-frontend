@@ -48,7 +48,9 @@
       "apiKeys": "API-sleutels",
       "apiKeysTooltip": "API-sleutels aanmaken en beheren voor CI en scripts",
       "ciTemplates": "CI-sjablonen",
-      "ciTemplatesTooltip": "Pijplijnsjablonen voor drift en version-lab bewerken, toevoegen of vervangen"
+      "ciTemplatesTooltip": "Pijplijnsjablonen voor drift en version-lab bewerken, toevoegen of vervangen",
+      "branding": "Merkopbouw",
+      "brandingTooltip": "Pas de productnaam, kleuren en het logo aan volgens de whitelabel-richtlijnen"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Meldingen",
         "body": "Webhooks en Slack-kanalen worden geactiveerd bij gebeurtenissen zoals gedetecteerde afwijkingen en mislukte uitvoeringen."
+      },
+      "adminBranding": {
+        "title": "Merkopbouw",
+        "body": "De app aanpassen aan uw huisstijl: productnaam, kleurenpalet en afbeeldingen voor het logo, de favicon en de inlogbanner, die aan elke bezoeker worden getoond, inclusief op de inlogpagina."
       },
       "adminAudit": {
         "title": "Controledagboek",
@@ -893,6 +899,25 @@
       "deleteConfirm": "Het schema „{{name}}” verwijderen? Dan wordt de uitvoering ervan gestopt.",
       "sourceOptional": "Bron (optioneel)",
       "stateOptional": "Provincie (optioneel)"
+    },
+    "branding": {
+      "title": "Merkopbouw",
+      "description": "Pas de app aan voor uw organisatie: productnaam, kleurenpalet, logo, favicon en afbeeldingen voor de inlogpagina.",
+      "loadFailed": "Het laden van de huidige huisstijl is mislukt.",
+      "productName": "Productnaam",
+      "productNameHelp": "Maximaal 100 tekens.",
+      "primaryColor": "Primaire kleur",
+      "secondaryColorLight": "Secundaire kleur (lichtmodus)",
+      "secondaryColorDark": "Secundaire kleur (donkere modus)",
+      "colorHelp": "Gebruik de hexadecimale notatie (#0a6e31) of de rgb()/hsl()-notatie.",
+      "logoUrl": "URL van het logo",
+      "faviconUrl": "URL van het favicon",
+      "loginHeroUrl": "URL van de hero-afbeelding bij het inloggen",
+      "urlHelp": "Dit moet een URL van het type https:// zijn of een pad ten opzichte van de root (/branding/logo.svg).",
+      "savedReloadHint": "Het merk is opgeslagen. Laad de pagina opnieuw om de wijzigingen te zien.",
+      "reloadNow": "Nu opnieuw laden",
+      "resetDefaults": "Terugzetten naar standaardinstellingen",
+      "securityNote": "De waarden worden bij het opslaan gecontroleerd: kleuren moeten correct kunnen worden geïnterpreteerd en afbeeldings-URL’s moeten een https-adres hebben of vanaf deze host worden aangeboden. Het thema wordt één keer geladen bij het opstarten van de app, dus wijzigingen worden pas na het herladen doorgevoerd."
     },
     "notifications": {
       "title": "Meldingen",

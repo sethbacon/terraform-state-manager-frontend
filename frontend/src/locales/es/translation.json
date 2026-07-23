@@ -48,7 +48,9 @@
       "apiKeys": "Claves de API",
       "apiKeysTooltip": "Crear y gestionar claves de API para la integración continua (CI) y los scripts",
       "ciTemplates": "Plantillas de CI",
-      "ciTemplatesTooltip": "Editar, añadir o sustituir plantillas de Drift y de la cadena de trabajo de Version-Lab"
+      "ciTemplatesTooltip": "Editar, añadir o sustituir plantillas de Drift y de la cadena de trabajo de Version-Lab",
+      "branding": "Imagen de marca",
+      "brandingTooltip": "Personalizar el nombre del producto, los colores y el logotipo con la marca del cliente"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Notificaciones",
         "body": "Se activan webhooks y canales de Slack cuando se detectan desviaciones o se producen fallos en la ejecución."
+      },
+      "adminBranding": {
+        "title": "Imagen de marca",
+        "body": "Personalización de la aplicación con marca blanca: nombre del producto, paleta de colores e imágenes del logotipo, el favicon y el banner de inicio de sesión, que se muestran a todos los visitantes, incluida la página de inicio de sesión."
       },
       "adminAudit": {
         "title": "Registro de auditoría",
@@ -893,6 +899,25 @@
       "deleteConfirm": "¿Quieres eliminar la tarea programada «{{name}}»? Dejará de ejecutarse.",
       "sourceOptional": "Fuente (opcional)",
       "stateOptional": "Estado (opcional)"
+    },
+    "branding": {
+      "title": "Imagen de marca",
+      "description": "Personaliza la aplicación con la imagen de marca de tu organización: nombre del producto, paleta de colores, logotipo, favicon e imágenes de inicio de sesión.",
+      "loadFailed": "No se ha podido cargar la imagen de marca actual.",
+      "productName": "Nombre del producto",
+      "productNameHelp": "Hasta 100 caracteres.",
+      "primaryColor": "Color primario",
+      "secondaryColorLight": "Color secundario (modo claro)",
+      "secondaryColorDark": "Color secundario (modo oscuro)",
+      "colorHelp": "Utiliza la notación hexadecimal (#0a6e31) o rgb()/hsl().",
+      "logoUrl": "URL del logotipo",
+      "faviconUrl": "URL del favicon",
+      "loginHeroUrl": "URL de la imagen principal de inicio de sesión",
+      "urlHelp": "Debe ser una URL de tipo https:// o una ruta relativa a la raíz (/branding/logo.svg).",
+      "savedReloadHint": "Se ha guardado la imagen de marca. Actualiza la página para ver los cambios.",
+      "reloadNow": "Actualizar ahora",
+      "resetDefaults": "Restablecer los valores predeterminados",
+      "securityNote": "Los valores se validan al guardar: los colores deben poder interpretarse y las URL de las imágenes deben ser https o proceder de este servidor. El tema se carga una vez al iniciar la aplicación, por lo que los cambios se aplican tras actualizar la página."
     },
     "notifications": {
       "title": "Notificaciones",
