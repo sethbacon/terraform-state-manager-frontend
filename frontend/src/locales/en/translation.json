@@ -48,7 +48,9 @@
       "apiKeys": "API Keys",
       "apiKeysTooltip": "Create and manage API keys for CI and scripts",
       "ciTemplates": "CI Templates",
-      "ciTemplatesTooltip": "Edit, add, or replace drift and version-lab pipeline templates"
+      "ciTemplatesTooltip": "Edit, add, or replace drift and version-lab pipeline templates",
+      "branding": "Branding",
+      "brandingTooltip": "Whitelabel the product name, colors, and logo"
     }
   },
   "common": {
@@ -394,6 +396,20 @@
           {
             "h": "Security",
             "p": "Destination URLs are stored encrypted and never returned — the form shows only whether a destination exists; leaving it blank on edit keeps the current one. Use Test to send a sample message."
+          }
+        ]
+      },
+      "adminBranding": {
+        "title": "Branding",
+        "body": "Whitelabel the app: product name, palette colors, and logo/favicon/login-hero images, served to every visitor including the login page.",
+        "sections": [
+          {
+            "h": "Validation & safety",
+            "p": "Colors must be hex or rgb()/hsl() notation; image URLs must be https or root-relative. Values are validated on save and again in the browser, so a bad value can never break the app render."
+          },
+          {
+            "h": "Applying changes",
+            "p": "The theme loads once at app start — after saving, reload the page to see the new branding. Reset to defaults clears every override."
           }
         ]
       },
@@ -1050,6 +1066,25 @@
       "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running.",
       "sourceOptional": "Source (optional)",
       "stateOptional": "State (optional)"
+    },
+    "branding": {
+      "title": "Branding",
+      "description": "Whitelabel the app for your organization: product name, palette colors, and logo, favicon, and login-hero images.",
+      "loadFailed": "Failed to load the current branding.",
+      "productName": "Product name",
+      "productNameHelp": "Up to 100 characters.",
+      "primaryColor": "Primary color",
+      "secondaryColorLight": "Secondary color (light mode)",
+      "secondaryColorDark": "Secondary color (dark mode)",
+      "colorHelp": "Use hex (#0a6e31) or rgb()/hsl() notation.",
+      "logoUrl": "Logo URL",
+      "faviconUrl": "Favicon URL",
+      "loginHeroUrl": "Login hero image URL",
+      "urlHelp": "Must be an https:// URL or a root-relative path (/branding/logo.svg).",
+      "savedReloadHint": "Branding saved. Reload the page to see it applied.",
+      "reloadNow": "Reload now",
+      "resetDefaults": "Reset to defaults",
+      "securityNote": "Values are validated on save: colors must parse, and image URLs must be https or served from this host. The theme loads once at app start, so changes apply after a reload."
     },
     "notifications": {
       "title": "Notifications",

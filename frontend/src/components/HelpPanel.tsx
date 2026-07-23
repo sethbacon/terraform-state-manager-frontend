@@ -25,6 +25,7 @@ const HELP_KEYS: Record<string, string> = {
   '/admin/sso': 'adminSso',
   '/admin/apikeys': 'adminApiKeys',
   '/admin/notifications': 'adminNotifications',
+  '/admin/branding': 'adminBranding',
   '/admin/audit-logs': 'adminAudit',
 }
 

@@ -893,6 +893,9 @@ export const api = {
       return null
     }
   },
+  // Admin: persist the whitelabel theme. An empty object clears all overrides.
+  updateUITheme: async (theme: UIThemeConfig): Promise<UIThemeConfig> =>
+    (await apiClient.put<UIThemeConfig>('/api/v1/admin/ui/theme', theme)).data,
   getDashboardOverview: async (refresh = false): Promise<DashboardOverview> =>
     (
       await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview', {
