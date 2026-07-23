@@ -10,14 +10,18 @@ export const AVAILABLE_SCOPES = [
   { value: 'state:drift', label: 'State Drift', description: 'Dispatch drift-detection runs through CI' },
   { value: 'state:execute', label: 'State Execute', description: 'Dispatch version-lab runs through CI' },
   { value: 'sources:manage', label: 'Sources Manage', description: 'Create and manage state sources and schedules' },
-  { value: 'organizations:read', label: 'Organizations Read', description: 'View organizations and members' },
-  { value: 'audit:read', label: 'Audit Read', description: 'View audit logs' },
+  // NOTE: organizations:read / audit:read are identity-core scopes the sibling
+  // registry honours, but this app gates every /admin route on the admin
+  // wildcard and never defines or checks them standalone — so they are omitted
+  // here rather than advertised as functional (they would grant nothing).
   { value: 'scim:provision', label: 'SCIM Provision', description: 'Provision users and groups via SCIM 2.0' },
   { value: 'admin', label: 'Admin', description: 'Full administrative access (grants every scope)' },
 ] as const
 
-/** System role template names, in escalation order (drives sort + chip colors). */
-export const SYSTEM_ROLE_ORDER = ['viewer', 'analyst', 'operator', 'editor', 'admin']
+/** System role template names, in escalation order (drives sort + chip colors).
+ * These are the roles this app actually seeds (bootstrap.go); there is no
+ * "analyst" role here — that is a registry-only template. */
+export const SYSTEM_ROLE_ORDER = ['viewer', 'operator', 'editor', 'admin']
 
 /**
  * Look up a scope's metadata (label, description) from {@link AVAILABLE_SCOPES},
@@ -56,8 +60,6 @@ export function getRoleTemplateColor(
       return 'primary'
     case 'viewer':
       return 'info'
-    case 'analyst':
-      return 'success'
     default:
       return 'default'
   }

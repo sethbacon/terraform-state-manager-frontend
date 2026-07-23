@@ -135,6 +135,7 @@
     "apiDocs": "API docs",
     "goToDashboard": "Go to dashboard",
     "estateTitle": "Your estate",
+    "estateLoadFailed": "Couldn't load your estate summary.",
     "estate": {
       "sources": "Sources",
       "states": "States",
@@ -1026,6 +1027,8 @@
       "edit": "Edit schedule",
       "cron": "Schedule",
       "cronHelp": "Cron expression (e.g. \"0 3 * * *\") or a keyword: daily, weekly, every 15m.",
+      "cronInvalid": "Not a valid schedule — use a 5-field cron expression (e.g. \"0 3 * * *\") or daily, weekly, every 15m.",
+      "cronNextRuns": "Next: {{runs}}",
       "pipeline": "CI pipeline",
       "repoRef": "Repo ref (optional)",
       "workingDir": "Working directory (optional)",

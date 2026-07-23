@@ -171,7 +171,11 @@ describe('UsersPage', () => {
     await screen.findByText('alice@example.com')
 
     fireEvent.click(screen.getByLabelText(i18n.t('admin.users.ariaDelete') as string))
-    fireEvent.click(await screen.findByRole('button', { name: i18n.t('admin.users.delete') as string }))
+    // Deleting a user is now type-to-confirm (cascades through memberships).
+    const confirm = await screen.findByTestId('confirm-dialog-confirm')
+    expect(confirm).toBeDisabled()
+    fireEvent.change(screen.getByTestId('confirm-dialog-type-input'), { target: { value: 'Alice' } })
+    fireEvent.click(confirm)
     await waitFor(() => expect(mocked.deleteAdminUser.mock.calls[0]?.[0]).toBe('u1'))
   })
 

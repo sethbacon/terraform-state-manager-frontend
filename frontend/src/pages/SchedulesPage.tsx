@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import {
@@ -30,6 +30,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import { api, type PipelineConnection, type Schedule, type ScheduleInput } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
+import { nextRuns, validateCron } from '../utils/cron'
 import PageHeader from '../components/PageHeader'
 import PageTitleIcon from '@mui/icons-material/Schedule'
 import TableSkeleton from '../components/skeletons/TableSkeleton'
@@ -263,6 +264,16 @@ function ScheduleFormDialog({
   }
   if (!open && seededFor !== null) setSeededFor(null)
 
+  // Validate the cron field live and preview its next fire times, so a
+  // malformed or unintended expression is caught before save instead of on
+  // the next (missed or mistimed) run. Grammar matches the backend's
+  // ComputeNextRun; the preview is computed client-side in local time.
+  const cronError = validateCron(cron) === 'invalid'
+  const cronPreview = useMemo(
+    () => (cron.trim() && !cronError ? nextRuns(cron, new Date(), 3) : []),
+    [cron, cronError],
+  )
+
   const sourcesQuery = useQuery({ queryKey: queryKeys.sources.list(), queryFn: api.listSources, enabled: open })
   const statesQuery = useQuery({
     queryKey: queryKeys.sources.states(sourceId),
@@ -312,7 +323,16 @@ function ScheduleFormDialog({
             required
             fullWidth
             size="small"
-            helperText={t('pages.schedules.cronHelp')}
+            error={cronError}
+            helperText={
+              cronError
+                ? t('pages.schedules.cronInvalid')
+                : cronPreview.length > 0
+                  ? t('pages.schedules.cronNextRuns', {
+                      runs: cronPreview.map((d) => d.toLocaleString()).join(' · '),
+                    })
+                  : t('pages.schedules.cronHelp')
+            }
           />
           <TextField
             label={t('pages.schedules.pipeline')}
@@ -382,7 +402,7 @@ function ScheduleFormDialog({
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
-          disabled={mutation.isPending || !name || !cron || !pipelineId}
+          disabled={mutation.isPending || !name || !cron || cronError || !pipelineId}
           onClick={() => mutation.mutate()}
         >
           {t('common.save')}
