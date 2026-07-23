@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.22.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.21.0...v1.22.0) (2026-07-23)
+
+
+### Features
+
+* admin Branding page for whitelabel theming ([#201](https://github.com/sethbacon/terraform-state-manager-frontend/issues/201)) ([7e09ed8](https://github.com/sethbacon/terraform-state-manager-frontend/commit/7e09ed8eb05851d16c0bbf46d5e121672e03043d))
+* **sources:** test-before-save and per-source sync status on the Sources page ([#191](https://github.com/sethbacon/terraform-state-manager-frontend/issues/191)) ([3d3bf09](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3d3bf098cf3145060a73678e4cc7067308fdf88a)), closes [#184](https://github.com/sethbacon/terraform-state-manager-frontend/issues/184)
+* **version-lab:** open a run detail dialog with full error and version matrix ([#196](https://github.com/sethbacon/terraform-state-manager-frontend/issues/196)) ([85af04b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/85af04b5b850611c2f4777fa74016b98f901d5db)), closes [#186](https://github.com/sethbacon/terraform-state-manager-frontend/issues/186)
+
+
+### Bug Fixes
+
+* **auth:** log out and redirect on a mid-session 401 instead of stranding the shell ([#194](https://github.com/sethbacon/terraform-state-manager-frontend/issues/194)) ([1e6117d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/1e6117d0b9925d3b77f7c9dd17b2dd1384443b12)), closes [#185](https://github.com/sethbacon/terraform-state-manager-frontend/issues/185)
+* **drift:** clear the bulk selection when the page or a filter changes ([#195](https://github.com/sethbacon/terraform-state-manager-frontend/issues/195)) ([09aa401](https://github.com/sethbacon/terraform-state-manager-frontend/commit/09aa4010ee76a047593b0dd8db03a2b21d827cbd)), closes [#187](https://github.com/sethbacon/terraform-state-manager-frontend/issues/187)
+* **sources:** preserve unmodeled config keys when editing a source ([#190](https://github.com/sethbacon/terraform-state-manager-frontend/issues/190)) ([4779910](https://github.com/sethbacon/terraform-state-manager-frontend/commit/47799103271e74fe965f92313915af18bfc1fd6f))
+* **ui:** consistency & polish cluster ([#189](https://github.com/sethbacon/terraform-state-manager-frontend/issues/189)) ([#198](https://github.com/sethbacon/terraform-state-manager-frontend/issues/198)) ([39169e3](https://github.com/sethbacon/terraform-state-manager-frontend/commit/39169e350a5474e9250f8286db7bc95f248ec83f))
+
+
+### Performance
+
+* bound DOM size in the states browser and reports table ([#200](https://github.com/sethbacon/terraform-state-manager-frontend/issues/200)) ([c7ba371](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c7ba37159a4b0572136a1fd6e6cfd9a1d8bf47b1))
+
 ## [1.21.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.20.0...v1.21.0) (2026-07-18)
 
 
