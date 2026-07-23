@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { Box, Button, Card, CardActions, CardContent, Stack, Typography } from '@mui/material'
+import { Alert, Box, Button, Card, CardActions, CardContent, Stack, Typography } from '@mui/material'
 import LoginIcon from '@mui/icons-material/Login'
 import DescriptionIcon from '@mui/icons-material/Description'
 import DashboardIcon from '@mui/icons-material/Dashboard'
@@ -47,7 +47,11 @@ export default function LandingPage() {
 
   // Signed-in users get a live estate summary (the data is private, so anonymous
   // visitors see only the hero + feature cards below).
-  const { data: overview } = useQuery({
+  const {
+    data: overview,
+    isError: overviewError,
+    refetch: refetchOverview,
+  } = useQuery({
     queryKey: ['dashboard', 'overview', 'landing'],
     queryFn: () => api.getDashboardOverview(),
     enabled: isAuthenticated,
@@ -117,6 +121,19 @@ export default function LandingPage() {
           <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
             {t('landing.estateTitle')}
           </Typography>
+          {overviewError && (
+            <Alert
+              severity="warning"
+              sx={{ mb: 2 }}
+              action={
+                <Button color="inherit" size="small" onClick={() => refetchOverview()}>
+                  {t('common.retry')}
+                </Button>
+              }
+            >
+              {t('landing.estateLoadFailed')}
+            </Alert>
+          )}
           <Box
             sx={{
               display: 'grid',

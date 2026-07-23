@@ -27,6 +27,7 @@ import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import ScienceIcon from '@mui/icons-material/Science'
 import DescriptionIcon from '@mui/icons-material/Description'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { useTranslation } from 'react-i18next'
 import PageHeader from '../components/PageHeader'
 import PageTitleIcon from '@mui/icons-material/Science'
@@ -527,6 +528,13 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
         )}
       </DialogContent>
       <DialogActions>
+        <Button
+          startIcon={<ContentCopyIcon />}
+          disabled={!q.data}
+          onClick={() => q.data && void navigator.clipboard.writeText(q.data)}
+        >
+          {t('common.copy')}
+        </Button>
         <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
     </Dialog>

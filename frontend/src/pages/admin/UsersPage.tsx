@@ -40,6 +40,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import PersonIcon from '@mui/icons-material/Person'
 import PrivacyTipIcon from '@mui/icons-material/PrivacyTip'
 import SearchIcon from '@mui/icons-material/Search'
+import ConfirmDialog from '../../components/ConfirmDialog'
 import EmptyState from '../../components/EmptyState'
 import PageHeader from '../../components/PageHeader'
 import PageTitleIcon from '@mui/icons-material/People'
@@ -544,23 +545,23 @@ export default function UsersPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t('admin.users.dialogTitleDelete')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('admin.users.confirmDelete', { name: deleteTarget?.name })}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>{t('admin.users.cancel')}</Button>
-          <Button
-            onClick={() => deleteTarget && deleteUserMutation.mutate(deleteTarget.id)}
-            color="error"
-            variant="contained"
-          >
-            {t('admin.users.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Delete Confirmation Dialog. Type-to-confirm: deleting a user cascades
+          through memberships — at least as destructive as deleting a source,
+          which already requires the typed name. */}
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteUserMutation.mutate(deleteTarget.id)
+        }}
+        title={t('admin.users.dialogTitleDelete')}
+        description={t('admin.users.confirmDelete', { name: deleteTarget?.name })}
+        confirmLabel={t('admin.users.delete')}
+        cancelLabel={t('admin.users.cancel')}
+        severity="error"
+        typeToConfirmText={deleteTarget?.name ?? ''}
+        loading={deleteUserMutation.isPending}
+      />
 
       {/* GDPR Erase Confirmation Dialog */}
       <Dialog

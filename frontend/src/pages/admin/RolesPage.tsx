@@ -34,7 +34,7 @@ import { AVAILABLE_SCOPES, SYSTEM_ROLE_ORDER, getScopeColor, getScopeInfo } from
 const SCOPE_CATEGORIES: Record<string, string[]> = {
   'State Access': ['state:read', 'state:write', 'state:transfer', 'state:drift', 'state:execute'],
   Sources: ['sources:manage'],
-  'Identity & Audit': ['organizations:read', 'audit:read', 'scim:provision'],
+  Identity: ['scim:provision'],
   System: ['admin'],
 }
 

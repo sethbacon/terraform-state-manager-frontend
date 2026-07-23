@@ -35,6 +35,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PeopleIcon from '@mui/icons-material/People'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import ConfirmDialog from '../../components/ConfirmDialog'
 import PageHeader from '../../components/PageHeader'
 import PageTitleIcon from '@mui/icons-material/Business'
 import {
@@ -386,23 +387,23 @@ export default function OrganizationsPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
-        <DialogTitle>{t('admin.organizations.dialogTitleDelete')}</DialogTitle>
-        <DialogContent>
-          <Typography>{t('admin.organizations.confirmDelete', { name: deleteTarget?.name })}</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDeleteTarget(null)}>{t('admin.organizations.cancel')}</Button>
-          <Button
-            onClick={() => deleteTarget && deleteOrgMutation.mutate(deleteTarget.id)}
-            color="error"
-            variant="contained"
-          >
-            {t('admin.organizations.delete')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {/* Delete Confirmation Dialog. Type-to-confirm: deleting an organization
+          cascades through memberships — higher blast radius than a source
+          delete, which already requires the typed name. */}
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          if (deleteTarget) deleteOrgMutation.mutate(deleteTarget.id)
+        }}
+        title={t('admin.organizations.dialogTitleDelete')}
+        description={t('admin.organizations.confirmDelete', { name: deleteTarget?.name })}
+        confirmLabel={t('admin.organizations.delete')}
+        cancelLabel={t('admin.organizations.cancel')}
+        severity="error"
+        typeToConfirmText={deleteTarget?.name ?? ''}
+        loading={deleteOrgMutation.isPending}
+      />
 
       {/* Members Dialog */}
       <Dialog open={Boolean(membersOrg)} onClose={() => setMembersOrg(null)} maxWidth="md" fullWidth>

@@ -219,13 +219,32 @@ describe('SchedulesPage', () => {
     fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
       target: { value: 'x' },
     })
+    // A client-side invalid cron now disables Save with an inline error…
     fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.schedules.cron')}`)), {
       target: { value: 'bogus' },
     })
     fireEvent.mouseDown(screen.getByLabelText(new RegExp(`^${i18n.t('pages.schedules.pipeline')}`)))
     fireEvent.click(await screen.findByRole('option', { name: /drift-ci/ }))
+    expect(screen.getByText(i18n.t('pages.schedules.cronInvalid') as string)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: i18n.t('common.save') as string })).toBeDisabled()
+
+    // …while a server-side rejection still surfaces inside the dialog.
+    fireEvent.change(screen.getByLabelText(new RegExp(`^${i18n.t('pages.schedules.cron')}`)), {
+      target: { value: '0 3 * * *' },
+    })
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
 
     expect(await screen.findByText('invalid cron_expr')).toBeInTheDocument()
+  })
+
+  it('previews the next fire times for a valid cron', async () => {
+    renderPage()
+    await screen.findByText('nightly drift')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.schedules.add') as string }))
+    fireEvent.change(await screen.findByLabelText(new RegExp(`^${i18n.t('pages.schedules.cron')}`)), {
+      target: { value: '0 3 * * *' },
+    })
+    expect(screen.getByText(/Next: /)).toBeInTheDocument()
   })
 })

@@ -154,7 +154,11 @@ describe('OrganizationsPage', () => {
     await screen.findByText('default')
 
     fireEvent.click(screen.getAllByLabelText(i18n.t('admin.organizations.ariaDeleteOrg') as string)[0])
-    fireEvent.click(await screen.findByRole('button', { name: i18n.t('admin.organizations.delete') as string }))
+    // Deleting an organization is now type-to-confirm (cascades through memberships).
+    const confirm = await screen.findByTestId('confirm-dialog-confirm')
+    expect(confirm).toBeDisabled()
+    fireEvent.change(screen.getByTestId('confirm-dialog-type-input'), { target: { value: 'default' } })
+    fireEvent.click(confirm)
     await waitFor(() => expect(mocked.deleteAdminOrganization.mock.calls[0]?.[0]).toBe('o1'))
   })
 

@@ -28,6 +28,7 @@ import {
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh'
 import HubIcon from '@mui/icons-material/Hub'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
@@ -1212,6 +1213,13 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
         )}
       </DialogContent>
       <DialogActions>
+        <Button
+          startIcon={<ContentCopyIcon />}
+          disabled={!q.data}
+          onClick={() => q.data && void navigator.clipboard.writeText(q.data)}
+        >
+          {t('common.copy')}
+        </Button>
         <Button onClick={onClose}>{t('common.close')}</Button>
       </DialogActions>
     </Dialog>
