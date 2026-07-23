@@ -40,6 +40,7 @@ const SSOPage = lazy(() => import('./pages/admin/SSOPage'))
 const NotificationsPage = lazy(() => import('./pages/admin/NotificationsPage'))
 const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'))
 const CITemplatesPage = lazy(() => import('./pages/admin/CITemplatesPage'))
+const BrandingPage = lazy(() => import('./pages/admin/BrandingPage'))
 
 // Routes backed by a real page (home is mounted separately at '/').
 const realPages: Record<string, ReactNode> = {
@@ -61,6 +62,7 @@ const realPages: Record<string, ReactNode> = {
   '/admin/notifications': <NotificationsPage />,
   '/admin/audit-logs': <AuditLogPage />,
   '/admin/ci-templates': <CITemplatesPage />,
+  '/admin/branding': <BrandingPage />,
 }
 
 export default function App() {

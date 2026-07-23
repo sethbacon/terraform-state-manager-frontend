@@ -23,7 +23,7 @@ describe('HelpPanel', () => {
   })
 
   it('covers every routed page with a real help entry', () => {
-    for (const path of ['/sources', '/drift', '/version-lab', '/schedules', '/reports', '/transfer', '/api-docs', '/admin', '/admin/users', '/admin/organizations', '/admin/roles', '/admin/oidc', '/admin/mtls', '/admin/sso', '/admin/notifications', '/admin/audit-logs']) {
+    for (const path of ['/sources', '/drift', '/version-lab', '/schedules', '/reports', '/transfer', '/api-docs', '/admin', '/admin/users', '/admin/organizations', '/admin/roles', '/admin/oidc', '/admin/mtls', '/admin/sso', '/admin/notifications', '/admin/branding', '/admin/audit-logs']) {
       const { unmount } = renderAt(path)
       const titles = screen.getAllByRole('heading')
       // The title must resolve to a real string, not a raw i18n key.

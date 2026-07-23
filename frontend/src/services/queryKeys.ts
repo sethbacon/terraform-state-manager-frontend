@@ -80,4 +80,7 @@ export const queryKeys = {
     all: ['health'] as const,
     runs: (page = 0, status = '') => ['health', 'runs', page, status] as const,
   },
+  ui: {
+    theme: () => ['ui', 'theme'] as const,
+  },
 }
