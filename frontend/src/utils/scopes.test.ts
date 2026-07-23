@@ -53,7 +53,8 @@ describe('getRoleTemplateColor', () => {
     ['editor', 'warning'],
     ['operator', 'primary'],
     ['viewer', 'info'],
-    ['analyst', 'success'],
+    // "analyst" is a registry-only template this app never seeds — no color.
+    ['analyst', 'default'],
     ['custom-role', 'default'],
     [undefined, 'default'],
   ])('%s → %s', (name, color) => {
