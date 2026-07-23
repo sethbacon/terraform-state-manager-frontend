@@ -135,6 +135,7 @@
     "apiDocs": "Documentation de l'API",
     "goToDashboard": "Accéder au tableau de bord",
     "estateTitle": "Votre succession",
+    "estateLoadFailed": "Impossible de charger le récapitulatif de votre patrimoine.",
     "estate": {
       "sources": "Sources",
       "states": "États",
@@ -877,6 +878,8 @@
       "edit": "Modifier le calendrier",
       "cron": "Calendrier",
       "cronHelp": "Expression Cron (par exemple « 0 3 * * * ») ou mot-clé : quotidien, hebdomadaire, toutes les 15 minutes.",
+      "cronInvalid": "Horaires non valides — utilisez une expression cron à 5 champs (par exemple « 0 3 * * * ») ou indiquez « tous les jours », « toutes les semaines » ou « toutes les 15 minutes ».",
+      "cronNextRuns": "Suivant : {{runs}}",
       "pipeline": "Pipeline d'intégration continue",
       "repoRef": "Référence de la opération de pension (facultatif)",
       "workingDir": "Répertoire de travail (facultatif)",

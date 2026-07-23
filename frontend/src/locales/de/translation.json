@@ -135,6 +135,7 @@
     "apiDocs": "API-Dokumentation",
     "goToDashboard": "Zum Dashboard wechseln",
     "estateTitle": "Ihr Nachlass",
+    "estateLoadFailed": "Ihre Immobilienübersicht konnte nicht geladen werden.",
     "estate": {
       "sources": "Quellen",
       "states": "Bundesstaaten",
@@ -877,6 +878,8 @@
       "edit": "Zeitplan bearbeiten",
       "cron": "Zeitplan",
       "cronHelp": "Cron-Ausdruck (z. B. „0 3 * * *“) oder ein Schlüsselwort: täglich, wöchentlich, alle 15 Minuten.",
+      "cronInvalid": "Der Zeitplan ist ungültig – verwenden Sie einen Cron-Ausdruck mit 5 Feldern (z. B. „0 3 * * *“) oder „täglich“, „wöchentlich“ oder „alle 15 Minuten“.",
+      "cronNextRuns": "Weiter: {{runs}}",
       "pipeline": "CI-Pipeline",
       "repoRef": "Repo-Referenz (optional)",
       "workingDir": "Arbeitsverzeichnis (optional)",

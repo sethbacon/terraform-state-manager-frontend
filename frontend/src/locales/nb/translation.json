@@ -135,6 +135,7 @@
     "apiDocs": "API-dokumentasjon",
     "goToDashboard": "Gå til oversikten",
     "estateTitle": "Arven din",
+    "estateLoadFailed": "Det var ikke mulig å laste inn oversikten over eiendommene dine.",
     "estate": {
       "sources": "Kilder",
       "states": "Stater",
@@ -877,6 +878,8 @@
       "edit": "Rediger tidsplan",
       "cron": "Tidsplan",
       "cronHelp": "Cron-uttrykk (f.eks. «0 3 * * *») eller et nøkkelord: daglig, ukentlig, hvert 15. minutt.",
+      "cronInvalid": "Dette er ikke et gyldig tidsplanuttrykk — bruk et cron-uttrykk med fem felt (f.eks. «0 3 * * *») eller «daglig», «ukentlig» eller «hvert 15. minutt».",
+      "cronNextRuns": "Neste: {{runs}}",
       "pipeline": "CI-prosess",
       "repoRef": "Repo-referanse (valgfritt)",
       "workingDir": "Arbeidskatalog (valgfritt)",

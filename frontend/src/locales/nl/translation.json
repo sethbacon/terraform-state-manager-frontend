@@ -135,6 +135,7 @@
     "apiDocs": "API-documentatie",
     "goToDashboard": "Ga naar het dashboard",
     "estateTitle": "Uw nalatenschap",
+    "estateLoadFailed": "Je vastgoedoverzicht kon niet worden geladen.",
     "estate": {
       "sources": "Bronnen",
       "states": "Staten",
@@ -877,6 +878,8 @@
       "edit": "Schema bewerken",
       "cron": "Schema",
       "cronHelp": "Cron-uitdrukking (bijv. \"0 3 * * *\") of een trefwoord: dagelijks, wekelijks, om de 15 minuten.",
+      "cronInvalid": "Dit is geen geldig schema — gebruik een cron-uitdrukking met 5 velden (bijv. \"0 3 * * *\") of dagelijks, wekelijks of om de 15 minuten.",
+      "cronNextRuns": "Volgende: {{runs}}",
       "pipeline": "CI-pijplijn",
       "repoRef": "Repo-referentie (optioneel)",
       "workingDir": "Werkmap (optioneel)",

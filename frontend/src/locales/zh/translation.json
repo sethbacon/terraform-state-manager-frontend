@@ -135,6 +135,7 @@
     "apiDocs": "API 文档",
     "goToDashboard": "转到仪表盘",
     "estateTitle": "您的遗产",
+    "estateLoadFailed": "无法加载您的房产概览。",
     "estate": {
       "sources": "来源",
       "states": "各州",
@@ -877,6 +878,8 @@
       "edit": "编辑日程",
       "cron": "日程安排",
       "cronHelp": "Cron 表达式（例如“0 3 * * *”）或关键字：每天、每周、每 15 分钟。",
+      "cronInvalid": "这不是有效的计划任务——请使用5个字段的cron表达式（例如“0 3 * * *”），或设置为每天、每周或每15分钟执行一次。",
+      "cronNextRuns": "下一篇：{{runs}}",
       "pipeline": "CI 管道",
       "repoRef": "Repo 引用（可选）",
       "workingDir": "工作目录（可选）",

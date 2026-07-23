@@ -135,6 +135,7 @@
     "apiDocs": "APIドキュメント",
     "goToDashboard": "ダッシュボードへ移動",
     "estateTitle": "ご遺産",
+    "estateLoadFailed": "お客様の資産概要を読み込めませんでした。",
     "estate": {
       "sources": "出典",
       "states": "州",
@@ -877,6 +878,8 @@
       "edit": "スケジュールを編集する",
       "cron": "スケジュール",
       "cronHelp": "Cron式（例：「0 3 * * *」）またはキーワード：毎日、毎週、15分ごと。",
+      "cronInvalid": "無効なスケジュールです。5つのフィールドからなるcron式（例：「0 3 * * *」）を使用するか、「毎日」、「毎週」、「15分ごと」などの設定を行ってください。",
+      "cronNextRuns": "次へ：{{runs}}",
       "pipeline": "CIパイプライン",
       "repoRef": "リポジトリ参照（任意）",
       "workingDir": "作業ディレクトリ（任意）",
