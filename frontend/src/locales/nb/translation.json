@@ -48,7 +48,9 @@
       "apiKeys": "API-nøkler",
       "apiKeysTooltip": "Opprett og administrer API-nøkler for CI og skript",
       "ciTemplates": "CI-maler",
-      "ciTemplatesTooltip": "Rediger, legg til eller erstatt maler for drift- og VersionLab-pipeline"
+      "ciTemplatesTooltip": "Rediger, legg til eller erstatt maler for drift- og VersionLab-pipeline",
+      "branding": "Merkevarebygging",
+      "brandingTooltip": "Tilpass produktnavnet, fargene og logoen"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Varsler",
         "body": "Webhook og Slack-kanaler utløses ved hendelser som dreier seg om oppdaget avvik og mislykkede kjøringer."
+      },
+      "adminBranding": {
+        "title": "Merkevarebygging",
+        "body": "Tilpass appen med eget merke: produktnavn, fargepalett og bilder for logo, favikon og innloggingsbanner, som vises for alle besøkende, inkludert på innloggingssiden."
       },
       "adminAudit": {
         "title": "Revisjonslogg",
@@ -893,6 +899,25 @@
       "deleteConfirm": "Skal du slette tidsplanen «{{name}}»? Da vil den slutte å kjøre.",
       "sourceOptional": "Kilde (valgfritt)",
       "stateOptional": "Delstat (valgfritt)"
+    },
+    "branding": {
+      "title": "Merkevarebygging",
+      "description": "Tilpass appen til din organisasjon: produktnavn, fargepalett, logo, favikon og bilder til påloggingssiden.",
+      "loadFailed": "Det gikk ikke å laste inn den gjeldende merkevareprofilen.",
+      "productName": "Produktnavn",
+      "productNameHelp": "Opptil 100 tegn.",
+      "primaryColor": "Primærfarge",
+      "secondaryColorLight": "Sekundærfarge (lysmodus)",
+      "secondaryColorDark": "Sekundærfarge (mørk modus)",
+      "colorHelp": "Bruk heksadesimalnotasjon (#0a6e31) eller rgb()/hsl()-notasjon.",
+      "logoUrl": "Logo-URL",
+      "faviconUrl": "Favicon-URL",
+      "loginHeroUrl": "URL til hovedbilde for innlogging",
+      "urlHelp": "Må være en URL av typen https:// eller en rotrelativ sti (/branding/logo.svg).",
+      "savedReloadHint": "Merkeinnstillingene er lagret. Last inn siden på nytt for å se endringene.",
+      "reloadNow": "Last inn på nytt nå",
+      "resetDefaults": "Tilbakestill til standardinnstillinger",
+      "securityNote": "Verdiene valideres ved lagring: fargene må kunne tolkes, og bilde-URL-ene må være https eller hentes fra denne verten. Temaet lastes inn én gang når appen startes, så endringene trer i kraft etter at siden er lastet inn på nytt."
     },
     "notifications": {
       "title": "Varsler",

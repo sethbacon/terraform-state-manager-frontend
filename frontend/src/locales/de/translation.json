@@ -48,7 +48,9 @@
       "apiKeys": "API-Schlüssel",
       "apiKeysTooltip": "API-Schlüssel für CI und Skripte erstellen und verwalten",
       "ciTemplates": "CI-Vorlagen",
-      "ciTemplatesTooltip": "Drift- und Version-Lab-Pipeline-Vorlagen bearbeiten, hinzufügen oder ersetzen"
+      "ciTemplatesTooltip": "Drift- und Version-Lab-Pipeline-Vorlagen bearbeiten, hinzufügen oder ersetzen",
+      "branding": "Markenbildung",
+      "brandingTooltip": "Produktname, Farben und Logo als White-Label-Version bereitstellen"
     }
   },
   "common": {
@@ -250,6 +252,10 @@
       "adminNotifications": {
         "title": "Benachrichtigungen",
         "body": "Webhooks und Slack-Kanäle werden bei Ereignissen ausgelöst, bei denen Abweichungen festgestellt wurden oder der Lauf fehlgeschlagen ist."
+      },
+      "adminBranding": {
+        "title": "Markenbildung",
+        "body": "App als White-Label-Lösung: Produktname, Farbpalette sowie Logo, Favicon und Bilder für den Login-Hero werden jedem Besucher angezeigt, einschließlich der Anmeldeseite."
       },
       "adminAudit": {
         "title": "Prüfprotokoll",
@@ -893,6 +899,25 @@
       "deleteConfirm": "Den Zeitplan „{{name}}“ löschen? Dann wird die Ausführung beendet.",
       "sourceOptional": "Quelle (optional)",
       "stateOptional": "Bundesland (optional)"
+    },
+    "branding": {
+      "title": "Markenbildung",
+      "description": "Passen Sie die App an Ihre Organisation an: Produktname, Farbpalette sowie Logo, Favicon und Bilder für den Login-Hero.",
+      "loadFailed": "Das Laden des aktuellen Brandings ist fehlgeschlagen.",
+      "productName": "Produktname",
+      "productNameHelp": "Bis zu 100 Zeichen.",
+      "primaryColor": "Grundfarbe",
+      "secondaryColorLight": "Sekundärfarbe (Hellmodus)",
+      "secondaryColorDark": "Sekundärfarbe (Dunkelmodus)",
+      "colorHelp": "Verwenden Sie die Hexadezimalnotation (#0a6e31) oder die rgb()-/hsl()-Notation.",
+      "logoUrl": "Logo-URL",
+      "faviconUrl": "Favicon-URL",
+      "loginHeroUrl": "URL des Hero-Bildes für die Anmeldung",
+      "urlHelp": "Es muss sich um eine URL vom Typ „https://“ oder einen root-relativen Pfad (/branding/logo.svg) handeln.",
+      "savedReloadHint": "Branding wurde gespeichert. Lade die Seite neu, um die Änderungen anzuzeigen.",
+      "reloadNow": "Jetzt neu laden",
+      "resetDefaults": "Auf Standardwerte zurücksetzen",
+      "securityNote": "Die Werte werden beim Speichern überprüft: Farben müssen gültig sein, und Bild-URLs müssen über https verweisen oder von diesem Host bereitgestellt werden. Das Theme wird einmalig beim Start der App geladen, sodass Änderungen erst nach einem Neuladen wirksam werden."
     },
     "notifications": {
       "title": "Benachrichtigungen",
