@@ -135,6 +135,7 @@
     "apiDocs": "Documentación de la API",
     "goToDashboard": "Ir al panel de control",
     "estateTitle": "Tu patrimonio",
+    "estateLoadFailed": "No se ha podido cargar el resumen de tu patrimonio.",
     "estate": {
       "sources": "Fuentes",
       "states": "Estados",
@@ -877,6 +878,8 @@
       "edit": "Editar horario",
       "cron": "Calendario",
       "cronHelp": "Expresión Cron (por ejemplo, «0 3 * * *») o una palabra clave: diario, semanal, cada 15 minutos.",
+      "cronInvalid": "Programación no válida: utiliza una expresión cron de 5 campos (por ejemplo, «0 3 * * *») o selecciona «diario», «semanal» o «cada 15 minutos».",
+      "cronNextRuns": "Siguiente: {{runs}}",
       "pipeline": "Proceso de integración continua",
       "repoRef": "Referencia de repositorio (opcional)",
       "workingDir": "Directorio de trabajo (opcional)",

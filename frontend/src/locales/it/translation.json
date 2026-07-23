@@ -135,6 +135,7 @@
     "apiDocs": "Documentazione API",
     "goToDashboard": "Vai alla dashboard",
     "estateTitle": "Il tuo patrimonio",
+    "estateLoadFailed": "Impossibile caricare il riepilogo del tuo patrimonio.",
     "estate": {
       "sources": "Fonti",
       "states": "Stati",
@@ -877,6 +878,8 @@
       "edit": "Modifica il programma",
       "cron": "Programma",
       "cronHelp": "Espressione Cron (ad es. \"0 3 * * *\") o una parola chiave: giornaliera, settimanale, ogni 15 minuti.",
+      "cronInvalid": "Pianificazione non valida: utilizzare un'espressione cron a 5 campi (ad es. \"0 3 * * *\") oppure impostare una frequenza giornaliera, settimanale o ogni 15 minuti.",
+      "cronNextRuns": "Successivo: {{runs}}",
       "pipeline": "Pipeline CI",
       "repoRef": "Riferimento al repo (facoltativo)",
       "workingDir": "Directory di lavoro (facoltativa)",
