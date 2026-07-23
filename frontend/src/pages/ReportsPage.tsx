@@ -17,6 +17,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TableSortLabel,
   TextField,
@@ -145,6 +146,18 @@ export default function ReportsPage() {
     })
     return rows
   }, [data, sortKey, sortDir])
+
+  // Client-side pagination bounds the DOM at fleet scale (up to 500 preview
+  // rows otherwise render at once) — same pattern as the audit/users tables.
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(50)
+  useEffect(() => {
+    setPage(0) // new result set or ordering invalidates the current page
+  }, [filterKey, sortKey, sortDir])
+  const pagedRows = useMemo(
+    () => sortedRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [sortedRows, page, rowsPerPage],
+  )
 
   const toggleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -408,7 +421,7 @@ export default function ReportsPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {sortedRows.map((r) => (
+              {pagedRows.map((r) => (
                 <TableRow
                   key={`${r.source_id}:${r.state_key}`}
                   hover
@@ -429,6 +442,20 @@ export default function ReportsPage() {
             </TableBody>
           </Table>
         </TableContainer>
+        {sortedRows.length > rowsPerPage && (
+          <TablePagination
+            component="div"
+            count={sortedRows.length}
+            page={page}
+            onPageChange={(_e, newPage) => setPage(newPage)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10))
+              setPage(0)
+            }}
+            rowsPerPageOptions={[25, 50, 100]}
+          />
+        )}
       </Card>
     </Box>
   )

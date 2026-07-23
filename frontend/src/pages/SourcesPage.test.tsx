@@ -328,6 +328,31 @@ describe('SourcesPage', () => {
     expect(screen.getByText(i18n.t('pages.sources.noStatesMatch', { filter: 'zzz' }) as string)).toBeInTheDocument()
   })
 
+  it('windows very long state lists so the DOM stays bounded', async () => {
+    const many = Array.from({ length: 500 }, (_, i) => ({
+      key: `ws-${String(i).padStart(3, '0')}.tfstate`,
+      name: `workspace-${String(i).padStart(3, '0')}.tfstate`,
+      size: 100,
+    }))
+    mocked.listStates.mockResolvedValue(many as Awaited<ReturnType<typeof api.listStates>>)
+    renderPage()
+    await screen.findByText('demo-local')
+    fireEvent.click(screen.getAllByRole('button', { name: i18n.t('pages.sources.browseStates') as string })[0])
+
+    // The head of the list renders; rows far past the viewport do not.
+    expect(await screen.findByText('workspace-000.tfstate')).toBeInTheDocument()
+    expect(screen.queryByText('workspace-400.tfstate')).not.toBeInTheDocument()
+    const rendered = screen.getAllByText(/^workspace-\d+\.tfstate$/)
+    expect(rendered.length).toBeLessThan(50)
+
+    // Filtering still reaches every state, not just the rendered window.
+    const filter = screen.getByPlaceholderText(
+      i18n.t('pages.sources.filterStates', { count: 500 }) as string,
+    )
+    fireEvent.change(filter, { target: { value: 'workspace-400' } })
+    expect(await screen.findByText('workspace-400.tfstate')).toBeInTheDocument()
+  })
+
   it('renders the resources tab', async () => {
     await openStateDetail()
     fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabResources') as string }))
