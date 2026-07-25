@@ -36,7 +36,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-i18next": "^15.4.1",
-    "react-router-dom": "^6.30.3",
+    "react-router-dom": "^7.18.1",
     "recharts": "^2.15.4",
     "swagger-ui-react": "^5.32.11"
   },
