@@ -128,7 +128,8 @@
     "signOut": "Se déconnecter",
     "insufficientTitle": "Droits d'accès insuffisants",
     "insufficientBody": "Vous ne disposez pas des droits d'accès requis ({{scope}}) pour consulter cette page.",
-    "completingSignIn": "Connexion en cours…"
+    "completingSignIn": "Connexion en cours…",
+    "signInFailed": "Échec de la connexion. Retour à la page de connexion…"
   },
   "landing": {
     "heroTitle": "L'état de Terraform, sous contrôle",

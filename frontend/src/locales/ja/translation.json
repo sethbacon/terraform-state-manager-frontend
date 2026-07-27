@@ -128,7 +128,8 @@
     "signOut": "ログアウト",
     "insufficientTitle": "権限が不十分です",
     "insufficientBody": "このページを表示するには、必要なアクセス権限（{{scope}}）がありません。",
-    "completingSignIn": "ログイン処理中…"
+    "completingSignIn": "ログイン処理中…",
+    "signInFailed": "ログインに失敗しました。ログインページに戻ります…"
   },
   "landing": {
     "heroTitle": "Terraformの状態を確実に管理",

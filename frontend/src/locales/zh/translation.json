@@ -128,7 +128,8 @@
     "signOut": "退出",
     "insufficientTitle": "权限不足",
     "insufficientBody": "您没有查看此页面的所需权限（{{scope}}）。",
-    "completingSignIn": "正在完成登录……"
+    "completingSignIn": "正在完成登录……",
+    "signInFailed": "登录失败。返回登录页面……"
   },
   "landing": {
     "heroTitle": "Terraform 状态，尽在掌控",

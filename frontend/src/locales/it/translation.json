@@ -128,7 +128,8 @@
     "signOut": "Esci",
     "insufficientTitle": "Autorizzazioni insufficienti",
     "insufficientBody": "Non disponi dei diritti di accesso necessari ({{scope}}) per visualizzare questa pagina.",
-    "completingSignIn": "Accesso in corso…"
+    "completingSignIn": "Accesso in corso…",
+    "signInFailed": "Accesso non riuscito. Si torna alla pagina di accesso…"
   },
   "landing": {
     "heroTitle": "Lo stato di Terraform, sotto controllo",

@@ -128,7 +128,8 @@
     "signOut": "Uitloggen",
     "insufficientTitle": "Onvoldoende rechten",
     "insufficientBody": "U beschikt niet over de vereiste toegangsrechten ({{scope}}) om deze pagina te bekijken.",
-    "completingSignIn": "Aanmelden wordt voltooid…"
+    "completingSignIn": "Aanmelden wordt voltooid…",
+    "signInFailed": "Het inloggen is mislukt. Je keert terug naar de inlogpagina…"
   },
   "landing": {
     "heroTitle": "Terraform-status, onder controle",
