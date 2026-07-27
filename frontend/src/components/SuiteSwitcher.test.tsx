@@ -20,7 +20,26 @@ it('renders nothing when no sibling', async () => {
   render(withQuery(<SuiteSwitcher />))
   expect(screen.queryByRole('button')).toBeNull()
 })
-
+it('renders nothing when the sibling publicUrl is unsafe (#221)', async () => {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        sibling: {
+          app: 'terraform-state-manager',
+          state: 'active',
+          publicUrl: 'javascript:alert(1)', // unsafe scheme must be rejected by isSafeExternalUrl
+        },
+      }),
+      { status: 200 },
+    ),
+  )
+  render(withQuery(<SuiteSwitcher />))
+  // The sibling resolves but its unsafe URL is rejected, so the switcher button
+  // never appears (findByRole rejects after its timeout).
+  await expect(
+    screen.findByRole('button', { name: /Open Terraform State Manager/i }, { timeout: 500 }),
+  ).rejects.toThrow()
+})
 it('renders a link when a sibling is active', async () => {
   vi.spyOn(globalThis, 'fetch').mockResolvedValue(
     new Response(

@@ -18,22 +18,12 @@ import { api, type UIThemeConfig } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 
 import { extractApiError as apiErr } from '../../utils/apiError'
+import { isSafeExternalUrl } from '../../utils/externalUrl'
 
 // Mirrors the backend gate (ui_theme.go): hex or rgb()/hsl() notation — what
 // MUI's decomposeColor can parse. Validated here too so the admin gets field-
 // level feedback instead of a submit error.
 const COLOR_RE = /^(#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|(rgb|rgba|hsl|hsla)\([0-9a-z.,%\s/]+\))$/i
-
-// URLs must be https or root-relative (http only for localhost development).
-function isValidAssetUrl(v: string): boolean {
-  const lower = v.toLowerCase()
-  return (
-    lower.startsWith('https://') ||
-    (v.startsWith('/') && !v.startsWith('//')) ||
-    lower.startsWith('http://localhost') ||
-    lower.startsWith('http://127.0.0.1')
-  )
-}
 
 type Field = {
   key: keyof UIThemeConfig
@@ -55,7 +45,7 @@ const FIELDS: Field[] = [
 function fieldError(f: Field, value: string): boolean {
   if (!value) return false
   if (f.kind === 'color') return !COLOR_RE.test(value)
-  if (f.kind === 'url') return !isValidAssetUrl(value)
+  if (f.kind === 'url') return !isSafeExternalUrl(value)
   return value.length > 100
 }
 

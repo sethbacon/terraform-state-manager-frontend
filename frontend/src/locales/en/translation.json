@@ -128,7 +128,8 @@
     "signOut": "Sign out",
     "insufficientTitle": "Insufficient permissions",
     "insufficientBody": "You don't have the required access ({{scope}}) to view this page.",
-    "completingSignIn": "Completing sign-in…"
+    "completingSignIn": "Completing sign-in…",
+    "signInFailed": "Sign-in failed. Returning to the login page…"
   },
   "landing": {
     "heroTitle": "Terraform state, under control",
