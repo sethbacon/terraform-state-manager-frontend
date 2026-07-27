@@ -1160,7 +1160,8 @@
     "title": "Une erreur s'est produite",
     "description": "Une erreur inattendue s'est produite lors de l'affichage de cette page.",
     "tryAgain": "Réessayez",
-    "reloadPage": "Actualiser la page"
+    "reloadPage": "Actualiser la page",
+    "reference": "Référence : {{id}}"
   },
   "empty": {
     "default": "Il n'y a encore rien ici."

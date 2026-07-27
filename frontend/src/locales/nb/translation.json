@@ -1160,7 +1160,8 @@
     "title": "Det oppstod en feil",
     "description": "Det oppstod en uventet feil under visningen av denne siden.",
     "tryAgain": "Prøv på nytt",
-    "reloadPage": "Last inn siden på nytt"
+    "reloadPage": "Last inn siden på nytt",
+    "reference": "Kilde: {{id}}"
   },
   "empty": {
     "default": "Det er ingenting her ennå."

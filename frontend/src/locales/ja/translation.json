@@ -1160,7 +1160,8 @@
     "title": "何か問題が発生しました",
     "description": "このページの表示中に予期せぬエラーが発生しました。",
     "tryAgain": "もう一度試してみてください",
-    "reloadPage": "ページを再読み込み"
+    "reloadPage": "ページを再読み込み",
+    "reference": "出典：{{id}}"
   },
   "empty": {
     "default": "まだここには何もありません。"

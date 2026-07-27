@@ -1160,7 +1160,8 @@
     "title": "Es ist ein Fehler aufgetreten",
     "description": "Beim Darstellen dieser Seite ist ein unerwarteter Fehler aufgetreten.",
     "tryAgain": "Versuche es noch einmal",
-    "reloadPage": "Seite neu laden"
+    "reloadPage": "Seite neu laden",
+    "reference": "Quelle: {{id}}"
   },
   "empty": {
     "default": "Hier steht noch nichts."

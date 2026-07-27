@@ -1160,7 +1160,8 @@
     "title": "Ha surgido un problema",
     "description": "Se ha producido un error inesperado al cargar esta página.",
     "tryAgain": "Inténtalo de nuevo",
-    "reloadPage": "Actualizar la página"
+    "reloadPage": "Actualizar la página",
+    "reference": "Referencia: {{id}}"
   },
   "empty": {
     "default": "De momento no hay nada aquí."
