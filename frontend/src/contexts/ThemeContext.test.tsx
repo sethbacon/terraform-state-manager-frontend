@@ -1,7 +1,8 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
-import { AppThemeProvider, useThemeMode } from './ThemeContext'
+import { AppThemeProvider, useThemeMode, getSafeUITheme } from './ThemeContext'
+import { api } from '../services/api'
 import i18n from '../i18n'
 
 vi.mock('../services/api', () => ({
@@ -71,5 +72,24 @@ describe('AppThemeProvider', () => {
     expect(result.current.productName).toBe('Terraform State Manager')
     expect(result.current.logoUrl).toBeNull()
     expect(result.current.loginHeroUrl).toBeNull()
+  })
+
+  it('getSafeUITheme strips unsafe whitelabel URLs at the app boundary (#221)', async () => {
+    vi.mocked(api.getUITheme).mockResolvedValueOnce({
+      product_name: 'Custom',
+      logo_url: 'javascript:alert(1)', // unsafe scheme -> stripped
+      favicon_url: '//evil.example/f.ico', // protocol-relative -> stripped
+      login_hero_url: 'https://cdn.example/hero.png', // safe -> kept
+    })
+    const theme = await getSafeUITheme()
+    expect(theme?.logo_url).toBeUndefined()
+    expect(theme?.favicon_url).toBeUndefined()
+    expect(theme?.login_hero_url).toBe('https://cdn.example/hero.png')
+    expect(theme?.product_name).toBe('Custom') // non-URL field untouched
+  })
+
+  it('getSafeUITheme passes a null theme through unchanged (#221)', async () => {
+    vi.mocked(api.getUITheme).mockResolvedValueOnce(null)
+    expect(await getSafeUITheme()).toBeNull()
   })
 })
