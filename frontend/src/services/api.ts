@@ -20,8 +20,39 @@ export interface UIThemeConfig {
 // production (nginx proxies the same paths). withCredentials so the HttpOnly auth
 // cookie is sent automatically. Sessions are cookie-only — the JWT is never read
 // by JS, so there is no bearer token to attach.
+
+/**
+ * Default per-request ceiling. Without it a hung backend (or an external
+ * state/CI backend it proxies to) leaves the request pending indefinitely — the
+ * mutation's isPending stays true and the disabled-while-pending submit button
+ * never recovers short of a page reload (#216). A finite timeout surfaces a
+ * clear, recoverable error instead.
+ */
+export const DEFAULT_TIMEOUT_MS = 30_000
+
+/**
+ * Longer ceiling for operations that legitimately run long: reading/writing large
+ * state blobs, transfers/migrations that proxy a full state between remote
+ * backends, CI discovery/verification that reaches external providers, and
+ * streamed exports. The backend itself caps /sources at 5 minutes, so this sits
+ * at that ceiling rather than cutting a big-but-healthy operation short.
+ */
+export const HEAVY_TIMEOUT_MS = 5 * 60_000
+
+// Path segments of the heavy operations above. Matching is by URL so it is
+// applied in one place (the request interceptor) rather than per call site; a
+// generous ceiling on an occasional fast match is harmless — it only bounds a
+// genuine hang.
+const HEAVY_OP_URL = /\/(state|analyze|reports|export|verify|discover|migrate|backup)(\/|$)/
+
+/** The heavy ceiling when url is a long-running operation, else undefined (the default applies). */
+export function heavyTimeoutForUrl(url: string | undefined): number | undefined {
+  return url && HEAVY_OP_URL.test(url) ? HEAVY_TIMEOUT_MS : undefined
+}
+
 export const apiClient = axios.create({
   baseURL: '',
+  timeout: DEFAULT_TIMEOUT_MS,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 })
@@ -45,6 +76,10 @@ apiClient.interceptors.request.use((config) => {
       config.headers['X-CSRF-Token'] = csrf
     }
   }
+  // Grant the longer ceiling to heavy operations (large state data, transfers,
+  // CI discovery, streamed exports); everything else keeps the default (#216).
+  const heavy = heavyTimeoutForUrl(config.url)
+  if (heavy) config.timeout = heavy
   return config
 })
 

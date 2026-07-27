@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
-import { api, apiClient, readCookie } from './api'
+import { api, apiClient, readCookie, DEFAULT_TIMEOUT_MS, HEAVY_TIMEOUT_MS, heavyTimeoutForUrl } from './api'
 import { SCOPES_KEY, USER_KEY } from '../utils/authStorage'
 
 // Spy on the shared axios instance rather than mocking the axios module — the
@@ -86,6 +86,41 @@ describe('interceptors', () => {
     await expect(responseHandlers()[0].rejected(err)).rejects.toBe(err)
     expect(localStorage.getItem(USER_KEY)).toBe('cached')
     localStorage.removeItem(USER_KEY)
+  })
+})
+
+describe('request timeout (#216)', () => {
+  it('sets a finite default timeout on the shared client', () => {
+    expect(apiClient.defaults.timeout).toBe(DEFAULT_TIMEOUT_MS)
+  })
+
+  it('heavyTimeoutForUrl grants the long ceiling to heavy operations only', () => {
+    for (const url of [
+      '/api/v1/sources/s1/state/raw',
+      '/api/v1/sources/s1/state/migrate',
+      '/api/v1/sources/s1/state/backup',
+      '/api/v1/analyze',
+      '/api/v1/reports/states/export',
+      '/api/v1/admin/audit-logs/export',
+      '/api/v1/admin/users/u1/export',
+      '/api/v1/ci-sources/c1/verify',
+      '/api/v1/ci-sources/c1/discover',
+    ]) {
+      expect(heavyTimeoutForUrl(url)).toBe(HEAVY_TIMEOUT_MS)
+    }
+    for (const url of ['/api/v1/sources', '/api/v1/me', '/api/v1/pipelines', undefined]) {
+      expect(heavyTimeoutForUrl(url)).toBeUndefined()
+    }
+  })
+
+  it('the request interceptor applies the heavy ceiling by URL', () => {
+    const fulfilled = (
+      apiClient.interceptors.request as unknown as {
+        handlers: { fulfilled: (c: { url?: string; timeout?: number }) => { timeout?: number } }[]
+      }
+    ).handlers[0].fulfilled
+    expect(fulfilled({ url: '/api/v1/sources/s1/state/raw' }).timeout).toBe(HEAVY_TIMEOUT_MS)
+    expect(fulfilled({ url: '/api/v1/sources' }).timeout).toBeUndefined()
   })
 })
 
