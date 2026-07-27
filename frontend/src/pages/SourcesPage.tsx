@@ -1314,8 +1314,11 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
     },
     onError: (e) => {
       // A serial/lineage conflict is recoverable: the backend supports
-      // ?force=true, so offer it explicitly instead of dead-ending.
+      // ?force=true, so offer it explicitly instead of dead-ending. Refetch the
+      // current server state first so the force dialog can show the operator what
+      // their draft would overwrite before they confirm (#214).
       if ((e as { response?: { status?: number } })?.response?.status === 409) {
+        q.refetch()
         setForceConfirmOpen(true)
       }
     },
@@ -1419,12 +1422,35 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
         </DialogActions>
       </Dialog>
 
-      <Dialog open={forceConfirmOpen} onClose={() => setForceConfirmOpen(false)}>
+      <Dialog open={forceConfirmOpen} onClose={() => setForceConfirmOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>{t('pages.sources.forceOverwriteTitle')}</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
             <Alert severity="warning">{errMsg(saveMutation.error)}</Alert>
             <Typography>{t('pages.sources.forceOverwriteBody')}</Typography>
+            {/* Show the CURRENT server state (refetched on the 409) so the operator
+                can see what forcing would overwrite before confirming (#214). */}
+            <Typography variant="subtitle2">{t('pages.sources.forceCurrentStateLabel')}</Typography>
+            {q.isFetching ? (
+              <CircularProgress size={20} />
+            ) : (
+              <Box
+                component="pre"
+                sx={{
+                  m: 0,
+                  p: 2,
+                  maxHeight: 300,
+                  overflow: 'auto',
+                  fontSize: 12,
+                  bgcolor: 'action.hover',
+                  borderRadius: 1,
+                  whiteSpace: 'pre-wrap',
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                {pretty}
+              </Box>
+            )}
           </Stack>
         </DialogContent>
         <DialogActions>

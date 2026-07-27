@@ -832,6 +832,7 @@
       "backupContentTitle": "Backup content",
       "forceOverwriteTitle": "Overwrite conflict",
       "forceOverwriteBody": "The backend refused this write to protect the state. Forcing past it can lose newer changes or split lineage - only continue if you are certain this content is correct.",
+      "forceCurrentStateLabel": "Current server state — what forcing will overwrite:",
       "forceOverwrite": "Force overwrite"
     },
     "drift": {
