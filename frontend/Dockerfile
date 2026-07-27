@@ -10,12 +10,14 @@ COPY package*.json .npmrc ./
 # can install the private @sethbacon/* dependency without baking the token into a layer.
 RUN --mount=type=secret,id=node_auth_token \
     NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" npm ci
-# Auto-fix what we can, then gate on PRODUCTION-dependency vulnerabilities only.
-# Dev-only tooling (vite/vitest/eslint) is not present in the final nginx image
+# Gate on PRODUCTION-dependency vulnerabilities only, against the exact committed
+# lockfile. No in-build `npm audit fix`: it would mutate node_modules without
+# updating the shipped lockfile, so the bundled dependency code could diverge from
+# its sha512-hashed integrity record — handle fixes as a reviewed PR instead
+# (#213). Dev-only tooling (vite/vitest/eslint) is not in the final nginx image
 # and is excluded so it cannot fail the build.
 RUN --mount=type=secret,id=node_auth_token \
     export NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" && \
-    npm audit fix || true && \
     npm audit --audit-level=high --omit=dev
 COPY . .
 RUN npm run build
