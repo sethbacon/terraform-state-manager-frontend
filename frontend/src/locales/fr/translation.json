@@ -666,6 +666,7 @@
       "backupContentTitle": "Contenu de sauvegarde",
       "forceOverwriteTitle": "Conflit de remplacement",
       "forceOverwriteBody": "Le backend a refusé cette écriture afin de protéger l'état. Le forcer pourrait entraîner la perte des modifications les plus récentes ou une fragmentation de la lignée ; ne continuez que si vous êtes certain que ce contenu est correct.",
+      "forceCurrentStateLabel": "État actuel du serveur — ce que la commande « forcing » va écraser :",
       "forceOverwrite": "Forcer la réécriture"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Modifier",
       "noResourceDrift": "Aucun écart par ressource n'a été signalé.",
       "noDetailsYet": "On ne dispose pas encore d'informations — les résultats de cette série n'ont pas encore été communiqués.",
+      "summaryTruncated": "Affichage de la première ressource modifiée «{{shown}}» de «{{total}}». Ouvrez l'exécution dans son pipeline source pour consulter le plan complet.",
       "addPipelineTitle": "Ajouter une connexion de canalisation",
       "ciSource": "Source CI",
       "ciSourceHelp": "Sélectionnez une source CI configurée pour choisir parmi ses pipelines ou ses workflows, ou saisissez les coordonnées manuellement.",

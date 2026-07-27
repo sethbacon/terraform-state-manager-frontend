@@ -666,6 +666,7 @@
       "backupContentTitle": "备份内容",
       "forceOverwriteTitle": "覆盖冲突",
       "forceOverwriteBody": "后端拒绝了此次写入操作，以保护状态。强行覆盖可能会导致较新的更改丢失或导致血统分裂——请仅在确信此内容正确时继续。",
+      "forceCurrentStateLabel": "当前服务器状态——强制操作将覆盖的内容：",
       "forceOverwrite": "强制覆盖"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "更改",
       "noResourceDrift": "未报告任何按资源计算的偏差。",
       "noDetailsYet": "目前尚无详细信息——该运行尚未报告结果。",
+      "summaryTruncated": "显示“{{total}}”中已更改资源的第一个{{shown}}。请打开其源管道中的“运行”以查看完整计划。",
       "addPipelineTitle": "添加管道连接",
       "ciSource": "CI 源代码",
       "ciSourceHelp": "选择一个已配置的 CI 源，以便从其管道或工作流中进行选择，或者手动输入坐标。",

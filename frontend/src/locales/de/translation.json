@@ -666,6 +666,7 @@
       "backupContentTitle": "Inhalt der Sicherungskopie",
       "forceOverwriteTitle": "Überschreibkonflikt",
       "forceOverwriteBody": "Das Backend hat diesen Schreibvorgang abgelehnt, um den Zustand zu schützen. Wenn Sie den Vorgang dennoch erzwingen, können neuere Änderungen verloren gehen oder die Versionskette unterbrochen werden – fahren Sie nur fort, wenn Sie sicher sind, dass dieser Inhalt korrekt ist.",
+      "forceCurrentStateLabel": "Aktueller Serverstatus – was durch das Erzwingen überschrieben wird:",
       "forceOverwrite": "Überschreiben erzwingen"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Ändern",
       "noResourceDrift": "Es wurde keine Abweichung pro Ressource gemeldet.",
       "noDetailsYet": "Es liegen noch keine Einzelheiten vor – die Messung hat noch keine Ergebnisse geliefert.",
+      "summaryTruncated": "Es werden die ersten „{{shown}}“ der geänderten Ressourcen unter {{total}} angezeigt. Öffnen Sie die Ausführung in der zugehörigen Quellpipeline, um den vollständigen Plan anzuzeigen.",
       "addPipelineTitle": "Pipeline-Verbindung hinzufügen",
       "ciSource": "CI-Quelle",
       "ciSourceHelp": "Wählen Sie eine konfigurierte CI-Quelle aus, um aus deren Pipelines oder Workflows auszuwählen, oder geben Sie die Koordinaten manuell ein.",

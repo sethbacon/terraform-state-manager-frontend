@@ -666,6 +666,7 @@
       "backupContentTitle": "Contenido de respaldo",
       "forceOverwriteTitle": "Conflicto de sobrescritura",
       "forceOverwriteBody": "El backend ha rechazado esta operación de escritura para proteger el estado. Si se fuerza la operación, se pueden perder los cambios más recientes o dividirse el linaje; continúa solo si estás seguro de que este contenido es correcto.",
+      "forceCurrentStateLabel": "Estado actual del servidor: lo que se sobrescribirá al aplicar la configuración forzada:",
       "forceOverwrite": "Forzar sobrescritura"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Cambiar",
       "noResourceDrift": "No se ha notificado ninguna desviación por recurso.",
       "noDetailsYet": "Aún no hay detalles: la carrera aún no ha dado a conocer los resultados.",
+      "summaryTruncated": "Se muestran los primeros recursos modificados de {{shown}} de {{total}}. Abre la ejecución en su canalización de origen para ver el plan completo.",
       "addPipelineTitle": "Añadir conexión de tubería",
       "ciSource": "Fuente de CI",
       "ciSourceHelp": "Selecciona una fuente de CI configurada para elegir entre sus pipelines o flujos de trabajo, o introduce las coordenadas manualmente.",

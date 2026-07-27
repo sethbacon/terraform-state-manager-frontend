@@ -666,6 +666,7 @@
       "backupContentTitle": "Sikkerhetskopiere innhold",
       "forceOverwriteTitle": "Overskrivingskonflikt",
       "forceOverwriteBody": "Backenden avviste denne skriveoperasjonen for å beskytte tilstanden. Hvis du tvinger gjennom endringen, kan nyere endringer gå tapt eller linjen kan splittes – fortsett bare hvis du er sikker på at dette innholdet er korrekt.",
+      "forceCurrentStateLabel": "Nåværende serverstatus — hva en tvangsoppdatering vil overskrive:",
       "forceOverwrite": "Tving overskriving"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Endring",
       "noResourceDrift": "Det ble ikke rapportert om avvik per ressurs.",
       "noDetailsYet": "Det foreligger ingen opplysninger ennå – løpet har ikke offentliggjort noen resultater.",
+      "summaryTruncated": "Viser de første {{shown}} av {{total}} endrede ressurser. Åpne «Kjør i kildekoden»-rørledningen for å se den fullstendige planen.",
       "addPipelineTitle": "Legg til rørledningsforbindelse",
       "ciSource": "CI-kilde",
       "ciSourceHelp": "Velg en konfigurert CI-kilde for å velge blant dens rørledninger eller arbeidsflyter, eller skriv inn koordinatene manuelt.",
