@@ -37,9 +37,7 @@ import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 import { useSuite } from '../hooks/useSuite'
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../utils/apiError'
 
 // hostOf extracts the bare host (incl. any non-default port) from a URL,
 // returning '' on a malformed value. Used to suggest the registry host from the

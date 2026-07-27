@@ -35,9 +35,7 @@ import PageTitleIcon from '@mui/icons-material/Assessment'
 import { api, type ReportFilters, type ReportFormat, type ReportStateRow, type VersionFilterOp } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../utils/apiError'
 
 // Operator toggle, ascending so it reads older → newer. Meanings reuse the
 // version drill-down's translated labels; symbols are intentionally untranslated.

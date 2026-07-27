@@ -29,9 +29,7 @@ const CHANNEL_TYPE_OPTIONS: NotificationChannelTypeOption[] = [
   { value: 'email', label: 'Email', isEmail: true },
 ]
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../../utils/apiError'
 
 // SMTPSettingsPanel configures the single shared SMTP relay backing every
 // "email" notification channel — host/port/credentials/from/use_tls, plus a

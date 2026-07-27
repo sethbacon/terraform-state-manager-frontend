@@ -39,9 +39,7 @@ import { useAuth } from '../contexts/AuthContext'
 
 const RECORDS_PAGE_SIZE = 25
 
-function recordApiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as recordApiErr } from '../utils/apiError'
 
 function recordStatusChip(status: DriftRecord['status'], t: (k: string) => string) {
   switch (status) {
