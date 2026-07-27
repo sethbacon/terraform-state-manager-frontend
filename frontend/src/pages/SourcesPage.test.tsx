@@ -404,6 +404,11 @@ describe('SourcesPage', () => {
     expect(await screen.findByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).toBeInTheDocument()
     expect(screen.getByText(/lower than current 9/)).toBeInTheDocument()
 
+    // #214: the force dialog shows the current server state (refetched on the 409)
+    // so the operator can see what forcing would overwrite before confirming.
+    expect(screen.getByText(i18n.t('pages.sources.forceCurrentStateLabel') as string)).toBeInTheDocument()
+    await waitFor(() => expect(mocked.getRawState.mock.calls.length).toBeGreaterThanOrEqual(2))
+
     fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.forceOverwrite') as string }))
     await waitFor(() =>
       expect(mocked.editState).toHaveBeenCalledWith('s1', 'app.tfstate', '{"version":4,"serial":8}', true),
