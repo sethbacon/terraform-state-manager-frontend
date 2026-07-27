@@ -34,7 +34,10 @@ export interface SourceForm {
   credentials?: Record<string, unknown>
 }
 
-const tokenAuth = (token: string) => ({ headers: { Authorization: `SetupToken ${token}` } })
+// Trim the operator-typed/pasted token once at the boundary so validation and
+// every mutating call send the identical value — a token pasted with surrounding
+// whitespace otherwise validates but fails the save calls (#241).
+const tokenAuth = (token: string) => ({ headers: { Authorization: `SetupToken ${token.trim()}` } })
 
 export const setupApi = {
   getStatus: async (): Promise<SetupStatus> =>
