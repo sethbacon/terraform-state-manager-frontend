@@ -94,7 +94,23 @@ export default function App() {
                         {allNavItems
                           .filter((item) => item.path !== '/' && realPages[item.path])
                           .map((item) => (
-                            <Route key={item.path} path={item.path} element={realPages[item.path]} />
+                            <Route
+                              key={item.path}
+                              path={item.path}
+                              // Wire each route's scope (navigation.tsx NavItem.scope) into the
+                              // existing ProtectedRoute guard so route access matches sidebar/palette
+                              // visibility (#230, #237). This is defense-in-depth/UX only — the
+                              // backend independently enforces scope on every /api/v1 call.
+                              element={
+                                item.scope ? (
+                                  <ProtectedRoute requiredScope={item.scope}>
+                                    {realPages[item.path]}
+                                  </ProtectedRoute>
+                                ) : (
+                                  realPages[item.path]
+                                )
+                              }
+                            />
                           ))}
                         <Route
                           path="*"
