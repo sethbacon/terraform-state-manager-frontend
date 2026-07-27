@@ -246,6 +246,31 @@ describe('DriftPage', () => {
     expect(within(dialog).getByText(i18n.t('pages.drift.noResourceDrift') as string)).toBeInTheDocument()
   })
 
+  it('caps the run-summary table and notes truncation for very large plans', async () => {
+    const bigSummary = Array.from({ length: 250 }, (_, i) => ({
+      address: `aws_instance.n${i}`,
+      actions: ['update'],
+      attrs: [],
+    }))
+    const bigRun = { ...runs[0], id: 'dbig', working_dir: 'big/plan', summary: bigSummary }
+    mocked.listDriftRuns.mockResolvedValue({ runs: [bigRun], total: 1 } as unknown as Awaited<
+      ReturnType<typeof api.listDriftRuns>
+    >)
+    renderPage()
+    fireEvent.click(await screen.findByText('big/plan'))
+    const dialog = await screen.findByRole('dialog')
+    // The truncation note reports the shown/total counts…
+    expect(
+      within(dialog).getByText(
+        i18n.t('pages.drift.summaryTruncated', { shown: 200, total: 250 }) as string,
+      ),
+    ).toBeInTheDocument()
+    // …and only the first 200 resource rows are rendered into the DOM.
+    expect(within(dialog).getByText('aws_instance.n0')).toBeInTheDocument()
+    expect(within(dialog).getByText('aws_instance.n199')).toBeInTheDocument()
+    expect(within(dialog).queryByText('aws_instance.n200')).not.toBeInTheDocument()
+  })
+
   it('dispatches a new run with optional ref and working dir', async () => {
     mocked.createDriftRun.mockResolvedValue(runs[2] as unknown as Awaited<ReturnType<typeof api.createDriftRun>>)
     renderPage()
