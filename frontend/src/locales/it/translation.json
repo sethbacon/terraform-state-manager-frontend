@@ -1160,7 +1160,8 @@
     "title": "Si è verificato un errore",
     "description": "Si è verificato un errore imprevisto durante il caricamento di questa pagina.",
     "tryAgain": "Riprova",
-    "reloadPage": "Aggiorna la pagina"
+    "reloadPage": "Aggiorna la pagina",
+    "reference": "Riferimento: {{id}}"
   },
   "empty": {
     "default": "Non c'è ancora nulla qui."

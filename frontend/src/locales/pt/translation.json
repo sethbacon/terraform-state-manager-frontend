@@ -1160,7 +1160,8 @@
     "title": "Ocorreu um erro",
     "description": "Ocorreu um erro inesperado durante a visualização desta página.",
     "tryAgain": "Tenta novamente",
-    "reloadPage": "Atualizar a página"
+    "reloadPage": "Atualizar a página",
+    "reference": "Referência: {{id}}"
   },
   "empty": {
     "default": "Ainda não há nada aqui."
