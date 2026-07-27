@@ -143,19 +143,27 @@ controls:
   installed without an integrity failure, and a new version cannot arrive
   via a routine floating-range install.
 - **Audited** — the package received a blind security audit methodology on
-  2026-07-10 (26 findings: 2 high, 16 medium, remainder low/info). All
-  findings were remediated in
+  2026-07-10 (26 findings: 2 high, 16 medium, remainder low/info), all
+  remediated in
   [v0.5.3](https://github.com/sethbacon/terraform-suite-ui/releases/tag/v0.5.3)
-  (2026-07-11), which is the version pinned here. The package repo now
-  carries its own `SECURITY.md` and a security-model section in its README.
+  (2026-07-11). That was the **audit-fix release, not necessarily the currently
+  pinned version** — the authoritative pin is whatever `frontend/package.json`
+  declares (it has since moved forward past v0.5.3). Every manual bump must review
+  the upstream
+  [CHANGELOG](https://github.com/sethbacon/terraform-suite-ui/blob/main/CHANGELOG.md)
+  for auth/consent-relevant changes (see the review note below). The package repo
+  now carries its own `SECURITY.md` and a security-model section in its README.
 - **Upstream supply-chain gates** — the package's own CI runs typecheck,
   tests, build, and CodeQL; its publish workflow verifies the tarball
   contains only `dist/` + docs before publishing and attaches a build
   provenance attestation (`actions/attest-build-provenance`) to each
   release.
-- **Manual, reviewed updates** — Dependabot does not have credentials for
-  the private registry, so this dependency is deliberately outside
-  Dependabot's reach. Version bumps are manual PRs that must update the
-  exact pin and lockfile together and review the upstream
+- **Manual, reviewed updates** — `.github/dependabot.yml` runs Dependabot for the
+  public dependency tree (npm, Docker base images, and GitHub Actions). The
+  private `@sethbacon/*` package is deliberately **excluded** from automated bumps
+  (`ignore`d): resolving it requires a GitHub Packages read token
+  (`DEPENDABOT_PACKAGES_READ`), and its version is pinned in lockstep with the
+  suite out of band. Bumps to it are manual PRs that must update the exact pin and
+  lockfile together and review the upstream
   [CHANGELOG](https://github.com/sethbacon/terraform-suite-ui/blob/main/CHANGELOG.md)
   for auth/consent-relevant changes.

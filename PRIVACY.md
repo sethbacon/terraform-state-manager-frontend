@@ -38,11 +38,19 @@ When you interact with the Service:
 ### 3.3 No Telemetry, No Analytics
 
 **This application contains no telemetry, analytics, error-reporting, or
-performance-monitoring pipeline, and no consent banner.** The frontend does not
-send usage data, page views, web-vitals, or error reports to any third party or
-analytics endpoint. The error-handling shim (`services/errorReporting.ts`) only
-logs to the browser console — it does not transmit anything off the device.
-There is therefore no telemetry opt-in to manage.
+performance-monitoring pipeline.** The frontend does not send usage data, page
+views, web-vitals, or error reports to any third party or analytics endpoint. The
+error-handling shim (`services/errorReporting.ts`) only logs to the browser
+console — it does not transmit anything off the device.
+
+A **consent banner** (`ConsentBanner`, inherited from the shared
+`@sethbacon/terraform-suite-ui` package) is mounted app-wide and offers
+Essential / Error Reporting / Performance Monitoring / Analytics toggles, storing
+the choice under the `tsm-consent` `localStorage` key (see section 7). These
+categories are shared-package UI: **no data pipeline is currently wired to any of
+them in this application**, so the choice does not presently gate any data
+collection — there is simply nothing to collect. The banner is disclosed here for
+transparency and to account for its storage key.
 
 ## 4. Legal Basis for Processing
 
@@ -98,6 +106,7 @@ The frontend stores only **non-personal UI preferences** in the browser's
 | `tsm-theme`            | UI theme (light/dark)                | Persistent |
 | `tsm-help-panel-open`  | Help panel open/closed state         | Persistent |
 | `tsm-nav-groups-open`  | Which sidebar groups are expanded    | Persistent |
+| `tsm-consent`          | Consent-banner category preferences (no data pipeline is wired to these; see section 3.3) | Persistent |
 | `i18nextLng`           | Selected interface language          | Persistent |
 
 The cached auth keys `tsm_user` and `tsm_scopes` are reserved by the app's
@@ -123,6 +132,12 @@ We implement technical and organizational measures including:
   and a restrictive `Permissions-Policy` (see `frontend/nginx.conf`)
 - Role-based access control (scopes), with `admin` as a wildcard
 - Audit logging of administrative and state-changing actions
+
+> **Note on HSTS:** this app's `frontend/nginx.conf` does **not** set a
+> `Strict-Transport-Security` header, because TLS is terminated upstream by your
+> ingress / load balancer (see the deployment disclaimer). The deploying
+> organization should add `Strict-Transport-Security` at that TLS-terminating
+> layer.
 
 See [SECURITY.md](SECURITY.md) for details.
 
