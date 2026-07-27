@@ -128,7 +128,8 @@
     "signOut": "Logg ut",
     "insufficientTitle": "Manglende rettigheter",
     "insufficientBody": "Du har ikke den nødvendige tilgangen ({{scope}}) for å se denne siden.",
-    "completingSignIn": "Fullfører pålogging…"
+    "completingSignIn": "Fullfører pålogging…",
+    "signInFailed": "Innloggingen mislyktes. Går tilbake til innloggingssiden…"
   },
   "landing": {
     "heroTitle": "Terraform-tilstand, under kontroll",

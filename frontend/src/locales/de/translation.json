@@ -128,7 +128,8 @@
     "signOut": "Abmelden",
     "insufficientTitle": "Unzureichende Berechtigungen",
     "insufficientBody": "Sie verfügen nicht über die erforderlichen Zugriffsrechte ({{scope}}), um diese Seite anzuzeigen.",
-    "completingSignIn": "Anmeldung wird abgeschlossen…"
+    "completingSignIn": "Anmeldung wird abgeschlossen…",
+    "signInFailed": "Die Anmeldung ist fehlgeschlagen. Zurück zur Anmeldeseite…"
   },
   "landing": {
     "heroTitle": "Terraform-State – alles unter Kontrolle",
