@@ -6,9 +6,10 @@ name: Release Please
     branches: [main]
   workflow_dispatch: {}
 
+# The job authenticates exclusively via the GitHub App token minted below; the
+# default GITHUB_TOKEN is never used for a write, so it needs no write grant (#231).
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release-please:
