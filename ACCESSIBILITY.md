@@ -26,6 +26,14 @@ components.
 | **Reduced motion**        | When `prefers-reduced-motion: reduce` is active, all MUI transitions are disabled (`theme.ts` zeroes the transition durations)                      |
 | **Self-hosted fonts**     | The Inter typeface is bundled via `@fontsource` (no CDN), so text renders reliably under a strict Content-Security-Policy                           |
 
+> **Shared-package disclosure.** Some mechanisms above are implemented in the private
+> [`@sethbacon/terraform-suite-ui`](https://github.com/sethbacon/terraform-suite-ui)
+> package rather than in this repository — notably the **skip link** and app shell
+> (`components/Layout.tsx` re-exports `SuiteLayout`) and the **reduced-motion** handling
+> and theming (`theme.ts` re-exports `createAppTheme`). See the "Shared Suite Package"
+> section of `ARCHITECTURE.md`; verifying those two behaviours against WCAG requires
+> auditing that package, which is versioned and audited separately.
+
 ## Focus & Announcements
 
 Route-change focus and announcements are implemented in `hooks/useRouteFocus.ts`,
@@ -49,7 +57,9 @@ MUI `Dialog` (focus-trapped) with an autofocused search input.
 
 ## Reduced Motion
 
-`createAppTheme(mode, prefersReducedMotion)` reads
+`createAppTheme(mode, prefersReducedMotion)` — provided by the shared
+`@sethbacon/terraform-suite-ui` package (this repo's `theme.ts` is a thin
+re-export, per `ARCHITECTURE.md`) — reads
 `prefers-reduced-motion: reduce` once at startup and, when set, replaces MUI's
 `transitions.create` with a no-op and zeroes every transition duration. This
 removes drawer slides, collapse animations, and dialog transitions for users who
