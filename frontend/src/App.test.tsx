@@ -158,4 +158,31 @@ describe('App routing', () => {
       await screen.findByText(i18n.t('pages.sources.empty') as string, {}, { timeout: 5000 }),
     ).toBeInTheDocument()
   })
+
+  it('shows the insufficient-scope message when a non-admin opens an admin route', async () => {
+    // A signed-in user WITHOUT the admin scope: the route-level ProtectedRoute
+    // guard renders the clean insufficient-scope message instead of mounting the
+    // admin page shell (#230, #237).
+    mockedUseAuth.mockReturnValue(
+      authState({ allowedScopes: ['state:read'], hasScope: (s: string) => s !== 'admin' }),
+    )
+    window.history.replaceState({}, '', '/admin/users')
+    render(<App />)
+    expect(
+      await screen.findByText(i18n.t('auth.insufficientTitle') as string, {}, { timeout: 5000 }),
+    ).toBeInTheDocument()
+    // The admin page's own data call must never fire when the scope gate blocks it.
+    expect(vi.mocked(api).listAdminUsers).not.toHaveBeenCalled()
+  })
+
+  it('lets a scoped non-admin reach a route they hold the scope for', async () => {
+    mockedUseAuth.mockReturnValue(
+      authState({ allowedScopes: ['state:read'], hasScope: (s: string) => s === 'state:read' }),
+    )
+    window.history.replaceState({}, '', '/sources')
+    render(<App />)
+    expect(
+      await screen.findByText(i18n.t('pages.sources.empty') as string, {}, { timeout: 5000 }),
+    ).toBeInTheDocument()
+  })
 })

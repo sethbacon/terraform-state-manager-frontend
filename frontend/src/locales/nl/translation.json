@@ -1160,7 +1160,8 @@
     "title": "Er is iets misgegaan",
     "description": "Er is een onverwachte fout opgetreden bij het weergeven van deze pagina.",
     "tryAgain": "Probeer het nog eens",
-    "reloadPage": "Pagina opnieuw laden"
+    "reloadPage": "Pagina opnieuw laden",
+    "reference": "Bron: {{id}}"
   },
   "empty": {
     "default": "Hier staat nog niets."

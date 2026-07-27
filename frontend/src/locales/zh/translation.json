@@ -1160,7 +1160,8 @@
     "title": "出现了一些问题",
     "description": "在渲染此页面时发生了一个意外错误。",
     "tryAgain": "请重试",
-    "reloadPage": "刷新页面"
+    "reloadPage": "刷新页面",
+    "reference": "参考：{{id}}"
   },
   "empty": {
     "default": "这里目前还没有内容。"
