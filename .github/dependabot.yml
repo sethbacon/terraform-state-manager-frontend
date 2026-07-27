@@ -1,0 +1,86 @@
+version: 2
+
+# Dependabot resolves the frontend dependency tree, which includes the private
+# @sethbacon/* package hosted on GitHub Packages. Configure a repository
+# Dependabot secret DEPENDABOT_PACKAGES_READ (a token with read:packages) so the
+# npm updater can resolve it; the private package itself is excluded from
+# automated version updates below (it is released and pinned in lockstep with the
+# suite, out of band).
+registries:
+  npm-github-packages:
+    type: npm-registry
+    url: https://npm.pkg.github.com
+    token: ${{secrets.DEPENDABOT_PACKAGES_READ}}
+
+updates:
+  # ---------------------------------------------------------------------------
+  # npm (frontend/) — public dependency tree
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: /frontend
+    registries:
+      - npm-github-packages
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    labels:
+      - dependencies
+      - javascript
+    commit-message:
+      prefix: "chore(deps)"
+    # Group public updates into one PR per cycle to reduce noise.
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
+    ignore:
+      # Private, released and version-pinned in lockstep with the suite; not
+      # auto-bumped here (resolved via the registry above only).
+      - dependency-name: "@sethbacon/*"
+      # React major bumps are breaking and need manual review.
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # ---------------------------------------------------------------------------
+  # Docker base images (frontend/Dockerfile: node builder + nginx runtime)
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    labels:
+      - dependencies
+      - docker
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
+
+  # ---------------------------------------------------------------------------
+  # GitHub Actions (SHA-pinned uses: across .github/workflows and .github/actions)
+  # ---------------------------------------------------------------------------
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      actions-dependencies:
+        patterns:
+          - "*"
