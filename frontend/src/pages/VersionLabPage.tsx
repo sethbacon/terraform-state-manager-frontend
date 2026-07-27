@@ -479,7 +479,7 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
   const [provider, setProvider] = useState('github_actions')
   const [variant, setVariant] = useState('default')
   const q = useQuery({
-    queryKey: ['health', 'workflow', provider, variant],
+    queryKey: queryKeys.health.workflow(provider, variant),
     queryFn: () => api.getHealthWorkflow(provider, variant),
     enabled: open,
   })

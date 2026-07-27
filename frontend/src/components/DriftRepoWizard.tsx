@@ -107,12 +107,12 @@ export default function DriftRepoWizard({
   })
 
   const templateQuery = useQuery({
-    queryKey: ['drift', 'workflow', source?.provider ?? ''],
+    queryKey: queryKeys.drift.workflow(source?.provider ?? ''),
     queryFn: () => api.getDriftWorkflow(source?.provider ?? 'github_actions'),
     enabled: open && Boolean(source),
   })
   const healthTemplateQuery = useQuery({
-    queryKey: ['health', 'workflow', source?.provider ?? ''],
+    queryKey: queryKeys.health.workflow(source?.provider ?? ''),
     queryFn: () => api.getHealthWorkflow(source?.provider ?? 'github_actions'),
     enabled: open && Boolean(source) && includeVersionLab,
   })
@@ -133,7 +133,7 @@ export default function DriftRepoWizard({
 
   // Poll the PR until it merges (or closes); 5s while open.
   const prQuery = useQuery({
-    queryKey: ['ci-sources', sourceId, 'pr', setup?.pr_id ?? 0],
+    queryKey: queryKeys.ciSources.pr(sourceId, setup?.pr_id ?? 0),
     queryFn: () => api.getCISourcePRState(sourceId, (isADO ? repo?.id : repo?.name) ?? '', setup?.pr_id ?? 0),
     enabled: open && Boolean(setup?.pr_id),
     refetchInterval: (q) => (q.state.data?.state === 'open' ? 5000 : false),

@@ -1164,7 +1164,7 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
   const [provider, setProvider] = useState('github_actions')
   const [variant, setVariant] = useState('default')
   const q = useQuery({
-    queryKey: ['drift', 'workflow', provider, variant],
+    queryKey: queryKeys.drift.workflow(provider, variant),
     queryFn: () => api.getDriftWorkflow(provider, variant),
     enabled: open,
   })
@@ -1201,6 +1201,8 @@ function WorkflowDialog({ open, onClose }: { open: boolean; onClose: () => void 
         <Divider sx={{ mb: 1 }} />
         {q.isLoading ? (
           <CircularProgress />
+        ) : q.isError ? (
+          <Alert severity="error">{apiErr(q.error)}</Alert>
         ) : (
           <Box
             component="pre"

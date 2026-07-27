@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '../services/queryKeys'
 
 export interface SuiteSibling {
   app: string
@@ -30,7 +31,7 @@ async function fetchUIConfig(): Promise<{ sibling: SuiteSibling | null }> {
 
 export function useSuite() {
   const { data } = useQuery({
-    queryKey: ['suite', 'ui-config'],
+    queryKey: queryKeys.suite.uiConfig(),
     queryFn: fetchUIConfig,
     staleTime: 60_000,
     refetchInterval: 60_000,
