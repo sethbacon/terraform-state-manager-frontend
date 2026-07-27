@@ -43,7 +43,7 @@ const CITemplatesPage = lazy(() => import('./pages/admin/CITemplatesPage'))
 const BrandingPage = lazy(() => import('./pages/admin/BrandingPage'))
 
 // Routes backed by a real page (home is mounted separately at '/').
-const realPages: Record<string, ReactNode> = {
+const pageElements: Record<string, ReactNode> = {
   '/sources': <SourcesPage />,
   '/drift': <DriftPage />,
   '/version-lab': <VersionLabPage />,
@@ -64,6 +64,15 @@ const realPages: Record<string, ReactNode> = {
   '/admin/ci-templates': <CITemplatesPage />,
   '/admin/branding': <BrandingPage />,
 }
+
+// Wrap each page in its own ErrorBoundary so a render crash in one page (e.g. a
+// malformed API response such as an unexpected null array) degrades to that page's
+// fallback inside the Layout chrome instead of unmounting the whole authenticated
+// shell (#217). The app-level boundary around <Routes> still catches anything
+// outside a page (e.g. the Layout itself).
+const realPages: Record<string, ReactNode> = Object.fromEntries(
+  Object.entries(pageElements).map(([path, element]) => [path, <ErrorBoundary>{element}</ErrorBoundary>]),
+)
 
 export default function App() {
   return (

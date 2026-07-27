@@ -46,6 +46,14 @@ vi.mock('./contexts/AuthContext', async (importOriginal) => {
 })
 vi.mock('swagger-ui-react', () => ({ default: () => <div data-testid="swagger-ui" /> }))
 vi.mock('swagger-ui-react/swagger-ui.css', () => ({}))
+// A page that always throws, to prove the per-route ErrorBoundary contains a page
+// render crash (#217). BrandingPage is intentionally NOT in the route table above,
+// so this throwing mock only affects the containment test below.
+vi.mock('./pages/admin/BrandingPage', () => ({
+  default: () => {
+    throw new Error('simulated page render crash')
+  },
+}))
 
 import App from './App'
 
@@ -146,6 +154,16 @@ describe('App routing', () => {
     window.history.replaceState({}, '', '/totally/unknown')
     render(<App />)
     expect(await screen.findByText('Page not found')).toBeInTheDocument()
+  })
+
+  it('contains a page render crash within its own ErrorBoundary, keeping the shell', async () => {
+    // BrandingPage is mocked to throw on render (see top of file). Its per-route
+    // ErrorBoundary should catch it and show the fallback inside the Layout, while
+    // the surrounding shell (nav) stays mounted — not the whole-app fallback (#217).
+    window.history.replaceState({}, '', '/admin/branding')
+    render(<App />)
+    expect(await screen.findByText(i18n.t('errorBoundary.title') as string)).toBeInTheDocument()
+    expect(screen.getAllByRole('navigation').length).toBeGreaterThan(0)
   })
 
   it('navigates between pages via the layout nav (route-focus path)', async () => {
