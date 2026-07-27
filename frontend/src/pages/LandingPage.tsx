@@ -14,6 +14,7 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { useAuth } from '../contexts/AuthContext'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '../services/api'
+import { queryKeys } from '../services/queryKeys'
 import DashboardCard from '../components/DashboardCard'
 
 interface Feature {
@@ -52,7 +53,7 @@ export default function LandingPage() {
     isError: overviewError,
     refetch: refetchOverview,
   } = useQuery({
-    queryKey: ['dashboard', 'overview', 'landing'],
+    queryKey: queryKeys.dashboard.overviewLanding(),
     queryFn: () => api.getDashboardOverview(),
     enabled: isAuthenticated,
   })

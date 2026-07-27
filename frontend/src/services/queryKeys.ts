@@ -7,6 +7,7 @@ export const queryKeys = {
   },
   dashboard: {
     overview: () => ['dashboard', 'overview'] as const,
+    overviewLanding: () => ['dashboard', 'overview', 'landing'] as const,
     statesByVersion: (version: string, op: string) =>
       ['dashboard', 'states-by-version', version, op] as const,
   },
@@ -61,12 +62,17 @@ export const queryKeys = {
     repos: (id: string) => ['ci-sources', id, 'repos'] as const,
     workflows: (id: string, repo: string) => ['ci-sources', id, 'repos', repo, 'workflows'] as const,
     serviceConnections: (id: string) => ['ci-sources', id, 'service-connections'] as const,
+    pr: (id: string, prId: number) => ['ci-sources', id, 'pr', prId] as const,
   },
   callbackPreflight: () => ['pipelines', 'callback-preflight'] as const,
   drift: {
     all: ['drift'] as const,
     runs: (page = 0, status = '') => ['drift', 'runs', page, status] as const,
     records: (params?: Record<string, unknown>) => ['drift', 'records', params ?? {}] as const,
+    workflow: (provider: string, variant?: string) =>
+      variant === undefined
+        ? (['drift', 'workflow', provider] as const)
+        : (['drift', 'workflow', provider, variant] as const),
   },
   apiKeys: {
     all: ['apiKeys'] as const,
@@ -79,8 +85,15 @@ export const queryKeys = {
   health: {
     all: ['health'] as const,
     runs: (page = 0, status = '') => ['health', 'runs', page, status] as const,
+    workflow: (provider: string, variant?: string) =>
+      variant === undefined
+        ? (['health', 'workflow', provider] as const)
+        : (['health', 'workflow', provider, variant] as const),
   },
   ui: {
     theme: () => ['ui', 'theme'] as const,
+  },
+  suite: {
+    uiConfig: () => ['suite', 'ui-config'] as const,
   },
 }
