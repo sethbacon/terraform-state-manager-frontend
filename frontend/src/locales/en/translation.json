@@ -1327,7 +1327,8 @@
     "title": "Something went wrong",
     "description": "An unexpected error occurred while rendering this page.",
     "tryAgain": "Try again",
-    "reloadPage": "Reload page"
+    "reloadPage": "Reload page",
+    "reference": "Reference: {{id}}"
   },
   "empty": {
     "default": "Nothing here yet."
