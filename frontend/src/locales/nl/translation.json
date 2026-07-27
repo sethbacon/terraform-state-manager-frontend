@@ -666,6 +666,7 @@
       "backupContentTitle": "Back-upinhoud",
       "forceOverwriteTitle": "Overschrijvingsconflict",
       "forceOverwriteBody": "De backend heeft deze schrijfbewerking geweigerd om de status te beschermen. Als je deze weigering negeert, kunnen recentere wijzigingen verloren gaan of kan de afstamming worden gesplitst – ga alleen door als je zeker weet dat deze inhoud correct is.",
+      "forceCurrentStateLabel": "Huidige serverstatus — wat door het forceren wordt overschreven:",
       "forceOverwrite": "Overschrijven afdwingen"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Wijzigen",
       "noResourceDrift": "Er werd geen afwijking per hulpbron gemeld.",
       "noDetailsYet": "Er zijn nog geen details bekend — de wedstrijd heeft nog geen resultaten bekendgemaakt.",
+      "summaryTruncated": "De eerste {{shown}} van de gewijzigde bronnen {{total}} worden weergegeven. Open de „Run in its source”-pijplijn om het volledige plan te bekijken.",
       "addPipelineTitle": "Pijpleidingaansluiting toevoegen",
       "ciSource": "CI-bron",
       "ciSourceHelp": "Kies een geconfigureerde CI-bron om uit de bijbehorende pijplijnen of workflows te kiezen, of voer de coördinaten handmatig in.",

@@ -666,6 +666,7 @@
       "backupContentTitle": "Conteúdo de reserva",
       "forceOverwriteTitle": "Conflito de substituição",
       "forceOverwriteBody": "O backend recusou esta gravação para proteger o estado. Forçar a gravação pode fazer com que se percam alterações mais recentes ou que a linhagem fique fragmentada — só deve continuar se tiver a certeza de que este conteúdo está correto.",
+      "forceCurrentStateLabel": "Estado atual do servidor — o que a opção «forcing» irá substituir:",
       "forceOverwrite": "Forçar substituição"
     },
     "drift": {
@@ -692,6 +693,7 @@
       "change": "Alterar",
       "noResourceDrift": "Não foi registado qualquer desvio por recurso.",
       "noDetailsYet": "Ainda não há detalhes — a execução ainda não apresentou resultados.",
+      "summaryTruncated": "Apresentam-se os primeiros recursos alterados ({{shown}}) de {{total}}. Abra a execução no seu pipeline de origem para visualizar o plano completo.",
       "addPipelineTitle": "Adicionar ligação de conduta",
       "ciSource": "Fonte CI",
       "ciSourceHelp": "Selecione uma fonte de CI configurada para escolher entre os seus pipelines ou fluxos de trabalho, ou introduza as coordenadas manualmente.",
