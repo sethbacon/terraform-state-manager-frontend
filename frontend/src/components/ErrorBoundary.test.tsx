@@ -24,7 +24,7 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('healthy child')).toBeInTheDocument()
   })
 
-  it('catches render errors, reports them, and shows the fallback UI', () => {
+  it('catches render errors, reports them with a correlation id, and hides the raw message', () => {
     const capture = vi.spyOn(errorReporting, 'captureError')
     render(
       <ErrorBoundary>
@@ -32,8 +32,15 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     )
     expect(screen.getByText(i18n.t('errorBoundary.title') as string)).toBeInTheDocument()
-    expect(screen.getByText('render exploded')).toBeInTheDocument()
-    expect(capture).toHaveBeenCalledWith(expect.any(Error), expect.objectContaining({ componentStack: expect.anything() }))
+    // The raw Error.message must NOT be disclosed in the UI (#234, CWE-209)...
+    expect(screen.queryByText('render exploded')).not.toBeInTheDocument()
+    // ...a correlation reference is shown instead...
+    expect(screen.getByText(/Reference:/)).toBeInTheDocument()
+    // ...and the raw error is captured for developers with that id.
+    expect(capture).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({ errorId: expect.any(String), componentStack: expect.anything() }),
+    )
   })
 
   it('renders a custom fallback when provided', () => {
@@ -56,7 +63,7 @@ describe('ErrorBoundary', () => {
         <Flaky />
       </ErrorBoundary>,
     )
-    expect(screen.getByText('flaky')).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('errorBoundary.title') as string)).toBeInTheDocument()
 
     explode = false
     fireEvent.click(screen.getByRole('button', { name: i18n.t('errorBoundary.tryAgain') as string }))
