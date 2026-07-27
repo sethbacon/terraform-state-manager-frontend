@@ -355,6 +355,13 @@ function actionColor(actions: string[]): 'success' | 'warning' | 'error' | 'defa
   return 'default'
 }
 
+// Cap how many per-resource drift rows the detail dialog renders at once: a drift
+// run against large/heavily-drifted infrastructure can produce a very large summary,
+// and rendering every row into the dialog's DOM at once could freeze the tab. Beyond
+// the cap we show a note pointing at the full plan (#233). The outer runs list is
+// already paginated (see the runs query); this bounds the per-run detail view too.
+const SUMMARY_RENDER_CAP = 200
+
 function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose: () => void }) {
   const { t } = useTranslation()
   return (
@@ -381,6 +388,14 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
                 </Typography>
               )}
             </Box>
+            {run.summary && run.summary.length > SUMMARY_RENDER_CAP && (
+              <Alert severity="info">
+                {t('pages.drift.summaryTruncated', {
+                  shown: SUMMARY_RENDER_CAP,
+                  total: run.summary.length,
+                })}
+              </Alert>
+            )}
             {run.summary && run.summary.length > 0 ? (
               <Table size="small">
                 <TableHead>
@@ -390,7 +405,7 @@ function DriftRunDetailDialog({ run, onClose }: { run: DriftRun | null; onClose:
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {run.summary.map((c) => (
+                  {run.summary.slice(0, SUMMARY_RENDER_CAP).map((c) => (
                     <TableRow key={c.address}>
                       <TableCell sx={{ wordBreak: 'break-all', verticalAlign: 'top' }}>
                         {c.address}

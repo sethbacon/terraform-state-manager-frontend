@@ -858,6 +858,7 @@
       "change": "Change",
       "noResourceDrift": "No per-resource drift was reported.",
       "noDetailsYet": "No details yet — the run has not reported results.",
+      "summaryTruncated": "Showing the first {{shown}} of {{total}} changed resources. Open the run in its source pipeline to view the complete plan.",
       "addPipelineTitle": "Add pipeline connection",
       "ciSource": "CI source",
       "ciSourceHelp": "Pick a configured CI source to choose from its pipelines or workflows, or enter coordinates manually.",
