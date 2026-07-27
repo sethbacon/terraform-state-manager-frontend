@@ -128,7 +128,8 @@
     "signOut": "Sair",
     "insufficientTitle": "Permissões insuficientes",
     "insufficientBody": "Não dispõe dos direitos de acesso necessários ({{scope}}) para visualizar esta página.",
-    "completingSignIn": "A concluir o início de sessão…"
+    "completingSignIn": "A concluir o início de sessão…",
+    "signInFailed": "A sessão não foi estabelecida. A voltar à página de início de sessão…"
   },
   "landing": {
     "heroTitle": "O estado do Terraform, sob controlo",

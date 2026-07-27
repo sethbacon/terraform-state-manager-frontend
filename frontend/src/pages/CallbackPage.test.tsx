@@ -26,14 +26,29 @@ describe('CallbackPage', () => {
     expect(screen.getByText(i18n.t('auth.completingSignIn') as string)).toBeInTheDocument()
   })
 
-  it('shows the IdP error instead of reloading', () => {
+  it('shows an app-authored message and the whitelisted code, never the raw description', () => {
     renderAt('?error=access_denied&error_description=Consent%20required')
-    expect(screen.getByText('Consent required')).toBeInTheDocument()
+    expect(screen.getByText(/Sign-in failed/i)).toBeInTheDocument()
+    // The constrained OIDC code is surfaced...
+    expect(screen.getByText(/access_denied/)).toBeInTheDocument()
+    // ...but the attacker-controllable free-text description is never rendered.
+    expect(screen.queryByText(/Consent required/)).not.toBeInTheDocument()
     expect(replaceSpy).not.toHaveBeenCalled()
   })
 
-  it('falls back to the bare error code when no description is present', () => {
-    renderAt('?error=access_denied')
-    expect(screen.getByText('access_denied')).toBeInTheDocument()
+  it('never reflects a script-shaped error_description (content-spoofing/XSS guard, #222/#227)', () => {
+    const payload = '<img src=x onerror=alert(1)>'
+    renderAt(`?error_description=${encodeURIComponent(payload)}`)
+    expect(screen.getByText(/Sign-in failed/i)).toBeInTheDocument()
+    expect(screen.queryByText(payload)).not.toBeInTheDocument()
+    expect(document.body.innerHTML).not.toContain('onerror=alert')
+    expect(replaceSpy).not.toHaveBeenCalled()
+  })
+
+  it('surfaces only whitelisted OIDC codes — an unknown code shows just the generic message', () => {
+    renderAt('?error=totally_made_up_code')
+    expect(screen.getByText(/Sign-in failed/i)).toBeInTheDocument()
+    expect(screen.queryByText(/totally_made_up_code/)).not.toBeInTheDocument()
+    expect(replaceSpy).not.toHaveBeenCalled()
   })
 })
