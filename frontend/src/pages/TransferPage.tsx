@@ -22,9 +22,7 @@ import { api, type TransferResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../utils/apiError'
 
 // defaultTargetKey derives a friendly destination key for a transfer: the
 // ref's display name when it differs from the opaque key, with .tfstate

@@ -17,9 +17,7 @@ import PageHeader from '../../components/PageHeader'
 import { api, type UIThemeConfig } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../../utils/apiError'
 
 // Mirrors the backend gate (ui_theme.go): hex or rgb()/hsl() notation — what
 // MUI's decomposeColor can parse. Validated here too so the admin gets field-

@@ -40,9 +40,7 @@ import TableSkeleton from '../../components/skeletons/TableSkeleton'
 import { queryKeys } from '../../services/queryKeys'
 import { useAuth } from '../../contexts/AuthContext'
 
-function keysApiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as keysApiErr } from '../../utils/apiError'
 
 // Mirrors the backend's assignable set (SCIM keeps its own token path).
 const ASSIGNABLE_SCOPES = [

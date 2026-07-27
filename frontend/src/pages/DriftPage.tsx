@@ -53,9 +53,7 @@ import TableSkeleton from '../components/skeletons/TableSkeleton'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
+import { extractApiError as apiErr } from '../utils/apiError'
 
 const RUNS_PAGE_SIZE = 20
 

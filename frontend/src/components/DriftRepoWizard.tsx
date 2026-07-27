@@ -26,6 +26,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { Trans, useTranslation } from 'react-i18next'
 import { api, type CIRepoRef, type CIServiceConnectionRef, type CIWorkflowSetupResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
+import { extractApiError as apiErr } from '../utils/apiError'
+import { isSafeExternalUrl } from '../utils/externalUrl'
 
 // DriftRepoWizard walks a repo from "has terraform" to "drift-enabled":
 // pick a CI source + repo, configure and copy the TSM workflow template,
@@ -34,10 +36,6 @@ import { queryKeys } from '../services/queryKeys'
 // Phase 1: the commit itself stays manual (no repo write scopes needed).
 
 const STEP_KEYS = ['source', 'workflow', 'connect'] as const
-
-function apiErr(e: unknown): string {
-  return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? 'Request failed.'
-}
 
 /** Substitute wizard choices into the served workflow template text. */
 export function customizeTemplate(template: string, provider: string, workingDir: string, scName: string): string {
@@ -545,7 +543,11 @@ export default function DriftRepoWizard({
                     values={{ branch: setup.branch }}
                     components={{
                       1: <code />,
-                      3: setup.pr_url ? <Link href={setup.pr_url} target="_blank" rel="noopener noreferrer" /> : <span />,
+                      3: isSafeExternalUrl(setup.pr_url) ? (
+                        <Link href={setup.pr_url} target="_blank" rel="noopener noreferrer" />
+                      ) : (
+                        <span />
+                      ),
                     }}
                   />
                 )}
