@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.23.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.0...v1.23.1) (2026-07-28)
+
+
+### Bug Fixes
+
+* **api:** validate analysis/drift/state-edit response shapes at the boundary ([#217](https://github.com/sethbacon/terraform-state-manager-frontend/issues/217)) ([#276](https://github.com/sethbacon/terraform-state-manager-frontend/issues/276)) ([87cce57](https://github.com/sethbacon/terraform-state-manager-frontend/commit/87cce57404ff35dd2e3ab48cf981aea43559b7c8))
+* **sources:** show computed draft-vs-current diff in force-overwrite dialog ([#214](https://github.com/sethbacon/terraform-state-manager-frontend/issues/214)) ([#273](https://github.com/sethbacon/terraform-state-manager-frontend/issues/273)) ([fc869ab](https://github.com/sethbacon/terraform-state-manager-frontend/commit/fc869ab692a1135cbd8230cf568d903b99dc3dfc))
+
 ## [1.23.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.22.0...v1.23.0) (2026-07-28)
 
 
