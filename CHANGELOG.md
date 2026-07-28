@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.23.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.22.0...v1.23.0) (2026-07-28)
+
+
+### Features
+
+* **frontend:** add axios request timeout with a longer ceiling for heavy ops ([#216](https://github.com/sethbacon/terraform-state-manager-frontend/issues/216)) ([#251](https://github.com/sethbacon/terraform-state-manager-frontend/issues/251)) ([684f02c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/684f02ce8145757731232232ea0b3e13fa912c58))
+
+
+### Bug Fixes
+
+* add HSTS and tighten CSP (base-uri/form-action/object-src) in nginx ([#208](https://github.com/sethbacon/terraform-state-manager-frontend/issues/208), [#210](https://github.com/sethbacon/terraform-state-manager-frontend/issues/210)) ([#268](https://github.com/sethbacon/terraform-state-manager-frontend/issues/268)) ([c4da80c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c4da80c5a5007e369368f248a8d055f030609e9f))
+* cap drift run summary table render count ([#233](https://github.com/sethbacon/terraform-state-manager-frontend/issues/233)) ([#266](https://github.com/sethbacon/terraform-state-manager-frontend/issues/266)) ([b09a86a](https://github.com/sethbacon/terraform-state-manager-frontend/commit/b09a86ad0b6638afc3d5d4d80fe4a9ddca80d739))
+* DriftPage workflow error state, setup token trim, dedup query keys ([#262](https://github.com/sethbacon/terraform-state-manager-frontend/issues/262)) ([7b1578f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/7b1578fa2c85bc2648e4165348d17524b1935458))
+* **frontend:** show a correlation id instead of the raw error message in ErrorBoundary ([#234](https://github.com/sethbacon/terraform-state-manager-frontend/issues/234)) ([#258](https://github.com/sethbacon/terraform-state-manager-frontend/issues/258)) ([e2151db](https://github.com/sethbacon/terraform-state-manager-frontend/commit/e2151db2e9d222f9e342c620ab8d0585bba4ac84))
+* **frontend:** unify URL validation + stop reflecting attacker error text ([#220](https://github.com/sethbacon/terraform-state-manager-frontend/issues/220), [#221](https://github.com/sethbacon/terraform-state-manager-frontend/issues/221), [#222](https://github.com/sethbacon/terraform-state-manager-frontend/issues/222), [#227](https://github.com/sethbacon/terraform-state-manager-frontend/issues/227)) ([#257](https://github.com/sethbacon/terraform-state-manager-frontend/issues/257)) ([afc927c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/afc927ca260eb288771d9af0fceee54d2a6d8441))
+* lock escapeValue:false XSS invariant + document error-scrubbing ([#242](https://github.com/sethbacon/terraform-state-manager-frontend/issues/242), [#245](https://github.com/sethbacon/terraform-state-manager-frontend/issues/245)) ([#267](https://github.com/sethbacon/terraform-state-manager-frontend/issues/267)) ([138e556](https://github.com/sethbacon/terraform-state-manager-frontend/commit/138e556eb275d2a0ed7f50f92076aa91840198f3))
+* route dashboard/report refresh through CSRF-safe POST /reconcile ([#215](https://github.com/sethbacon/terraform-state-manager-frontend/issues/215)) ([#272](https://github.com/sethbacon/terraform-state-manager-frontend/issues/272)) ([a6b12f2](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a6b12f2ae05acb010a67b1cf7b19efcd2f42fa81))
+* show current server state before force-overwrite on 409 ([#214](https://github.com/sethbacon/terraform-state-manager-frontend/issues/214)) ([#270](https://github.com/sethbacon/terraform-state-manager-frontend/issues/270)) ([61a97f9](https://github.com/sethbacon/terraform-state-manager-frontend/commit/61a97f9ac57edf8e65ecdb8c77d1d1554ee8f43d))
+* wire route-level scope guard into App router ([#230](https://github.com/sethbacon/terraform-state-manager-frontend/issues/230), [#237](https://github.com/sethbacon/terraform-state-manager-frontend/issues/237)) ([#263](https://github.com/sethbacon/terraform-state-manager-frontend/issues/263)) ([136580c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/136580c60bdb36e272d48fe918154951162876b2))
+* wrap each route page in its own ErrorBoundary ([#217](https://github.com/sethbacon/terraform-state-manager-frontend/issues/217)) ([#269](https://github.com/sethbacon/terraform-state-manager-frontend/issues/269)) ([1eb691f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/1eb691f56eddffeab0eaa9946ab6d1ece6f073aa))
+
+
+### Documentation
+
+* correct consent-banner, HSTS, suite-ui version, and Dependabot claims ([#223](https://github.com/sethbacon/terraform-state-manager-frontend/issues/223), [#224](https://github.com/sethbacon/terraform-state-manager-frontend/issues/224), [#225](https://github.com/sethbacon/terraform-state-manager-frontend/issues/225), [#226](https://github.com/sethbacon/terraform-state-manager-frontend/issues/226)) ([#260](https://github.com/sethbacon/terraform-state-manager-frontend/issues/260)) ([0a62fba](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0a62fba34d2e2a72fb5297f6e7d0a9849fbd41e9))
+* disclose shared-package a11y mechanisms + fix stale coverage floor ([#239](https://github.com/sethbacon/terraform-state-manager-frontend/issues/239), [#240](https://github.com/sethbacon/terraform-state-manager-frontend/issues/240)) ([#265](https://github.com/sethbacon/terraform-state-manager-frontend/issues/265)) ([489ed58](https://github.com/sethbacon/terraform-state-manager-frontend/commit/489ed58e655db9c8e5534fec6635966250f231bb))
+
+
+### Refactor
+
+* **frontend:** shared API-error util + guard server-sourced PR URL ([#219](https://github.com/sethbacon/terraform-state-manager-frontend/issues/219), [#209](https://github.com/sethbacon/terraform-state-manager-frontend/issues/209)) ([#250](https://github.com/sethbacon/terraform-state-manager-frontend/issues/250)) ([3f6e0a1](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3f6e0a180bce2c1097119d68b659420d2642bf8d))
+
 ## [1.22.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.21.0...v1.22.0) (2026-07-23)
 
 
