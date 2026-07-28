@@ -305,7 +305,9 @@ describe('sources + state read plane', () => {
     await api.listStates('s1')
     expect(get).toHaveBeenCalledWith('/api/v1/sources/s1/states')
 
-    get.mockReturnValue(ok({ rum: 18 }))
+    // A minimally valid analysis payload: the boundary validator (#217) requires
+    // the analysis object's breakdown fields to be arrays.
+    get.mockReturnValue(ok({ key: 'k.tfstate', size: 1, analysis: { resource_types: [], providers: [], modules: [] } }))
     await api.analyzeState('s1', 'k.tfstate')
     expect(get).toHaveBeenCalledWith('/api/v1/sources/s1/state/analysis', { params: { key: 'k.tfstate' } })
 
