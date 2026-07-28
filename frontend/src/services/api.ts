@@ -928,6 +928,17 @@ export function reportFilterParams(f: ReportFilters): URLSearchParams {
   return p
 }
 
+/**
+ * Reconciles the persistent analysis store via the CSRF-protected POST endpoint.
+ * Reconciling re-reads state from every selected backend, so it must not ride on
+ * a replayable GET. Scopes to the given source ids when provided, else the whole
+ * fleet. See #215.
+ */
+async function reconcileStore(sourceIds?: string[]): Promise<void> {
+  const body = sourceIds && sourceIds.length > 0 ? { source_ids: sourceIds } : {}
+  await apiClient.post('/api/v1/reconcile', body)
+}
+
 export const api = {
   getVersion: async (): Promise<VersionInfo> => (await apiClient.get<VersionInfo>('/api/v1/version')).data,
   getHealth: async (): Promise<HealthInfo> => (await apiClient.get<HealthInfo>('/health')).data,
@@ -942,12 +953,14 @@ export const api = {
   // Admin: persist the whitelabel theme. An empty object clears all overrides.
   updateUITheme: async (theme: UIThemeConfig): Promise<UIThemeConfig> =>
     (await apiClient.put<UIThemeConfig>('/api/v1/admin/ui/theme', theme)).data,
-  getDashboardOverview: async (refresh = false): Promise<DashboardOverview> =>
-    (
-      await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview', {
-        params: refresh ? { refresh: 'true' } : undefined,
-      })
-    ).data,
+  // Reconcile the analysis store (CSRF-protected POST), optionally scoped. #215.
+  reconcile: (sourceIds?: string[]): Promise<void> => reconcileStore(sourceIds),
+  getDashboardOverview: async (refresh = false): Promise<DashboardOverview> => {
+    // A refresh reconciles the store first via the CSRF-safe POST, then reads it;
+    // the GET no longer triggers a reconcile (#215).
+    if (refresh) await reconcileStore()
+    return (await apiClient.get<DashboardOverview>('/api/v1/dashboard/overview')).data
+  },
   // State files matching a Terraform version (op: eq default, or lt/lte/gt/gte for a semver range).
   listStatesByVersion: async (version: string, op: VersionFilterOp = 'eq'): Promise<VersionStateRef[]> =>
     (
@@ -1141,9 +1154,9 @@ export const api = {
   // Reports: cross-fleet state query (live preview) and multi-format export.
   listReportStates: async (filters: ReportFilters, refresh = false): Promise<ReportStatesResult> => {
     const params = reportFilterParams(filters)
-    // Reconcile first when asked; the backend scopes the refresh to the selected
-    // source(s), so a filtered view doesn't reconcile the whole fleet.
-    if (refresh) params.set('refresh', 'true')
+    // A refresh reconciles first (scoped to the selected sources) via the CSRF-safe
+    // POST, then reads the store; the GET no longer reconciles (#215).
+    if (refresh) await reconcileStore(filters.sourceIds)
     return (await apiClient.get<ReportStatesResult>('/api/v1/reports/states', { params })).data
   },
   downloadStatesReport: async (filters: ReportFilters, format: ReportFormat): Promise<void> => {

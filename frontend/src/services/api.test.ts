@@ -138,12 +138,33 @@ describe('system + dashboard', () => {
     expect(get).toHaveBeenCalledWith('/health')
   })
 
-  it('getDashboardOverview default + forced refresh', async () => {
+  it('getDashboardOverview reads directly; a forced refresh reconciles via POST first (#215)', async () => {
     get.mockReturnValue(ok({ sources: 1 }))
+    post.mockReturnValue(ok(undefined))
     await api.getDashboardOverview()
-    expect(get).toHaveBeenCalledWith('/api/v1/dashboard/overview', { params: undefined })
+    expect(get).toHaveBeenCalledWith('/api/v1/dashboard/overview')
+    expect(post).not.toHaveBeenCalled()
     await api.getDashboardOverview(true)
-    expect(get).toHaveBeenCalledWith('/api/v1/dashboard/overview', { params: { refresh: 'true' } })
+    // A refresh no longer rides on the GET: it POSTs to the CSRF-safe reconcile
+    // endpoint (whole fleet), then reads the store.
+    expect(post).toHaveBeenCalledWith('/api/v1/reconcile', {})
+    expect(get).toHaveBeenLastCalledWith('/api/v1/dashboard/overview')
+  })
+
+  it('listReportStates forced refresh reconciles the selected sources first (#215)', async () => {
+    get.mockReturnValue(ok({ states: [] }))
+    post.mockReturnValue(ok(undefined))
+    await api.listReportStates({ sourceIds: ['s1', 's2'] }, true)
+    expect(post).toHaveBeenCalledWith('/api/v1/reconcile', { source_ids: ['s1', 's2'] })
+    expect(get.mock.calls.some((c) => c[0] === '/api/v1/reports/states')).toBe(true)
+  })
+
+  it('api.reconcile posts optional source_ids to /reconcile', async () => {
+    post.mockReturnValue(ok(undefined))
+    await api.reconcile()
+    expect(post).toHaveBeenCalledWith('/api/v1/reconcile', {})
+    await api.reconcile(['s1'])
+    expect(post).toHaveBeenLastCalledWith('/api/v1/reconcile', { source_ids: ['s1'] })
   })
 })
 
@@ -583,10 +604,13 @@ describe('pipelines + CI sources', () => {
     expect(listCall[1].params.getAll('source_id')).toEqual(['a', 'b'])
     expect(listCall[1].params.has('refresh')).toBe(false)
 
-    // refresh=true forwards the same (scoping) filters with a reconcile flag.
+    // refresh=true now reconciles the scoped sources via the CSRF-safe POST first,
+    // then reads the store with no refresh param on the GET (#215).
+    post.mockReturnValue(ok(undefined))
     await api.listReportStates({ sourceIds: ['a'] }, true)
+    expect(post).toHaveBeenCalledWith('/api/v1/reconcile', { source_ids: ['a'] })
     const refreshCall = get.mock.calls.slice(-1)[0] as [string, { params: URLSearchParams }]
-    expect(refreshCall[1].params.get('refresh')).toBe('true')
+    expect(refreshCall[1].params.has('refresh')).toBe(false)
     expect(refreshCall[1].params.getAll('source_id')).toEqual(['a'])
 
     const createObjectURL = vi.fn(() => 'blob:fake')
