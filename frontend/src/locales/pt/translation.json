@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Conflito de substituição",
       "forceOverwriteBody": "O backend recusou esta gravação para proteger o estado. Forçar a gravação pode fazer com que se percam alterações mais recentes ou que a linhagem fique fragmentada — só deve continuar se tiver a certeza de que este conteúdo está correto.",
       "forceCurrentStateLabel": "Estado atual do servidor — o que a opção «forcing» irá substituir:",
+      "forceDiffLabel": "O que mudaria ao guardar o seu rascunho em comparação com o estado atual do servidor:",
+      "forceDiffAdded": "Adicionado pela sua lista de rascunhos",
+      "forceDiffRemoved": "Eliminado pelo teu rascunho",
+      "forceDiffChanged": "As instâncias mudam",
+      "forceDiffNone": "A sua proposta não alteraria o inventário de recursos (os valores dos atributos podem continuar a diferir).",
+      "forceDiffApprox": "As entradas alteradas comparam o número de instâncias e as chaves, e não os valores dos atributos — verifique cuidadosamente antes de confirmar a alteração.",
+      "forceDiffFailed": "Não foi possível calcular a diferença; em vez disso, está a ser apresentado o estado atual do servidor.",
       "forceOverwrite": "Forçar substituição"
     },
     "drift": {

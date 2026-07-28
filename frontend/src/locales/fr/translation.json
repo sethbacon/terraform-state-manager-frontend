@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Conflit de remplacement",
       "forceOverwriteBody": "Le backend a refusé cette écriture afin de protéger l'état. Le forcer pourrait entraîner la perte des modifications les plus récentes ou une fragmentation de la lignée ; ne continuez que si vous êtes certain que ce contenu est correct.",
       "forceCurrentStateLabel": "État actuel du serveur — ce que la commande « forcing » va écraser :",
+      "forceDiffLabel": "En quoi l'enregistrement de votre brouillon changerait-il par rapport à l'état actuel du serveur :",
+      "forceDiffAdded": "Ajouté depuis votre brouillon",
+      "forceDiffRemoved": "Supprimé par votre brouillon",
+      "forceDiffChanged": "Les instances changent",
+      "forceDiffNone": "Votre projet ne modifierait pas l'inventaire des ressources (les valeurs des attributs pourraient toutefois varier).",
+      "forceDiffApprox": "Les entrées modifiées comparent le nombre d'instances et les clés, et non les valeurs d'attributs — vérifiez attentivement avant de forcer l'opération.",
+      "forceDiffFailed": "Impossible de calculer la différence ; l'état actuel du serveur s'affiche à la place.",
       "forceOverwrite": "Forcer la réécriture"
     },
     "drift": {

@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "覆盖冲突",
       "forceOverwriteBody": "后端拒绝了此次写入操作，以保护状态。强行覆盖可能会导致较新的更改丢失或导致血统分裂——请仅在确信此内容正确时继续。",
       "forceCurrentStateLabel": "当前服务器状态——强制操作将覆盖的内容：",
+      "forceDiffLabel": "保存草稿后，与当前服务器状态相比会有哪些变化：",
+      "forceDiffAdded": "由您的草稿添加",
+      "forceDiffRemoved": "已被您的草稿删除",
+      "forceDiffChanged": "实例会发生变化",
+      "forceDiffNone": "您的草案不会改变资源清单（属性值可能仍会有所不同）。",
+      "forceDiffApprox": "已修改的条目比较的是实例数量和键，而非属性值——强制执行前请仔细审核。",
+      "forceDiffFailed": "无法计算差异；因此显示当前服务器状态。",
       "forceOverwrite": "强制覆盖"
     },
     "drift": {
