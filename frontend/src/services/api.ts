@@ -1,6 +1,12 @@
 import axios from 'axios'
 import { clearAuthStorage } from '../utils/authStorage'
 import type { MeResponse } from '../types/auth'
+import {
+  validateAnalysisResult,
+  validateDriftRecordsResponse,
+  validateDriftRunsResponse,
+  validateEditStateResponse,
+} from './validation'
 
 /**
  * Runtime whitelabel theme config from the backend. All fields are optional so the
@@ -382,6 +388,13 @@ export interface AnalysisResult {
   size: number
   last_modified?: string
   analysis: StateAnalysis
+}
+
+/** Result of a raw state edit (PUT .../state/raw): the new serial after the write. */
+export interface EditStateResponse {
+  status: string
+  backup_id?: string
+  serial: number
 }
 
 export interface CreateSourceInput {
@@ -1083,7 +1096,9 @@ export const api = {
   listStates: async (id: string): Promise<StateRef[]> =>
     (await apiClient.get<{ states: StateRef[] }>(`/api/v1/sources/${id}/states`)).data.states,
   analyzeState: async (id: string, key: string): Promise<AnalysisResult> =>
-    (await apiClient.get<AnalysisResult>(`/api/v1/sources/${id}/state/analysis`, { params: { key } })).data,
+    validateAnalysisResult(
+      (await apiClient.get<AnalysisResult>(`/api/v1/sources/${id}/state/analysis`, { params: { key } })).data,
+    ),
   listStateResources: async (id: string, key: string): Promise<ResourceSummary[]> =>
     (await apiClient.get<{ resources: ResourceSummary[] }>(`/api/v1/sources/${id}/state/resources`, { params: { key } }))
       .data.resources,
@@ -1179,18 +1194,15 @@ export const api = {
     (await apiClient.post('/api/v1/analyze', content, { headers: { 'Content-Type': 'application/json' } })).data,
 
   // Edit plane (Phase 2)
-  editState: async (
-    id: string,
-    key: string,
-    content: string,
-    force = false,
-  ): Promise<{ status: string; backup_id?: string; serial: number }> =>
-    (
-      await apiClient.put(`/api/v1/sources/${id}/state/raw`, content, {
-        params: { key, ...(force ? { force: 'true' } : {}) },
-        headers: { 'Content-Type': 'application/json' },
-      })
-    ).data,
+  editState: async (id: string, key: string, content: string, force = false): Promise<EditStateResponse> =>
+    validateEditStateResponse(
+      (
+        await apiClient.put<EditStateResponse>(`/api/v1/sources/${id}/state/raw`, content, {
+          params: { key, ...(force ? { force: 'true' } : {}) },
+          headers: { 'Content-Type': 'application/json' },
+        })
+      ).data,
+    ),
   stateOperation: async (
     id: string,
     key: string,
@@ -1366,26 +1378,29 @@ export const api = {
     if (params?.offset != null) q.set('offset', String(params.offset))
     if (params?.status) q.set('status', params.status)
     const qs = q.toString()
-    const data = (await apiClient.get<{ runs: DriftRun[]; total?: number }>(`/api/v1/drift/runs${qs ? `?${qs}` : ''}`))
-      .data
+    const data = validateDriftRunsResponse(
+      (await apiClient.get<{ runs: DriftRun[]; total?: number }>(`/api/v1/drift/runs${qs ? `?${qs}` : ''}`)).data,
+    )
     return { runs: data.runs, total: data.total ?? data.runs.length }
   },
   createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
     (await apiClient.post<DriftRun>('/api/v1/drift/runs', input)).data,
   listDriftRecords: async (params?: ListDriftRecordsParams): Promise<DriftRecordsResponse> =>
-    (
-      await apiClient.get<DriftRecordsResponse>('/api/v1/drift/records', {
-        params: {
-          status: params?.statuses?.length ? params.statuses.join(',') : undefined,
-          source_id: params?.sourceId || undefined,
-          severity: params?.severity || undefined,
-          page: params?.page,
-          per_page: params?.perPage,
-          start_date: params?.startDate,
-          end_date: params?.endDate,
-        },
-      })
-    ).data,
+    validateDriftRecordsResponse(
+      (
+        await apiClient.get<DriftRecordsResponse>('/api/v1/drift/records', {
+          params: {
+            status: params?.statuses?.length ? params.statuses.join(',') : undefined,
+            source_id: params?.sourceId || undefined,
+            severity: params?.severity || undefined,
+            page: params?.page,
+            per_page: params?.perPage,
+            start_date: params?.startDate,
+            end_date: params?.endDate,
+          },
+        })
+      ).data,
+    ),
   acknowledgeDriftRecord: async (id: string, note: string): Promise<DriftRecord> =>
     (await apiClient.post<DriftRecord>(`/api/v1/drift/records/${id}/acknowledge`, { note })).data,
   resolveDriftRecord: async (id: string): Promise<DriftRecord> =>
