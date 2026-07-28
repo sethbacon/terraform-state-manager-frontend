@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Overskrivingskonflikt",
       "forceOverwriteBody": "Backenden avviste denne skriveoperasjonen for å beskytte tilstanden. Hvis du tvinger gjennom endringen, kan nyere endringer gå tapt eller linjen kan splittes – fortsett bare hvis du er sikker på at dette innholdet er korrekt.",
       "forceCurrentStateLabel": "Nåværende serverstatus — hva en tvangsoppdatering vil overskrive:",
+      "forceDiffLabel": "Hva vil endres ved å lagre utkastet ditt sammenlignet med serverens nåværende tilstand:",
+      "forceDiffAdded": "Lagt til fra utkastet ditt",
+      "forceDiffRemoved": "Fjernet av utkastet ditt",
+      "forceDiffChanged": "Forekomster endres",
+      "forceDiffNone": "Utkastet ditt vil ikke endre ressursoversikten (attributtverdiene kan fortsatt variere).",
+      "forceDiffApprox": "Endrede oppføringer sammenligner antall forekomster og nøkler, ikke attributtverdier — sjekk nøye før du bekrefter endringen.",
+      "forceDiffFailed": "Det var ikke mulig å beregne forskjellen; viser i stedet serverens nåværende tilstand.",
       "forceOverwrite": "Tving overskriving"
     },
     "drift": {

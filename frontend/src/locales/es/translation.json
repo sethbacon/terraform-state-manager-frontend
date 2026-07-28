@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Conflicto de sobrescritura",
       "forceOverwriteBody": "El backend ha rechazado esta operación de escritura para proteger el estado. Si se fuerza la operación, se pueden perder los cambios más recientes o dividirse el linaje; continúa solo si estás seguro de que este contenido es correcto.",
       "forceCurrentStateLabel": "Estado actual del servidor: lo que se sobrescribirá al aplicar la configuración forzada:",
+      "forceDiffLabel": "Qué cambiaría al guardar tu borrador en comparación con el estado actual del servidor:",
+      "forceDiffAdded": "Añadido desde tu borrador",
+      "forceDiffRemoved": "Eliminado por tu borrador",
+      "forceDiffChanged": "Las instancias cambian",
+      "forceDiffNone": "Tu borrador no modificaría el inventario de recursos (los valores de los atributos podrían seguir siendo diferentes).",
+      "forceDiffApprox": "Las entradas modificadas comparan el número de instancias y las claves, no los valores de los atributos; revísalas detenidamente antes de aplicar los cambios.",
+      "forceDiffFailed": "No se ha podido calcular la diferencia; en su lugar, se muestra el estado actual del servidor.",
       "forceOverwrite": "Forzar sobrescritura"
     },
     "drift": {

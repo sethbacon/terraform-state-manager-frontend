@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Overschrijvingsconflict",
       "forceOverwriteBody": "De backend heeft deze schrijfbewerking geweigerd om de status te beschermen. Als je deze weigering negeert, kunnen recentere wijzigingen verloren gaan of kan de afstamming worden gesplitst – ga alleen door als je zeker weet dat deze inhoud correct is.",
       "forceCurrentStateLabel": "Huidige serverstatus — wat door het forceren wordt overschreven:",
+      "forceDiffLabel": "Wat er zou veranderen als je je concept opslaat, vergeleken met de huidige serverstatus:",
+      "forceDiffAdded": "Toegevoegd vanuit je conceptlijst",
+      "forceDiffRemoved": "Verwijderd door je concept",
+      "forceDiffChanged": "Situaties veranderen",
+      "forceDiffNone": "Uw concept zou geen wijzigingen aanbrengen in de inventaris van hulpbronnen (de attribuutwaarden kunnen nog steeds verschillen).",
+      "forceDiffApprox": "Gewijzigde vermeldingen vergelijken het aantal instanties en sleutels, niet de attribuutwaarden — controleer dit zorgvuldig voordat je de wijzigingen doorvoert.",
+      "forceDiffFailed": "Het verschil kon niet worden berekend; in plaats daarvan wordt de huidige serverstatus weergegeven.",
       "forceOverwrite": "Overschrijven afdwingen"
     },
     "drift": {

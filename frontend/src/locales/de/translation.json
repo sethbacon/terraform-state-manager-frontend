@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Überschreibkonflikt",
       "forceOverwriteBody": "Das Backend hat diesen Schreibvorgang abgelehnt, um den Zustand zu schützen. Wenn Sie den Vorgang dennoch erzwingen, können neuere Änderungen verloren gehen oder die Versionskette unterbrochen werden – fahren Sie nur fort, wenn Sie sicher sind, dass dieser Inhalt korrekt ist.",
       "forceCurrentStateLabel": "Aktueller Serverstatus – was durch das Erzwingen überschrieben wird:",
+      "forceDiffLabel": "Was sich durch das Speichern Ihres Entwurfs im Vergleich zum aktuellen Serverstatus ändern würde:",
+      "forceDiffAdded": "Von deinem Entwurf hinzugefügt",
+      "forceDiffRemoved": "Durch deinen Entwurf entfernt",
+      "forceDiffChanged": "Instanzen ändern sich",
+      "forceDiffNone": "Dein Entwurf würde das Ressourcenverzeichnis nicht ändern (die Attributwerte können weiterhin voneinander abweichen).",
+      "forceDiffApprox": "Bei geänderten Einträgen werden die Anzahl der Instanzen und die Schlüssel verglichen, nicht die Attributwerte – bitte sorgfältig prüfen, bevor Sie die Änderung erzwingen.",
+      "forceDiffFailed": "Der Vergleich konnte nicht berechnet werden; stattdessen wird der aktuelle Serverstatus angezeigt.",
       "forceOverwrite": "Überschreiben erzwingen"
     },
     "drift": {

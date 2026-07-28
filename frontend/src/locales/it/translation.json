@@ -667,6 +667,13 @@
       "forceOverwriteTitle": "Conflitto di sovrascrittura",
       "forceOverwriteBody": "Il backend ha rifiutato questa operazione di scrittura per proteggere lo stato del sistema. Se si forza l'operazione, si rischia di perdere le modifiche più recenti o di frammentare la genealogia; procedere solo se si è certi che il contenuto sia corretto.",
       "forceCurrentStateLabel": "Stato attuale del server — cosa verrà sovrascritto dall'operazione di forzatura:",
+      "forceDiffLabel": "Cosa cambierebbe salvando la bozza rispetto allo stato attuale del server:",
+      "forceDiffAdded": "Aggiunto dalla tua bozza",
+      "forceDiffRemoved": "Eliminato dalla tua bozza",
+      "forceDiffChanged": "Le istanze cambiano",
+      "forceDiffNone": "La tua bozza non modificherebbe l'inventario delle risorse (i valori degli attributi potrebbero comunque differire).",
+      "forceDiffApprox": "Le voci modificate confrontano il numero di istanze e le chiavi, non i valori degli attributi: controllare attentamente prima di procedere con l'applicazione forzata.",
+      "forceDiffFailed": "Impossibile calcolare la differenza; viene visualizzato invece lo stato attuale del server.",
       "forceOverwrite": "Sovrascrittura forzata"
     },
     "drift": {
