@@ -50,6 +50,7 @@ export const queryKeys = {
     locks: (id: string) => ['sources', id, 'locks'] as const,
     backupContent: (id: string, backupId: string) => ['sources', id, 'backup', backupId, 'content'] as const,
     backupDiff: (id: string, backupId: string) => ['sources', id, 'backup', backupId, 'diff'] as const,
+    editDiff: (id: string, key: string) => ['sources', id, 'edit-diff', key] as const,
   },
   pipelines: {
     all: ['pipelines'] as const,

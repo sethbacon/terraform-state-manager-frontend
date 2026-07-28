@@ -531,6 +531,17 @@ export interface BackupDiff {
   approximate_changed: boolean
 }
 
+// Edit preview: what saving a draft would add/remove/change vs the current state.
+export interface EditDiff {
+  key: string
+  draft_serial: number | null
+  current_serial: number | null
+  added: ResourceSummary[]
+  removed: ResourceSummary[]
+  changed: ResourceSummary[]
+  approximate_changed: boolean
+}
+
 // An app-level advisory lock currently held on a state key. Age judgement
 // (vs the backend's 15-minute stale TTL) is up to the caller.
 export interface StateLock {
@@ -1214,6 +1225,15 @@ export const api = {
   // current state. "changed" is an instance-count/key approximation.
   getBackupDiff: async (id: string, backupId: string): Promise<BackupDiff> =>
     (await apiClient.get<BackupDiff>(`/api/v1/sources/${id}/state/backups/${backupId}/diff`)).data,
+  // Edit preview: what saving `content` (the draft) would add/remove/change vs the
+  // current state. Read-only (no lock, no write); "changed" is an approximation. #214.
+  getEditDiff: async (id: string, key: string, content: string): Promise<EditDiff> =>
+    (
+      await apiClient.post<EditDiff>(`/api/v1/sources/${id}/state/diff`, content, {
+        params: { key },
+        headers: { 'Content-Type': 'application/json' },
+      })
+    ).data,
   listStateLocks: async (id: string): Promise<StateLock[]> =>
     (await apiClient.get<{ locks: StateLock[] }>(`/api/v1/sources/${id}/state/locks`)).data.locks,
   // Admin-only: release the app-level advisory lock on a key regardless of

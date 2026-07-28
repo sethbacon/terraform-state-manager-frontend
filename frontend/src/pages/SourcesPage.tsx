@@ -50,6 +50,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import {
   api,
   type AnalysisResult,
+  type EditDiff,
   type ModuleFreshness,
   type ResourceSummary,
   type SourceSyncInfo,
@@ -1276,6 +1277,57 @@ function ModulesTab({ sourceId, stateKey }: { sourceId: string; stateKey: string
   )
 }
 
+// EditDiffSummary renders the resource-level diff of a pending edit (what saving
+// the draft would add / remove / change vs. the current server state), shown in
+// the force-overwrite dialog. "changed" is an instance-count/key approximation,
+// not an attribute diff (#214).
+function EditDiffSummary({ diff }: { diff: EditDiff }) {
+  const { t } = useTranslation()
+  const addr = (r: ResourceSummary) =>
+    `${r.module && r.module !== 'root' ? r.module + '.' : ''}${r.type}.${r.name}`
+  const buckets: {
+    key: string
+    label: string
+    color: 'success' | 'error' | 'warning'
+    sign: string
+    rows: ResourceSummary[]
+  }[] = [
+    { key: 'added', label: t('pages.sources.forceDiffAdded'), color: 'success', sign: '+', rows: diff.added },
+    { key: 'removed', label: t('pages.sources.forceDiffRemoved'), color: 'error', sign: '−', rows: diff.removed },
+    { key: 'changed', label: t('pages.sources.forceDiffChanged'), color: 'warning', sign: '~', rows: diff.changed },
+  ]
+  const noChanges = buckets.every((b) => b.rows.length === 0)
+  return (
+    <Box sx={{ maxHeight: 300, overflow: 'auto' }}>
+      {noChanges && <Alert severity="info">{t('pages.sources.forceDiffNone')}</Alert>}
+      {buckets
+        .filter((b) => b.rows.length > 0)
+        .map((b) => (
+          <Box key={b.key} sx={{ mb: 1 }}>
+            <Typography variant="caption" sx={{ fontWeight: 600, display: 'block', mb: 0.5 }}>
+              {b.label} ({b.rows.length})
+            </Typography>
+            <Stack spacing={0.5}>
+              {b.rows.map((r) => (
+                <Stack key={addr(r)} direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+                  <Chip size="small" color={b.color} variant="outlined" label={b.sign} />
+                  <Typography variant="body2" sx={{ fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                    {addr(r)}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+          </Box>
+        ))}
+      {diff.changed.length > 0 && (
+        <Alert severity="info" sx={{ mt: 1 }}>
+          {t('pages.sources.forceDiffApprox')}
+        </Alert>
+      )}
+    </Box>
+  )
+}
+
 function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
@@ -1289,6 +1341,16 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
   const q = useQuery({
     queryKey: queryKeys.sources.raw(sourceId, stateKey),
     queryFn: () => api.getRawState(sourceId, stateKey),
+  })
+
+  // Computed diff (draft vs. current server state) for the force-overwrite
+  // dialog. Fetched on demand (enabled: false) only when a 409 occurs; not
+  // cached (gcTime: 0) since the draft changes between attempts (#214).
+  const diffQuery = useQuery({
+    queryKey: queryKeys.sources.editDiff(sourceId, stateKey),
+    queryFn: () => api.getEditDiff(sourceId, stateKey, draft),
+    enabled: false,
+    gcTime: 0,
   })
 
   const invalidateState = () => {
@@ -1315,10 +1377,12 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
     onError: (e) => {
       // A serial/lineage conflict is recoverable: the backend supports
       // ?force=true, so offer it explicitly instead of dead-ending. Refetch the
-      // current server state first so the force dialog can show the operator what
-      // their draft would overwrite before they confirm (#214).
+      // current server state and compute a draft-vs-current diff so the force
+      // dialog can show the operator exactly what their draft would overwrite
+      // before they confirm (#214).
       if ((e as { response?: { status?: number } })?.response?.status === 409) {
         q.refetch()
+        diffQuery.refetch()
         setForceConfirmOpen(true)
       }
     },
@@ -1428,28 +1492,34 @@ function RawTab({ sourceId, stateKey }: { sourceId: string; stateKey: string }) 
           <Stack spacing={2}>
             <Alert severity="warning">{errMsg(saveMutation.error)}</Alert>
             <Typography>{t('pages.sources.forceOverwriteBody')}</Typography>
-            {/* Show the CURRENT server state (refetched on the 409) so the operator
-                can see what forcing would overwrite before confirming (#214). */}
-            <Typography variant="subtitle2">{t('pages.sources.forceCurrentStateLabel')}</Typography>
-            {q.isFetching ? (
+            {/* Show a resource-level diff of the draft vs. the current server state
+                so the operator sees exactly what forcing would clobber (#214). If the
+                diff can't be computed, fall back to the raw current state. */}
+            <Typography variant="subtitle2">{t('pages.sources.forceDiffLabel')}</Typography>
+            {diffQuery.isFetching || q.isFetching ? (
               <CircularProgress size={20} />
+            ) : diffQuery.data ? (
+              <EditDiffSummary diff={diffQuery.data} />
             ) : (
-              <Box
-                component="pre"
-                sx={{
-                  m: 0,
-                  p: 2,
-                  maxHeight: 300,
-                  overflow: 'auto',
-                  fontSize: 12,
-                  bgcolor: 'action.hover',
-                  borderRadius: 1,
-                  whiteSpace: 'pre-wrap',
-                  overflowWrap: 'anywhere',
-                }}
-              >
-                {pretty}
-              </Box>
+              <>
+                <Alert severity="info">{t('pages.sources.forceDiffFailed')}</Alert>
+                <Box
+                  component="pre"
+                  sx={{
+                    m: 0,
+                    p: 2,
+                    maxHeight: 300,
+                    overflow: 'auto',
+                    fontSize: 12,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                    whiteSpace: 'pre-wrap',
+                    overflowWrap: 'anywhere',
+                  }}
+                >
+                  {pretty}
+                </Box>
+              </>
             )}
           </Stack>
         </DialogContent>
