@@ -833,6 +833,13 @@
       "forceOverwriteTitle": "Overwrite conflict",
       "forceOverwriteBody": "The backend refused this write to protect the state. Forcing past it can lose newer changes or split lineage - only continue if you are certain this content is correct.",
       "forceCurrentStateLabel": "Current server state — what forcing will overwrite:",
+      "forceDiffLabel": "What saving your draft would change vs. the current server state:",
+      "forceDiffAdded": "Added by your draft",
+      "forceDiffRemoved": "Removed by your draft",
+      "forceDiffChanged": "Instances change",
+      "forceDiffNone": "Your draft would not change the resource inventory (attribute values may still differ).",
+      "forceDiffApprox": "Changed entries compare instance counts and keys, not attribute values — review carefully before forcing.",
+      "forceDiffFailed": "Couldn't compute the diff; showing the current server state instead.",
       "forceOverwrite": "Force overwrite"
     },
     "drift": {

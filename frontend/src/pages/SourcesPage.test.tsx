@@ -26,6 +26,7 @@ vi.mock('../services/api', async (importOriginal) => {
       restoreBackup: vi.fn(),
       getBackupContent: vi.fn(),
       getBackupDiff: vi.fn(),
+      getEditDiff: vi.fn(),
       listStateLocks: vi.fn(),
       forceUnlock: vi.fn(),
       downloadReport: vi.fn(),
@@ -387,6 +388,15 @@ describe('SourcesPage', () => {
 
   it('offers a force override when the save hits a serial/lineage 409', async () => {
     mocked.getRawState.mockResolvedValue('{"version":4,"serial":9}')
+    mocked.getEditDiff.mockResolvedValue({
+      key: 'app.tfstate',
+      draft_serial: 8,
+      current_serial: 9,
+      added: [{ module: '', mode: 'managed', type: 'aws_s3_bucket', name: 'logs', provider: 'aws', instances: 1 }],
+      removed: [],
+      changed: [],
+      approximate_changed: false,
+    } as Awaited<ReturnType<typeof api.getEditDiff>>)
     mocked.editState
       .mockRejectedValueOnce({
         response: { status: 409, data: { error: 'new serial 8 is lower than current 9; pass force=true to override' } },
@@ -404,10 +414,12 @@ describe('SourcesPage', () => {
     expect(await screen.findByText(i18n.t('pages.sources.forceOverwriteTitle') as string)).toBeInTheDocument()
     expect(screen.getByText(/lower than current 9/)).toBeInTheDocument()
 
-    // #214: the force dialog shows the current server state (refetched on the 409)
-    // so the operator can see what forcing would overwrite before confirming.
-    expect(screen.getByText(i18n.t('pages.sources.forceCurrentStateLabel') as string)).toBeInTheDocument()
-    await waitFor(() => expect(mocked.getRawState.mock.calls.length).toBeGreaterThanOrEqual(2))
+    // #214: the force dialog shows a resource-level diff of the draft vs. the
+    // current server state (fetched on the 409), so the operator sees what forcing
+    // would clobber before confirming.
+    expect(await screen.findByText(i18n.t('pages.sources.forceDiffLabel') as string)).toBeInTheDocument()
+    expect(await screen.findByText('aws_s3_bucket.logs')).toBeInTheDocument()
+    await waitFor(() => expect(mocked.getEditDiff).toHaveBeenCalledWith('s1', 'app.tfstate', expect.any(String)))
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.forceOverwrite') as string }))
     await waitFor(() =>
