@@ -43,11 +43,19 @@ jobs:
       - name: Set up frontend
         uses: ./.github/actions/setup-frontend
 
+      # Same triage the image build uses (frontend/scripts/audit-gate.mjs): block
+      # only on advisories that reach production AND have a non-breaking fix.
+      # Accepted risks live in frontend/scripts/npm-audit-exceptions.json with a
+      # rationale and a review date, so an advisory nobody can act on does not
+      # open a fresh issue every Monday forever.
       - name: npm audit
         id: audit
         working-directory: frontend
         continue-on-error: true
-        run: npm audit --omit=dev --audit-level=high
+        run: |
+          npm audit --json --omit=dev > "$RUNNER_TEMP/frontend-audit.json" || true
+          node scripts/audit-gate.mjs "$RUNNER_TEMP/frontend-audit.json" \
+            --exceptions scripts/npm-audit-exceptions.json
 
       - name: Create issue on new vulnerabilities
         if: steps.audit.outcome == 'failure'
@@ -92,10 +100,22 @@ jobs:
         uses: google/osv-scanner-action/osv-scanner-action@9a498708959aeaef5ef730655706c5a1df1edbc2 # v2.3.8
         continue-on-error: true
         with:
+          # JSON so the triage step below can classify findings; it prints a
+          # readable summary in place of the table.
           scan-args: |-
-            --recursive
-            ./frontend
-            --format=table
+            --format=json
+            --output=osv-results.json
+            --lockfile=frontend/package-lock.json
+
+      # Triaged through the same gate and the same exceptions file the npm-audit
+      # job uses, so the two scanners cannot reach opposite conclusions about one
+      # advisory. That matters here: OSV lists react-router's fix as 8.3.0, which
+      # reads as "a fix exists", while npm audit correctly reports the same
+      # advisory as fixable only by a breaking change. Without shared triage this
+      # job would be red every week with no action anyone could take.
+      - name: Triage OSV findings
+        run: node frontend/scripts/audit-gate.mjs osv-results.json \
+          --exceptions frontend/scripts/npm-audit-exceptions.json
 
       - name: Create issue on new vulnerabilities
         if: steps.osv.outcome == 'failure'
