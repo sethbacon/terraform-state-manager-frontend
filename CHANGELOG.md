@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.23.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.1...v1.23.2) (2026-07-31)
+
+
+### Bug Fixes
+
+* **deps:** patch brace-expansion and triage the react-router advisory ([#278](https://github.com/sethbacon/terraform-state-manager-frontend/issues/278)) ([2d29894](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2d2989410188deec3a9c748f9b0755cd7f5c1a42))
+* log out via CSRF-protected POST instead of a GET navigation ([#280](https://github.com/sethbacon/terraform-state-manager-frontend/issues/280)) ([d8333ac](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d8333acb0b74478a30e3915107b906761fbedb8f))
+
 ## [1.23.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.0...v1.23.1) (2026-07-28)
 
 
