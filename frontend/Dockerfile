@@ -16,9 +16,19 @@ RUN --mount=type=secret,id=node_auth_token \
 # its sha512-hashed integrity record — handle fixes as a reviewed PR instead
 # (#213). Dev-only tooling (vite/vitest/eslint) is not in the final nginx image
 # and is excluded so it cannot fail the build.
+#
+# Triaged rather than raw: bare `npm audit` exits non-zero for ANY high advisory,
+# including ones no PR can act on — notably one whose only published "fix" is a
+# semver-major DOWNGRADE. That fails the image build regardless of what changed,
+# which blocks releases on something nobody can fix. audit-gate.mjs blocks only
+# on advisories that reach production AND have a non-breaking fix; documented
+# accepted risks live in scripts/npm-audit-exceptions.json with a review date.
+# Same gate and same register as terraform-registry-frontend.
+COPY scripts/audit-gate.mjs scripts/npm-audit-exceptions.json ./scripts/
 RUN --mount=type=secret,id=node_auth_token \
     export NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" && \
-    npm audit --audit-level=high --omit=dev
+    npm audit --json --omit=dev > /tmp/audit.json || true; \
+    node scripts/audit-gate.mjs /tmp/audit.json --exceptions scripts/npm-audit-exceptions.json
 COPY . .
 RUN npm run build
 

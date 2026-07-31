@@ -22,7 +22,10 @@ export default defineConfig({
     // runs that don't reproduce running a file in isolation). Cap at half the
     // cores so individual test files still get enough CPU to render on time.
     maxWorkers: '50%',
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    // scripts/ is included so the audit-gate tests actually run: this glob is an
+    // explicit override of vitest's default, so a test outside src/ is silently
+    // never executed unless listed here.
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'scripts/**/*.test.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary', 'lcov', 'json-summary'],
