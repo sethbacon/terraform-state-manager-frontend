@@ -1070,12 +1070,27 @@ export const api = {
   // LDAP search-bind login; sets the HttpOnly session cookie like the OIDC flow.
   ldapLogin: async (username: string, password: string): Promise<{ expires_in: number }> =>
     (await apiClient.post<{ expires_in: number }>('/api/v1/auth/ldap/login', { username, password })).data,
-  // Full-page redirects (OAuth + logout leave the SPA).
+  // Full-page redirect (OAuth login leaves the SPA).
   login: (provider = 'oidc'): void => {
     window.location.href = `/api/v1/auth/login?provider=${encodeURIComponent(provider)}`
   },
-  logout: (): void => {
-    window.location.href = '/api/v1/auth/logout'
+  // Logout is a POST, not a navigation: a GET logout is triggerable by a
+  // cross-site link (the auth cookie rides a top-level navigation under
+  // SameSite=Lax), so it must go through the double-submit CSRF check that
+  // apiClient's interceptor satisfies. The backend answers 200 with the
+  // destination rather than a 302 because an XHR cannot follow a cross-origin
+  // redirect to the IdP's end-session endpoint — the SPA navigates itself.
+  logout: async (): Promise<void> => {
+    let destination = '/'
+    try {
+      const { data } = await apiClient.post<{ redirect_url?: string }>('/api/v1/auth/logout')
+      if (data?.redirect_url) destination = data.redirect_url
+    } catch {
+      // Session already gone, a stale CSRF cookie, or a network blip. Local
+      // session state is cleared regardless, so leave the app anyway rather
+      // than stranding the user on an authenticated-looking page.
+    }
+    window.location.href = destination
   },
 
   // State sources (Phase 1 read plane)
