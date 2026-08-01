@@ -1,22 +1,11 @@
-import { useEffect, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Alert, Box } from '@mui/material'
 import PaletteIcon from '@mui/icons-material/Palette'
+import { BrandingSettingsCard, type UIThemeConfig } from '@sethbacon/terraform-suite-ui'
 import PageHeader from '../../components/PageHeader'
-import { api, type UIThemeConfig } from '../../services/api'
+import { api } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
-
 import { extractApiError as apiErr } from '../../utils/apiError'
 import { isSafeExternalUrl } from '../../utils/externalUrl'
 
@@ -24,30 +13,6 @@ import { isSafeExternalUrl } from '../../utils/externalUrl'
 // MUI's decomposeColor can parse. Validated here too so the admin gets field-
 // level feedback instead of a submit error.
 const COLOR_RE = /^(#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})|(rgb|rgba|hsl|hsla)\([0-9a-z.,%\s/]+\))$/i
-
-type Field = {
-  key: keyof UIThemeConfig
-  labelKey: string
-  helperKey: string
-  kind: 'text' | 'color' | 'url'
-}
-
-const FIELDS: Field[] = [
-  { key: 'product_name', labelKey: 'pages.branding.productName', helperKey: 'pages.branding.productNameHelp', kind: 'text' },
-  { key: 'primary_color', labelKey: 'pages.branding.primaryColor', helperKey: 'pages.branding.colorHelp', kind: 'color' },
-  { key: 'secondary_color_light', labelKey: 'pages.branding.secondaryColorLight', helperKey: 'pages.branding.colorHelp', kind: 'color' },
-  { key: 'secondary_color_dark', labelKey: 'pages.branding.secondaryColorDark', helperKey: 'pages.branding.colorHelp', kind: 'color' },
-  { key: 'logo_url', labelKey: 'pages.branding.logoUrl', helperKey: 'pages.branding.urlHelp', kind: 'url' },
-  { key: 'favicon_url', labelKey: 'pages.branding.faviconUrl', helperKey: 'pages.branding.urlHelp', kind: 'url' },
-  { key: 'login_hero_url', labelKey: 'pages.branding.loginHeroUrl', helperKey: 'pages.branding.urlHelp', kind: 'url' },
-]
-
-function fieldError(f: Field, value: string): boolean {
-  if (!value) return false
-  if (f.kind === 'color') return !COLOR_RE.test(value)
-  if (f.kind === 'url') return !isSafeExternalUrl(value)
-  return value.length > 100
-}
 
 /**
  * Admin whitelabel branding: product name, palette colors, and logo/favicon/
@@ -57,33 +22,14 @@ function fieldError(f: Field, value: string): boolean {
  */
 export default function BrandingPage() {
   const { t } = useTranslation()
-  const [form, setForm] = useState<UIThemeConfig>({})
-  const [saved, setSaved] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   const themeQuery = useQuery({ queryKey: queryKeys.ui.theme(), queryFn: api.getUITheme })
-  useEffect(() => {
-    if (themeQuery.data) setForm(themeQuery.data)
-  }, [themeQuery.data])
 
   const save = useMutation({
     mutationFn: (cfg: UIThemeConfig) => api.updateUITheme(cfg),
-    onSuccess: (_data, cfg) => {
-      setForm(cfg)
-      setSaved(true)
-      setError(null)
-    },
-    onError: (e) => {
-      setSaved(false)
-      setError(apiErr(e))
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.ui.theme() }),
   })
-
-  const hasInvalidField = FIELDS.some((f) => fieldError(f, (form[f.key] ?? '') as string))
-
-  // Empty strings are dropped so the stored config only carries real overrides.
-  const compact = (cfg: UIThemeConfig): UIThemeConfig =>
-    Object.fromEntries(Object.entries(cfg).filter(([, v]) => v !== '' && v !== undefined))
 
   return (
     <Box>
@@ -93,70 +39,63 @@ export default function BrandingPage() {
         description={t('pages.branding.description')}
       />
 
-      {themeQuery.isLoading && <CircularProgress size={24} />}
-      {themeQuery.isError && <Alert severity="error">{t('pages.branding.loadFailed')}</Alert>}
-
-      {!themeQuery.isLoading && !themeQuery.isError && (
-        <Card variant="outlined">
-          <CardContent>
-            <Stack spacing={2} sx={{ maxWidth: 560 }}>
-              {FIELDS.map((f) => {
-                const value = (form[f.key] ?? '') as string
-                const invalid = fieldError(f, value)
-                return (
-                  <TextField
-                    key={f.key}
-                    size="small"
-                    label={t(f.labelKey)}
-                    value={value}
-                    error={invalid}
-                    helperText={invalid ? t(f.helperKey) : undefined}
-                    placeholder={f.kind === 'color' ? '#0a6e31' : undefined}
-                    onChange={(e) => {
-                      setSaved(false)
-                      setForm((prev) => ({ ...prev, [f.key]: e.target.value }))
-                    }}
-                    fullWidth
-                  />
-                )
-              })}
-
-              {error && <Alert severity="error">{error}</Alert>}
-              {saved && (
-                <Alert
-                  severity="success"
-                  action={
-                    <Button color="inherit" size="small" onClick={() => window.location.reload()}>
-                      {t('pages.branding.reloadNow')}
-                    </Button>
-                  }
-                >
-                  {t('pages.branding.savedReloadHint')}
-                </Alert>
-              )}
-
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="contained"
-                  disabled={hasInvalidField || save.isPending}
-                  onClick={() => save.mutate(compact(form))}
-                >
-                  {t('common.save')}
-                </Button>
-                <Button
-                  color="inherit"
-                  disabled={save.isPending}
-                  onClick={() => save.mutate({})}
-                >
-                  {t('pages.branding.resetDefaults')}
-                </Button>
-              </Stack>
-              <Typography variant="body2" color="text.secondary">
-                {t('pages.branding.securityNote')}
-              </Typography>
-            </Stack>
-          </CardContent>
-        </Card>
+      {themeQuery.isError ? (
+        <Alert severity="error">{t('pages.branding.loadFailed')}</Alert>
+      ) : (
+        <BrandingSettingsCard
+          value={themeQuery.data ?? {}}
+          isLoading={themeQuery.isLoading}
+          validators={{ isValidColor: (v) => COLOR_RE.test(v), isValidUrl: isSafeExternalUrl }}
+          // Each field supplies only errorText: these strings read as
+          // corrections, and colorHelp/urlHelp are each shared by several
+          // fields, so showing them unconditionally would put the same line on
+          // screen three times.
+          strings={{
+            fields: {
+              product_name: {
+                label: t('pages.branding.productName'),
+                errorText: t('pages.branding.productNameHelp'),
+              },
+              primary_color: {
+                label: t('pages.branding.primaryColor'),
+                errorText: t('pages.branding.colorHelp'),
+              },
+              secondary_color_light: {
+                label: t('pages.branding.secondaryColorLight'),
+                errorText: t('pages.branding.colorHelp'),
+              },
+              secondary_color_dark: {
+                label: t('pages.branding.secondaryColorDark'),
+                errorText: t('pages.branding.colorHelp'),
+              },
+              logo_url: {
+                label: t('pages.branding.logoUrl'),
+                errorText: t('pages.branding.urlHelp'),
+              },
+              favicon_url: {
+                label: t('pages.branding.faviconUrl'),
+                errorText: t('pages.branding.urlHelp'),
+              },
+              login_hero_url: {
+                label: t('pages.branding.loginHeroUrl'),
+                errorText: t('pages.branding.urlHelp'),
+              },
+            },
+            resetDefaults: t('pages.branding.resetDefaults'),
+            savedReloadHint: t('pages.branding.savedReloadHint'),
+            reloadNow: t('pages.branding.reloadNow'),
+            securityNote: t('pages.branding.securityNote'),
+          }}
+          onSave={async (cfg) => {
+            // The card renders Error.message; the backend's rejection is an
+            // axios error, so unwrap it here or its validation detail is lost.
+            try {
+              await save.mutateAsync(cfg)
+            } catch (e) {
+              throw new Error(apiErr(e))
+            }
+          }}
+        />
       )}
     </Box>
   )
