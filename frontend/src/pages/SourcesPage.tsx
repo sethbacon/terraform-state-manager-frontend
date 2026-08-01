@@ -213,6 +213,8 @@ export default function SourcesPage() {
                 >
                   {s.name}
                 </Typography>
+              </Stack>
+              <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1, alignItems: 'center', mt: 0.5 }}>
                 <Chip size="small" color="primary" label={s.type} />
                 <StateCountChip sourceId={s.id} />
                 <SourceSyncBadge sync={syncBySource.get(s.id)} />
