@@ -168,6 +168,53 @@ describe('system + dashboard', () => {
   })
 })
 
+describe('ui theme', () => {
+  // The theme provider calls this at app start, where a failure must never
+  // block rendering -- so swallowing every failure to null is correct here.
+  it('getUITheme swallows a failure into null', async () => {
+    get.mockReturnValue(Promise.reject({ response: { status: 500 } }))
+    await expect(api.getUITheme()).resolves.toBeNull()
+    expect(get).toHaveBeenCalledWith('/api/v1/ui/theme')
+  })
+
+  it('getUITheme returns the stored config', async () => {
+    get.mockReturnValue(ok({ product_name: 'Acme State' }))
+    await expect(api.getUITheme()).resolves.toEqual({ product_name: 'Acme State' })
+  })
+
+  describe('getAdminUITheme', () => {
+    // The backend serves {} (200) for an unset theme rather than 404 (see
+    // GetUITheme in ui_theme.go), so there is no "not configured yet" status to
+    // special-case -- every failure here means the read itself failed.
+    it('returns the stored config, including an empty one', async () => {
+      get.mockReturnValue(ok({}))
+      await expect(api.getAdminUITheme()).resolves.toEqual({})
+      expect(get).toHaveBeenCalledWith('/api/v1/ui/theme')
+
+      get.mockReturnValue(ok({ product_name: 'Acme State', primary_color: '#0a6e31' }))
+      await expect(api.getAdminUITheme()).resolves.toEqual({
+        product_name: 'Acme State',
+        primary_color: '#0a6e31',
+      })
+    })
+
+    // PUT /api/v1/admin/ui/theme is a full replace. If a failed read resolved
+    // to null/empty like getUITheme does, the editor would render an empty
+    // form and the next Save would silently wipe every stored field -- so
+    // unlike getUITheme, this must reject rather than swallow.
+    it.each([500, 502, 401, 403])('propagates a %i instead of swallowing it', async (status) => {
+      get.mockReturnValue(Promise.reject({ response: { status } }))
+      await expect(api.getAdminUITheme()).rejects.toEqual({ response: { status } })
+    })
+
+    it('propagates a network failure that has no response at all', async () => {
+      const networkError = new Error('Network Error')
+      get.mockReturnValue(Promise.reject(networkError))
+      await expect(api.getAdminUITheme()).rejects.toBe(networkError)
+    })
+  })
+})
+
 describe('admin identity', () => {
   it('getAdminStats / listAdminUsers / listAuditLogs pass params through', async () => {
     get.mockReturnValue(ok({ users: [], total: 0 }))

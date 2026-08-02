@@ -24,7 +24,7 @@ export default function BrandingPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
 
-  const themeQuery = useQuery({ queryKey: queryKeys.ui.theme(), queryFn: api.getUITheme })
+  const themeQuery = useQuery({ queryKey: queryKeys.ui.theme(), queryFn: api.getAdminUITheme })
 
   const save = useMutation({
     mutationFn: (cfg: UIThemeConfig) => api.updateUITheme(cfg),

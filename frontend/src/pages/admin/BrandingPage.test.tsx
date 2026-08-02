@@ -10,7 +10,15 @@ vi.mock('../../services/api', async (importOriginal) => {
   return {
     ...actual,
     api: {
+      // getUITheme is mocked too (even though the page no longer calls it) so the
+      // load-failure test below actually discriminates fixed vs. buggy wiring: if
+      // BrandingPage's queryFn ever regressed to api.getUITheme, it would resolve
+      // this stub's null -- reproducing the swallowed-failure bug (a blank form
+      // where an error belongs) -- rather than leaving getUITheme undefined, which
+      // would make react-query's own "missing queryFn" fallback coincidentally
+      // also produce isError:true and mask the regression.
       getUITheme: vi.fn(),
+      getAdminUITheme: vi.fn(),
       updateUITheme: vi.fn(),
     },
   }
@@ -29,7 +37,8 @@ function renderPage() {
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mocked.getUITheme.mockResolvedValue({ product_name: 'Acme State', primary_color: '#0a6e31' })
+  mocked.getUITheme.mockResolvedValue(null)
+  mocked.getAdminUITheme.mockResolvedValue({ product_name: 'Acme State', primary_color: '#0a6e31' })
 })
 
 describe('BrandingPage', () => {
@@ -93,5 +102,20 @@ describe('BrandingPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: i18n.t('common.save') as string }))
     expect(await screen.findByText(/primary_color is not a valid color/)).toBeInTheDocument()
+  })
+
+  // Regression guard: a failed load must never fall through to an empty form.
+  // PUT /api/v1/admin/ui/theme is a full replace, so an empty form backed by a
+  // Save button would let an admin blank out every stored branding value the
+  // moment they typed one field and hit Save.
+  it('does not render the form when the load fails', async () => {
+    mocked.getAdminUITheme.mockRejectedValue({ response: { status: 500 } })
+    renderPage()
+
+    expect(await screen.findByText(i18n.t('pages.branding.loadFailed') as string)).toBeInTheDocument()
+    expect(screen.queryByLabelText(i18n.t('pages.branding.productName') as string)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(i18n.t('pages.branding.primaryColor') as string)).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: i18n.t('common.save') as string })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: i18n.t('pages.branding.resetDefaults') as string })).not.toBeInTheDocument()
   })
 })
