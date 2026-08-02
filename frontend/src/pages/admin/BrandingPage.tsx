@@ -61,7 +61,7 @@ export default function BrandingPage() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const themeQuery = useQuery({ queryKey: queryKeys.ui.theme(), queryFn: api.getUITheme })
+  const themeQuery = useQuery({ queryKey: queryKeys.ui.theme(), queryFn: api.getAdminUITheme })
   useEffect(() => {
     if (themeQuery.data) setForm(themeQuery.data)
   }, [themeQuery.data])

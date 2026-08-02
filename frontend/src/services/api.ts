@@ -963,6 +963,18 @@ export const api = {
       return null
     }
   },
+  // Read path for the branding editor. Unlike getUITheme -- which deliberately
+  // swallows every failure so theming can never block app start -- this lets
+  // failures reject. The backend serves {} (200) for an unset theme rather than
+  // 404 (see GetUITheme in ui_theme.go), so there is no "not configured yet"
+  // status to special-case here: any failure means the read itself failed.
+  //
+  // That distinction matters because PUT /api/v1/admin/ui/theme is a full
+  // replace, not a merge. If a failed read were treated as "no branding
+  // configured", the editor would render an empty form and the admin's next
+  // Save would silently wipe every field they were never shown.
+  getAdminUITheme: async (): Promise<UIThemeConfig> =>
+    (await apiClient.get<UIThemeConfig>('/api/v1/ui/theme')).data,
   // Admin: persist the whitelabel theme. An empty object clears all overrides.
   updateUITheme: async (theme: UIThemeConfig): Promise<UIThemeConfig> =>
     (await apiClient.put<UIThemeConfig>('/api/v1/admin/ui/theme', theme)).data,
