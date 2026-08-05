@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.23.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.2...v1.23.3) (2026-08-05)
+
+
+### Bug Fixes
+
+* **admin:** stop silently blanking branding on a failed theme load ([#285](https://github.com/sethbacon/terraform-state-manager-frontend/issues/285)) ([91a9e82](https://github.com/sethbacon/terraform-state-manager-frontend/commit/91a9e8241046a9aa335009c27805a8913fd42ead))
+* **deployments:** configure state-source roots in the dev stack; patch brace-expansion ([#289](https://github.com/sethbacon/terraform-state-manager-frontend/issues/289)) ([c61d14d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c61d14d96fd42fca593e59c7de46a677ce939ff9))
+* **sources:** give the chip row its own line on source cards ([#282](https://github.com/sethbacon/terraform-state-manager-frontend/issues/282)) ([90fcd0b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/90fcd0b2a427e39cf87be0efbfebfe9ee988dd80)), closes [#281](https://github.com/sethbacon/terraform-state-manager-frontend/issues/281)
+
+
+### Refactor
+
+* **branding:** render the admin page from the shared card ([#284](https://github.com/sethbacon/terraform-state-manager-frontend/issues/284)) ([3f653d1](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3f653d189fb8d26167c9cce74383bcbb191bd528))
+
 ## [1.23.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.1...v1.23.2) (2026-07-31)
 
 
