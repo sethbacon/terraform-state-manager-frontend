@@ -83,6 +83,10 @@ services:
       TSM_JWT_SECRET: dev-jwt-secret-change-me-0123456789abcdef
       # 32-byte key for encrypting per-source credentials (e.g. HCP tokens) at rest.
       TSM_ENCRYPTION_KEY: dev-encryption-key-0123456789abc
+      # Server-local state sources are confined to these roots, and the backend
+      # fails closed when the list is empty — so the "demo-local" source below
+      # cannot be created without this line. It must match the mount path.
+      TSM_STATESOURCE_LOCAL_ROOTS: /data/states
       DEV_MODE: "true"
     ports:
       - "8081:8080"
