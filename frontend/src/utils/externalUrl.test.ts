@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { isSafeUrl } from '@sethbacon/terraform-suite-ui'
 import { isSafeExternalUrl } from './externalUrl'
+
+vi.mock('@sethbacon/terraform-suite-ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@sethbacon/terraform-suite-ui')>()
+  return { ...actual, isSafeUrl: vi.fn(actual.isSafeUrl) }
+})
 
 describe('isSafeExternalUrl', () => {
   it.each([
@@ -39,5 +45,31 @@ describe('isSafeExternalUrl', () => {
   it('does not throw and returns false for truthy non-string inputs', () => {
     expect(isSafeExternalUrl(123 as unknown as string)).toBe(false)
     expect(isSafeExternalUrl({} as unknown as string)).toBe(false)
+  })
+})
+
+// Regression coverage for #102: isSafeExternalUrl must compose the shared isSafeUrl rather than
+// re-deriving its own copy of the control-character/protocol-relative/relative-path checks. Each
+// test here would fail if a future edit un-does that composition.
+describe('isSafeExternalUrl delegates to the shared isSafeUrl (#102)', () => {
+  afterEach(() => {
+    vi.mocked(isSafeUrl).mockClear()
+  })
+
+  it('calls the shared isSafeUrl with the raw value', () => {
+    isSafeExternalUrl('  https://registry.example.com  ')
+    expect(vi.mocked(isSafeUrl)).toHaveBeenCalledWith('  https://registry.example.com  ')
+  })
+
+  it('rejects whatever the shared isSafeUrl rejects, even an otherwise-valid https URL', () => {
+    vi.mocked(isSafeUrl).mockReturnValueOnce(false)
+    expect(isSafeExternalUrl('https://registry.example.com')).toBe(false)
+  })
+
+  it('still narrows to http(s) after isSafeUrl accepts a mailto: URL', () => {
+    // Proves the app doesn't just forward isSafeUrl's answer wholesale -- it composes its own
+    // scheme narrowing on top, since isSafeUrl itself allows mailto:/tel:.
+    vi.mocked(isSafeUrl).mockReturnValueOnce(true)
+    expect(isSafeExternalUrl('mailto:a@b.com')).toBe(false)
   })
 })
