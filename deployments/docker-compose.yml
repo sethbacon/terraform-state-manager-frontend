@@ -87,6 +87,22 @@ services:
       # fails closed when the list is empty — so the "demo-local" source below
       # cannot be created without this line. It must match the mount path.
       TSM_STATESOURCE_LOCAL_ROOTS: /data/states
+      # identity v0.25.0 routes OIDC discovery/JWKS/token-exchange through the
+      # shared egress guard, whose default policy DENIES loopback and RFC1918 —
+      # and Keycloak here is a compose service on the bridge network. Without
+      # this the stack boots and then cannot log in: NewOIDCProvider fails with
+      # `egress to "keycloak" (172.x.x.x) blocked: RFC 1918 address` and
+      # /api/v1/auth/providers reports no OIDC provider.
+      #
+      # Setting this key REPLACES the built-in default rather than widening it
+      # (main.go:124 applies it only when non-empty), so the four private ranges
+      # are re-stated — omit them and every internal state backend stops
+      # resolving. The registry's equivalent key WIDENS instead; same name,
+      # opposite behaviour.
+      #
+      # DEV_MODE does not cover this: the scheme rule (AllowInsecureIssuer, for
+      # http://keycloak:8180) and the destination rule are separate controls.
+      TSM_SECURITY_EGRESS_ALLOWLIST: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7,keycloak,127.0.0.1
       DEV_MODE: "true"
     ports:
       - "8081:8080"
