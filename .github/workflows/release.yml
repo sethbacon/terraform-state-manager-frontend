@@ -36,7 +36,7 @@ jobs:
     outputs:
       version: ${{ steps.tag.outputs.value }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # full history to walk ancestry
 
@@ -83,7 +83,7 @@ jobs:
       # Check out the released tag's commit specifically (for a workflow_dispatch
       # re-run this is the dispatched tag, not the branch head), so the built image
       # matches the tag it is published under (#212).
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.guard.outputs.version }}
 
