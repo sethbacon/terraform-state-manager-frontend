@@ -34,9 +34,15 @@ describe('createAppTheme', () => {
     expect(createAppTheme('light', false, 'rtl').direction).toBe('rtl')
   })
 
-  it('applies whitelabel colour overrides and falls back to the brand default', () => {
+  it('canonicalises whitelabel colour overrides and falls back to the brand default', () => {
+    // @sethbacon/terraform-suite-ui 0.8.1 routes every override through MUI's
+    // decomposeColor + recomposeColor, so the palette and the ':root' custom
+    // properties only ever see MUI's own re-serialisation and never the raw
+    // host-supplied string. '#FF0000' therefore arrives as 'rgb(255, 0, 0)'.
+    // Asserting the canonical form is the point: a test that accepted the input
+    // verbatim would pass again the moment that normalisation was removed.
     expect(createAppTheme('light', false, 'ltr', { primary: '#FF0000' }).palette.primary.main).toBe(
-      '#FF0000',
+      'rgb(255, 0, 0)',
     )
     expect(createAppTheme('light').palette.primary.main).toBe(BRAND_PRIMARY)
   })
