@@ -77,13 +77,22 @@ describe('AuthProvider', () => {
     expect(admin.result.current.hasScope('sources:manage')).toBe(true)
   })
 
-  it('flags an already-expired session immediately', async () => {
+  it('ends an already-expired session immediately rather than warning about it', async () => {
+    // @sethbacon/terraform-suite-ui 0.8.1 changed this to fail closed: a session
+    // already past its expiry when /me resolves is ENDED, not flagged with
+    // sessionExpiresSoon. Warning about a session the client already knows is dead
+    // leaves the UI rendered against it until the user acts on the warning, so the
+    // assertion here is that authentication is gone -- sessionExpiresSoon staying
+    // false is the point, not an omission.
     mocked.getCurrentUser.mockResolvedValue({
       ...me,
       session_expires_at: new Date(Date.now() - 1000).toISOString(),
     } as Awaited<ReturnType<typeof api.getCurrentUser>>)
     const { result } = await renderAuth()
-    expect(result.current.sessionExpiresSoon).toBe(true)
+    await waitFor(() => expect(result.current.isAuthenticated).toBe(false))
+    expect(result.current.user).toBeNull()
+    expect(result.current.allowedScopes).toEqual([])
+    expect(result.current.sessionExpiresSoon).toBe(false)
   })
 
   it('devLogin sets the cookie then re-resolves the user', async () => {
