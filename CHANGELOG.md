@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.23.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.3...v1.23.4) (2026-08-08)
+
+
+### Bug Fixes
+
+* **deployments:** allow the dev stack's IdP through the new egress guard ([#292](https://github.com/sethbacon/terraform-state-manager-frontend/issues/292)) ([9eff866](https://github.com/sethbacon/terraform-state-manager-frontend/commit/9eff866749bff886c5f9a0247413227005b4ca6c))
+* **deps:** bump @sethbacon/terraform-suite-ui to 0.8.1 and verify its provenance ([#293](https://github.com/sethbacon/terraform-state-manager-frontend/issues/293)) ([d522940](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d5229404b22a3ce83a60b79e26ca32b4c2b712b4))
+* **deps:** pin nanoid past GHSA-2v37-7h3g-55p8 ([#296](https://github.com/sethbacon/terraform-state-manager-frontend/issues/296)) ([bc88126](https://github.com/sethbacon/terraform-state-manager-frontend/commit/bc8812653567026b7c9235a0d7986b1d4dda1e8d))
+* **utils:** compose isSafeExternalUrl on top of the shared isSafeUrl guard ([#290](https://github.com/sethbacon/terraform-state-manager-frontend/issues/290)) ([01bd257](https://github.com/sethbacon/terraform-state-manager-frontend/commit/01bd257acae9b7f573da40056999ed5de777d52a))
+
 ## [1.23.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.2...v1.23.3) (2026-08-05)
 
 
