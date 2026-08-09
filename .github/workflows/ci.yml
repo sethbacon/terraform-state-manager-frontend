@@ -7,7 +7,12 @@ name: CI
   pull_request:
     branches: [main]
   workflow_dispatch: {}
-  workflow_call: {} # allows release.yml / weekly-security.yml to call this later
+  workflow_call: # allows release.yml / weekly-security.yml to call this later
+    secrets:
+      GIST_TOKEN:
+        # The only secret ci.yml references. Optional: the coverage-badge
+        # steps are env-guarded, so a repo without it skips them.
+        required: false
 
 concurrency:
   group: ci-${{ github.event_name }}-${{ github.head_ref || github.ref }}
@@ -31,6 +36,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-frontend
       - name: Lint
         working-directory: frontend
@@ -42,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
         working-directory: frontend
@@ -53,6 +62,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-frontend
       - name: Run tests (with coverage)
         working-directory: frontend
@@ -111,6 +122,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup-frontend
       - name: Build
         working-directory: frontend

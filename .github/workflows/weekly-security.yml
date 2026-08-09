@@ -22,7 +22,10 @@ jobs:
     permissions:
       contents: read
       packages: read
-    secrets: inherit
+    # Not `secrets: inherit`, which hands the called workflow EVERY secret this
+    # repository holds. ci.yml references exactly one.
+    secrets:
+      GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
     uses: ./.github/workflows/ci.yml
 
   # ── npm audit (production dependency tree) ────────────
@@ -39,6 +42,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set up frontend
         uses: ./.github/actions/setup-frontend
@@ -94,6 +99,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Run OSV-Scanner
         id: osv
@@ -155,14 +162,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@dc73d59c2d7bd4f8194098a91219eeee6d8a1719 # v4
+        uses: github/codeql-action/init@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
         with:
           languages: javascript-typescript
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@dc73d59c2d7bd4f8194098a91219eeee6d8a1719 # v4
+        uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # v4
         with:
           category: /language:javascript-typescript
 
