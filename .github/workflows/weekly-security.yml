@@ -22,7 +22,10 @@ jobs:
     permissions:
       contents: read
       packages: read
-    secrets: inherit
+    # Not `secrets: inherit`, which hands the called workflow EVERY secret this
+    # repository holds. ci.yml references exactly one.
+    secrets:
+      GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
     uses: ./.github/workflows/ci.yml
 
   # ── npm audit (production dependency tree) ────────────

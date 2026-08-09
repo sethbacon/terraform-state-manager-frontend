@@ -7,7 +7,12 @@ name: CI
   pull_request:
     branches: [main]
   workflow_dispatch: {}
-  workflow_call: {} # allows release.yml / weekly-security.yml to call this later
+  workflow_call: # allows release.yml / weekly-security.yml to call this later
+    secrets:
+      GIST_TOKEN:
+        # The only secret ci.yml references. Optional: the coverage-badge
+        # steps are env-guarded, so a repo without it skips them.
+        required: false
 
 concurrency:
   group: ci-${{ github.event_name }}-${{ github.head_ref || github.ref }}
