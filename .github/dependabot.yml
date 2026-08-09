@@ -44,6 +44,8 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
+    cooldown:
+      default-days: 7
 
   # ---------------------------------------------------------------------------
   # Docker base images (frontend/Dockerfile: node builder + nginx runtime)
@@ -64,6 +66,8 @@ updates:
       docker-dependencies:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
 
   # ---------------------------------------------------------------------------
   # GitHub Actions (SHA-pinned uses: across .github/workflows and .github/actions)
@@ -84,3 +88,5 @@ updates:
       actions-dependencies:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
