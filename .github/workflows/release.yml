@@ -39,12 +39,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # full history to walk ancestry
+          persist-credentials: false
 
       - name: Resolve release tag
         id: tag
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            TAG="${{ github.event.inputs.tag }}"
+            TAG="${GITHUB_EVENT_INPUTS_TAG}"
             # The manual fallback (RELEASING.md) requires the operator to push the
             # real vX.Y.Z tag BEFORE dispatching. Verify it actually exists on the
             # remote rather than trusting the free-text input, so a made-up tag
@@ -59,16 +60,21 @@ jobs:
             echo "value=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
             echo "sha=${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          GITHUB_EVENT_INPUTS_TAG: ${{ github.event.inputs.tag }}
 
       - name: Check tagged commit is reachable from main
         run: |
           git fetch origin main
-          if ! git merge-base --is-ancestor "${{ steps.tag.outputs.sha }}" origin/main; then
+          if ! git merge-base --is-ancestor "${STEPS_TAG_OUTPUTS_SHA}" origin/main; then
             echo "::error::Release tags must be pushed on main." \
                  "This ref points to a commit that is not in origin/main."
             exit 1
           fi
-          echo "✅ Tag ${{ steps.tag.outputs.value }} is on main — proceeding with release."
+          echo "✅ Tag ${STEPS_TAG_OUTPUTS_VALUE} is on main — proceeding with release."
+        env:
+          STEPS_TAG_OUTPUTS_SHA: ${{ steps.tag.outputs.sha }}
+          STEPS_TAG_OUTPUTS_VALUE: ${{ steps.tag.outputs.value }}
 
   docker:
     name: Publish Docker image
@@ -86,6 +92,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.guard.outputs.version }}
+          persist-credentials: false
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
@@ -165,4 +172,6 @@ jobs:
         uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: Sign image with cosign (keyless)
-        run: cosign sign --yes "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.push.outputs.digest }}"
+        run: cosign sign --yes "${{ env.REGISTRY }}/${IMAGE_NAME}@${STEPS_PUSH_OUTPUTS_DIGEST}"
+        env:
+          STEPS_PUSH_OUTPUTS_DIGEST: ${{ steps.push.outputs.digest }}
