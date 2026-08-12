@@ -37,7 +37,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import type { TooltipProps } from 'recharts'
 import {
   api,
   type Count,
@@ -253,8 +252,8 @@ function CountBarChart({
           margin={{ left: 24 }}
           onClick={
             onCategoryClick
-              ? (state: { activeLabel?: string }) => {
-                if (state?.activeLabel) onCategoryClick(state.activeLabel)
+              ? (state) => {
+                if (state?.activeLabel) onCategoryClick(String(state.activeLabel))
               }
               : undefined
           }
@@ -279,10 +278,17 @@ function CountBarChart({
  * is not always visible on the Y axis, so show it alongside the count rather
  * than relying on recharts' default content, which only renders the value.
  */
-function CountTooltip({ active, payload }: TooltipProps<number, string>) {
+// Typed structurally rather than against recharts' own tooltip props, whose shape and
+// export name have moved between majors; only these two fields are ever read.
+type CountTooltipProps = {
+  active?: boolean
+  payload?: { payload: Count }[]
+}
+
+function CountTooltip({ active, payload }: CountTooltipProps) {
   const { t } = useTranslation()
   if (!active || !payload || payload.length === 0) return null
-  const datum = payload[0].payload as Count
+  const datum = payload[0].payload
   return (
     <Box
       sx={{
