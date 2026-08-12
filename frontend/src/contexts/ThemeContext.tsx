@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { SuiteThemeProvider, useThemeMode as useSuiteThemeMode } from '@sethbacon/terraform-suite-ui'
+import { SuiteThemeProvider, useThemeMode as useSuiteThemeMode } from '@4cloudguru/cloud-suite-ui'
 import { api } from '../services/api'
 import { isSafeExternalUrl } from '../utils/externalUrl'
 

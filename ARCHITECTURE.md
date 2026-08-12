@@ -252,10 +252,10 @@ This app's error reporter is a **minimal console-only shim**: `captureError(erro
 
 In production the SPA is served by nginx (`frontend/nginx.conf`) with a SPA fallback (`try_files ... /index.html`) and a proxy for `/api`, `/health`, `/ready`, and `/swagger.(json|yaml)`. nginx sets strict security headers including a **Content-Security-Policy with a per-request style nonce**. The nonce is derived once via an nginx `map` (so the header and body agree across the `try_files` internal redirect), and `sub_filter` swaps the `__CSP_NONCE__` placeholder in `index.html`. `main.tsx` reads `<meta name="csp-nonce">` and feeds the nonce to the emotion cache; `ApiDocumentation.tsx` applies the same nonce to its injected `<style>` so Swagger UI's theme survives the policy. In development the placeholder is left literal and treated as "no nonce".
 
-## Shared Suite Package (`@sethbacon/terraform-suite-ui`)
+## Shared Suite Package (`@4cloudguru/cloud-suite-ui`)
 
 Cross-cutting concerns shared with the other Terraform Suite apps live in the
-private package [`@sethbacon/terraform-suite-ui`](https://github.com/sethbacon/terraform-suite-ui),
+private package [`@4cloudguru/cloud-suite-ui`](https://github.com/sethbacon/terraform-suite-ui),
 published to the GitHub Packages npm registry and pinned to an **exact**
 version in `package.json` (see the "Shared private package" section of
 `SECURITY.md` for the audit/provenance/update policy — the package carries the

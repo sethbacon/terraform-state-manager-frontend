@@ -25,7 +25,7 @@ permissions:
   # because the repository is public and a public clone needs no credential. The
   # declared set now matches the access the workflow actually exercises.
   contents: read
-  # npm ci in frontend/ resolves @sethbacon/terraform-suite-ui from
+  # npm ci in frontend/ resolves @4cloudguru/cloud-suite-ui from
   # npm.pkg.github.com.
   packages: read
 

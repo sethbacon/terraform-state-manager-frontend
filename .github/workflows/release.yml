@@ -126,10 +126,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          # GitHub Packages read token so the Docker build can npm-install the private
-          # @sethbacon/* dependency (consumed via --mount=type=secret in the Dockerfile).
-          secrets: |
-            node_auth_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Trivy image scan (pre-push gate)
         # Scan the built image BEFORE it is pushed, so a fixable HIGH/CRITICAL
@@ -158,8 +154,6 @@ jobs:
           # Reuses the layers built and cached above, so this is a cache hit that
           # only exports the already-scanned image to the registry.
           cache-from: type=gha
-          secrets: |
-            node_auth_token=${{ secrets.GITHUB_TOKEN }}
 
       - name: Attest build provenance (SLSA)
         uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1

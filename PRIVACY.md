@@ -44,7 +44,7 @@ error-handling shim (`services/errorReporting.ts`) only logs to the browser
 console — it does not transmit anything off the device.
 
 A **consent banner** (`ConsentBanner`, inherited from the shared
-`@sethbacon/terraform-suite-ui` package) is mounted app-wide and offers
+`@4cloudguru/cloud-suite-ui` package) is mounted app-wide and offers
 Essential / Error Reporting / Performance Monitoring / Analytics toggles, storing
 the choice under the `tsm-consent` `localStorage` key (see section 7). These
 categories are shared-package UI: **no data pipeline is currently wired to any of
