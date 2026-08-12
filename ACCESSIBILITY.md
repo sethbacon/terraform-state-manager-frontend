@@ -26,8 +26,8 @@ components.
 | **Reduced motion**        | When `prefers-reduced-motion: reduce` is active, all MUI transitions are disabled (`theme.ts` zeroes the transition durations)                      |
 | **Self-hosted fonts**     | The Inter typeface is bundled via `@fontsource` (no CDN), so text renders reliably under a strict Content-Security-Policy                           |
 
-> **Shared-package disclosure.** Some mechanisms above are implemented in the private
-> [`@4cloudguru/cloud-suite-ui`](https://github.com/sethbacon/terraform-suite-ui)
+> **Shared-package disclosure.** Some mechanisms above are implemented in the shared
+> [`@4cloudguru/cloud-suite-ui`](https://github.com/4cloudguru/cloud-suite-ui)
 > package rather than in this repository — notably the **skip link** and app shell
 > (`components/Layout.tsx` re-exports `SuiteLayout`) and the **reduced-motion** handling
 > and theming (`theme.ts` re-exports `createAppTheme`). See the "Shared Suite Package"

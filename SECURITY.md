@@ -121,11 +121,11 @@ Or in the UI: **Settings → Rules → Rulesets → New ruleset** targeting tags
 - **Cosign keyless signing** on Docker images via Sigstore — verify with `cosign verify`
   (see [RELEASING.md](RELEASING.md)).
 
-### Shared private package: `@4cloudguru/cloud-suite-ui`
+### Shared package: `@4cloudguru/cloud-suite-ui`
 
-This app depends on the private, out-of-tree package
-[`@4cloudguru/cloud-suite-ui`](https://github.com/sethbacon/terraform-suite-ui)
-(GitHub Packages npm registry), which carries **load-bearing security code**
+This app depends on the out-of-tree package
+[`@4cloudguru/cloud-suite-ui`](https://github.com/4cloudguru/cloud-suite-ui)
+(public, npmjs), which carries **load-bearing security code**
 shared across the Terraform Suite apps: the authentication/session provider
 (`SuiteAuthProvider` — session lifecycle, expiry warnings, scope checks),
 the GDPR consent provider, the theme provider, and the app shell/navigation.
@@ -145,12 +145,12 @@ controls:
 - **Audited** — the package received a blind security audit methodology on
   2026-07-10 (26 findings: 2 high, 16 medium, remainder low/info), all
   remediated in
-  [v0.5.3](https://github.com/sethbacon/terraform-suite-ui/releases/tag/v0.5.3)
+  [v0.5.3](https://github.com/4cloudguru/cloud-suite-ui/releases/tag/v0.5.3)
   (2026-07-11). That was the **audit-fix release, not necessarily the currently
   pinned version** — the authoritative pin is whatever `frontend/package.json`
   declares (it has since moved forward past v0.5.3). Every manual bump must review
   the upstream
-  [CHANGELOG](https://github.com/sethbacon/terraform-suite-ui/blob/main/CHANGELOG.md)
+  [CHANGELOG](https://github.com/4cloudguru/cloud-suite-ui/blob/main/CHANGELOG.md)
   for auth/consent-relevant changes (see the review note below). The package repo
   now carries its own `SECURITY.md` and a security-model section in its README.
 - **Upstream supply-chain gates** — the package's own CI runs typecheck,
@@ -160,10 +160,9 @@ controls:
   release.
 - **Manual, reviewed updates** — `.github/dependabot.yml` runs Dependabot for the
   public dependency tree (npm, Docker base images, and GitHub Actions). The
-  private `@sethbacon/*` package is deliberately **excluded** from automated bumps
-  (`ignore`d): resolving it requires a GitHub Packages read token
-  (`DEPENDABOT_PACKAGES_READ`), and its version is pinned in lockstep with the
-  suite out of band. Bumps to it are manual PRs that must update the exact pin and
+  `@4cloudguru/*` package is deliberately **excluded** from automated bumps
+  (`ignore`d): it is released and version-pinned in lockstep with the rest of the
+  suite, out of band. Bumps to it are manual PRs that must update the exact pin and
   lockfile together and review the upstream
-  [CHANGELOG](https://github.com/sethbacon/terraform-suite-ui/blob/main/CHANGELOG.md)
+  [CHANGELOG](https://github.com/4cloudguru/cloud-suite-ui/blob/main/CHANGELOG.md)
   for auth/consent-relevant changes.
