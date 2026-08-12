@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DriftPage from './DriftPage'
 import { api } from '../services/api'
@@ -590,5 +590,89 @@ describe('DriftPage', () => {
         }),
       ),
     )
+  })
+})
+
+// Divergences this page carries against its own neighbours. Each is preserved
+// deliberately by the pages/drift/ split (#218) rather than harmonised, and
+// pinned here so that changing one becomes a deliberate decision with a failing
+// test rather than a silent tidy-up.
+describe('DriftPage preserved divergences', () => {
+  afterEach(async () => {
+    await i18n.changeLanguage('en')
+  })
+
+  it('keeps the pipeline and working directory selected after a dispatch', async () => {
+    // A successful dispatch clears the ref and the state pinning but not the
+    // pipeline or the working directory, so several runs can be fired at the
+    // same pipeline without re-picking it.
+    mocked.createDriftRun.mockResolvedValue(runs[2] as unknown as Awaited<ReturnType<typeof api.createDriftRun>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.newDriftRun') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: /drift-ci/ }))
+    fireEvent.change(within(dialog).getByLabelText(i18n.t('pages.drift.gitRefOptional') as string), {
+      target: { value: 'release/1' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(i18n.t('pages.drift.workingDir') as string), {
+      target: { value: 'envs/prod' },
+    })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.dispatch') as string }))
+    await waitFor(() => expect(mocked.createDriftRun).toHaveBeenCalled())
+
+    // The ref is cleared...
+    await waitFor(() =>
+      expect(within(dialog).getByLabelText(i18n.t('pages.drift.gitRefOptional') as string)).toHaveValue(''),
+    )
+    // ...but the pipeline and the working directory survive.
+    expect(within(dialog).getByLabelText(i18n.t('pages.drift.workingDir') as string)).toHaveValue('envs/prod')
+    expect(within(dialog).getByText('drift-ci (github_actions)')).toBeInTheDocument()
+  })
+
+  it('keeps the CI sources dialog open after adding a source', async () => {
+    // This dialog is a manager, not a one-shot create form: a successful create
+    // clears the form and refetches the list above it, and stays open.
+    mocked.createCISource.mockResolvedValue(ciSources[0] as Awaited<ReturnType<typeof api.createCISource>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.ciSources') as string }))
+    const dialog = await screen.findByRole('dialog')
+    const nameField = within(dialog).getByLabelText(i18n.t('common.name') as string)
+    fireEvent.change(nameField, { target: { value: 'corp-gh' } })
+    fireEvent.change(within(dialog).getByLabelText(i18n.t('pages.drift.ownerLabel') as string), {
+      target: { value: 'corp' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(i18n.t('pages.drift.apiToken') as string), {
+      target: { value: 'ghp_x' },
+    })
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.addCiSource') as string }))
+    await waitFor(() => expect(mocked.createCISource).toHaveBeenCalled())
+
+    await waitFor(() => expect(nameField).toHaveValue(''))
+
+    // "Still open" cannot be asserted synchronously: MUI keeps a closing Dialog
+    // mounted for the length of its exit transition, so an immediate
+    // getByRole('dialog') passes either way (it did — this assertion was inert
+    // on the first attempt). Wait for a removal that must never come instead.
+    await expect(
+      waitForElementToBeRemoved(() => screen.queryByRole('dialog'), { timeout: 1000 }),
+    ).rejects.toThrow()
+    expect(within(screen.getByRole('dialog')).getByText(i18n.t('pages.drift.ciSourcesTitle') as string)).toBeInTheDocument()
+  })
+
+  it('leaves the empty pipeline-connections hint untranslated', async () => {
+    mocked.listPipelines.mockResolvedValue([])
+    mocked.listDriftRuns.mockResolvedValue({ runs: [], total: 0 })
+    await i18n.changeLanguage('ja')
+    renderPage()
+
+    // The neighbouring no-runs hint is translated; this one is not.
+    expect(await screen.findByText(i18n.t('pages.drift.noRuns') as string)).toBeInTheDocument()
+    expect(i18n.t('pages.drift.noRuns')).not.toBe('No drift runs yet.')
+    expect(screen.getByText('No pipeline connections yet.')).toBeInTheDocument()
   })
 })
