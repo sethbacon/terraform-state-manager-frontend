@@ -26,13 +26,16 @@ updates:
         patterns:
           - "*"
     ignore:
-      # Private, released and version-pinned in lockstep with the suite; not
-      # auto-bumped here (resolved via the registry above only).
+      # Released and version-pinned in lockstep with the suite; not auto-bumped here.
       - dependency-name: "@4cloudguru/*"
       # React major bumps are breaking and need manual review.
       - dependency-name: "react"
         update-types: ["version-update:semver-major"]
       - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      # typescript-eslint pins a supported TS range, so a TS major arrives before
+      # the linter can parse it and breaks lint outright (TS 7 did exactly this).
+      - dependency-name: "typescript"
         update-types: ["version-update:semver-major"]
     cooldown:
       default-days: 7
