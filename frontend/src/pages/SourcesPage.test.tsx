@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -1065,5 +1065,109 @@ describe('SourcesPage', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Create' }))
 
     expect(await screen.findByText('base_path is not a directory')).toBeInTheDocument()
+  })
+})
+
+// Divergences this page carries against its own neighbours. Each is preserved
+// deliberately by the pages/sources/ split (#218) rather than harmonised, and
+// pinned here so that changing one becomes a deliberate decision with a failing
+// test rather than a silent tidy-up.
+describe('SourcesPage preserved divergences', () => {
+  const hcpSource = [{ id: 'h1', name: 'hcp-prod', type: 'hcp', config: { organization: 'acme' } }]
+
+  afterEach(async () => {
+    await i18n.changeLanguage('en')
+  })
+
+  it('leaves the state-ops action labels untranslated', async () => {
+    // StateOpsDialog's Cancel/Apply are hard-coded English while the rest of
+    // the dialog goes through t(). Switching language proves it: the title
+    // becomes Japanese, the two buttons do not.
+    await i18n.changeLanguage('ja')
+    await openStateDetail()
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.sources.stateOps') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    // Guard against an inert assertion: if the language switch had not taken
+    // effect, everything below would trivially still be English.
+    expect(within(dialog).getByText(i18n.t('pages.sources.stateOpTitle') as string)).toBeInTheDocument()
+    expect(i18n.t('common.cancel')).not.toBe('Cancel')
+
+    expect(within(dialog).getByRole('button', { name: 'Apply' })).toBeInTheDocument()
+    expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    expect(within(dialog).queryByRole('button', { name: i18n.t('common.cancel') as string })).toBeNull()
+  })
+
+  it('leaves the resources and backups tab strings untranslated', async () => {
+    mocked.listBackups.mockResolvedValue([
+      { id: 'b1', created_at: '2026-06-11T08:00:00Z', serial: 6, created_by: 'alice' },
+    ] as never)
+    await i18n.changeLanguage('ja')
+    await openStateDetail()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabResources') as string }))
+    // Translated neighbour first, so a failed language switch cannot make the
+    // hard-coded assertions below pass by accident.
+    expect(await screen.findByText(i18n.t('common.type') as string)).toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText(i18n.t('pages.sources.filterResources') as string), {
+      target: { value: 'zzz-no-match' },
+    })
+    expect(await screen.findByText('No matching resources.')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('tab', { name: i18n.t('pages.sources.tabBackups') as string }))
+    expect(await screen.findByText(i18n.t('pages.sources.serialHeader') as string)).toBeInTheDocument()
+    expect(screen.getByText('By')).toBeInTheDocument()
+  })
+
+  it('falls back to the create-specific message when source creation fails without a body', async () => {
+    // Every other dialog on this page falls back to extractApiError's bare
+    // 'Request failed.'; Add alone falls back to a translated message.
+    mocked.createSource.mockRejectedValue(new Error('network down'))
+    renderPage()
+    await screen.findByText('demo-local')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.addSource') as string }))
+    const dialog = await screen.findByRole('dialog')
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'bad' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(/path/i), { target: { value: '/nope' } })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Create' }))
+
+    expect(await screen.findByText(i18n.t('pages.sources.createFailed') as string)).toBeInTheDocument()
+    expect(screen.queryByText('Request failed.')).toBeNull()
+  })
+
+  it('requires credential fields on create but not on edit', async () => {
+    // A credential left blank on edit means "keep the stored secret", so Edit
+    // treats credentials as optional. Add has no stored secret to keep, so the
+    // same field is required there. The hcp connector's API token is such a
+    // field: credential and not optional.
+    mocked.listSources.mockResolvedValue(hcpSource as unknown as Awaited<ReturnType<typeof api.listSources>>)
+    renderPage()
+    await screen.findByText('hcp-prod')
+
+    // Edit: organization is seeded from config, the token is blank — saveable.
+    fireEvent.click(screen.getAllByLabelText(i18n.t('pages.sources.editSourceAria') as string)[0])
+    let dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByLabelText(/API token/i)).toHaveValue('')
+    expect(within(dialog).getByRole('button', { name: i18n.t('common.save') as string })).toBeEnabled()
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.cancel') as string }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+
+    // Add: same connector, same blank token — not creatable until it is filled.
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('actions.addSource') as string }))
+    dialog = await screen.findByRole('dialog')
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: /HCP/i }))
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull())
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'new-hcp' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(/Organization/i), { target: { value: 'acme' } })
+    expect(within(dialog).getByRole('button', { name: 'Create' })).toBeDisabled()
+
+    fireEvent.change(within(dialog).getByLabelText(/API token/i), { target: { value: 'tok' } })
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Create' })).toBeEnabled())
   })
 })
