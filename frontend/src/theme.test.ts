@@ -35,7 +35,7 @@ describe('createAppTheme', () => {
   })
 
   it('canonicalises whitelabel colour overrides and falls back to the brand default', () => {
-    // @sethbacon/terraform-suite-ui 0.8.1 routes every override through MUI's
+    // @4cloudguru/cloud-suite-ui 0.8.1 routes every override through MUI's
     // decomposeColor + recomposeColor, so the palette and the ':root' custom
     // properties only ever see MUI's own re-serialisation and never the raw
     // host-supplied string. '#FF0000' therefore arrives as 'rgb(255, 0, 0)'.

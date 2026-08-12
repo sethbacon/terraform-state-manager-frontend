@@ -8,7 +8,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from '../components/Layout'
-import { AuthProvider, type AuthApi } from '@sethbacon/terraform-suite-ui'
+import { AuthProvider, type AuthApi } from '@4cloudguru/cloud-suite-ui'
 import { AppThemeProvider } from '../contexts/ThemeContext'
 import { HelpProvider, useHelp } from '../contexts/HelpContext'
 import UsersPage from './admin/UsersPage'

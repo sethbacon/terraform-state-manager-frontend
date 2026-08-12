@@ -14,7 +14,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { NotificationChannelsSection, type NotificationChannelTypeOption } from '@sethbacon/terraform-suite-ui'
+import { NotificationChannelsSection, type NotificationChannelTypeOption } from '@4cloudguru/cloud-suite-ui'
 import { api, type NotificationChannelInput } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import PageHeader from '../../components/PageHeader'

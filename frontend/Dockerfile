@@ -6,10 +6,8 @@ WORKDIR /app
 # .npmrc carries legacy-peer-deps=true (eslint-plugin-jsx-a11y hasn't declared
 # ESLint 10 support yet); npm ci needs it to resolve the dependency tree.
 COPY package*.json .npmrc ./
-# NODE_AUTH_TOKEN (a GitHub Packages read token) is injected as a BuildKit secret so npm
-# can install the private @sethbacon/* dependency without baking the token into a layer.
-RUN --mount=type=secret,id=node_auth_token \
-    NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" npm ci
+# The suite UI dependency is public on npmjs, so npm ci needs no registry auth.
+RUN npm ci
 # Gate on PRODUCTION-dependency vulnerabilities only, against the exact committed
 # lockfile. No in-build `npm audit fix`: it would mutate node_modules without
 # updating the shipped lockfile, so the bundled dependency code could diverge from
@@ -25,9 +23,7 @@ RUN --mount=type=secret,id=node_auth_token \
 # accepted risks live in scripts/npm-audit-exceptions.json with a review date.
 # Same gate and same register as terraform-registry-frontend.
 COPY scripts/audit-gate.mjs scripts/npm-audit-exceptions.json ./scripts/
-RUN --mount=type=secret,id=node_auth_token \
-    export NODE_AUTH_TOKEN="$(cat /run/secrets/node_auth_token)" && \
-    npm audit --json --omit=dev > /tmp/audit.json || true; \
+RUN npm audit --json --omit=dev > /tmp/audit.json || true; \
     node scripts/audit-gate.mjs /tmp/audit.json --exceptions scripts/npm-audit-exceptions.json
 COPY . .
 RUN npm run build

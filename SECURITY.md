@@ -121,10 +121,10 @@ Or in the UI: **Settings → Rules → Rulesets → New ruleset** targeting tags
 - **Cosign keyless signing** on Docker images via Sigstore — verify with `cosign verify`
   (see [RELEASING.md](RELEASING.md)).
 
-### Shared private package: `@sethbacon/terraform-suite-ui`
+### Shared private package: `@4cloudguru/cloud-suite-ui`
 
 This app depends on the private, out-of-tree package
-[`@sethbacon/terraform-suite-ui`](https://github.com/sethbacon/terraform-suite-ui)
+[`@4cloudguru/cloud-suite-ui`](https://github.com/sethbacon/terraform-suite-ui)
 (GitHub Packages npm registry), which carries **load-bearing security code**
 shared across the Terraform Suite apps: the authentication/session provider
 (`SuiteAuthProvider` — session lifecycle, expiry warnings, scope checks),

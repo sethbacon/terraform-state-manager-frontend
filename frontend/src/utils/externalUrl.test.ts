@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { isSafeUrl } from '@sethbacon/terraform-suite-ui'
+import { isSafeUrl } from '@4cloudguru/cloud-suite-ui'
 import { isSafeExternalUrl } from './externalUrl'
 
-vi.mock('@sethbacon/terraform-suite-ui', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@sethbacon/terraform-suite-ui')>()
+vi.mock('@4cloudguru/cloud-suite-ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@4cloudguru/cloud-suite-ui')>()
   return { ...actual, isSafeUrl: vi.fn(actual.isSafeUrl) }
 })
 

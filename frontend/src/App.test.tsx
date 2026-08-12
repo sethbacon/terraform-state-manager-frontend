@@ -19,7 +19,7 @@ vi.mock('./services/api', async (importOriginal) => {
 })
 vi.mock('./contexts/AuthContext', async (importOriginal) => {
   const actual = await importOriginal<typeof import('./contexts/AuthContext')>()
-  const { AuthProvider: SuiteAuthProvider } = await import('@sethbacon/terraform-suite-ui')
+  const { AuthProvider: SuiteAuthProvider } = await import('@4cloudguru/cloud-suite-ui')
   // SuiteLayout reads the package's own auth context, so back the provider with a
   // real package AuthProvider that resolves an authenticated admin. The app-level
   // useAuth (used by ProtectedRoute) stays mocked below.

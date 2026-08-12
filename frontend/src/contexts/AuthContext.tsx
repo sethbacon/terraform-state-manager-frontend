@@ -3,7 +3,7 @@
 // primary membership — matching this app's previous behaviour. SESSION_WARNING_LEAD_MS
 // and useAuth are re-exported so existing imports keep working.
 import { useEffect, useRef, type ReactNode } from 'react'
-import { AuthProvider as SuiteAuthProvider, useAuth, SESSION_WARNING_LEAD_MS } from '@sethbacon/terraform-suite-ui'
+import { AuthProvider as SuiteAuthProvider, useAuth, SESSION_WARNING_LEAD_MS } from '@4cloudguru/cloud-suite-ui'
 import { api, setUnauthorizedHandler } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
 import { queryClient } from '../queryClient'
