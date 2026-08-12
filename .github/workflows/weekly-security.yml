@@ -14,14 +14,11 @@ permissions:
   contents: read
 
 jobs:
-  # Re-run the full CI suite (lint, typecheck, tests, build) on schedule. The
-  # calling job grants packages:read so ci.yml's npm ci can install the private
-  # @sethbacon/* dependency.
+  # Re-run the full CI suite (lint, typecheck, tests, build) on schedule.
   ci:
     name: CI
     permissions:
       contents: read
-      packages: read
     # Not `secrets: inherit`, which hands the called workflow EVERY secret this
     # repository holds. ci.yml references exactly one.
     secrets:
@@ -37,7 +34,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: read # install the private @sethbacon/* dependency
       issues: write
     steps:
       - name: Checkout
