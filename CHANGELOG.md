@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.24.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.0...v1.24.1) (2026-08-12)
+
+
+### Bug Fixes
+
+* **ci:** spend the replay credential on the one private checkout only ([#318](https://github.com/sethbacon/terraform-state-manager-frontend/issues/318)) ([5424d46](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5424d46113cdfd536677b2f42c980a978870e6ca))
+
+
+### Refactor
+
+* **sources,drift:** split the two god-components into one module per flow ([#320](https://github.com/sethbacon/terraform-state-manager-frontend/issues/320)) ([5666a03](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5666a0393b898dee585e04b77118818938dcccfc))
+
 ## [1.24.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.4...v1.24.0) (2026-08-12)
 
 
