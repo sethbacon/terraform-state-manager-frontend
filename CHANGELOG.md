@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.24.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.4...v1.24.0) (2026-08-12)
+
+
+### Features
+
+* adopt @4cloudguru/cloud-suite-ui from npmjs ([#311](https://github.com/sethbacon/terraform-state-manager-frontend/issues/311)) ([3fa253c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/3fa253c408bdd4bfb07acbf4e169e39d4e268922))
+
+
+### Bug Fixes
+
+* **ci:** check out the two ADO extension repos the replay gate requires ([#303](https://github.com/sethbacon/terraform-state-manager-frontend/issues/303)) ([db687a2](https://github.com/sethbacon/terraform-state-manager-frontend/commit/db687a2580a3d6d3d757aa33c654e3603ab79936))
+* **ci:** drop the dead GitHub Packages registry from dependabot ([#312](https://github.com/sethbacon/terraform-state-manager-frontend/issues/312)) ([a98df93](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a98df93941a835509fc25468e12daabed43bc82d))
+* **ci:** pin the suite-ui attestation signer repo during the bridge ([#310](https://github.com/sethbacon/terraform-state-manager-frontend/issues/310)) ([d7ccd93](https://github.com/sethbacon/terraform-state-manager-frontend/commit/d7ccd9377be93eb379edd308c450b568ca1fd2cc))
+* **ci:** point dependabot at the packages secret that exists ([#306](https://github.com/sethbacon/terraform-state-manager-frontend/issues/306)) ([b95ba28](https://github.com/sethbacon/terraform-state-manager-frontend/commit/b95ba287623a386b53af7a63faec3d7652e33f21))
+* **ci:** point the suite-ui checkout at its new owner ([#308](https://github.com/sethbacon/terraform-state-manager-frontend/issues/308)) ([9ce273d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/9ce273d4d70d404f19e024e384687704c86267f3))
+* **ci:** repair the empty `with:` blocks that broke five workflows at startup ([#301](https://github.com/sethbacon/terraform-state-manager-frontend/issues/301)) ([c848131](https://github.com/sethbacon/terraform-state-manager-frontend/commit/c84813125c30bbc47d9518b3c7d5cb9cb9414b41))
+* **ci:** stop dependabot proposing typescript majors ([#313](https://github.com/sethbacon/terraform-state-manager-frontend/issues/313)) ([8362e0f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8362e0fcb056ac1b390bd76ec5712f736da03f4f))
+* **ci:** verify library provenance by owner while its repo move settles ([#309](https://github.com/sethbacon/terraform-state-manager-frontend/issues/309)) ([0990297](https://github.com/sethbacon/terraform-state-manager-frontend/commit/09902972992fb9ddef634155bf1b8f6aeab9e3d2))
+* **deps:** patch dompurify and retire the stale react-router exception ([#317](https://github.com/sethbacon/terraform-state-manager-frontend/issues/317)) ([139d786](https://github.com/sethbacon/terraform-state-manager-frontend/commit/139d786a827fed4aa5b3debf5f1b3ad04045cbc4))
+
+
+### Refactor
+
+* **dashboard:** make EstateOverview typing survive a recharts major ([#316](https://github.com/sethbacon/terraform-state-manager-frontend/issues/316)) ([204874f](https://github.com/sethbacon/terraform-state-manager-frontend/commit/204874fd389c57d5f58caa66f075056a9a6e1959))
+
 ## [1.23.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.23.3...v1.23.4) (2026-08-08)
 
 
