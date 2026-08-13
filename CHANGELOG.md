@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.24.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.1...v1.24.2) (2026-08-13)
+
+
+### Documentation
+
+* correct the suite-ui package as public on npmjs ([#323](https://github.com/sethbacon/terraform-state-manager-frontend/issues/323)) ([43be007](https://github.com/sethbacon/terraform-state-manager-frontend/commit/43be0076b719945a65ebf7cfd8c2bcd09a336322))
+
 ## [1.24.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.0...v1.24.1) (2026-08-12)
 
 
