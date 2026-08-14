@@ -79,6 +79,7 @@ jobs:
   docker:
     name: Publish Docker image
     runs-on: ubuntu-latest
+    environment: release
     needs: guard
     permissions:
       contents: read
