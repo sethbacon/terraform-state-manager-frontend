@@ -279,6 +279,56 @@ export interface RoleTemplate {
   created_at: string
   updated_at: string
 }
+/**
+ * Longest note this UI will send with a platform-admin grant.
+ *
+ * The cap is OURS, not the server's. TSM stores the note in a TEXT column and
+ * validates no length at all — the sibling registry caps it at 500 and answers
+ * 400, and backend `platform_admins.go` records the divergence as deliberate
+ * and open rather than accidental. So the form imposes a limit instead of
+ * assuming a refusal that will never come.
+ */
+export const PLATFORM_ADMIN_NOTE_MAX_LENGTH = 500
+
+/**
+ * One platform-admin grant as the carrier records it
+ * (`GET /api/v1/admin/platform-admins`).
+ *
+ * `email`/`name` describe the GRANTEE and `granted_by_email` whoever conferred
+ * the grant. All three are omitted rather than blanked when they do not resolve,
+ * because "nobody answers to this id" is a real state here and an empty string
+ * is not a person: an orphaned grant carries neither, and a grant whose granter
+ * has since been deleted keeps its `granted_by` UUID with no address beside it.
+ *
+ * ORPHANED, NOT `user_resolved`. The sibling registry spells this same idea as
+ * `user_resolved`, with the OPPOSITE sense. Reading registry's key against this
+ * API does not produce an obviously missing field — it produces the exact
+ * opposite answer, silently, on the one flag that decides whether a row elevates
+ * anybody. TSM keeps `orphaned` deliberately (backend `platform_admins.go`).
+ */
+export interface PlatformAdmin {
+  user_id: string
+  email?: string
+  name?: string
+  /** null for the first-boot bootstrap row: nobody conferred it, and `note` records where it came from. */
+  granted_by: string | null
+  granted_by_email?: string
+  granted_at: string
+  note: string | null
+  /** true when the grantee no longer resolves. Such a row elevates NOBODY, is not counted by the never-zero floor, and this listing is the only surface it can be removed from. */
+  orphaned: boolean
+}
+/**
+ * The 201 body of a grant. Deliberately NOT a {@link PlatformAdmin}: the create
+ * path echoes the row it wrote and never resolves identities, so a caller that
+ * wants to name the new administrator must use the user it picked.
+ */
+export interface PlatformAdminGrant {
+  user_id: string
+  granted_by: string | null
+  granted_at: string
+  note: string | null
+}
 export interface AuditLogEntry {
   id: string
   action: string
@@ -1046,6 +1096,21 @@ export const api = {
   },
   listAdminRoles: async (): Promise<RoleTemplate[]> =>
     (await apiClient.get<{ roles: RoleTemplate[] }>('/api/v1/admin/roles')).data.roles,
+
+  // Platform-admin carrier (admin scope). Orphaned grants are returned, not
+  // filtered: this listing is the only surface they can be removed from.
+  listPlatformAdmins: async (): Promise<PlatformAdmin[]> =>
+    (await apiClient.get<{ platform_admins?: PlatformAdmin[] }>('/api/v1/admin/platform-admins')).data
+      .platform_admins ?? [],
+  // 400 (not 404) when the id answers to nobody, 409 when the user already holds
+  // the grant, 503 when identity could not be reached or the carrier is unwired.
+  grantPlatformAdmin: async (input: { user_id: string; note?: string }): Promise<PlatformAdminGrant> =>
+    (await apiClient.post<PlatformAdminGrant>('/api/v1/admin/platform-admins', input)).data,
+  // 409 is the carrier's never-zero floor refusing, not a malformed request; 404
+  // means there was no row to remove. Callers must tell the two apart.
+  revokePlatformAdmin: async (userId: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/platform-admins/${encodeURIComponent(userId)}`)
+  },
   listAuditLogs: async (params?: AuditLogFilters): Promise<{ logs: AuditLogEntry[]; total: number }> =>
     (await apiClient.get<{ logs: AuditLogEntry[]; total: number }>('/api/v1/admin/audit-logs', { params })).data,
   // Server-side export: walks every matching page (the list endpoint caps

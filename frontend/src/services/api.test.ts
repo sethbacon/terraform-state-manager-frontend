@@ -309,6 +309,36 @@ describe('admin identity', () => {
     await api.updateOIDCGroupMapping(mapping)
     expect(put).toHaveBeenCalledWith('/api/v1/admin/oidc/group-mapping', mapping)
   })
+
+  it('platform-admin carrier: list unwraps its envelope, grant/revoke hit the right routes', async () => {
+    get.mockReturnValue(ok({ platform_admins: [{ user_id: 'u1', orphaned: true }], total: 1 }))
+    expect(await api.listPlatformAdmins()).toEqual([{ user_id: 'u1', orphaned: true }])
+    expect(get).toHaveBeenCalledWith('/api/v1/admin/platform-admins')
+
+    // An envelope with no array is an empty list, not a crash in every caller
+    // that maps over it.
+    get.mockReturnValue(ok({ total: 0 }))
+    expect(await api.listPlatformAdmins()).toEqual([])
+
+    post.mockReturnValue(ok({ user_id: 'u2', granted_by: 'u1', granted_at: 'now', note: 'why' }))
+    expect(await api.grantPlatformAdmin({ user_id: 'u2', note: 'why' })).toEqual({
+      user_id: 'u2',
+      granted_by: 'u1',
+      granted_at: 'now',
+      note: 'why',
+    })
+    expect(post).toHaveBeenCalledWith('/api/v1/admin/platform-admins', { user_id: 'u2', note: 'why' })
+
+    del.mockReturnValue(ok({ user_id: 'u2', revoked: true }))
+    await api.revokePlatformAdmin('u2')
+    expect(del).toHaveBeenCalledWith('/api/v1/admin/platform-admins/u2')
+  })
+
+  it('encodes the revoke path segment rather than pasting it into the URL', async () => {
+    del.mockReturnValue(ok({}))
+    await api.revokePlatformAdmin('a/../b')
+    expect(del).toHaveBeenCalledWith('/api/v1/admin/platform-admins/a%2F..%2Fb')
+  })
 })
 
 describe('auth', () => {

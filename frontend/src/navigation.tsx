@@ -12,6 +12,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard'
 import PeopleIcon from '@mui/icons-material/People'
 import BusinessIcon from '@mui/icons-material/Business'
 import BadgeIcon from '@mui/icons-material/Badge'
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import HistoryIcon from '@mui/icons-material/History'
 import VpnKeyIcon from '@mui/icons-material/VpnKey'
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts'
@@ -71,6 +72,11 @@ export const navGroups: NavGroup[] = [
     items: [
       { path: '/admin/organizations', labelKey: 'nav.admin.organizations', tooltipKey: 'nav.admin.organizationsTooltip', icon: <BusinessIcon />, scope: 'admin' },
       { path: '/admin/roles', labelKey: 'nav.admin.roles', tooltipKey: 'nav.admin.rolesTooltip', icon: <BadgeIcon />, scope: 'admin' },
+      // Sits beside role templates: the two are the deployment's authority
+      // surfaces. Platform-admin authority is platform-wide by definition and
+      // the carrier grants a flat scope, so there is no organization dimension
+      // to this page (backend #393).
+      { path: '/admin/platform-admins', labelKey: 'nav.admin.platformAdmins', tooltipKey: 'nav.admin.platformAdminsTooltip', icon: <AdminPanelSettingsIcon />, scope: 'admin' },
       { path: '/admin/users', labelKey: 'nav.admin.users', tooltipKey: 'nav.admin.usersTooltip', icon: <PeopleIcon />, scope: 'admin' },
       { path: '/admin/oidc', labelKey: 'nav.admin.oidcGroups', tooltipKey: 'nav.admin.oidcGroupsTooltip', icon: <ManageAccountsIcon />, scope: 'admin' },
       { path: '/admin/mtls', labelKey: 'nav.admin.mtls', tooltipKey: 'nav.admin.mtlsTooltip', icon: <VerifiedUserIcon />, scope: 'admin' },

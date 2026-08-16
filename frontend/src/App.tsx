@@ -34,6 +34,7 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/AdminDashboardPage')
 const UsersPage = lazy(() => import('./pages/admin/UsersPage'))
 const OrganizationsPage = lazy(() => import('./pages/admin/OrganizationsPage'))
 const RolesPage = lazy(() => import('./pages/admin/RolesPage'))
+const PlatformAdminsPage = lazy(() => import('./pages/admin/PlatformAdminsPage'))
 const GroupMappingsPage = lazy(() => import('./pages/admin/GroupMappingsPage'))
 const MTLSPage = lazy(() => import('./pages/admin/MTLSPage'))
 const SSOPage = lazy(() => import('./pages/admin/SSOPage'))
@@ -56,6 +57,7 @@ const pageElements: Record<string, ReactNode> = {
   '/admin/users': <UsersPage />,
   '/admin/organizations': <OrganizationsPage />,
   '/admin/roles': <RolesPage />,
+  '/admin/platform-admins': <PlatformAdminsPage />,
   '/admin/oidc': <GroupMappingsPage />,
   '/admin/mtls': <MTLSPage />,
   '/admin/sso': <SSOPage />,

@@ -22,6 +22,7 @@ export const queryKeys = {
     organizations: () => ['admin', 'organizations'] as const,
     orgMembers: (orgId: string) => ['admin', 'organizations', orgId, 'members'] as const,
     roles: () => ['admin', 'roles'] as const,
+    platformAdmins: () => ['admin', 'platform-admins'] as const,
     auditLogs: (params?: Record<string, unknown>) =>
       params ? (['admin', 'audit-logs', params] as const) : (['admin', 'audit-logs'] as const),
     sso: () => ['admin', 'sso'] as const,

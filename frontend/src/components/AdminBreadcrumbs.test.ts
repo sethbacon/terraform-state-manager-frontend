@@ -20,6 +20,10 @@ describe('buildAdminBreadcrumbs', () => {
       { labelKey: 'nav.admin.dashboard', to: '/admin' },
       { labelKey: 'nav.admin.auditLogs' },
     ])
+    expect(buildAdminBreadcrumbs('/admin/platform-admins')).toEqual([
+      { labelKey: 'nav.admin.dashboard', to: '/admin' },
+      { labelKey: 'nav.admin.platformAdmins' },
+    ])
   })
 
   it('ignores unknown admin segments', () => {
