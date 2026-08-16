@@ -120,6 +120,7 @@ const routes: Array<[path: string, textKey: string]> = [
   ['/admin/users', 'admin.users.pageSubtitle'],
   ['/admin/organizations', 'admin.organizations.pageSubtitle'],
   ['/admin/roles', 'admin.roles.title'],
+  ['/admin/platform-admins', 'admin.platformAdmins.pageSubtitle'],
   ['/admin/oidc', 'admin.oidcSettings.pageSubtitle'],
   ['/admin/mtls', 'mtls.pageSubtitle'],
   ['/admin/sso', 'pages.sso.title'],

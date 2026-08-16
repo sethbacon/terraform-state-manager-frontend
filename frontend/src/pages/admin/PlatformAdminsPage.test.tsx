@@ -198,6 +198,9 @@ describe('PlatformAdminsPage — the last-administrator floor', () => {
     renderPage()
     const dialog = await openRevoke(bob)
 
+    // The dialog is genuinely OPEN, so the absent confirm button below is a
+    // real refusal rather than a query against a dialog that never rendered.
+    expect(within(dialog).getByText(t('admin.platformAdmins.revokeDialogTitle'))).toBeInTheDocument()
     expect(within(dialog).getByTestId('platform-admins-last-admin')).toBeInTheDocument()
     expect(within(dialog).getByText(t('admin.platformAdmins.lastAdminBody'))).toBeInTheDocument()
     // The refusal explains what the floor counts; it must not claim the
@@ -224,6 +227,11 @@ describe('PlatformAdminsPage — the last-administrator floor', () => {
     expect(
       await screen.findByText(t('admin.platformAdmins.msgRevoked', { subject: 'bob@example.com' })),
     ).toBeInTheDocument()
+    // MUI keeps a closing Dialog mounted through its exit transition, so this
+    // has to be polled to extinction rather than asserted on the next tick —
+    // read straight after the click it would report a dialog that is merely
+    // animating out, in either direction.
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
   it('explains a server 409 in place instead of reporting it as a failure', async () => {
@@ -339,6 +347,10 @@ describe('PlatformAdminsPage — granting', () => {
       await screen.findByText(t('admin.platformAdmins.msgGranted', { subject: 'carol@example.com' })),
     ).toBeInTheDocument()
     await waitFor(() => expect(mocked.listPlatformAdmins).toHaveBeenCalledTimes(2))
+    // Polled, not read on the next tick: the Dialog stays mounted through its
+    // MUI exit transition, so a same-tick assertion would pass on one that is
+    // only animating out.
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
   it('omits an empty note rather than sending a blank one', async () => {

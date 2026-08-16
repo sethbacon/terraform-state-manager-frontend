@@ -477,10 +477,11 @@ export default function PlatformAdminsPage() {
             onClick={() => {
               if (!selectedUser) return
               setError(null)
-              grantMutation.mutate({
-                user: selectedUser,
-                ...(trimmedNote ? { note: trimmedNote } : {}),
-              })
+              // The empty-note decision belongs to the mutationFn alone: a
+              // second conditional here would make the payload depend on two
+              // places that must agree, and a mutation to either would be
+              // masked by the other.
+              grantMutation.mutate({ user: selectedUser, note: trimmedNote })
             }}
           >
             {grantMutation.isPending
