@@ -14,3 +14,16 @@
 export function extractApiError(e: unknown, fallback = 'Request failed.'): string {
   return (e as { response?: { data?: { error?: string } } })?.response?.data?.error ?? fallback
 }
+
+/**
+ * Companion to {@link extractApiError} for the responses whose STATUS carries
+ * meaning the message does not: a 409 that is an invariant refusing rather than
+ * a mistake the operator made, or a 503 that means "nothing was attempted, try
+ * again" rather than the generic breakage a 500 reports.
+ *
+ * @returns the HTTP status, or undefined when the request never reached a
+ *          response at all (network failure, aborted request).
+ */
+export function apiErrorStatus(e: unknown): number | undefined {
+  return (e as { response?: { status?: number } })?.response?.status
+}
