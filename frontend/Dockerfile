@@ -1,7 +1,11 @@
 # Multi-stage Dockerfile for the Terraform State Manager frontend.
 
 # Stage 1: build the static SPA.
-FROM node:26-alpine AS builder
+# Must stay on the major declared in package.json `engines` (and in
+# @4cloudguru/cloud-suite-ui). .npmrc sets engine-strict=true, so a mismatch
+# fails this build instead of printing an EBADENGINE warning nobody reads.
+# Digest-pinned like the nginx stage below, so the builder cannot float.
+FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS builder
 WORKDIR /app
 # .npmrc carries legacy-peer-deps=true (eslint-plugin-jsx-a11y hasn't declared
 # ESLint 10 support yet); npm ci needs it to resolve the dependency tree.
