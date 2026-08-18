@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.25.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.2...v1.25.0) (2026-08-16)
+
+
+### Features
+
+* **admin:** add the platform-admin management page ([#334](https://github.com/sethbacon/terraform-state-manager-frontend/issues/334)) ([2da5fd5](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2da5fd5b8f408993024284c5de455cc8675bf880)), closes [#332](https://github.com/sethbacon/terraform-state-manager-frontend/issues/332)
+
 ## [1.24.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.1...v1.24.2) (2026-08-13)
 
 
