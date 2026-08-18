@@ -59,6 +59,13 @@ updates:
       docker-dependencies:
         patterns:
           - "*"
+    ignore:
+      # The node builder major is tied to package.json `engines`; Dependabot has
+      # no visibility of that, and the grouped bump in #255 silently moved it
+      # 24 -> 26 without the major even appearing in the PR title. Digest and
+      # minor updates still flow. Raise the major here and in `engines` together.
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
     cooldown:
       default-days: 7
 
