@@ -33,9 +33,18 @@ jobs:
   guard:
     name: Verify tag is on main
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       version: ${{ steps.tag.outputs.value }}
     steps:
+      # hardening-exception: egress-audit — this job clones this repository;
+      #   harden-runner has never run in this repository, so no endpoint baseline
+      #   exists and a block policy written without one fails closed on its first run;
+      #   audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # full history to walk ancestry
@@ -79,6 +88,7 @@ jobs:
   docker:
     name: Publish Docker image
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment: release
     needs: guard
     permissions:
@@ -87,6 +97,15 @@ jobs:
       id-token: write # Sigstore OIDC (cosign keyless)
       attestations: write # SLSA provenance attestation
     steps:
+      # hardening-exception: egress-audit — this job pulls base images and pushes
+      #   layers to a container registry, calls the GitHub API, and clones this
+      #   repository; harden-runner has never run in this repository, so no endpoint
+      #   baseline exists and a block policy written without one fails closed on its
+      #   first run; audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       # Check out the released tag's commit specifically (for a workflow_dispatch
       # re-run this is the dispatched tag, not the branch head), so the built image
       # matches the tag it is published under (#212).
