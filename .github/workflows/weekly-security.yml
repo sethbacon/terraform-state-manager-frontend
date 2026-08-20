@@ -32,10 +32,19 @@ jobs:
   npm-audit:
     name: npm audit (prod deps)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       issues: write
     steps:
+      # hardening-exception: egress-audit — this job calls the GitHub API and clones
+      #   this repository; harden-runner has never run in this repository, so no
+      #   endpoint baseline exists and a block policy written without one fails closed
+      #   on its first run; audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -89,10 +98,20 @@ jobs:
   osv-scan:
     name: OSV Vulnerability Scan
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       issues: write
     steps:
+      # hardening-exception: egress-audit — this job queries the OSV vulnerability
+      #   database, calls the GitHub API, and clones this repository; harden-runner
+      #   has never run in this repository, so no endpoint baseline exists and a block
+      #   policy written without one fails closed on its first run; audit is what
+      #   produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -151,11 +170,20 @@ jobs:
   codeql:
     name: CodeQL Analysis (JavaScript/TypeScript)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       actions: read # CodeQL reads workflow-run metadata (required on private repos)
       contents: read
       security-events: write
     steps:
+      # hardening-exception: egress-audit — this job downloads the CodeQL bundle and
+      #   its query packs and clones this repository; harden-runner has never run in
+      #   this repository, so no endpoint baseline exists and a block policy written
+      #   without one fails closed on its first run; audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -174,11 +202,20 @@ jobs:
   notify-on-failure:
     name: Create issue on failure
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [ci, npm-audit, osv-scan, codeql]
     if: failure() && github.event_name == 'schedule'
     permissions:
       issues: write
     steps:
+      # hardening-exception: egress-audit — this job queries the OSV vulnerability
+      #   database and calls the GitHub API; harden-runner has never run in this
+      #   repository, so no endpoint baseline exists and a block policy written
+      #   without one fails closed on its first run; audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
       - name: Create failure issue
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
