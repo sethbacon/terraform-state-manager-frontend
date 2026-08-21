@@ -4,7 +4,7 @@
 // and useAuth are re-exported so existing imports keep working.
 import { useEffect, useRef, type ReactNode } from 'react'
 import { AuthProvider as SuiteAuthProvider, useAuth, SESSION_WARNING_LEAD_MS } from '@4cloudguru/cloud-suite-ui'
-import { api, setUnauthorizedHandler } from '../services/api'
+import { api, setActingOrganization, setUnauthorizedHandler } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
 import { queryClient } from '../queryClient'
 
@@ -34,10 +34,34 @@ function SessionExpiryBridge() {
   return null
 }
 
+// Keeps the api client's acting organization in step with the provider's.
+//
+// A bridge rather than the api module reading storage directly, because the
+// PROVIDER is the only thing that knows whether a remembered choice is still
+// valid — it re-derives the selection against the memberships the server
+// returned and discards one the user no longer holds. The api module reading the
+// raw key would resend an organization the provider had already rejected, and
+// every write would be refused with no visible cause.
+//
+// Null is pushed through deliberately: a caller with several organizations who
+// has not chosen has nothing to send, and the backend refuses an unnamed write
+// in exactly that case. Clearing on unmount matters for the same reason a
+// logout clears it — a stale organization outliving its session is the one
+// value that must not be inherited by whoever signs in next.
+function OrganizationBridge() {
+  const { currentOrganizationId } = useAuth()
+  useEffect(() => {
+    setActingOrganization(currentOrganizationId)
+    return () => setActingOrganization(null)
+  }, [currentOrganizationId])
+  return null
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <SuiteAuthProvider api={api} onClearStorage={handleClearStorage}>
       <SessionExpiryBridge />
+      <OrganizationBridge />
       {children}
     </SuiteAuthProvider>
   )
