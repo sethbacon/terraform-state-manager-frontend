@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { ORGANIZATION_HEADER } from '@4cloudguru/cloud-suite-ui'
 import { clearAuthStorage } from '../utils/authStorage'
 import type { MeResponse } from '../types/auth'
 import {
@@ -82,12 +83,45 @@ apiClient.interceptors.request.use((config) => {
       config.headers['X-CSRF-Token'] = csrf
     }
   }
+  // The acting organization, on EVERY request rather than only on mutations.
+  //
+  // Writes need it: the backend stamps the row with it, having first verified it
+  // against a scope it resolved itself (it is a claim, never an authority). Reads
+  // do not — scope for a read comes from the caller's memberships — so sending it
+  // there is inert.
+  //
+  // Sent anyway, because "mutations only" is a rule someone has to remember when
+  // adding a route, and forgetting it fails in the quietest possible way: the
+  // write is refused for a user with several organizations and works for
+  // everyone else. Uniform is one fewer thing to get right. It also lets /me
+  // answer with the scopes for the SELECTED organization rather than a union.
+  if (actingOrganization) {
+    config.headers = config.headers ?? {}
+    config.headers[ORGANIZATION_HEADER] = actingOrganization
+  }
   // Grant the longer ceiling to heavy operations (large state data, transfers,
   // CI discovery, streamed exports); everything else keeps the default (#216).
   const heavy = heavyTimeoutForUrl(config.url)
   if (heavy) config.timeout = heavy
   return config
 })
+
+// The organization the user is acting in, registered by the auth layer.
+//
+// It lives here as a module variable rather than being read from storage,
+// because AuthProvider is the only thing that knows whether a remembered choice
+// is still VALID: it re-derives the selection against the memberships the server
+// returned, and discards one the user no longer holds. Reading the raw storage
+// key here would resend a stale organization the provider had already rejected.
+//
+// Null is a legitimate steady state, not an error: a caller who belongs to
+// several organizations and has not chosen yet has nothing to send, and the
+// backend refuses an unnamed write in exactly that case. See OrganizationBridge
+// in contexts/AuthContext.
+let actingOrganization: string | null = null
+export function setActingOrganization(organizationId: string | null): void {
+  actingOrganization = organizationId
+}
 
 // Optional hook the auth layer registers to react to a 401. It is responsible
 // for gating on whether a session was actually established, so this module can

@@ -8,6 +8,9 @@ import { USER_KEY } from '../utils/authStorage'
 // Captures the handler the SessionExpiryBridge registers with the api module, so
 // a test can invoke it as the 401 interceptor would.
 const unauth = vi.hoisted(() => ({ handler: null as (() => void) | null }))
+// Hoisted for the same reason unauth is: vi.mock's factory runs before module
+// scope, so a plain const would be in the temporal dead zone when it is read.
+const acting = vi.hoisted(() => ({ value: null as string | null, calls: [] as (string | null)[] }))
 
 vi.mock('../services/api', () => ({
   api: {
@@ -20,6 +23,10 @@ vi.mock('../services/api', () => ({
   },
   setUnauthorizedHandler: vi.fn((h: (() => void) | null) => {
     unauth.handler = h
+  }),
+  setActingOrganization: vi.fn((organizationId: string | null) => {
+    acting.value = organizationId
+    acting.calls.push(organizationId)
   }),
 }))
 
@@ -40,6 +47,8 @@ async function renderAuth() {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  acting.value = null
+  acting.calls.length = 0
 })
 
 describe('AuthProvider', () => {
@@ -178,5 +187,53 @@ describe('AuthProvider', () => {
 
     act(() => unauth.handler?.())
     expect(mocked.logout).not.toHaveBeenCalled()
+  })
+
+  // --- the acting-organization bridge ---------------------------------------
+
+  // The api client must learn the organization from the PROVIDER, not from
+  // storage. The provider re-derives the selection against the memberships the
+  // server returned and discards one the user no longer holds; reading the raw
+  // key in the api module would resend an organization already rejected, and
+  // every write would be refused with no visible cause.
+  it('pushes the resolved organization to the api client', async () => {
+    mocked.getCurrentUser.mockResolvedValue({
+      ...me,
+      memberships: [{ organization_id: 'org-only', organization_name: 'Only' }],
+    } as Awaited<ReturnType<typeof api.getCurrentUser>>)
+
+    await renderAuth()
+    await waitFor(() => expect(acting.value).toBe('org-only'))
+  })
+
+  // A caller who belongs to several and has not chosen has nothing to send, and
+  // the backend refuses an unnamed write in exactly that case. Null must reach
+  // the api client rather than leaving a previous value in place.
+  it('pushes null when there are several organizations and no choice', async () => {
+    mocked.getCurrentUser.mockResolvedValue({
+      ...me,
+      memberships: [
+        { organization_id: 'a', organization_name: 'A' },
+        { organization_id: 'b', organization_name: 'B' },
+      ],
+    } as Awaited<ReturnType<typeof api.getCurrentUser>>)
+
+    await renderAuth()
+    expect(acting.value).toBeNull()
+  })
+
+  // A stale organization outliving its session is the one value that must not be
+  // inherited by whoever signs in next.
+  it('clears the organization when the provider unmounts', async () => {
+    mocked.getCurrentUser.mockResolvedValue({
+      ...me,
+      memberships: [{ organization_id: 'org-only', organization_name: 'Only' }],
+    } as Awaited<ReturnType<typeof api.getCurrentUser>>)
+
+    const { unmount } = await renderAuth()
+    await waitFor(() => expect(acting.value).toBe('org-only'))
+
+    unmount()
+    expect(acting.value).toBeNull()
   })
 })
