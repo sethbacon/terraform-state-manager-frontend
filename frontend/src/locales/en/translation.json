@@ -1649,5 +1649,9 @@
     "noMappings": "No mTLS certificate mappings configured.",
     "certificateSubject": "Certificate Subject",
     "scopes": "Scopes"
+  },
+  "organization": {
+    "pickerTooltip": "Organization you are acting in",
+    "unselected": "Choose organization"
   }
 }
