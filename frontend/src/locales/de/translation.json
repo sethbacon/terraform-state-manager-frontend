@@ -1482,5 +1482,9 @@
     "noMappings": "Es sind keine mTLS-Zertifikatszuordnungen konfiguriert.",
     "certificateSubject": "Zertifikatsbetreff",
     "scopes": "Anwendungsbereiche"
+  },
+  "organization": {
+    "pickerTooltip": "Organisation, in deren Namen Sie handeln",
+    "unselected": "Organisation auswählen"
   }
 }

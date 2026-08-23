@@ -1482,5 +1482,9 @@
     "noMappings": "Det er ikke konfigurert noen mTLS-sertifikat-tilordninger.",
     "certificateSubject": "Sertifikatets emne",
     "scopes": "Omfang"
+  },
+  "organization": {
+    "pickerTooltip": "Organisasjonen du representerer",
+    "unselected": "Velg organisasjon"
   }
 }

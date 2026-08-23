@@ -1482,5 +1482,9 @@
     "noMappings": "mTLS 証明書のマッピングが設定されていません。",
     "certificateSubject": "証明書のサブジェクト",
     "scopes": "適用範囲"
+  },
+  "organization": {
+    "pickerTooltip": "所属組織",
+    "unselected": "組織を選択してください"
   }
 }

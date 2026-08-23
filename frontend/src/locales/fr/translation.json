@@ -1482,5 +1482,9 @@
     "noMappings": "Aucun mappage de certificats mTLS n'a été configuré.",
     "certificateSubject": "Objet du certificat",
     "scopes": "Champs d'application"
+  },
+  "organization": {
+    "pickerTooltip": "Organisation au nom de laquelle vous agissez",
+    "unselected": "Choisissez une organisation"
   }
 }
