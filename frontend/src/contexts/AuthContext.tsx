@@ -57,9 +57,25 @@ function OrganizationBridge() {
   return null
 }
 
+// Where the selected organization is remembered across reloads. Namespaced to
+// this app rather than reusing the shared DEFAULT_ORGANIZATION_KEY: the suite
+// apps are separate origins with separate onboarding, so a user may legitimately
+// act in a different organization in each, and one shared key would make picking
+// in one silently re-point the other.
+//
+// The stored value is a HINT and never an authority — the provider matches it
+// against the memberships the server just returned and discards anything that
+// does not match, so a hand-edited value or one left behind by a different user
+// of the same browser is ignored rather than honoured.
+const ORGANIZATION_STORAGE_KEY = 'tsm.organization'
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
-    <SuiteAuthProvider api={api} onClearStorage={handleClearStorage}>
+    <SuiteAuthProvider
+      api={api}
+      onClearStorage={handleClearStorage}
+      organizationStorageKey={ORGANIZATION_STORAGE_KEY}
+    >
       <SessionExpiryBridge />
       <OrganizationBridge />
       {children}

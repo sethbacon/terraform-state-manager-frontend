@@ -5,7 +5,7 @@ import SearchIcon from '@mui/icons-material/Search'
 import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import { useTranslation } from 'react-i18next'
-import { SuiteLayout } from '@4cloudguru/cloud-suite-ui'
+import { OrganizationPicker, SuiteLayout } from '@4cloudguru/cloud-suite-ui'
 import { SUPPORTED_LANGUAGES } from '../i18n'
 import { homeItem, navGroups, apiDocsItem, adminDashboardItem } from '../navigation'
 import { useHelp } from '../contexts/HelpContext'
@@ -70,15 +70,27 @@ export default function Layout() {
         contentHeader={<AdminBreadcrumbs />}
         contentInsetRight={helpOpen ? HELP_PANEL_WIDTH : 0}
         appBarActions={
-          <Tooltip title={t('commandPalette.hint')}>
-            <IconButton
-              color="inherit"
-              onClick={() => setPaletteOpen(true)}
-              aria-label={t('commandPalette.openButton')}
-            >
-              <SearchIcon />
-            </IconButton>
-          </Tooltip>
+          <>
+            {/* Renders nothing for a caller who belongs to one organization, so a
+                single-organization deployment sees no new UI. For a caller in
+                several it is the only way to name the organization a write
+                belongs to — without it the backend refuses every stamped write
+                with "name the organization to act in", and the client has no way
+                to comply. */}
+            <OrganizationPicker
+              tooltip={t('organization.pickerTooltip')}
+              unselectedLabel={t('organization.unselected')}
+            />
+            <Tooltip title={t('commandPalette.hint')}>
+              <IconButton
+                color="inherit"
+                onClick={() => setPaletteOpen(true)}
+                aria-label={t('commandPalette.openButton')}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Tooltip>
+          </>
         }
         supportMenu={
           <>

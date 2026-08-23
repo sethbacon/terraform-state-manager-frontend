@@ -237,3 +237,37 @@ describe('AuthProvider', () => {
     expect(acting.value).toBeNull()
   })
 })
+
+// The remembered organization is wired through the app's own provider, so it is
+// asserted here rather than in Layout.test.tsx — that harness renders the
+// PACKAGE provider directly and would be testing the library, not this wiring.
+describe('remembered organization', () => {
+  const TWO = [
+    { organization_id: 'aaaaaaaa-0000-4000-8000-000000000001', organization_name: 'Alpha' },
+    { organization_id: 'bbbbbbbb-0000-4000-8000-000000000002', organization_name: 'Beta' },
+  ]
+
+  it('restores a remembered choice that still matches a membership', async () => {
+    window.localStorage.setItem('tsm.organization', TWO[1].organization_id)
+    mocked.getCurrentUser.mockResolvedValue({ ...me, memberships: TWO })
+
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    await waitFor(() => expect(result.current.currentOrganizationId).toBe(TWO[1].organization_id))
+    // ...and it reaches the API client, which is what puts it on the wire.
+    await waitFor(() => expect(acting.value).toBe(TWO[1].organization_id))
+  })
+
+  it('discards a remembered value that is not one of the memberships', async () => {
+    // The stored value is a HINT, never an authority: it outlives the session
+    // that wrote it and the user can edit it, so it selects a membership only
+    // when the server just returned that membership.
+    window.localStorage.setItem('tsm.organization', 'cccccccc-0000-4000-8000-000000000003')
+    mocked.getCurrentUser.mockResolvedValue({ ...me, memberships: TWO })
+
+    const { result } = renderHook(() => useAuth(), { wrapper })
+    await waitFor(() => expect(result.current.isAuthenticated).toBe(true))
+    // Two memberships and no valid hint means no choice has been made, so
+    // nothing is claimed on the wire and the backend will ask for one.
+    expect(result.current.currentOrganizationId).toBeNull()
+  })
+})

@@ -27,11 +27,14 @@ const accountLabel = i18n.t('header.account', { defaultValue: 'Account' }) as st
 
 // SuiteLayout consumes the package's own useAuth, so drive auth state through a
 // real package AuthProvider with a mock backend contract.
-function makeAuthApi(scopes: string[] = ['admin']): AuthApi {
+function makeAuthApi(
+  scopes: string[] = ['admin'],
+  memberships: Array<{ organization_id: string; organization_name: string }> = [],
+): AuthApi {
   return {
     getCurrentUser: vi.fn().mockResolvedValue({
       user: { id: 'u1', email: 'alice@example.com', name: 'Alice' },
-      memberships: [],
+      memberships,
       allowed_scopes: scopes,
     }),
     login: vi.fn(),
@@ -169,4 +172,33 @@ describe('Layout', () => {
     fireEvent.click(await within(palette).findByText(tt('nav.sources')))
     expect(await screen.findByText('sources outlet')).toBeInTheDocument()
   })
+})
+
+// The organization picker is mounted in the app bar. These two tests exist
+// because the failure they guard is SILENT: with the picker absent, a caller who
+// belongs to several organizations resolves to no acting organization, sends no
+// X-Organization-Id header, and every stamped write is refused by the backend
+// with "name the organization to act in" — which the client then has no way to
+// comply with. Nothing throws, and a single-organization deployment looks fine.
+describe('Layout organization picker', () => {
+  const TWO = [
+    { organization_id: 'aaaaaaaa-0000-4000-8000-000000000001', organization_name: 'Alpha' },
+    { organization_id: 'bbbbbbbb-0000-4000-8000-000000000002', organization_name: 'Beta' },
+  ]
+
+  it('offers the picker to a caller who belongs to several organizations', async () => {
+    renderLayout(makeAuthApi(['admin'], TWO))
+    expect(
+      await screen.findByLabelText(tt('organization.pickerTooltip')),
+    ).toBeInTheDocument()
+  })
+
+  it('shows no picker to a caller who belongs to one organization', async () => {
+    renderLayout(makeAuthApi(['admin'], [TWO[0]]))
+    // Wait for the shell to settle so this is an assertion about the resolved
+    // tree rather than about a render that has not happened yet.
+    expect(await screen.findByText('home outlet')).toBeInTheDocument()
+    expect(screen.queryByLabelText(tt('organization.pickerTooltip'))).toBeNull()
+  })
+
 })
