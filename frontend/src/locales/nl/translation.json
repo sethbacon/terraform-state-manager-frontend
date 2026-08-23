@@ -1482,5 +1482,9 @@
     "noMappings": "Er zijn geen mTLS-certificaatkoppelingen geconfigureerd.",
     "certificateSubject": "Onderwerp van het certificaat",
     "scopes": "Toepassingsgebieden"
+  },
+  "organization": {
+    "pickerTooltip": "Organisatie waarvoor u optreedt",
+    "unselected": "Kies een organisatie"
   }
 }

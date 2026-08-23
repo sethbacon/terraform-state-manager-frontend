@@ -1482,5 +1482,9 @@
     "noMappings": "未配置任何 mTLS 证书映射。",
     "certificateSubject": "证书主题",
     "scopes": "范围"
+  },
+  "organization": {
+    "pickerTooltip": "您所代表的组织",
+    "unselected": "选择组织"
   }
 }

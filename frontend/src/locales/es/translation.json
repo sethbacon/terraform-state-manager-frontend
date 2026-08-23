@@ -1482,5 +1482,9 @@
     "noMappings": "No hay asignaciones de certificados mTLS configuradas.",
     "certificateSubject": "Asunto del certificado",
     "scopes": "Ámbitos de aplicación"
+  },
+  "organization": {
+    "pickerTooltip": "Organización en la que desempeñas tus funciones",
+    "unselected": "Selecciona una organización"
   }
 }
