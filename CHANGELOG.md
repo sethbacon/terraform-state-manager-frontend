@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.26.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.25.0...v1.26.0) (2026-08-23)
+
+
+### Features
+
+* **api:** send the acting organization on every request ([#361](https://github.com/sethbacon/terraform-state-manager-frontend/issues/361)) ([b5e345c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/b5e345cb3bf156163c7127fce55ba04eb6733dbe))
+* **shell:** mount the organization picker and remember the choice ([#362](https://github.com/sethbacon/terraform-state-manager-frontend/issues/362)) ([f4e8c17](https://github.com/sethbacon/terraform-state-manager-frontend/commit/f4e8c1740476e9f8bff2bc9091feb40540d167af))
+
+
+### Bug Fixes
+
+* **ci:** refuse to run signature-replay when Dependabot edited the workflow ([#346](https://github.com/sethbacon/terraform-state-manager-frontend/issues/346)) ([ce14c6d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ce14c6d8ff62c8f49f7f56c8673b7884a9065e47))
+
+
+### Documentation
+
+* **security:** record the shared-workflow trust relationship, and fix what it invalidated ([#357](https://github.com/sethbacon/terraform-state-manager-frontend/issues/357)) ([76aa0ef](https://github.com/sethbacon/terraform-state-manager-frontend/commit/76aa0ef24571a21e043b3aaea9a8777789ac7d81))
+
 ## [1.25.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.24.2...v1.25.0) (2026-08-16)
 
 
