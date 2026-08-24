@@ -102,6 +102,27 @@ updates:
   # The gate is only meaningful while it parses the way release-please does, so
   # these bumps want checking against release-please's own dependency rather
   # than merging on green.
+  # The Playwright suite is a separate npm tree with its own lockfile, so the
+  # /frontend entry above never sees it. It was the only lockfile in this
+  # repository that no entry covered -- and the sibling SPA does watch its
+  # equivalent, so this was drift between the two rather than a decision.
+  - package-ecosystem: npm
+    directory: /e2e
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    labels:
+      - dependencies
+      - javascript
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      e2e-dependencies:
+        patterns:
+          - "*"
+
   - package-ecosystem: npm
     directory: /.github/commit-message-check
     schedule:
