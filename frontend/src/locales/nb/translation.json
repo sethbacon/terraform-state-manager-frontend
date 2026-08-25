@@ -882,7 +882,7 @@
       "gitRef": "Git-referanse",
       "workingDir": "Arbeidskatalog",
       "terraformVersion": "Terraform-versjon",
-      "registryHostField": "Registret (valgfritt)",
+      "registryHostField": "Registret vert (valgfritt)",
       "registryHostHelp": "Registreringens vert slik den fremgår av kildadressene i modulen din (f.eks. registry.example.com) – ikke en speil-URL eller -bane. Fylles ut automatisk fra den tilkoblede registreringen når dette er tilgjengelig; leverandører hentes fra dens nettverksspeil.",
       "providerVersions": "Leverandørversjoner (valgfritt)",
       "moduleVersions": "Modulversjoner (valgfritt)",
