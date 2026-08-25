@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.26.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.0...v1.26.1) (2026-08-25)
+
+
+### Bug Fixes
+
+* **i18n:** give nb registryHostField the host word it lost in the split ([#378](https://github.com/sethbacon/terraform-state-manager-frontend/issues/378)) ([0dd6c49](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0dd6c491c5fdf215e99648e2910b0d1ed87deda6))
+* **i18n:** split the colliding versionLab.registryHost key, which mislabelled the run detail ([#375](https://github.com/sethbacon/terraform-state-manager-frontend/issues/375)) ([2e1f2c5](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2e1f2c51b738bd67930d20cd43becf12d1ebb2aa)), closes [#364](https://github.com/sethbacon/terraform-state-manager-frontend/issues/364)
+
 ## [1.26.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.25.0...v1.26.0) (2026-08-23)
 
 
