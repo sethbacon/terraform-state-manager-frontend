@@ -100,7 +100,7 @@ describe('VersionLabPage version-pin fields', () => {
     fireEvent.change(within(dialog).getByLabelText(labelRe('pages.versionLab.workingDir')), {
       target: { value: '.' },
     })
-    fireEvent.change(within(dialog).getByLabelText(labelRe('pages.versionLab.registryHost')), {
+    fireEvent.change(within(dialog).getByLabelText(labelRe('pages.versionLab.registryHostField')), {
       target: { value: 'registry.example.com' },
     })
 

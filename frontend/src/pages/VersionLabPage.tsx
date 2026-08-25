@@ -383,7 +383,7 @@ function NewHealthRunDialog({
             fullWidth
           />
           <TextField
-            label={t('pages.versionLab.registryHost')}
+            label={t('pages.versionLab.registryHostField')}
             value={registryHost}
             onChange={(e) => setRegistryHost(e.target.value)}
             placeholder="registry.example.com"
