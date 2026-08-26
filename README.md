@@ -88,7 +88,8 @@ frontend/
 │   ├── services/             # axios api client + React Query keys
 │   └── locales/              # en source + 9 translated locales
 ├── Dockerfile                # build + nginx serve
-└── nginx.conf                # SPA fallback + backend proxy
+└── nginx.conf.template       # SPA fallback + backend proxy (${BACKEND_URL})
+└── docker-entrypoint.sh      # renders the template when BACKEND_URL is set
 e2e/                          # Playwright smoke pack (own package.json)
 deployments/                  # local dev Docker Compose (postgres/backend/frontend/keycloak)
 ```

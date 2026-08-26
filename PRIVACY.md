@@ -129,11 +129,11 @@ We implement technical and organizational measures including:
 - CSRF protection via the double-submit `tsm_csrf` token / `X-CSRF-Token` header
 - A strict Content-Security-Policy with per-request style nonces, plus
   `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`,
-  and a restrictive `Permissions-Policy` (see `frontend/nginx.conf`)
+  and a restrictive `Permissions-Policy` (see `frontend/nginx.conf.template`)
 - Role-based access control (scopes), with `admin` as a wildcard
 - Audit logging of administrative and state-changing actions
 
-> **Note on HSTS:** this app's `frontend/nginx.conf` does **not** set a
+> **Note on HSTS:** this app's `frontend/nginx.conf.template` does **not** set a
 > `Strict-Transport-Security` header, because TLS is terminated upstream by your
 > ingress / load balancer (see the deployment disclaimer). The deploying
 > organization should add `Strict-Transport-Security` at that TLS-terminating

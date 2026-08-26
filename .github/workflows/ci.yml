@@ -27,6 +27,110 @@ permissions:
   contents: read
 
 jobs:
+  # ── Image config (required) ───────────────────────────────────────────
+  #
+  # The FIRST job in this repository that actually RUNS the image. Everything
+  # else builds it, scans its layers, and pushes it -- release.yml's Trivy step
+  # inspects filesystem contents and never starts a container. That meant the
+  # nginx config and, since #380, the entrypoint were unexercised until somebody
+  # deployed them.
+  #
+  # This is deliberately NOT an end-to-end test. It asserts the three outcomes
+  # the entrypoint exists to produce, because each of them has already been got
+  # wrong once:
+  #   * BACKEND_URL unset  -> Docker Compose behaviour, byte-for-byte
+  #   * BACKEND_URL set    -> upstream replaced, nginx variables intact
+  #   * config mounted RO  -> operator's file wins, container stays up
+  image-config:
+    name: Image config
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # hardening-exception: egress-audit — this job clones this repository and
+      #   pulls the node/nginx base images; harden-runner has never run in this
+      #   repository, so no endpoint baseline exists and a block policy written
+      #   without one fails closed on its first run; audit is what produces that list
+      - name: Harden the runner
+        uses: step-security/harden-runner@05e31511f85b41b11d1cf0ef85d0992719546e2c # v2.21.0
+        with:
+          egress-policy: audit
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build the image
+        run: docker build -t tsm-frontend:ci -f frontend/Dockerfile frontend
+
+      # The build-time render. The image must carry a working config even if the
+      # entrypoint never runs, so this is checked without starting a container.
+      - name: Build-time render targets the Compose upstream
+        run: |
+          set -euo pipefail
+          conf=$(docker run --rm --entrypoint sh tsm-frontend:ci -c 'cat /etc/nginx/conf.d/default.conf')
+          grep -q 'proxy_pass http://backend:8080;' <<<"$conf"
+          test "$(grep -c 'proxy_pass http://backend:8080;' <<<"$conf")" = 4
+
+      # Regression guard for the substitution allowlist. A bare `envsubst` blanks
+      # these, nginx still starts, and the app silently renders unstyled because
+      # the CSP nonce becomes empty.
+      - name: nginx runtime variables survived substitution
+        run: |
+          set -euo pipefail
+          conf=$(docker run --rm --entrypoint sh tsm-frontend:ci -c 'cat /etc/nginx/conf.d/default.conf')
+          grep -q "nonce-\$csp_nonce" <<<"$conf"
+          grep -q 'proxy_set_header Host \$host;' <<<"$conf"
+          grep -q 'X-Forwarded-For \$proxy_add_x_forwarded_for;' <<<"$conf"
+
+      # The template must not sit where nginx's own entrypoint would render it
+      # unconditionally, which would clobber default.conf on every start.
+      - name: Template is outside /etc/nginx/templates
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint sh tsm-frontend:ci -c 'test ! -d /etc/nginx/templates'
+          docker run --rm --entrypoint sh tsm-frontend:ci -c 'test -f /etc/nginx/nginx.conf.template'
+
+      - name: BACKEND_URL unset serves, and keeps the Compose upstream
+        run: |
+          set -euo pipefail
+          docker run -d --name unset --add-host backend:127.0.0.1 tsm-frontend:ci
+          sleep 4
+          docker ps --format '{{.Names}}' | grep -qx unset
+          docker exec unset grep -q 'proxy_pass http://backend:8080;' /etc/nginx/conf.d/default.conf
+          docker exec unset wget -q --spider http://127.0.0.1:80/
+          docker rm -f unset
+
+      # The bug from #380: no host named "backend" exists anywhere here, so
+      # before the entrypoint this crash-looped with
+      #   nginx: [emerg] host not found in upstream "backend"
+      - name: BACKEND_URL set replaces the upstream and starts
+        run: |
+          set -euo pipefail
+          docker run -d --name set -e BACKEND_URL=http://127.0.0.1:9999 tsm-frontend:ci
+          sleep 4
+          docker ps --format '{{.Names}}' | grep -qx set
+          docker exec set grep -q 'proxy_pass http://127.0.0.1:9999;' /etc/nginx/conf.d/default.conf
+          docker exec set grep -q "nonce-\$csp_nonce" /etc/nginx/conf.d/default.conf
+          docker exec set wget -q --spider http://127.0.0.1:80/
+          docker rm -f set
+
+      # The Helm chart and the kustomize base mount a ConfigMap over this exact
+      # path with subPath, making it read-only. An entrypoint that writes
+      # unconditionally crash-loops in-cluster.
+      - name: A read-only mounted config is honoured, not overwritten
+        run: |
+          set -euo pipefail
+          docker run --rm --entrypoint sh tsm-frontend:ci -c 'cat /etc/nginx/conf.d/default.conf' > mounted.conf
+          sed -i 's|proxy_pass http://backend:8080;|proxy_pass http://127.0.0.1:7777;|g' mounted.conf
+          chmod 444 mounted.conf
+          docker run -d --name ro -e BACKEND_URL=http://ignored:1234 \
+            -v "$PWD/mounted.conf:/etc/nginx/conf.d/default.conf:ro" tsm-frontend:ci
+          sleep 4
+          docker ps --format '{{.Names}}' | grep -qx ro
+          docker exec ro grep -q 'proxy_pass http://127.0.0.1:7777;' /etc/nginx/conf.d/default.conf
+          docker logs ro 2>&1 | grep -q 'not writable'
+          docker exec ro wget -q --spider http://127.0.0.1:80/
+          docker rm -f ro
+
   # ── Lint (required) ───────────────────────────────────────────────────
   lint:
     name: Lint
