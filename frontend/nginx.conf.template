@@ -1,3 +1,18 @@
+# TEMPLATE, not a config. ${BACKEND_URL} is substituted by docker-entrypoint.sh
+# at container start, and again at BUILD time with the Docker Compose default so
+# the image still has a working /etc/nginx/conf.d/default.conf even if the
+# entrypoint never runs.
+#
+# THIS IS THE ONLY COPY. The registry frontend keeps a second, near-identical
+# nginx-ecs.conf.template beside its nginx.conf, and the two have already drifted
+# apart (proxy_hide_header, client_max_body_size and the long-read timeout are in
+# one and not the other). One templated file cannot drift from itself.
+#
+# ONLY ${BACKEND_URL} is substituted -- see the entrypoint's envsubst allowlist.
+# Every other $name here is an nginx runtime variable ($csp_nonce, $request_id,
+# $host, $remote_addr, $scheme, $uri, $proxy_add_x_forwarded_for) and must reach
+# nginx untouched.
+
 # Derive the per-request CSP nonce ONCE. A map variable is evaluated lazily and
 # cached for the whole request, so the CSP header and the sub_filter body rewrite
 # below see the SAME value. A plain `set $csp_nonce $request_id` inside the server
@@ -41,10 +56,18 @@ server {
     sub_filter_once off;
     sub_filter '__CSP_NONCE__' '$csp_nonce';
 
-    # Proxy API + probe endpoints to the backend service. "backend" resolves on the
-    # Docker Compose network; override the upstream host as needed in other setups.
+    # Whole .tfstate documents are posted as JSON request bodies (POST
+    # /api/v1/analyze, PUT /api/v1/sources/{id}/state), and nginx's default cap is
+    # 1 MiB. Every other nginx config in this product already sets 100m -- the
+    # Helm ConfigMap, the kustomize base, the Cloud Run generator and the binary
+    # bundle -- and this image was the lone outlier.
+    client_max_body_size 100m;
+
+    # Proxy API + probe endpoints to the backend service. The upstream is
+    # ${BACKEND_URL}, which defaults to the Docker Compose service and is
+    # overridden by the BACKEND_URL environment variable in any other deployment.
     location /api/ {
-        proxy_pass http://backend:8080;
+        proxy_pass ${BACKEND_URL};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -52,16 +75,16 @@ server {
     }
 
     location = /health {
-        proxy_pass http://backend:8080;
+        proxy_pass ${BACKEND_URL};
     }
 
     location = /ready {
-        proxy_pass http://backend:8080;
+        proxy_pass ${BACKEND_URL};
     }
 
     # OpenAPI spec served by the backend (consumed by the API docs page).
     location ~ ^/swagger\.(json|yaml)$ {
-        proxy_pass http://backend:8080;
+        proxy_pass ${BACKEND_URL};
     }
 
     # SPA fallback: serve index.html for client-side routes.

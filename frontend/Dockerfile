@@ -35,7 +35,24 @@ RUN npm run build
 # Stage 2: serve via nginx (proxies /api and probes to the backend).
 # Pinned by digest for reproducibility and supply-chain hardening (nginx:1.27-alpine).
 FROM nginx:1.31-alpine@sha256:4a73073bd557c65b759505da037898b61f1be6cbcc3c2c3aeac22d2a470c1752
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# The nginx config is a TEMPLATE with one substitution, ${BACKEND_URL}.
+#
+# It is rendered TWICE, on purpose. Here at build time with the Docker Compose
+# default, so the image carries a working default.conf even if the entrypoint
+# never runs; and again at start by docker-entrypoint.sh when the operator sets
+# BACKEND_URL to something else (#380).
+#
+# The template is deliberately NOT placed in /etc/nginx/templates/: the nginx
+# base image's own entrypoint runs 20-envsubst-on-templates.sh over that
+# directory unconditionally, which would clobber default.conf on every start --
+# including local Compose runs, where it would render an EMPTY upstream.
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+RUN BACKEND_URL=http://backend:8080 \
+    envsubst '${BACKEND_URL}' \
+    < /etc/nginx/nginx.conf.template \
+    > /etc/nginx/conf.d/default.conf
+COPY docker-entrypoint.sh /docker-entrypoint-custom.sh
+RUN chmod +x /docker-entrypoint-custom.sh
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Apply the latest Alpine security patches on top of the digest-pinned base
@@ -60,3 +77,8 @@ RUN apk upgrade --no-cache && \
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1
+
+# CMD, not ENTRYPOINT. The nginx base image's ENTRYPOINT stays in place and still
+# runs /docker-entrypoint.d/*.sh (ipv6 listen fixup, local resolvers, worker
+# tuning) before exec'ing this as its "$@".
+CMD ["/docker-entrypoint-custom.sh"]
