@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.1...v1.26.2) (2026-08-26)
+
+
+### Bug Fixes
+
+* **docker:** render the nginx upstream from BACKEND_URL ([#381](https://github.com/sethbacon/terraform-state-manager-frontend/issues/381)) ([2b328b3](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2b328b3041c6725da83e833a6861efe2fb195a87))
+
 ## [1.26.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.0...v1.26.1) (2026-08-25)
 
 
