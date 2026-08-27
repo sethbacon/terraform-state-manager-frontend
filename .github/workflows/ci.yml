@@ -149,6 +149,18 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup-frontend
+
+      # Runs before the ESLint pass, and from the repository root rather than frontend/.
+      #
+      # This is the PREVENTIVE layer: it stops a CI-skip directive reaching a workflow
+      # file at all. It is deliberately not the only layer, because it has a hole it
+      # cannot close on its own -- it is a check, and the directive it looks for is the
+      # thing that stops checks running. A pull request that already carries one in its
+      # head commit skips this job along with every other. The suppression-immune half
+      # lives in pr-ci-presence.yml, on a schedule, where no commit message can reach it.
+      - name: No CI-skip directives in workflow files
+        run: node scripts/check-workflow-ci-skip.mjs
+
       - name: Lint
         working-directory: frontend
         run: npm run lint
