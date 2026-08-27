@@ -129,6 +129,63 @@ jobs:
             --output=osv-results.json
             --lockfile=frontend/package-lock.json
 
+      # DISTINGUISH A BROKEN SCANNER FROM A CLEAN ONE (#894).
+      #
+      # continue-on-error above collapses osv-scanner's exit 1 ("vulnerabilities
+      # found") and its error exits -- 127 (general error) and 128 (no packages
+      # found) -- into a single `outcome == 'failure'`, and GitHub exposes the
+      # raw exit code nowhere. So "Create issue on new vulnerabilities" below
+      # would file an issue TITLED "vulnerabilities found" for a scanner that
+      # had simply stopped working, and the triage step would read the same run
+      # as clean.
+      #
+      # Not hypothetical: terraform-state-manager-backend#334 filed exactly that
+      # issue, asserting vulnerabilities that did not exist, while seven
+      # genuinely reachable advisories stayed invisible.
+      #
+      # WHY THE JSON CANNOT BE TRUSTED ON ITS OWN. A scan that never reached the
+      # OSV API still writes a syntactically valid `{"results": []}` -- which is
+      # byte-identical to a clean scan. Only the pairing is contradictory:
+      # osv-scanner's exit 1 always carries at least one finding, so
+      # "failed AND found nothing" cannot be a real result.
+      #
+      # Runs BEFORE the triage gate, because that gate reads `{"results": []}`
+      # as clean and would pass the job on a scan that never happened.
+      #
+      # FAILS THE RUN rather than warning. A permanently-red Monday for a broken
+      # scanner is the notification; a silently green one is the defect, and the
+      # whole point is that the two were indistinguishable.
+      - name: Distinguish a broken scanner from real findings
+        id: osv_verdict
+        if: steps.osv.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          found=$(node -e '
+            const fs = require("fs");
+            let d;
+            try { d = JSON.parse(fs.readFileSync("osv-results.json", "utf8")); }
+            catch { process.stdout.write("0"); process.exit(0); }
+            let n = 0;
+            for (const r of d.results || [])
+              for (const p of r.packages || [])
+                n += (p.vulnerabilities || []).length;
+            process.stdout.write(String(n));
+          ')
+          if [ "$found" -gt 0 ]; then
+            echo "findings=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "findings=false" >> "$GITHUB_OUTPUT"
+          echo "::error title=OSV-Scanner did not scan::osv-scanner exited non-zero but its results contain no vulnerabilities. Exit 1 always carries at least one, so this was a scanner error (127 general error, or 128 no packages found), NOT a clean scan and NOT a finding. Do not read this run as green -- fix the scanner. See #894."
+          {
+            echo '## ⚠️ OSV-Scanner did not complete'
+            echo ''
+            echo 'The scan step exited non-zero but reported no vulnerabilities.'
+            echo 'This run tells you **nothing** about whether this repository has'
+            echo 'known vulnerabilities.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+
       # Triaged through the same gate and the same exceptions file the npm-audit
       # job uses, so the two scanners cannot reach opposite conclusions about one
       # advisory. That matters here: OSV lists react-router's fix as 8.3.0, which
@@ -140,7 +197,7 @@ jobs:
           --exceptions frontend/scripts/npm-audit-exceptions.json
 
       - name: Create issue on new vulnerabilities
-        if: steps.osv.outcome == 'failure'
+        if: steps.osv.outcome == 'failure' && steps.osv_verdict.outputs.findings == 'true'
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
