@@ -65,6 +65,7 @@ jobs:
           DEEPL_API_KEY: ${{ secrets.DEEPL_API_KEY }}
 
       - name: Create PR with translations
+        id: cpr
         # v8.1.1
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
@@ -78,5 +79,46 @@ jobs:
             - [ ] Spot-check a few strings in each language for accuracy
             - [ ] No English source strings appear verbatim in non-English files
             - [ ] Interpolation tokens (`{{name}}`) are preserved correctly
-          commit-message: "chore(i18n): update translations [skip ci]"
+          # This message carried a CI-skip directive from the day the workflow was
+          # written. GitHub honours those on a branch's head commit for BOTH the push
+          # and the pull_request event, so every PR this job opened was created with
+          # zero check runs and zero commit statuses -- every required context stuck on
+          # "Expected - waiting for status", clearable only by an admin override.
+          # Twelve translation PRs merged that way, none ever inspected by a gate.
+          #
+          # The head commit of this branch never changes after creation, so the
+          # suppression lasted the whole life of each PR. The only reason CI was ever
+          # seen on this branch is that "Update branch" writes a merge commit whose
+          # message has no directive -- those five head commits have 6 to 10 checks.
+          #
+          # Removing it cannot loop: this job triggers on pushes that touch
+          # frontend/src/locales/en/translation.json, and scripts/translate.mjs only
+          # ever writes the nine non-English bundles and scripts/.translation-hashes.json.
+          # Merging its own PR therefore does not re-trigger it. The recursion the
+          # directive appeared to guard against was never possible.
+          #
+          # scripts/check-workflow-ci-skip.mjs fails CI if the directive comes back.
+          commit-message: "chore(i18n): update translations"
           delete-branch: true
+
+      # Zero-latency half of the guard. The scheduled auditor in pr-ci-presence.yml is
+      # the suppression-immune backstop, but it runs on a cadence and one of these PRs
+      # was merged within the hour. This asserts, in the run that opens the PR, that
+      # checks actually attached to it -- and this job is reachable, because it is
+      # triggered by a human push to main rather than by the bot commit under test.
+      #
+      # Read-only and unauthenticated-capable: check runs are world-readable on this
+      # public repository, so no additional App permission is requested. Asking the App
+      # for a permission its installation lacks makes the token step 422 -- that is what
+      # broke release-please in a sibling repository and had to be reverted.
+      - name: The translation PR must have CI attached
+        if: >-
+          steps.cpr.outputs.pull-request-operation == 'created' ||
+          steps.cpr.outputs.pull-request-operation == 'updated'
+        env:
+          # Through env, not interpolated into the script line: a `${{ }}` expansion
+          # inside a run block is executed by the shell, which is the template-injection
+          # class this repository's workflow-security gate rejects.
+          GITHUB_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+        run: node scripts/assert-pr-checks-present.mjs --pr "$PR_NUMBER" --wait 10

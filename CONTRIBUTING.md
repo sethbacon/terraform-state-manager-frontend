@@ -325,6 +325,46 @@ DEEPL_API_KEY=<key> node scripts/translate.mjs --all
 The single repository secret the workflow needs is `DEEPL_API_KEY`. The workflow triggers
 automatically on pushes to `main` that change `frontend/src/locales/en/translation.json`.
 
+### Translation PRs get the same CI as any other PR
+
+They did not, for a long time, and it is worth knowing why so it is not reintroduced.
+
+`translate.yml` used to commit with a CI-skip directive in the message. GitHub honours those
+on a branch's head commit for **both** the `push` and the `pull_request` event, so every PR
+the workflow opened was created with zero check runs and zero commit statuses. Branch
+protection showed all eight required contexts as *"Expected — waiting for status"*, which can
+only be cleared by an admin override — so twelve translation PRs merged without a single gate
+ever inspecting them. Nothing was red; there was simply nothing there.
+
+The head commit of `i18n/auto-translate` never changes after creation, so the suppression
+lasted the whole life of each PR. The only reason CI was ever seen on that branch is that
+clicking **Update branch** writes a merge commit whose message carries no directive.
+
+Three layers keep it fixed, because each one alone has a hole the other two cover:
+
+| Layer | Where | Catches |
+|---|---|---|
+| `scripts/check-workflow-ci-skip.mjs` | step in the required **Lint** check | the directive reaching any workflow file |
+| `scripts/assert-pr-checks-present.mjs` | `.github/workflows/pr-ci-presence.yml`, on a **schedule** | any open PR that has no checks, whatever the cause |
+| the same script, `--pr` mode | last step of `translate.yml` | the translation PR specifically, with no scheduler latency |
+
+The scheduled auditor is the important one. A guard for *"no checks ran"* that is itself a
+check cannot fire in the one situation it exists to detect — the suppression that hides the
+CI hides the guard with it. GitHub's skip keywords apply to `push` and `pull_request` only,
+so `schedule` is the trigger that a commit message cannot reach.
+
+Run either locally:
+
+```bash
+node scripts/check-workflow-ci-skip.mjs
+GITHUB_REPOSITORY=sethbacon/terraform-state-manager-frontend \
+  node scripts/assert-pr-checks-present.mjs
+```
+
+Never re-add a skip directive to a commit message. If a workflow needs to avoid re-triggering
+itself, express that as a `paths:` or `branches:` filter on the trigger, where it is visible
+and reviewable.
+
 ---
 
 ## Pull Request Process
