@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.26.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.3...v1.26.4) (2026-08-28)
+
+
+### Bug Fixes
+
+* **ci:** stop piping into grep -q, which dies 141 under pipefail ([#390](https://github.com/sethbacon/terraform-state-manager-frontend/issues/390)) ([2476c37](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2476c3763e947f030a7a37b62767d403911583b9))
+
 ## [1.26.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.2...v1.26.3) (2026-08-28)
 
 
