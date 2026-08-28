@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.27.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.4...v1.27.0) (2026-08-28)
+
+
+### Features
+
+* **identity:** offer a platform administrator the organization picker ([#392](https://github.com/sethbacon/terraform-state-manager-frontend/issues/392)) ([904d48b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/904d48b5d538fa665f2995d5275844b010f2c98c))
+
 ## [1.26.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.3...v1.26.4) (2026-08-28)
 
 
