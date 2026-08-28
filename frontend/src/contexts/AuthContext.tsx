@@ -2,8 +2,14 @@
 // The provider is cookie/`/me`-driven and derives the role template from the
 // primary membership — matching this app's previous behaviour. SESSION_WARNING_LEAD_MS
 // and useAuth are re-exported so existing imports keep working.
-import { useEffect, useRef, type ReactNode } from 'react'
-import { AuthProvider as SuiteAuthProvider, useAuth, SESSION_WARNING_LEAD_MS } from '@4cloudguru/cloud-suite-ui'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  ADMIN_SCOPE,
+  AuthProvider as SuiteAuthProvider,
+  useAuth,
+  SESSION_WARNING_LEAD_MS,
+  type SelectableOrganization,
+} from '@4cloudguru/cloud-suite-ui'
 import { api, setActingOrganization, setUnauthorizedHandler } from '../services/api'
 import { clearAuthStorage } from '../utils/authStorage'
 import { queryClient } from '../queryClient'
@@ -57,6 +63,83 @@ function OrganizationBridge() {
   return null
 }
 
+// Supplies the organization directory a PLATFORM ADMINISTRATOR must choose from.
+//
+// # Why a platform administrator is offered anything at all
+//
+// tenantscope.Resolve returns Scope{PlatformAdmin: true} and returns BEFORE it
+// reads memberships, so such a caller reaches every organization and carries
+// none. ActingOrganization then refuses an unnamed write from them
+// UNCONDITIONALLY -- not only when they reach several -- with "name the
+// organization to act in via the X-Organization-Id header". The picker, which
+// renders from the choice universe, had nothing to offer for exactly the caller
+// the server always requires to choose: an administrator could neither create
+// nor rotate an API key and the UI showed no control to fix it.
+//
+// # Why the predicate is "admin scope AND no memberships"
+//
+// /auth/me publishes no platform-admin flag, so the standing has to be derived.
+// It is derivable exactly: reportedScopes emits `admin` only when this request
+// actually carries it, and with no memberships the role-template union is empty,
+// so the only remaining carrier is the platform_admins table. Admin scope with
+// zero memberships therefore MEANS platform administrator -- and it is also
+// precisely the deadlocked set, since a caller with memberships already has a
+// universe to pick from.
+//
+// Everyone else is left alone, and deliberately: their memberships already are
+// the set they may act in, and widening it would offer organizations the server
+// refuses on every write. It also keeps a platform-wide identity read off every
+// ordinary admin's page load.
+//
+// # It degrades to the previous behaviour, never to a blank picker
+//
+// A failed directory read clears the extra universe rather than surfacing an
+// error: the caller is left exactly where they were before this bridge existed
+// (memberships alone), which for an ordinary user is unchanged and for an
+// administrator is the pre-existing refusal, not a new crash. The array is
+// compared by the ids it holds, so handing the provider a fresh one re-resolves
+// nothing that has not actually moved.
+function PlatformAdminOrganizations({
+  onChoices,
+}: {
+  onChoices: (organizations: SelectableOrganization[] | undefined) => void
+}) {
+  const { isAuthenticated, memberships, hasScope } = useAuth()
+  const isPlatformAdmin = isAuthenticated && memberships.length === 0 && hasScope(ADMIN_SCOPE)
+
+  useEffect(() => {
+    if (!isPlatformAdmin) {
+      // Covers sign-out and a demotion mid-session as well as the ordinary user:
+      // an acting-organization universe must not outlive the standing that
+      // justified it.
+      onChoices(undefined)
+      return
+    }
+    let live = true
+    // An async body rather than a .catch chain, so a SYNCHRONOUS throw from the
+    // call itself degrades too. A rejected promise is the expected failure, but
+    // the effect must not be the thing that takes the tree down either way --
+    // there is no error boundary between here and the app shell.
+    const load = async () => {
+      try {
+        const orgs = await api.listAdminOrganizations()
+        if (!live) return
+        onChoices(
+          orgs.map((o) => ({ organization_id: o.id, organization_name: o.display_name || o.name })),
+        )
+      } catch {
+        if (live) onChoices(undefined)
+      }
+    }
+    void load()
+    return () => {
+      live = false
+    }
+  }, [isPlatformAdmin, onChoices])
+
+  return null
+}
+
 // Where the selected organization is remembered across reloads. Namespaced to
 // this app rather than reusing the shared DEFAULT_ORGANIZATION_KEY: the suite
 // apps are separate origins with separate onboarding, so a user may legitimately
@@ -70,14 +153,30 @@ function OrganizationBridge() {
 const ORGANIZATION_STORAGE_KEY = 'tsm.organization'
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Lifted to the provider's own parent because the directory is a PROP of the
+  // provider while the standing that decides whether to fetch it is INSIDE:
+  // PlatformAdminOrganizations reads the resolved session and hands the answer
+  // back up. The provider re-resolves the selection when the extra
+  // organizations land, which they do after /me has already settled.
+  const [selectableOrganizations, setSelectableOrganizations] = useState<
+    SelectableOrganization[] | undefined
+  >(undefined)
+  // Identity-stable so the bridge's effect is driven by the caller's standing
+  // and not by this component re-rendering.
+  const handleChoices = useCallback((organizations: SelectableOrganization[] | undefined) => {
+    setSelectableOrganizations(organizations)
+  }, [])
+
   return (
     <SuiteAuthProvider
       api={api}
       onClearStorage={handleClearStorage}
       organizationStorageKey={ORGANIZATION_STORAGE_KEY}
+      selectableOrganizations={selectableOrganizations}
     >
       <SessionExpiryBridge />
       <OrganizationBridge />
+      <PlatformAdminOrganizations onChoices={handleChoices} />
       {children}
     </SuiteAuthProvider>
   )

@@ -20,6 +20,12 @@ vi.mock('../services/api', () => ({
     refreshToken: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
+    // Read by the platform-admin organization bridge. Present here because the
+    // admin-wildcard case below is a session with the `admin` scope and no
+    // memberships -- which is exactly the standing the bridge acts on -- so
+    // omitting it would exercise the failure path while looking like the
+    // ordinary one.
+    listAdminOrganizations: vi.fn(),
   },
   setUnauthorizedHandler: vi.fn((h: (() => void) | null) => {
     unauth.handler = h
