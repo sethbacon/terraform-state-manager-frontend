@@ -158,7 +158,12 @@ jobs:
       # thing that stops checks running. A pull request that already carries one in its
       # head commit skips this job along with every other. The suppression-immune half
       # lives in pr-ci-presence.yml, on a schedule, where no commit message can reach it.
-      - name: No CI-skip directives in workflow files
+      # Needs frontend/node_modules, so it runs after setup-frontend: the scanner parses
+      # the YAML and tests resolved string values, because four different spellings of the
+      # same directive -- hex escape, unicode escape, escaped bracket, line continuation --
+      # all resolve to the live directive while defeating a source-text regex. Without the
+      # parser it exits 2 rather than reporting clean.
+      - name: No CI-skip directives in workflow or action files
         run: node scripts/check-workflow-ci-skip.mjs
 
       - name: Lint

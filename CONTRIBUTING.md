@@ -344,7 +344,7 @@ Three layers keep it fixed, because each one alone has a hole the other two cove
 
 | Layer | Where | Catches |
 |---|---|---|
-| `scripts/check-workflow-ci-skip.mjs` | step in the required **Lint** check | the directive reaching any workflow file |
+| `scripts/check-workflow-ci-skip.mjs` | step in the required **Lint** check | the directive reaching any workflow or composite-action file |
 | `scripts/assert-pr-checks-present.mjs` | `.github/workflows/pr-ci-presence.yml`, on a **schedule** | any open PR that has no checks, whatever the cause |
 | the same script, `--pr` mode | last step of `translate.yml` | the translation PR specifically, with no scheduler latency |
 
@@ -352,6 +352,34 @@ The scheduled auditor is the important one. A guard for *"no checks ran"* that i
 check cannot fire in the one situation it exists to detect — the suppression that hides the
 CI hides the guard with it. GitHub's skip keywords apply to `push` and `pull_request` only,
 so `schedule` is the trigger that a commit message cannot reach.
+
+The static scanner runs **two passes**, and needs both. Pass 1 reads the raw file text. Pass 2
+parses the YAML and tests the **resolved string values** — what GitHub itself reads. Pass 2 is
+the load-bearing one, because YAML has many spellings for one string, and all four of these
+resolve to exactly `[skip ci]` while defeating any source-text regex:
+
+```yaml
+commit-message: "... [skip\x20ci]"      # hex escape for the space
+commit-message: "... [skip\u0020ci]"    # unicode escape for the space
+commit-message: "... \x5Bskip ci]"      # hex escape for the opening bracket
+commit-message: "... [skip \
+  ci]"                                  # double-quoted line continuation
+```
+
+The last one is the instructive case: whitespace-normalising the whole file closes the `>-`
+folded-scalar axis **only**, because a line continuation leaves a literal backslash between
+the words that survives normalisation. Chasing spellings one at a time is unwinnable — testing
+the resolved value closes all of them, including the fifth nobody has thought of yet.
+
+Pass 1 is still kept, because it is not a subset of pass 2: comments do not survive parsing,
+and a file that fails to parse still gets read. A directive has to evade **both** to land.
+
+The scanner enumerates **every YAML file under `.github`**, recursively, plus any `action.yml`
+elsewhere in the tree — not just `.github/workflows/*.yml`. `.github/dependabot.yml` has a
+`commit-message:` key of its own, and a composite action can `git commit` in a `run:` block.
+It then cross-checks what it read against an independent enumeration and refuses to report
+clean if the two disagree: a walk that quietly narrows produces a green check over the files
+it stopped reading, which is indistinguishable from a repository with nothing to find.
 
 Run either locally:
 

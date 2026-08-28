@@ -97,7 +97,8 @@ jobs:
           # Merging its own PR therefore does not re-trigger it. The recursion the
           # directive appeared to guard against was never possible.
           #
-          # scripts/check-workflow-ci-skip.mjs fails CI if the directive comes back.
+          # scripts/check-workflow-ci-skip.mjs fails CI if the directive comes back,
+          # in any spelling: it tests the resolved YAML value, not the source text.
           commit-message: "chore(i18n): update translations"
           delete-branch: true
 
