@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.26.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.2...v1.26.3) (2026-08-28)
+
+
+### Bug Fixes
+
+* **ci:** give translation PRs the CI every other PR gets ([#387](https://github.com/sethbacon/terraform-state-manager-frontend/issues/387)) ([a3e39b1](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a3e39b11f960ed80b754dfbea4342a11b57704b8)), closes [#379](https://github.com/sethbacon/terraform-state-manager-frontend/issues/379)
+* **ci:** tell a broken OSV scanner from a clean one ([#385](https://github.com/sethbacon/terraform-state-manager-frontend/issues/385)) ([5f41e02](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5f41e02291b172d37ae01dad4efa7d6ac037e2ac))
+* **ci:** test the resolved YAML value, not the workflow source text ([#388](https://github.com/sethbacon/terraform-state-manager-frontend/issues/388)) ([5b17dcf](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5b17dcf93ad53369dd2fa20a4c41d89b0c2cd122))
+
 ## [1.26.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.1...v1.26.2) (2026-08-26)
 
 
