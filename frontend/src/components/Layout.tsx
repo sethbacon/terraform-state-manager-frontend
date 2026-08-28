@@ -76,7 +76,14 @@ export default function Layout() {
                 several it is the only way to name the organization a write
                 belongs to — without it the backend refuses every stamped write
                 with "name the organization to act in", and the client has no way
-                to comply. */}
+                to comply.
+
+                It renders from the provider's choice universe, not from
+                memberships, which is what lets it also serve a platform
+                administrator: they reach every organization and belong to none,
+                so memberships alone offered nothing to exactly the caller the
+                server always requires to choose. AuthContext supplies their
+                universe — see PlatformAdminOrganizations. */}
             <OrganizationPicker
               tooltip={t('organization.pickerTooltip')}
               unselectedLabel={t('organization.unselected')}
