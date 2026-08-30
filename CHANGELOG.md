@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.28.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.27.0...v1.28.0) (2026-08-30)
+
+
+### Features
+
+* **auth:** accept the session's remaining lifetime from /auth/me ([#395](https://github.com/sethbacon/terraform-state-manager-frontend/issues/395)) ([a7ea73b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a7ea73b4190d6bee9fb487308ad6a3b972a19d8e))
+
 ## [1.27.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.4...v1.27.0) (2026-08-28)
 
 
