@@ -23,7 +23,7 @@
     "visualize": "VITE_ANALYZE=true vite build"
   },
   "dependencies": {
-    "@4cloudguru/cloud-suite-ui": "0.12.0",
+    "@4cloudguru/cloud-suite-ui": "0.13.0",
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
