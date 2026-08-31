@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.29.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.28.0...v1.29.0) (2026-08-31)
+
+
+### Features
+
+* **ci:** adopt the release-PR closing-keyword guard ([cb3800c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/cb3800c58806015bd3dcdaab151fadabfd1108e9))
+
+
+### Bug Fixes
+
+* **ci:** a non-empty, non-ref-shaped comment satisfies both pin gates ([a307170](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a3071700cff94d647783e8ab5290fd70f55839a7))
+* **ci:** correct the pin comment to name the commit actually referenced ([886ee07](https://github.com/sethbacon/terraform-state-manager-frontend/commit/886ee075cd69322af5da42c9eaff5dd6b177a9ff))
+* **ci:** drop the unresolvable pin comment zizmor's ref-version-mismatch flagged ([f799dd8](https://github.com/sethbacon/terraform-state-manager-frontend/commit/f799dd816d9fa688d2426a78bf588e9870b942f2))
+* **ci:** re-pin the release-close guard to the fixed shared-workflows commit ([ae9717d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ae9717da36e977c791e1a748a141074ae3dcccd4))
+
 ## [1.28.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.27.0...v1.28.0) (2026-08-30)
 
 
