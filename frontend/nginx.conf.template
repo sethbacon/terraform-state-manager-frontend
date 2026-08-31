@@ -30,6 +30,9 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # ${BACKEND_URL} is https on Cloud Run / ACA — send SNI on proxied TLS.
+    proxy_ssl_server_name on;
+
     # Security headers (mirrors the registry frontend). The CSP uses a per-request
     # nonce ($csp_nonce, from the map above): index.html ships a `__CSP_NONCE__`
     # placeholder that main.tsx feeds to emotion's cache, and sub_filter swaps it
