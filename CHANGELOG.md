@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.0...v1.30.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* send TLS SNI to backend on proxied requests (nginx) ([#406](https://github.com/sethbacon/terraform-state-manager-frontend/issues/406)) ([8c38dde](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8c38dde4ce2a238c030eeff98f4bf3ec0211f394))
+
 ## [1.30.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.29.0...v1.30.0) (2026-08-31)
 
 
