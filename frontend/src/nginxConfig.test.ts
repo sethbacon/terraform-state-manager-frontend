@@ -72,3 +72,38 @@ describe('nginx.conf.template', () => {
     expect(maskComments(conf)).not.toMatch(/proxy_ssl_server_name\s+on;/)
   })
 })
+
+/**
+ * The other half of the same class of bug as the SNI fix above.
+ *
+ * `${BACKEND_URL}` is a platform-routed ingress on ACA/Cloud Run: the platform
+ * picks the target container app from the Host header of the proxied request.
+ * `proxy_set_header Host $host` overwrites that with this server's public
+ * hostname, which the platform cannot resolve to an app, so it answers 404
+ * without the request ever reaching the backend.
+ *
+ * /health and /ready were unaffected only because they set no proxy headers at
+ * all and so inherited nginx's default of the upstream name -- which is why the
+ * app could look healthy while every /api/ call 404'd.
+ */
+describe('nginx.conf.template proxied Host header', () => {
+  const masked = maskComments(nginxConf)
+
+  it('never sends this server name as Host to the proxied backend', () => {
+    expect(masked).not.toMatch(/proxy_set_header\s+Host\s+\$host\s*;/)
+  })
+
+  it('sets Host to the upstream wherever it is set at all', () => {
+    const hostHeaders = masked.match(/proxy_set_header\s+Host\s+\S+\s*;/g) ?? []
+    expect(hostHeaders.length).toBeGreaterThan(0)
+    for (const directive of hostHeaders) {
+      expect(directive).toMatch(/\$proxy_host/)
+    }
+  })
+
+  it('preserves the public hostname in X-Forwarded-Host wherever Host is overridden', () => {
+    const hostCount = (masked.match(/proxy_set_header\s+Host\s+\$proxy_host\s*;/g) ?? []).length
+    const fwdCount = (masked.match(/proxy_set_header\s+X-Forwarded-Host\s+\$host\s*;/g) ?? []).length
+    expect(fwdCount).toBe(hostCount)
+  })
+})
