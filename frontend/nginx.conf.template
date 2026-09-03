@@ -71,7 +71,14 @@ server {
     # overridden by the BACKEND_URL environment variable in any other deployment.
     location /api/ {
         proxy_pass ${BACKEND_URL};
-        proxy_set_header Host $host;
+        # Host must stay the UPSTREAM's name, not this server's. ${BACKEND_URL}
+        # is a platform-routed ingress on ACA/Cloud Run, which resolves the
+        # target app from the Host header, so sending the public hostname makes
+        # the platform answer "app not found" (404) without ever reaching the
+        # backend. /health and /ready worked only because they set no headers.
+        # The public hostname travels in X-Forwarded-Host instead.
+        proxy_set_header Host $proxy_host;
+        proxy_set_header X-Forwarded-Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
