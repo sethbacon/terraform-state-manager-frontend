@@ -10,8 +10,8 @@
 #
 # ONLY ${BACKEND_URL} is substituted -- see the entrypoint's envsubst allowlist.
 # Every other $name here is an nginx runtime variable ($csp_nonce, $request_id,
-# $host, $remote_addr, $scheme, $uri, $proxy_add_x_forwarded_for) and must reach
-# nginx untouched.
+# $host, $proxy_host, $remote_addr, $scheme, $uri, $proxy_add_x_forwarded_for)
+# and must reach nginx untouched.
 
 # Derive the per-request CSP nonce ONCE. A map variable is evaluated lazily and
 # cached for the whole request, so the CSP header and the sub_filter body rewrite

@@ -78,7 +78,10 @@ jobs:
           set -euo pipefail
           conf=$(docker run --rm --entrypoint sh tsm-frontend:ci -c 'cat /etc/nginx/conf.d/default.conf')
           grep -q "nonce-\$csp_nonce" <<<"$conf"
-          grep -q 'proxy_set_header Host \$host;' <<<"$conf"
+          # $host moved from Host to X-Forwarded-Host: proxying to a platform ingress
+          # needs the upstream's name in Host, so $host is carried alongside instead.
+          grep -q 'proxy_set_header X-Forwarded-Host \$host;' <<<"$conf"
+          grep -q 'proxy_set_header Host \$proxy_host;' <<<"$conf"
           grep -q 'X-Forwarded-For \$proxy_add_x_forwarded_for;' <<<"$conf"
 
       # The template must not sit where nginx's own entrypoint would render it
