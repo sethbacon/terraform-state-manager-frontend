@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.30.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.1...v1.30.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* send the upstream Host when proxying /api/ to the backend ([#408](https://github.com/sethbacon/terraform-state-manager-frontend/issues/408)) ([04f1b62](https://github.com/sethbacon/terraform-state-manager-frontend/commit/04f1b624d4134ccfde6bfd081bd9196f4f5f4d6e))
+
 ## [1.30.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.0...v1.30.1) (2026-08-31)
 
 
