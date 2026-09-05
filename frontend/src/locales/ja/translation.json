@@ -148,6 +148,16 @@
       "rumHint": "運用資産",
       "totalResources": "リソースの合計"
     },
+    "driftTitle": "ドリフトの状態",
+    "driftLoadFailed": "ドリフトの概要を読み込めませんでした。",
+    "drift": {
+      "openDrift": "オープンドリフト",
+      "critical": "重要",
+      "inFlight": "飛行中",
+      "inFlightHint": "現在割り当て済みまたは実行中のドリフト走行",
+      "unverified": "未確認",
+      "unverifiedHint": "自身のチェックが解析不能または切り捨てられていたライブレコード"
+    },
     "featuresTitle": "できること",
     "open": "開く",
     "signInToUse": "ご利用にはログインが必要です",
@@ -729,7 +739,9 @@
       "authMethod": "認証方式",
       "authMethodPat": "個人用アクセストークン",
       "authMethodApp": "アプリの登録（Entra）",
+      "authMethodWorkloadIdentity": "ワークロード ID (AKS)",
       "appAuthHelp": "Microsoft Entra アプリの登録（クライアント資格情報） — 定期的なドリフトに推奨。PAT の有効期限なし。",
+      "workloadIdentityHelp": "AKS ワークロード ID — TSM には秘密情報が保存されません。このクライアント ID を指定した管理 ID 上のフェデレーション認証情報が必要です。詳細については、導入ガイドの「ワークロード ID」のセクションを参照してください。",
       "tenantId": "テナントID",
       "clientId": "クライアントID",
       "clientSecret": "クライアントシークレット",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "接続後に最初のドリフト走行を実行する",
         "firstRunDispatched": "最初のドリフト走行の映像が公開されました。このページでご覧ください。",
         "firstRunFailed": "接続は確立されましたが、初回の実行でディスパッチに失敗しました：{{error}}",
-        "versionLabSuffix": "バージョン・ラボ"
+        "versionLabSuffix": "バージョン・ラボ",
+        "profile": "テンプレートプロファイル",
+        "profileHelp": "どの組み込みテンプレート、あるいは演算子によって編集されたテンプレートを使用するか。",
+        "fanOut": "リポレベルのファンアウト",
+        "fanOutHelp": "このリポジトリ内の複数のアプリを1つのCIジョブで実行します。fan-outテンプレートプロファイルが必要です。これにより、生成される接続のスケジュールで、複数の状態を一度にターゲットに設定できるようになります。"
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "選択した項目を解決",
       "bulkPartialFailure": "{{count}} 更新できませんでした",
       "sourceOptional": "出典（任意）",
-      "stateOptional": "州（任意）"
+      "stateOptional": "州（任意）",
+      "openCiRun": "CI実行を開始",
+      "batchFilter": "バッチ：{{id}}",
+      "tabOverview": "概要",
+      "tabCoverage": "取材範囲",
+      "completenessColumn": "完全性",
+      "recordAcknowledgedAt": "{{when}} で紹介されました",
+      "recordResolvedAt": "{{when}} で解決済み",
+      "completeness": {
+        "unparseable": "未確認",
+        "unparseableHint": "未検証 — プランを解析できませんでした。この結果は不明であり、クリーンではありません。",
+        "truncated": "一部抜粋：{{entries}}のエントリ／{{attrs}}の属性は省略",
+        "truncatedHint": "部分的な結果 — {{entries}} 件のエントリ / {{attrs}} 個の属性がプランから除外されました。",
+        "unmasked": "マスクされていない値",
+        "unmaskedHint": "このプランには、マスクされていない機密値が含まれている可能性があります。"
+      },
+      "coverage": {
+        "sourceLabel": "出典",
+        "chooseSource": "情報源を選択して、その報道内容をご覧ください。",
+        "filterAll": "すべて",
+        "filterUnscheduled": "予定外",
+        "filterStale": "古くなった",
+        "filterIncomplete": "未完了",
+        "filterDrifted": "漂流した",
+        "colState": "州",
+        "colScheduled": "予定",
+        "colLastChecked": "最終確認日",
+        "colDrifted": "漂流した",
+        "colRecord": "記録",
+        "colCi": "CIの実行",
+        "neverChecked": "確認したことがない",
+        "summaryTotal": "{{count}} 州",
+        "summaryScheduled": "配信予定：{{count}}",
+        "summaryUnscheduled": "予定外：{{count}}",
+        "summaryStale": "期限切れ：{{count}}",
+        "summaryIncomplete": "未完成：{{count}}",
+        "summaryOpen": "記事はこちら：{{count}}",
+        "summaryCritical": "重要：{{count}}",
+        "empty": "この情報源に関する州の情報はありません。"
+      }
     },
     "versionLab": {
       "noPipelines": "まだパイプラインの接続はありません。Drift ページで接続を追加してから、ここに戻ってきてください。",
@@ -911,7 +966,19 @@
       "deleteTitle": "スケジュールを削除する",
       "deleteConfirm": "「{{name}}」というスケジュールを削除しますか？ 削除すると、そのスケジュールは実行されなくなります。",
       "sourceOptional": "出典（任意）",
-      "stateOptional": "州（任意）"
+      "stateOptional": "州（任意）",
+      "viewRun": "実行結果を表示",
+      "fanOutTargets": "ターゲット（ファンアウト）",
+      "fanOutTargetsHelp": "この接続はファンアウトに対応しています。このスケジュールで計画すべきすべての状態を、1つのCIジョブに列挙してください。",
+      "addTarget": "ターゲットを追加",
+      "removeTarget": "ターゲットを削除",
+      "targetSource": "出典",
+      "targetState": "州",
+      "targetWorkingDir": "作業ディレクトリ",
+      "bulkSourceLabel": "ソースから状態を追加する",
+      "bulkPattern": "ステートキーパターン（正規表現）",
+      "bulkAdd": "一致する状態を追加する",
+      "targetsRequired": "ターゲットは少なくとも1つ必要です"
     },
     "branding": {
       "title": "ブランディング",

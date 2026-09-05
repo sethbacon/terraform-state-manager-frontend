@@ -148,6 +148,16 @@
       "rumHint": "Verwaltetes Vermögen",
       "totalResources": "Gesamte Ressourcen"
     },
+    "driftTitle": "Drift-Status",
+    "driftLoadFailed": "Die Drift-Zusammenfassung konnte nicht geladen werden.",
+    "drift": {
+      "openDrift": "Offener Drift",
+      "critical": "Kritisch",
+      "inFlight": "Im Flug",
+      "inFlightHint": "Derzeit zugewiesene oder laufende Drift-Läufe",
+      "unverified": "Nicht verifiziert",
+      "unverifiedHint": "Live-Datensätze, deren eigene Prüfsumme nicht analysierbar oder unvollständig war"
+    },
     "featuresTitle": "Was Sie tun können",
     "open": "Öffnen",
     "signInToUse": "Bitte melden Sie sich an, um die Funktion zu nutzen",
@@ -729,7 +739,9 @@
       "authMethod": "Authentifizierungsmethode",
       "authMethodPat": "Persönliches Zugriffstoken",
       "authMethodApp": "App-Registrierung (Entra)",
+      "authMethodWorkloadIdentity": "Workload-Identität (AKS)",
       "appAuthHelp": "Microsoft Entra-App-Registrierung (Client-Anmeldeinformationen) – empfohlen für geplante Drift; kein Ablauf der PAT.",
+      "workloadIdentityHelp": "AKS-Workload-Identität – In TSM werden keine Geheimnisse gespeichert. Es ist eine föderierte Anmeldeinformation für die verwaltete Identität erforderlich, in der diese Client-ID angegeben ist; siehe den Abschnitt „Workload-Identität“ im Bereitstellungshandbuch.",
       "tenantId": "Mieter-ID",
       "clientId": "Kunden-ID",
       "clientSecret": "Client-Geheimnis",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Nach dem Anschließen einen ersten Drift-Lauf starten",
         "firstRunDispatched": "Der erste Drift-Lauf ist gestartet – hier auf dieser Seite könnt ihr ihn euch ansehen.",
         "firstRunFailed": "Verbindung hergestellt, aber der erste Durchlauf konnte nicht ausgeführt werden: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Vorlagenprofil",
+        "profileHelp": "Welche integrierte oder vom Bediener bearbeitete Vorlage soll verwendet werden?",
+        "fanOut": "Fan-Out auf Repo-Ebene",
+        "fanOutHelp": "Führt mehrere Apps in diesem Repo in einem CI-Job aus. Erfordert das „Fan-Out“-Template-Profil; der daraus resultierende Verbindungsplan kann dann mehrere Zustände gleichzeitig ansprechen."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Ausgewählte auflösen",
       "bulkPartialFailure": "{{count}} konnte nicht aktualisiert werden",
       "sourceOptional": "Quelle (optional)",
-      "stateOptional": "Bundesland (optional)"
+      "stateOptional": "Bundesland (optional)",
+      "openCiRun": "CI-Lauf starten",
+      "batchFilter": "Chargennummer: {{id}}",
+      "tabOverview": "Übersicht",
+      "tabCoverage": "Umfang",
+      "completenessColumn": "Vollständigkeit",
+      "recordAcknowledgedAt": "Quelle: {{when}}",
+      "recordResolvedAt": "Beschlossen unter {{when}}",
+      "completeness": {
+        "unparseable": "Nicht verifiziert",
+        "unparseableHint": "Nicht verifiziert – der Plan konnte nicht analysiert werden; dieses Ergebnis ist unbekannt und nicht eindeutig.",
+        "truncated": "Auszug: Einträge unter „{{entries}}“ / Attribute unter „{{attrs}}“ wurden weggelassen",
+        "truncatedHint": "Teilresultat — Einträge „{{entries}}“ / Attribute „{{attrs}}“ wurden im Plan weggelassen.",
+        "unmasked": "Unmaskierte Werte",
+        "unmaskedHint": "Dieser Plan enthält möglicherweise unverschlüsselte sensible Werte."
+      },
+      "coverage": {
+        "sourceLabel": "Quelle",
+        "chooseSource": "Wählen Sie eine Quelle aus, um deren Berichterstattung anzuzeigen.",
+        "filterAll": "Alle",
+        "filterUnscheduled": "Außerplanmäßig",
+        "filterStale": "Abgelaufen",
+        "filterIncomplete": "Unvollständig",
+        "filterDrifted": "Abgetrieben",
+        "colState": "Bundesland",
+        "colScheduled": "Geplant",
+        "colLastChecked": "Zuletzt überprüft",
+        "colDrifted": "Abgetrieben",
+        "colRecord": "Aufzeichnung",
+        "colCi": "CI-Lauf",
+        "neverChecked": "Noch nie überprüft",
+        "summaryTotal": "{{count}} Bundesstaaten",
+        "summaryScheduled": "Geplant: {{count}}",
+        "summaryUnscheduled": "Nicht im Programm: {{count}}",
+        "summaryStale": "Veraltet: {{count}}",
+        "summaryIncomplete": "Unvollständig: {{count}}",
+        "summaryOpen": "Öffnungszeiten: {{count}}",
+        "summaryCritical": "Wichtig: {{count}}",
+        "empty": "Für diese Quelle sind keine Bundesstaaten angegeben."
+      }
     },
     "versionLab": {
       "noPipelines": "Es gibt noch keine Pipeline-Verbindungen – fügen Sie eine auf der Seite „Drift“ hinzu und kehren Sie dann hierher zurück.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Zeitplan löschen",
       "deleteConfirm": "Den Zeitplan „{{name}}“ löschen? Dann wird die Ausführung beendet.",
       "sourceOptional": "Quelle (optional)",
-      "stateOptional": "Bundesland (optional)"
+      "stateOptional": "Bundesland (optional)",
+      "viewRun": "Lauf anzeigen",
+      "fanOutTargets": "Ziele (Fan-out)",
+      "fanOutTargetsHelp": "Diese Verbindung unterstützt Fan-Out – listen Sie alle Zustände auf, die dieser Zeitplan in einem CI-Job berücksichtigen soll.",
+      "addTarget": "Ziel hinzufügen",
+      "removeTarget": "Ziel entfernen",
+      "targetSource": "Quelle",
+      "targetState": "Bundesland",
+      "targetWorkingDir": "Arbeitsverzeichnis",
+      "bulkSourceLabel": "Zustände aus der Quelle hinzufügen",
+      "bulkPattern": "Zustandsschlüsselmuster (regulärer Ausdruck)",
+      "bulkAdd": "Passende Zustände hinzufügen",
+      "targetsRequired": "Es ist mindestens ein Ziel erforderlich"
     },
     "branding": {
       "title": "Markenbildung",
