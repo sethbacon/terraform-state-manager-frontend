@@ -37,7 +37,7 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
   const [provider, setProvider] = useState('github_actions')
   const [organization, setOrganization] = useState('')
   const [project, setProject] = useState('')
-  const [authMethod, setAuthMethod] = useState<'pat' | 'app'>('pat')
+  const [authMethod, setAuthMethod] = useState<'pat' | 'app' | 'workload_identity'>('pat')
   const [token, setToken] = useState('')
   const [tenantId, setTenantId] = useState('')
   const [clientId, setClientId] = useState('')
@@ -54,6 +54,9 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
   // App auth: an Entra app registration for Azure DevOps, a GitHub App for GitHub.
   const adoApp = provider === 'azure_devops' && authMethod === 'app'
   const ghApp = provider === 'github_actions' && authMethod === 'app'
+  // AKS Workload Identity: Azure DevOps only, no secret — client_id names the
+  // managed identity's federated credential (drift-fleet-scale.md Phase 1b).
+  const adoWorkloadIdentity = provider === 'azure_devops' && authMethod === 'workload_identity'
 
   const resetForm = () => {
     setName('')
@@ -76,15 +79,17 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
         organization,
         project: provider === 'azure_devops' ? project : undefined,
         auth_method: authMethod,
-        ...(adoApp
-          ? { tenant_id: tenantId, client_id: clientId, client_secret: clientSecret }
-          : ghApp
-            ? {
-              github_app_id: githubAppId,
-              github_installation_id: githubInstallationId,
-              app_private_key: appPrivateKey,
-            }
-            : { token }),
+        ...(adoWorkloadIdentity
+          ? { client_id: clientId }
+          : adoApp
+            ? { tenant_id: tenantId, client_id: clientId, client_secret: clientSecret }
+            : ghApp
+              ? {
+                github_app_id: githubAppId,
+                github_installation_id: githubInstallationId,
+                app_private_key: appPrivateKey,
+              }
+              : { token }),
       }),
     // Divergence, preserved: creating a source clears the form and refetches
     // the list above it but leaves the dialog open, because this dialog is a
@@ -113,11 +118,13 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
     Boolean(name.trim()) &&
     Boolean(organization.trim()) &&
     (provider !== 'azure_devops' || Boolean(project.trim())) &&
-    (adoApp
-      ? Boolean(tenantId.trim()) && Boolean(clientId.trim()) && Boolean(clientSecret)
-      : ghApp
-        ? Boolean(githubAppId.trim()) && Boolean(githubInstallationId.trim()) && Boolean(appPrivateKey.trim())
-        : Boolean(token))
+    (adoWorkloadIdentity
+      ? Boolean(clientId.trim())
+      : adoApp
+        ? Boolean(tenantId.trim()) && Boolean(clientId.trim()) && Boolean(clientSecret)
+        : ghApp
+          ? Boolean(githubAppId.trim()) && Boolean(githubInstallationId.trim()) && Boolean(appPrivateKey.trim())
+          : Boolean(token))
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
@@ -172,7 +179,19 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
           <Divider />
 
           <TextField label={t('common.name')} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
-          <TextField select label={t('common.provider')} value={provider} onChange={(e) => setProvider(e.target.value)} fullWidth>
+          <TextField
+            select
+            label={t('common.provider')}
+            value={provider}
+            onChange={(e) => {
+              setProvider(e.target.value)
+              // workload_identity is Azure DevOps only — leaving it selected
+              // while switching to GitHub would silently fall back to the
+              // plain-token form with no visible auth method selected.
+              if (e.target.value !== 'azure_devops' && authMethod === 'workload_identity') setAuthMethod('pat')
+            }}
+            fullWidth
+          >
             <MenuItem value="github_actions">GitHub Actions</MenuItem>
             <MenuItem value="azure_devops">Azure DevOps</MenuItem>
           </TextField>
@@ -189,13 +208,28 @@ export default function CISourcesDialog({ open, onClose }: { open: boolean; onCl
             select
             label={t('pages.drift.authMethod')}
             value={authMethod}
-            onChange={(e) => setAuthMethod(e.target.value as 'pat' | 'app')}
+            onChange={(e) => setAuthMethod(e.target.value as 'pat' | 'app' | 'workload_identity')}
             fullWidth
           >
             <MenuItem value="pat">{t('pages.drift.authMethodPat')}</MenuItem>
             <MenuItem value="app">{t('pages.drift.authMethodApp')}</MenuItem>
+            {provider === 'azure_devops' && (
+              <MenuItem value="workload_identity">{t('pages.drift.authMethodWorkloadIdentity')}</MenuItem>
+            )}
           </TextField>
-          {adoApp ? (
+          {adoWorkloadIdentity ? (
+            <>
+              <Typography variant="caption" color="text.secondary">
+                {t('pages.drift.workloadIdentityHelp')}
+              </Typography>
+              <TextField
+                label={t('pages.drift.clientId')}
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+                fullWidth
+              />
+            </>
+          ) : adoApp ? (
             <>
               <Typography variant="caption" color="text.secondary">
                 {t('pages.drift.appAuthHelp')}

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import DriftPage from './DriftPage'
 import { api } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
@@ -36,6 +37,7 @@ vi.mock('../services/api', async (importOriginal) => {
       listDriftRecords: vi.fn(),
       acknowledgeDriftRecord: vi.fn(),
       resolveDriftRecord: vi.fn(),
+      listCITemplates: vi.fn(),
     },
   }
 })
@@ -129,11 +131,13 @@ const ciSources = [
   },
 ]
 
-function renderPage() {
+function renderPage(initialEntries: string[] = ['/drift']) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <DriftPage />
+      <MemoryRouter initialEntries={initialEntries}>
+        <DriftPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }
@@ -141,6 +145,7 @@ function renderPage() {
 beforeEach(() => {
   vi.clearAllMocks()
   mockedUseAuth.mockReturnValue({ hasScope: () => true } as unknown as AuthShape)
+  mocked.listCITemplates.mockResolvedValue([])
   mocked.listPipelines.mockResolvedValue(pipelines as Awaited<ReturnType<typeof api.listPipelines>>)
   mocked.listDriftRuns.mockResolvedValue({ runs, total: runs.length } as unknown as Awaited<
     ReturnType<typeof api.listDriftRuns>
@@ -463,6 +468,66 @@ describe('DriftPage', () => {
     expect(await within(dialog).findByText(i18n.t('pages.drift.testConnectionOk') as string)).toBeInTheDocument()
   })
 
+  it('adds an ADO source with workload identity auth (client_id only, no secret)', async () => {
+    mocked.createCISource.mockResolvedValue(ciSources[0] as Awaited<ReturnType<typeof api.createCISource>>)
+    renderPage()
+    await screen.findByText('drift-ci')
+
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.ciSources') as string }))
+    const dialog = await screen.findByRole('dialog')
+
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('common.name')}`)), {
+      target: { value: 'corp-wi' },
+    })
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: /Azure DevOps/ }))
+    fireEvent.change(await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.organization')}`)), {
+      target: { value: 'corp' },
+    })
+    fireEvent.change(within(dialog).getByLabelText(new RegExp(`^${i18n.t('pages.drift.project')}`)), {
+      target: { value: 'Platform' },
+    })
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    fireEvent.click(await screen.findByRole('option', { name: i18n.t('pages.drift.authMethodWorkloadIdentity') as string }))
+    expect(within(dialog).getByText(i18n.t('pages.drift.workloadIdentityHelp') as string)).toBeInTheDocument()
+    // Only the one field — no tenant/secret inputs for this method.
+    expect(within(dialog).queryByLabelText(new RegExp(`^${i18n.t('pages.drift.tenantId')}`))).not.toBeInTheDocument()
+    expect(within(dialog).queryByLabelText(new RegExp(`^${i18n.t('pages.drift.clientSecret')}`))).not.toBeInTheDocument()
+    fireEvent.change(await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.clientId')}`)), {
+      target: { value: 'tsm-ado-dispatch' },
+    })
+
+    const addBtn = within(dialog)
+      .getAllByRole('button')
+      .find((b) => !(b as HTMLButtonElement).disabled && /add/i.test(b.textContent ?? ''))!
+    fireEvent.click(addBtn)
+    await waitFor(() =>
+      expect(mocked.createCISource).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'corp-wi',
+          provider: 'azure_devops',
+          auth_method: 'workload_identity',
+          client_id: 'tsm-ado-dispatch',
+        }),
+      ),
+    )
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('token')
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('client_secret')
+    expect(mocked.createCISource.mock.calls[0]?.[0]).not.toHaveProperty('tenant_id')
+  })
+
+  it('offers workload identity only for Azure DevOps, not GitHub', async () => {
+    renderPage()
+    await screen.findByText('drift-ci')
+    fireEvent.click(screen.getByRole('button', { name: i18n.t('pages.drift.ciSources') as string }))
+    const dialog = await screen.findByRole('dialog')
+    // Default provider is GitHub Actions.
+    fireEvent.mouseDown(within(dialog).getAllByRole('combobox')[1])
+    expect(
+      screen.queryByRole('option', { name: i18n.t('pages.drift.authMethodWorkloadIdentity') as string }),
+    ).not.toBeInTheDocument()
+  })
+
   it('adds a GitHub source with GitHub App auth (no PAT in the payload)', async () => {
     mocked.createCISource.mockResolvedValue(ciSources[0] as Awaited<ReturnType<typeof api.createCISource>>)
     renderPage()
@@ -629,7 +694,7 @@ describe('DriftPage preserved divergences', () => {
     )
     // ...but the pipeline and the working directory survive.
     expect(within(dialog).getByLabelText(i18n.t('pages.drift.workingDir') as string)).toHaveValue('envs/prod')
-    expect(within(dialog).getByText('drift-ci (github_actions)')).toBeInTheDocument()
+    expect(within(dialog).getByDisplayValue('drift-ci (github_actions)')).toBeInTheDocument()
   })
 
   it('keeps the CI sources dialog open after adding a source', async () => {
