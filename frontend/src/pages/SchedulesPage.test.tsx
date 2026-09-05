@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { MemoryRouter } from 'react-router-dom'
 import SchedulesPage from './SchedulesPage'
 import { api } from '../services/api'
 import i18n from '../i18n'
@@ -45,7 +46,9 @@ function renderPage() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <SchedulesPage />
+      <MemoryRouter>
+        <SchedulesPage />
+      </MemoryRouter>
     </QueryClientProvider>,
   )
 }
@@ -178,6 +181,13 @@ describe('SchedulesPage', () => {
         expect.objectContaining({ target_config: expect.objectContaining({ source_id: 's-gone', state_key: 'app.tfstate' }) }),
       ),
     )
+  })
+
+  it('links the last run to the drift page, filtered to its batch (works for a fanned or a single legacy run)', async () => {
+    renderPage()
+    await screen.findByText('nightly drift')
+    const link = screen.getByRole('link', { name: i18n.t('pages.schedules.viewRun') as string })
+    expect(link).toHaveAttribute('href', '/drift?batch=d1')
   })
 
   it('runs a schedule now', async () => {
