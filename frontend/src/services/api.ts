@@ -754,7 +754,19 @@ export interface DriftSummaryItem {
   attrs?: DriftAttrChange[]
 }
 
-export interface DriftRun {
+// DriftCompleteness carries the drift contract's five markers — what a check
+// did NOT do — mirroring the backend's single embedded Completeness struct
+// (drift_completeness.go) so DriftRun and DriftRecord share ONE definition
+// here too rather than repeating the five fields on each.
+export interface DriftCompleteness {
+  truncated: boolean
+  omitted_entries: number
+  omitted_attrs: number
+  unparseable: boolean
+  unmasked: boolean
+}
+
+export interface DriftRun extends DriftCompleteness {
   id: string
   pipeline_connection_id: string | null
   source_id: string | null
@@ -771,6 +783,20 @@ export interface DriftRun {
   actor: string
   created_at: string
   updated_at: string
+  // Repo-level fan-out dispatch (Phase 1): NULL/empty for a legacy single-target
+  // run. ci_run_id/ci_run_url come from the dispatch API's own response, never
+  // the callback body, and may be empty even on a successful dispatch.
+  batch_id: string | null
+  ci_run_id: string
+  ci_run_url: string
+}
+
+// One target inside a fan-out dispatch/schedule: its own state, planned
+// alongside the others in one CI job.
+export interface DriftTargetItem {
+  source_id: string
+  state_key: string
+  working_dir: string
 }
 
 export interface CreateDriftRunInput {
@@ -779,6 +805,14 @@ export interface CreateDriftRunInput {
   state_key?: string
   repo_ref?: string
   working_dir?: string
+  /** 2+ items dispatches a repo-level fan-out batch (connection must be fan_out capable). */
+  targets?: DriftTargetItem[]
+}
+
+// A fan-out dispatch response (2+ targets): one row per target under a shared batch.
+export interface DriftBatch {
+  batch_id: string
+  runs: DriftRun[]
 }
 
 // APIKey is a stored key (never the secret; key_prefix identifies it).
@@ -828,7 +862,7 @@ export interface StateAnalysisSnapshot {
   analyzed_at: string
 }
 
-export interface DriftRecord {
+export interface DriftRecord extends DriftCompleteness {
   id: string
   source_id: string | null
   state_key: string
@@ -857,6 +891,57 @@ export interface DriftRecordsResponse {
   total: number
 }
 
+// GET /drift/coverage: one source's live state listing joined against its
+// latest run, live record, and schedule membership (Phase 4a). Completeness
+// here is intentionally partial (unparseable/truncated only — no omitted
+// counts or unmasked) because it is projected from the run join, not the
+// full run row.
+export interface DriftCoverageState {
+  key: string
+  scheduled: boolean
+  last_run_id: string | null
+  last_run_at: string | null
+  last_status: string | null
+  drifted: boolean | null
+  unparseable: boolean
+  truncated: boolean
+  ci_run_url: string | null
+  record_id: string | null
+  record_status: string | null
+  severity: string | null
+}
+
+export interface DriftCoverageSummary {
+  total: number
+  scheduled: number
+  unscheduled: number
+  stale: number
+  incomplete: number
+  open: number
+  critical: number
+}
+
+export interface DriftCoverage {
+  states: DriftCoverageState[]
+  summary: DriftCoverageSummary
+}
+
+// GET /drift/summary: the fleet-wide rollup behind the landing page's cards.
+export interface DriftSummaryBySource {
+  source_id: string
+  source_name: string
+  open: number
+  acknowledged: number
+  critical: number
+}
+
+export interface DriftSummary {
+  records_by_source: DriftSummaryBySource[]
+  runs_24h: { completed: number; failed: number; dispatched: number }
+  incomplete_records: number
+  in_flight: number
+}
+
 export interface ListDriftRecordsParams {
   statuses?: string[]
   sourceId?: string
@@ -873,6 +958,8 @@ export interface ScheduleTargetConfig {
   state_key?: string
   repo_ref?: string
   working_dir?: string
+  /** Repo-level fan-out: 2+ states planned in one CI job (connection must be fan_out capable). */
+  targets?: DriftTargetItem[]
 }
 
 export interface Schedule {
@@ -1439,7 +1526,7 @@ export const api = {
     provider: string
     organization: string
     project?: string
-    auth_method?: 'pat' | 'app'
+    auth_method?: 'pat' | 'app' | 'workload_identity'
     token?: string
     tenant_id?: string
     client_id?: string
@@ -1497,20 +1584,25 @@ export const api = {
       )
     ).data,
   listDriftRuns: async (
-    params?: { limit?: number; offset?: number; status?: string },
+    params?: { limit?: number; offset?: number; status?: string; batchId?: string; sourceId?: string; stateKey?: string },
   ): Promise<{ runs: DriftRun[]; total: number }> => {
     const q = new URLSearchParams()
     if (params?.limit != null) q.set('limit', String(params.limit))
     if (params?.offset != null) q.set('offset', String(params.offset))
     if (params?.status) q.set('status', params.status)
+    if (params?.batchId) q.set('batch_id', params.batchId)
+    if (params?.sourceId) q.set('source_id', params.sourceId)
+    if (params?.stateKey) q.set('state_key', params.stateKey)
     const qs = q.toString()
     const data = validateDriftRunsResponse(
       (await apiClient.get<{ runs: DriftRun[]; total?: number }>(`/api/v1/drift/runs${qs ? `?${qs}` : ''}`)).data,
     )
     return { runs: data.runs, total: data.total ?? data.runs.length }
   },
-  createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun> =>
-    (await apiClient.post<DriftRun>('/api/v1/drift/runs', input)).data,
+  // Returns a single DriftRun for no-targets (or one-item) requests — the
+  // legacy shape — and a DriftBatch ({batch_id, runs}) for 2+ targets.
+  createDriftRun: async (input: CreateDriftRunInput): Promise<DriftRun | DriftBatch> =>
+    (await apiClient.post<DriftRun | DriftBatch>('/api/v1/drift/runs', input)).data,
   listDriftRecords: async (params?: ListDriftRecordsParams): Promise<DriftRecordsResponse> =>
     validateDriftRecordsResponse(
       (
@@ -1531,6 +1623,14 @@ export const api = {
     (await apiClient.post<DriftRecord>(`/api/v1/drift/records/${id}/acknowledge`, { note })).data,
   resolveDriftRecord: async (id: string): Promise<DriftRecord> =>
     (await apiClient.post<DriftRecord>(`/api/v1/drift/records/${id}/resolve`)).data,
+  getDriftCoverage: async (sourceId: string, staleAfter?: string): Promise<DriftCoverage> =>
+    (
+      await apiClient.get<DriftCoverage>('/api/v1/drift/coverage', {
+        params: { source_id: sourceId, stale_after: staleAfter || undefined },
+      })
+    ).data,
+  getDriftSummary: async (): Promise<DriftSummary> =>
+    (await apiClient.get<DriftSummary>('/api/v1/drift/summary')).data,
 
   // Schedules
   listSchedules: async (): Promise<Schedule[]> =>
