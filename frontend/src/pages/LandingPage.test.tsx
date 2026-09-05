@@ -4,11 +4,11 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import LandingPage from './LandingPage'
 import { useAuth } from '../contexts/AuthContext'
-import { api, type DashboardOverview } from '../services/api'
+import { api, type DashboardOverview, type DriftSummary } from '../services/api'
 import i18n from '../i18n'
 
 vi.mock('../contexts/AuthContext', () => ({ useAuth: vi.fn() }))
-vi.mock('../services/api', () => ({ api: { getDashboardOverview: vi.fn() } }))
+vi.mock('../services/api', () => ({ api: { getDashboardOverview: vi.fn(), getDriftSummary: vi.fn() } }))
 
 const mockedUseAuth = vi.mocked(useAuth)
 const mockedApi = vi.mocked(api)
@@ -39,6 +39,7 @@ beforeEach(() => {
   // Keep the estate query pending by default so non-estate tests don't trigger
   // async state updates; the estate test overrides this with real data.
   mockedApi.getDashboardOverview.mockReturnValue(new Promise<DashboardOverview>(() => { }))
+  mockedApi.getDriftSummary.mockReturnValue(new Promise<DriftSummary>(() => { }))
 })
 
 describe('LandingPage', () => {
@@ -101,5 +102,32 @@ describe('LandingPage', () => {
     setAuth(false)
     renderLanding()
     expect(screen.queryByText(i18n.t('landing.estateTitle') as string)).not.toBeInTheDocument()
+  })
+
+  it('shows fleet drift cards, summed from the summary endpoint, for authenticated users', async () => {
+    mockedApi.getDriftSummary.mockResolvedValue({
+      records_by_source: [
+        { source_id: 's1', source_name: 'a', open: 2, acknowledged: 1, critical: 1 },
+        { source_id: 's2', source_name: 'b', open: 3, acknowledged: 0, critical: 0 },
+      ],
+      runs_24h: { completed: 10, failed: 1, dispatched: 2 },
+      incomplete_records: 4,
+      in_flight: 2,
+    } as DriftSummary)
+    setAuth(true)
+    renderLanding()
+    expect(screen.getByText(i18n.t('landing.driftTitle') as string)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('landing.drift.openDrift') as string)).toBeInTheDocument()
+    // Open drift summed across sources (2 + 3), critical summed (1 + 0).
+    expect(await screen.findByText('5')).toBeInTheDocument()
+    expect(screen.getByText('1')).toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+    expect(screen.getByText('4')).toBeInTheDocument()
+  })
+
+  it('hides the drift cards from anonymous visitors', () => {
+    setAuth(false)
+    renderLanding()
+    expect(screen.queryByText(i18n.t('landing.driftTitle') as string)).not.toBeInTheDocument()
   })
 })

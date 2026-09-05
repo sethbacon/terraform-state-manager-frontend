@@ -58,6 +58,21 @@ export default function LandingPage() {
     enabled: isAuthenticated,
   })
 
+  // Fleet drift cards (Phase 4b): open/critical are summed across
+  // records_by_source because the summary endpoint reports them per source,
+  // not as a fleet-wide total — the landing page wants one number each.
+  const {
+    data: driftSummary,
+    isError: driftSummaryError,
+    refetch: refetchDriftSummary,
+  } = useQuery({
+    queryKey: queryKeys.drift.summary(),
+    queryFn: () => api.getDriftSummary(),
+    enabled: isAuthenticated,
+  })
+  const openDrift = driftSummary?.records_by_source.reduce((sum, s) => sum + s.open, 0)
+  const criticalDrift = driftSummary?.records_by_source.reduce((sum, s) => sum + s.critical, 0)
+
   return (
     <Box>
       {/* Hero */}
@@ -162,6 +177,49 @@ export default function LandingPage() {
               label={t('landing.estate.totalResources')}
               value={overview?.total_resources ?? '\u2014'}
               to="/reports"
+            />
+          </Box>
+        </Box>
+      )}
+
+      {isAuthenticated && (
+        <Box sx={{ mb: 6 }}>
+          <Typography variant="h5" sx={{ fontWeight: 600, mb: 3 }}>
+            {t('landing.driftTitle')}
+          </Typography>
+          {driftSummaryError && (
+            <Alert
+              severity="warning"
+              sx={{ mb: 2 }}
+              action={
+                <Button color="inherit" size="small" onClick={() => refetchDriftSummary()}>
+                  {t('common.retry')}
+                </Button>
+              }
+            >
+              {t('landing.driftLoadFailed')}
+            </Alert>
+          )}
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 3,
+              gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+            }}
+          >
+            <DashboardCard label={t('landing.drift.openDrift')} value={openDrift ?? '\u2014'} to="/drift" />
+            <DashboardCard label={t('landing.drift.critical')} value={criticalDrift ?? '\u2014'} to="/drift" />
+            <DashboardCard
+              label={t('landing.drift.inFlight')}
+              hint={t('landing.drift.inFlightHint')}
+              value={driftSummary?.in_flight ?? '\u2014'}
+              to="/drift"
+            />
+            <DashboardCard
+              label={t('landing.drift.unverified')}
+              hint={t('landing.drift.unverifiedHint')}
+              value={driftSummary?.incomplete_records ?? '\u2014'}
+              to="/drift"
             />
           </Box>
         </Box>
