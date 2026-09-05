@@ -49,6 +49,11 @@ const openRecord: DriftRecord = {
   detections: 3,
   first_detected_at: '2026-06-10T08:00:00Z',
   last_detected_at: '2026-06-11T08:00:00Z',
+  truncated: false,
+  omitted_entries: 0,
+  omitted_attrs: 0,
+  unparseable: false,
+  unmasked: false,
 }
 
 const ackedRecord: DriftRecord = {
@@ -128,6 +133,38 @@ describe('DriftRecordsSection', () => {
     // per-resource changed attribute (name + before -> after)
     expect(within(dialog).getByText('instance_type')).toBeInTheDocument()
     expect(within(dialog).getByText(/t2\.micro → t3\.micro/)).toBeInTheDocument()
+  })
+
+  it('flags an unparseable live record as not verified, in the table and in the detail dialog', async () => {
+    mocked.listDriftRecords.mockResolvedValue({
+      records: [{ ...openRecord, unparseable: true }, ackedRecord],
+      counts: { open: 1, acknowledged: 1 },
+      total: 2,
+    })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+    expect(screen.getByLabelText(i18n.t('pages.drift.completeness.unparseableHint') as string)).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText(/estate \/ envs\/prod.tfstate/))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByText(i18n.t('pages.drift.completeness.unparseable') as string)).toBeInTheDocument()
+  })
+
+  it('shows when a record was resolved', async () => {
+    const resolvedRecord = { ...openRecord, status: 'resolved' as const, resolved_at: '2026-06-12T09:00:00Z' }
+    mocked.listDriftRecords.mockResolvedValue({
+      records: [resolvedRecord],
+      counts: {},
+      total: 1,
+    })
+    renderSection()
+    fireEvent.click(await screen.findByText(/estate \/ envs\/prod.tfstate/))
+    const dialog = await screen.findByRole('dialog')
+    expect(
+      within(dialog).getByText(
+        i18n.t('pages.drift.recordResolvedAt', { when: new Date(resolvedRecord.resolved_at!).toLocaleString() }) as string,
+      ),
+    ).toBeInTheDocument()
   })
 
   it('switching to All requests every status', async () => {

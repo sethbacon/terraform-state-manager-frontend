@@ -7,6 +7,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
   Stack,
   Table,
   TableBody,
@@ -17,6 +18,8 @@ import {
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
 import { type DriftRun } from '../../services/api'
+import CompletenessChips from '../../components/CompletenessChips'
+import { isSafeExternalUrl } from '../../utils/externalUrl'
 import { statusChip } from './statusChip'
 
 function actionColor(actions: string[]): 'success' | 'warning' | 'error' | 'default' {
@@ -44,7 +47,15 @@ export default function DriftRunDetailDialog({ run, onClose }: { run: DriftRun |
         {run && (
           <Stack spacing={2}>
             <Box>
-              {statusChip(run, t)}
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+                {statusChip(run, t)}
+                <CompletenessChips completeness={run} />
+                {isSafeExternalUrl(run.ci_run_url) && (
+                  <Link href={run.ci_run_url} target="_blank" rel="noopener noreferrer">
+                    {t('pages.drift.openCiRun')}
+                  </Link>
+                )}
+              </Stack>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                 {run.repo_ref || t('pages.drift.defaultRef')} · {run.working_dir || '.'} ·{' '}
                 {run.added != null

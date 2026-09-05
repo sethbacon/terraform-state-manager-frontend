@@ -34,6 +34,7 @@ import DoneAllIcon from '@mui/icons-material/DoneAll'
 import { useTranslation } from 'react-i18next'
 import { api, type DriftRecord } from '../services/api'
 import TableSkeleton from './skeletons/TableSkeleton'
+import CompletenessChips from './CompletenessChips'
 import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -260,6 +261,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                 <TableCell>{t('pages.drift.recordSeverity')}</TableCell>
                 <TableCell>{t('pages.drift.recordState')}</TableCell>
                 <TableCell align="right">+ / ~ / -</TableCell>
+                <TableCell align="center">{t('pages.drift.completenessColumn')}</TableCell>
                 <TableCell align="right">{t('pages.drift.recordDetections')}</TableCell>
                 <TableCell>{t('pages.drift.recordLastDetected')}</TableCell>
                 <TableCell align="right">{t('common.actions')}</TableCell>
@@ -286,6 +288,9 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                     {sourceLabel(r)} / {r.state_key}
                   </TableCell>
                   <TableCell align="right">{`${r.added} / ${r.changed} / ${r.destroyed}`}</TableCell>
+                  <TableCell align="center">
+                    <CompletenessChips completeness={r} variant="icon" />
+                  </TableCell>
                   <TableCell align="right">{r.detections}</TableCell>
                   <TableCell>{new Date(r.last_detected_at).toLocaleString()}</TableCell>
                   <TableCell align="right" onClick={(e) => e.stopPropagation()}>
@@ -396,7 +401,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
         <DialogContent>
           {detail && (
             <Stack spacing={1}>
-              <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+              <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
                 {recordStatusChip(detail.status, t)}
                 <Chip
                   size="small"
@@ -405,6 +410,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                   label={detail.severity}
                 />
                 <Chip size="small" variant="outlined" label={detail.origin} />
+                <CompletenessChips completeness={detail} />
                 <Typography variant="body2" color="text.secondary">
                   {sourceLabel(detail)} / {detail.state_key}
                 </Typography>
@@ -418,6 +424,14 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                 <Alert severity="info">
                   {t('pages.drift.ackedBy', { actor: detail.acknowledged_by || '—' })}
                   {detail.ack_note ? ` — ${detail.ack_note}` : ''}
+                  {detail.acknowledged_at
+                    ? ` — ${t('pages.drift.recordAcknowledgedAt', { when: new Date(detail.acknowledged_at).toLocaleString() })}`
+                    : ''}
+                </Alert>
+              )}
+              {detail.status === 'resolved' && detail.resolved_at && (
+                <Alert severity="success">
+                  {t('pages.drift.recordResolvedAt', { when: new Date(detail.resolved_at).toLocaleString() })}
                 </Alert>
               )}
               {(detail.summary?.length ?? 0) > 0 ? (
