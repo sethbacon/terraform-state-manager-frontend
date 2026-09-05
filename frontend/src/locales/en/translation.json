@@ -148,6 +148,16 @@
       "rumHint": "Resources under management",
       "totalResources": "Total resources"
     },
+    "driftTitle": "Drift status",
+    "driftLoadFailed": "Couldn't load the drift summary.",
+    "drift": {
+      "openDrift": "Open drift",
+      "critical": "Critical",
+      "inFlight": "In flight",
+      "inFlightHint": "Drift runs currently dispatched or running",
+      "unverified": "Unverified",
+      "unverifiedHint": "Live records whose own check was unparseable or truncated"
+    },
     "featuresTitle": "What you can do",
     "open": "Open",
     "signInToUse": "Sign in to use",
@@ -895,7 +905,9 @@
       "authMethod": "Auth method",
       "authMethodPat": "Personal access token",
       "authMethodApp": "App registration (Entra)",
+      "authMethodWorkloadIdentity": "Workload identity (AKS)",
       "appAuthHelp": "Microsoft Entra app registration (client credentials) — recommended for scheduled drift; no PAT expiry.",
+      "workloadIdentityHelp": "AKS Workload Identity — no secret stored in TSM. Requires a federated credential on the managed identity naming this client ID; see the deployment guide's Workload Identity section.",
       "tenantId": "Tenant ID",
       "clientId": "Client ID",
       "clientSecret": "Client secret",
@@ -963,7 +975,11 @@
         "dispatchFirstRun": "Dispatch a first drift run after connecting",
         "firstRunDispatched": "First drift run dispatched — watch it on this page.",
         "firstRunFailed": "Connection created, but the first run failed to dispatch: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Template profile",
+        "profileHelp": "Which built-in or operator-edited template to use.",
+        "fanOut": "Repo-level fan-out",
+        "fanOutHelp": "Plans multiple apps in this repo in one CI job. Requires the fan-out template profile; the resulting connection's schedule can then target several states at once."
       },
       "fields": {
         "github_actions": {
@@ -1025,7 +1041,46 @@
       "resolveSelected": "Resolve selected",
       "bulkPartialFailure": "{{count}} could not be updated",
       "sourceOptional": "Source (optional)",
-      "stateOptional": "State (optional)"
+      "stateOptional": "State (optional)",
+      "openCiRun": "Open CI run",
+      "batchFilter": "Batch: {{id}}",
+      "tabOverview": "Overview",
+      "tabCoverage": "Coverage",
+      "completenessColumn": "Completeness",
+      "recordAcknowledgedAt": "Acknowledged at {{when}}",
+      "recordResolvedAt": "Resolved at {{when}}",
+      "completeness": {
+        "unparseable": "Not verified",
+        "unparseableHint": "Not verified — the plan could not be parsed; this result is unknown, not clean.",
+        "truncated": "Partial: {{entries}} entries / {{attrs}} attrs omitted",
+        "truncatedHint": "Partial result — {{entries}} entries / {{attrs}} attributes omitted from the plan.",
+        "unmasked": "Unmasked values",
+        "unmaskedHint": "This plan may contain unmasked sensitive values."
+      },
+      "coverage": {
+        "sourceLabel": "Source",
+        "chooseSource": "Choose a source to see its coverage.",
+        "filterAll": "All",
+        "filterUnscheduled": "Unscheduled",
+        "filterStale": "Stale",
+        "filterIncomplete": "Incomplete",
+        "filterDrifted": "Drifted",
+        "colState": "State",
+        "colScheduled": "Scheduled",
+        "colLastChecked": "Last checked",
+        "colDrifted": "Drifted",
+        "colRecord": "Record",
+        "colCi": "CI run",
+        "neverChecked": "Never checked",
+        "summaryTotal": "{{count}} states",
+        "summaryScheduled": "Scheduled: {{count}}",
+        "summaryUnscheduled": "Unscheduled: {{count}}",
+        "summaryStale": "Stale: {{count}}",
+        "summaryIncomplete": "Incomplete: {{count}}",
+        "summaryOpen": "Open: {{count}}",
+        "summaryCritical": "Critical: {{count}}",
+        "empty": "No states for this source."
+      }
     },
     "versionLab": {
       "noPipelines": "No pipeline connections yet — add one on the Drift page, then return here.",
@@ -1077,7 +1132,19 @@
       "deleteTitle": "Delete schedule",
       "deleteConfirm": "Delete the schedule \"{{name}}\"? It will stop running.",
       "sourceOptional": "Source (optional)",
-      "stateOptional": "State (optional)"
+      "stateOptional": "State (optional)",
+      "viewRun": "View run",
+      "fanOutTargets": "Targets (fan-out)",
+      "fanOutTargetsHelp": "This connection is fan-out capable — list every state this schedule should plan in one CI job.",
+      "addTarget": "Add target",
+      "removeTarget": "Remove target",
+      "targetSource": "Source",
+      "targetState": "State",
+      "targetWorkingDir": "Working directory",
+      "bulkSourceLabel": "Add states from source",
+      "bulkPattern": "State key pattern (regex)",
+      "bulkAdd": "Add matching states",
+      "targetsRequired": "At least one target is required"
     },
     "branding": {
       "title": "Branding",

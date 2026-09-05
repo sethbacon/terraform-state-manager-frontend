@@ -23,12 +23,22 @@ import {
   TableRow,
   TextField,
   Tooltip,
+  Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { api, type PipelineConnection, type Schedule, type ScheduleInput } from '../services/api'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { Link as RouterLink } from 'react-router-dom'
+import {
+  api,
+  type DriftTargetItem,
+  type PipelineConnection,
+  type Schedule,
+  type ScheduleInput,
+  type StateSource,
+} from '../services/api'
 import { queryKeys } from '../services/queryKeys'
 import { nextRuns, validateCron } from '../utils/cron'
 import PageHeader from '../components/PageHeader'
@@ -142,13 +152,27 @@ export default function SchedulesPage() {
                   />
                 </TableCell>
                 <TableCell>
-                  {s.last_status ? (
-                    <Chip size="small" color={statusColor(s.last_status)} label={s.last_status} />
-                  ) : (
-                    <Box component="span" sx={{ color: 'text.secondary' }}>
-                      {t('pages.schedules.never')}
-                    </Box>
-                  )}
+                  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
+                    {s.last_status ? (
+                      <Chip size="small" color={statusColor(s.last_status)} label={s.last_status} />
+                    ) : (
+                      <Box component="span" sx={{ color: 'text.secondary' }}>
+                        {t('pages.schedules.never')}
+                      </Box>
+                    )}
+                    {s.last_run_id && (
+                      <Tooltip title={t('pages.schedules.viewRun')}>
+                        <IconButton
+                          size="small"
+                          component={RouterLink}
+                          to={`/drift?batch=${s.last_run_id}`}
+                          aria-label={t('pages.schedules.viewRun')}
+                        >
+                          <OpenInNewIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                  </Stack>
                 </TableCell>
                 <TableCell sx={{ color: 'text.secondary' }}>
                   {s.enabled && s.next_run_at ? new Date(s.next_run_at).toLocaleString() : '—'}
@@ -221,6 +245,70 @@ function toInput(s: Schedule): ScheduleInput {
   }
 }
 
+// One row of the fan-out targets repeater: its own state (source, state key,
+// working dir) plus its own states-for-source query. Extracted to its own
+// component rather than called inline in a .map() because each row's
+// useQuery must have a stable per-row identity — hook order inside a mapped
+// array at the parent's render level would drift as rows are added/removed.
+function ScheduleTargetRow({
+  target,
+  sources,
+  onChange,
+  onRemove,
+}: {
+  target: DriftTargetItem
+  sources: StateSource[]
+  onChange: (patch: Partial<DriftTargetItem>) => void
+  onRemove: () => void
+}) {
+  const { t } = useTranslation()
+  const statesQuery = useQuery({
+    queryKey: queryKeys.sources.states(target.source_id),
+    queryFn: () => api.listStates(target.source_id),
+    enabled: Boolean(target.source_id),
+  })
+
+  return (
+    <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+      <TextField
+        select
+        label={t('pages.schedules.targetSource')}
+        value={target.source_id}
+        onChange={(e) => onChange({ source_id: e.target.value, state_key: '' })}
+        size="small"
+        sx={{ minWidth: 160 }}
+      >
+        <MenuItem value="">{t('common.none')}</MenuItem>
+        {sources.map((s) => (
+          <MenuItem key={s.id} value={s.id}>
+            {s.name}
+          </MenuItem>
+        ))}
+      </TextField>
+      <Autocomplete
+        size="small"
+        options={statesQuery.data ?? []}
+        loading={statesQuery.isLoading}
+        getOptionLabel={(st) => st.name || st.key}
+        value={(statesQuery.data ?? []).find((st) => st.key === target.state_key) ?? null}
+        onChange={(_, v) => onChange({ state_key: v?.key ?? '' })}
+        disabled={!target.source_id || statesQuery.isLoading}
+        sx={{ minWidth: 200, flexGrow: 1 }}
+        renderInput={(params) => <TextField {...params} label={t('pages.schedules.targetState')} />}
+      />
+      <TextField
+        label={t('pages.schedules.targetWorkingDir')}
+        value={target.working_dir}
+        onChange={(e) => onChange({ working_dir: e.target.value })}
+        size="small"
+      />
+      <IconButton size="small" aria-label={t('pages.schedules.removeTarget')} onClick={onRemove}>
+        <DeleteIcon fontSize="small" />
+      </IconButton>
+    </Stack>
+  )
+}
+
 function ScheduleFormDialog({
   open,
   schedule,
@@ -242,6 +330,9 @@ function ScheduleFormDialog({
   const [stateKey, setStateKey] = useState('')
   const [repoRef, setRepoRef] = useState('')
   const [workingDir, setWorkingDir] = useState('')
+  const [targets, setTargets] = useState<DriftTargetItem[]>([])
+  const [bulkSourceId, setBulkSourceId] = useState('')
+  const [bulkPattern, setBulkPattern] = useState('')
   const [enabled, setEnabled] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -258,6 +349,9 @@ function ScheduleFormDialog({
     setStateKey(schedule?.target_config.state_key ?? '')
     setRepoRef(schedule?.target_config.repo_ref ?? '')
     setWorkingDir(schedule?.target_config.working_dir ?? '')
+    setTargets(schedule?.target_config.targets ?? [])
+    setBulkSourceId('')
+    setBulkPattern('')
     setEnabled(schedule?.enabled ?? true)
   }
   if (!open && seededFor !== null) setSeededFor(null)
@@ -278,6 +372,41 @@ function ScheduleFormDialog({
     queryFn: () => api.listStates(sourceId),
     enabled: Boolean(sourceId),
   })
+  // Backs the "add all states matching /regex/" bulk helper below the
+  // repeater — a separate source picker from any one row's, since it adds
+  // NEW rows rather than editing an existing one.
+  const bulkStatesQuery = useQuery({
+    queryKey: queryKeys.sources.states(bulkSourceId),
+    queryFn: () => api.listStates(bulkSourceId),
+    enabled: Boolean(bulkSourceId),
+  })
+
+  // A connection flagged fan_out plans 2+ states in one CI job — the targets
+  // repeater replaces the single source/state/working-dir trio for it.
+  const selectedPipeline = pipelines.find((p) => p.id === pipelineId)
+  const fanOut = Boolean(selectedPipeline?.config?.fan_out)
+  const validTargets = targets.filter((tg) => tg.source_id && tg.state_key)
+
+  const addTarget = () => setTargets((prev) => [...prev, { source_id: '', state_key: '', working_dir: '' }])
+  const updateTarget = (i: number, patch: Partial<DriftTargetItem>) =>
+    setTargets((prev) => prev.map((tg, idx) => (idx === i ? { ...tg, ...patch } : tg)))
+  const removeTarget = (i: number) => setTargets((prev) => prev.filter((_, idx) => idx !== i))
+  const addMatching = () => {
+    if (!bulkSourceId || !bulkPattern.trim()) return
+    let re: RegExp
+    try {
+      re = new RegExp(bulkPattern)
+    } catch {
+      return
+    }
+    setTargets((prev) => {
+      const existing = new Set(prev.map((tg) => JSON.stringify([tg.source_id, tg.state_key])))
+      const additions = (bulkStatesQuery.data ?? [])
+        .filter((s) => re.test(s.key) && !existing.has(JSON.stringify([bulkSourceId, s.key])))
+        .map((s) => ({ source_id: bulkSourceId, state_key: s.key, working_dir: '' }))
+      return [...prev, ...additions]
+    })
+  }
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -285,13 +414,15 @@ function ScheduleFormDialog({
         name,
         cron_expr: cron,
         target_type: 'drift',
-        target_config: {
-          pipeline_connection_id: pipelineId,
-          source_id: sourceId || undefined,
-          state_key: stateKey || undefined,
-          repo_ref: repoRef || undefined,
-          working_dir: workingDir || undefined,
-        },
+        target_config: fanOut
+          ? { pipeline_connection_id: pipelineId, repo_ref: repoRef || undefined, targets: validTargets }
+          : {
+            pipeline_connection_id: pipelineId,
+            source_id: sourceId || undefined,
+            state_key: stateKey || undefined,
+            repo_ref: repoRef || undefined,
+            working_dir: workingDir || undefined,
+          },
         enabled,
       }
       return schedule ? api.updateSchedule(schedule.id, input) : api.createSchedule(input)
@@ -332,21 +463,15 @@ function ScheduleFormDialog({
                   : t('pages.schedules.cronHelp')
             }
           />
-          <TextField
-            label={t('pages.schedules.pipeline')}
-            value={pipelineId}
-            onChange={(e) => setPipelineId(e.target.value)}
-            select
-            required
-            fullWidth
+          <Autocomplete
             size="small"
-          >
-            {pipelines.map((p) => (
-              <MenuItem key={p.id} value={p.id}>
-                {p.name}
-              </MenuItem>
-            ))}
-          </TextField>
+            options={pipelines}
+            getOptionLabel={(p) => p.name}
+            value={pipelines.find((p) => p.id === pipelineId) ?? null}
+            onChange={(_, v) => setPipelineId(v?.id ?? '')}
+            fullWidth
+            renderInput={(params) => <TextField {...params} label={t('pages.schedules.pipeline')} required />}
+          />
           <TextField
             label={t('pages.schedules.repoRef')}
             value={repoRef}
@@ -354,42 +479,104 @@ function ScheduleFormDialog({
             fullWidth
             size="small"
           />
-          <TextField
-            label={t('pages.schedules.workingDir')}
-            value={workingDir}
-            onChange={(e) => setWorkingDir(e.target.value)}
-            fullWidth
-            size="small"
-          />
-          <TextField
-            select
-            label={t('pages.schedules.sourceOptional')}
-            value={sourceId}
-            onChange={(e) => {
-              setSourceId(e.target.value)
-              setStateKey('')
-            }}
-            fullWidth
-            size="small"
-          >
-            <MenuItem value="">{t('common.none')}</MenuItem>
-            {(sourcesQuery.data ?? []).map((s) => (
-              <MenuItem key={s.id} value={s.id}>
-                {s.name}
-              </MenuItem>
-            ))}
-          </TextField>
-          <Autocomplete
-            size="small"
-            options={statesQuery.data ?? []}
-            loading={statesQuery.isLoading}
-            getOptionLabel={(st) => st.name || st.key}
-            value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
-            onChange={(_, v) => setStateKey(v?.key ?? '')}
-            disabled={!sourceId || statesQuery.isLoading}
-            fullWidth
-            renderInput={(params) => <TextField {...params} label={t('pages.schedules.stateOptional')} />}
-          />
+          {!fanOut && (
+            <>
+              <TextField
+                label={t('pages.schedules.workingDir')}
+                value={workingDir}
+                onChange={(e) => setWorkingDir(e.target.value)}
+                fullWidth
+                size="small"
+              />
+              <TextField
+                select
+                label={t('pages.schedules.sourceOptional')}
+                value={sourceId}
+                onChange={(e) => {
+                  setSourceId(e.target.value)
+                  setStateKey('')
+                }}
+                fullWidth
+                size="small"
+              >
+                <MenuItem value="">{t('common.none')}</MenuItem>
+                {(sourcesQuery.data ?? []).map((s) => (
+                  <MenuItem key={s.id} value={s.id}>
+                    {s.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <Autocomplete
+                size="small"
+                options={statesQuery.data ?? []}
+                loading={statesQuery.isLoading}
+                getOptionLabel={(st) => st.name || st.key}
+                value={(statesQuery.data ?? []).find((st) => st.key === stateKey) ?? null}
+                onChange={(_, v) => setStateKey(v?.key ?? '')}
+                disabled={!sourceId || statesQuery.isLoading}
+                fullWidth
+                renderInput={(params) => <TextField {...params} label={t('pages.schedules.stateOptional')} />}
+              />
+            </>
+          )}
+          {fanOut && (
+            <Box>
+              <Typography variant="subtitle2">{t('pages.schedules.fanOutTargets')}</Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                {t('pages.schedules.fanOutTargetsHelp')}
+              </Typography>
+              <Stack spacing={1}>
+                {targets.map((tg, i) => (
+                  <ScheduleTargetRow
+                    key={i}
+                    target={tg}
+                    sources={sourcesQuery.data ?? []}
+                    onChange={(patch) => updateTarget(i, patch)}
+                    onRemove={() => removeTarget(i)}
+                  />
+                ))}
+              </Stack>
+              <Button size="small" startIcon={<AddIcon />} onClick={addTarget} sx={{ mt: 1 }}>
+                {t('pages.schedules.addTarget')}
+              </Button>
+              {targets.length === 0 && (
+                <Typography variant="caption" color="error" sx={{ display: 'block', mt: 0.5 }}>
+                  {t('pages.schedules.targetsRequired')}
+                </Typography>
+              )}
+              <Stack direction="row" spacing={1} sx={{ mt: 2, alignItems: 'flex-start' }}>
+                <TextField
+                  select
+                  label={t('pages.schedules.bulkSourceLabel')}
+                  value={bulkSourceId}
+                  onChange={(e) => setBulkSourceId(e.target.value)}
+                  size="small"
+                  sx={{ minWidth: 160 }}
+                >
+                  <MenuItem value="">{t('common.none')}</MenuItem>
+                  {(sourcesQuery.data ?? []).map((s) => (
+                    <MenuItem key={s.id} value={s.id}>
+                      {s.name}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <TextField
+                  label={t('pages.schedules.bulkPattern')}
+                  value={bulkPattern}
+                  onChange={(e) => setBulkPattern(e.target.value)}
+                  size="small"
+                  sx={{ flexGrow: 1 }}
+                />
+                <Button
+                  size="small"
+                  disabled={!bulkSourceId || !bulkPattern.trim() || bulkStatesQuery.isLoading}
+                  onClick={addMatching}
+                >
+                  {t('pages.schedules.bulkAdd')}
+                </Button>
+              </Stack>
+            </Box>
+          )}
           <FormControlLabel
             control={<Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />}
             label={t('pages.schedules.enabled')}
@@ -400,7 +587,9 @@ function ScheduleFormDialog({
         <Button onClick={onClose}>{t('common.cancel')}</Button>
         <Button
           variant="contained"
-          disabled={mutation.isPending || !name || !cron || cronError || !pipelineId}
+          disabled={
+            mutation.isPending || !name || !cron || cronError || !pipelineId || (fanOut && validTargets.length === 0)
+          }
           onClick={() => mutation.mutate()}
         >
           {t('common.save')}

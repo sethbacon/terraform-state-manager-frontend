@@ -70,13 +70,14 @@ export default function NewRunDialog({
       <DialogTitle>{t('pages.drift.newRunTitle')}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField select label={t('pages.drift.pipeline')} value={pipelineId} onChange={(e) => setPipelineId(e.target.value)} fullWidth>
-            {pipelines.map((p) => (
-              <MenuItem key={p.id} value={p.id}>
-                {p.name} ({p.provider})
-              </MenuItem>
-            ))}
-          </TextField>
+          <Autocomplete
+            options={pipelines}
+            getOptionLabel={(p) => `${p.name} (${p.provider})`}
+            value={pipelines.find((p) => p.id === pipelineId) ?? null}
+            onChange={(_, v) => setPipelineId(v?.id ?? '')}
+            fullWidth
+            renderInput={(params) => <TextField {...params} label={t('pages.drift.pipeline')} />}
+          />
           <TextField
             label={t('pages.drift.gitRefOptional')}
             value={repoRef}

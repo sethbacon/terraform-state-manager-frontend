@@ -4,6 +4,7 @@ import {
   Alert,
   Button,
   Card,
+  Chip,
   MenuItem,
   Stack,
   Table,
@@ -15,9 +16,11 @@ import {
   Typography,
 } from '@mui/material'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { api, type DriftRun } from '../../services/api'
 import { queryKeys } from '../../services/queryKeys'
 import TableSkeleton from '../../components/skeletons/TableSkeleton'
+import CompletenessChips from '../../components/CompletenessChips'
 import DriftRunDetailDialog from './DriftRunDetailDialog'
 import { statusChip } from './statusChip'
 
@@ -29,14 +32,21 @@ const RUNS_PAGE_SIZE = 20
 // it is clicking a row of this table.
 export default function DriftRunsTable() {
   const { t } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const batchId = searchParams.get('batch') ?? ''
   const [runsPage, setRunsPage] = useState(0)
   const [runsStatus, setRunsStatus] = useState('')
   const [selectedRun, setSelectedRun] = useState<DriftRun | null>(null)
 
   const runsQuery = useQuery({
-    queryKey: queryKeys.drift.runs(runsPage, runsStatus),
+    queryKey: queryKeys.drift.runs(runsPage, runsStatus, batchId),
     queryFn: () =>
-      api.listDriftRuns({ limit: RUNS_PAGE_SIZE, offset: runsPage * RUNS_PAGE_SIZE, status: runsStatus || undefined }),
+      api.listDriftRuns({
+        limit: RUNS_PAGE_SIZE,
+        offset: runsPage * RUNS_PAGE_SIZE,
+        status: runsStatus || undefined,
+        batchId: batchId || undefined,
+      }),
     // Poll while any run is still in flight so results appear when the CI job calls back.
     refetchInterval: (q) =>
       (q.state.data?.runs ?? []).some((r) => r.status === 'dispatched' || r.status === 'running') ? 4000 : false,
@@ -50,6 +60,17 @@ export default function DriftRunsTable() {
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {t('pages.drift.recentRuns')}
         </Typography>
+        {batchId && (
+          <Chip
+            size="small"
+            label={t('pages.drift.batchFilter', { id: batchId })}
+            onDelete={() => {
+              searchParams.delete('batch')
+              setSearchParams(searchParams)
+              setRunsPage(0)
+            }}
+          />
+        )}
         <TextField
           select
           size="small"
@@ -81,6 +102,7 @@ export default function DriftRunsTable() {
                   <TableCell>{t('common.ref')}</TableCell>
                   <TableCell>{t('pages.drift.dir')}</TableCell>
                   <TableCell align="right">+ / ~ / -</TableCell>
+                  <TableCell align="center">{t('pages.drift.completenessColumn')}</TableCell>
                   <TableCell>{t('common.created')}</TableCell>
                   <TableCell>{t('common.detail')}</TableCell>
                 </TableRow>
@@ -93,6 +115,9 @@ export default function DriftRunsTable() {
                     <TableCell>{r.working_dir || '.'}</TableCell>
                     <TableCell align="right">
                       {r.added != null ? `${r.added} / ${r.changed} / ${r.destroyed}` : '—'}
+                    </TableCell>
+                    <TableCell align="center">
+                      <CompletenessChips completeness={r} variant="icon" />
                     </TableCell>
                     <TableCell>{new Date(r.created_at).toLocaleString()}</TableCell>
                     <TableCell sx={{ maxWidth: 220, wordBreak: 'break-word' }}>{r.detail || '—'}</TableCell>

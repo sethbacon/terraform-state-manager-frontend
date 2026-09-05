@@ -10,6 +10,8 @@ import {
   CircularProgress,
   IconButton,
   Stack,
+  Tab,
+  Tabs,
   Typography,
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
@@ -30,6 +32,7 @@ import { queryKeys } from '../services/queryKeys'
 import { useAuth } from '../contexts/AuthContext'
 import AddPipelineDialog from './drift/AddPipelineDialog'
 import CISourcesDialog from './drift/CISourcesDialog'
+import DriftCoverageTab from './drift/DriftCoverageTab'
 import DriftRunsTable from './drift/DriftRunsTable'
 import EditPipelineDialog from './drift/EditPipelineDialog'
 import NewRunDialog from './drift/NewRunDialog'
@@ -47,6 +50,7 @@ export default function DriftPage() {
   const canManage = hasScope('sources:manage')
   const canRun = hasScope('state:drift')
 
+  const [tab, setTab] = useState(0)
   const [addPipelineOpen, setAddPipelineOpen] = useState(false)
   const [ciSourcesOpen, setCiSourcesOpen] = useState(false)
   const [repoWizardOpen, setRepoWizardOpen] = useState(false)
@@ -91,63 +95,74 @@ export default function DriftPage() {
         }
       />
 
-      {/* Drift records: the durable, acknowledgeable signal (runs are the mechanism) */}
-      <DriftRecordsSection sourceNames={sourceNames} />
+      <Tabs value={tab} onChange={(_, v) => setTab(v as number)} sx={{ mb: 2 }}>
+        <Tab label={t('pages.drift.tabOverview')} />
+        <Tab label={t('pages.drift.tabCoverage')} />
+      </Tabs>
 
-      {/* Pipeline connections */}
-      <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }}>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          {t('pages.drift.pipelines')}
-        </Typography>
-        {canManage && (
-          <>
-            <Button size="small" startIcon={<AutoFixHighIcon />} onClick={() => setRepoWizardOpen(true)} sx={{ mr: 1 }}>
-              {t('pages.drift.setUpRepo')}
-            </Button>
-            <Button size="small" startIcon={<HubIcon />} onClick={() => setCiSourcesOpen(true)} sx={{ mr: 1 }}>
-              {t('pages.drift.ciSources')}
-            </Button>
-            <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
-              {t('actions.addPipeline')}
-            </Button>
-          </>
-        )}
-      </Stack>
-      {pipelinesQuery.isLoading && <CircularProgress size={20} />}
-      {/* Divergence, preserved: this empty state is hard-coded English while
-          the neighbouring no-runs and no-CI-sources hints are translated. */}
-      {pipelinesQuery.data && pipelinesQuery.data.length === 0 && (
-        <Alert severity="info" sx={{ mb: 3 }}>
-          No pipeline connections yet.
-        </Alert>
-      )}
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', mb: 4 }}>
-        {pipelinesQuery.data?.map((p) => (
-          <Card key={p.id} variant="outlined">
-            <CardContent>
-              <Stack direction="row" spacing={0.5} sx={{ alignItems: 'flex-start' }}>
-                <Typography variant="subtitle1" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
-                  {p.name}
-                </Typography>
-                {canManage && (
-                  <Stack direction="row" sx={{ flexShrink: 0, mt: -0.5, mr: -0.5 }}>
-                    <IconButton size="small" aria-label="edit" onClick={() => setEditPipelineTarget(p)}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton size="small" aria-label="delete" onClick={() => setDeletePipelineTarget(p)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
+      {tab === 0 && (
+        <>
+          {/* Drift records: the durable, acknowledgeable signal (runs are the mechanism) */}
+          <DriftRecordsSection sourceNames={sourceNames} />
+
+          {/* Pipeline connections */}
+          <Stack direction="row" sx={{ mb: 1, alignItems: 'center' }}>
+            <Typography variant="h6" sx={{ flexGrow: 1 }}>
+              {t('pages.drift.pipelines')}
+            </Typography>
+            {canManage && (
+              <>
+                <Button size="small" startIcon={<AutoFixHighIcon />} onClick={() => setRepoWizardOpen(true)} sx={{ mr: 1 }}>
+                  {t('pages.drift.setUpRepo')}
+                </Button>
+                <Button size="small" startIcon={<HubIcon />} onClick={() => setCiSourcesOpen(true)} sx={{ mr: 1 }}>
+                  {t('pages.drift.ciSources')}
+                </Button>
+                <Button size="small" startIcon={<AddIcon />} onClick={() => setAddPipelineOpen(true)}>
+                  {t('actions.addPipeline')}
+                </Button>
+              </>
+            )}
+          </Stack>
+          {pipelinesQuery.isLoading && <CircularProgress size={20} />}
+          {/* Divergence, preserved: this empty state is hard-coded English while
+              the neighbouring no-runs and no-CI-sources hints are translated. */}
+          {pipelinesQuery.data && pipelinesQuery.data.length === 0 && (
+            <Alert severity="info" sx={{ mb: 3 }}>
+              No pipeline connections yet.
+            </Alert>
+          )}
+          <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', mb: 4 }}>
+            {pipelinesQuery.data?.map((p) => (
+              <Card key={p.id} variant="outlined">
+                <CardContent>
+                  <Stack direction="row" spacing={0.5} sx={{ alignItems: 'flex-start' }}>
+                    <Typography variant="subtitle1" sx={{ flexGrow: 1, wordBreak: 'break-word' }}>
+                      {p.name}
+                    </Typography>
+                    {canManage && (
+                      <Stack direction="row" sx={{ flexShrink: 0, mt: -0.5, mr: -0.5 }}>
+                        <IconButton size="small" aria-label="edit" onClick={() => setEditPipelineTarget(p)}>
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" aria-label="delete" onClick={() => setDeletePipelineTarget(p)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    )}
                   </Stack>
-                )}
-              </Stack>
-              <Chip size="small" label={p.provider} sx={{ mt: 0.5 }} />
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
+                  <Chip size="small" label={p.provider} sx={{ mt: 0.5 }} />
+                </CardContent>
+              </Card>
+            ))}
+          </Box>
 
-      {/* Drift runs */}
-      <DriftRunsTable />
+          {/* Drift runs */}
+          <DriftRunsTable />
+        </>
+      )}
+
+      {tab === 1 && <DriftCoverageTab />}
 
       <AddPipelineDialog
         open={addPipelineOpen}
