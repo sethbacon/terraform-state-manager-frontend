@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DriftRepoWizard from './DriftRepoWizard'
 import { api } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 import i18n from '../i18n'
 
 vi.mock('../services/api', async (importOriginal) => {
@@ -23,11 +24,15 @@ vi.mock('../services/api', async (importOriginal) => {
       createCISourcePipeline: vi.fn(),
       createPipeline: vi.fn(),
       createDriftRun: vi.fn(),
+      listCITemplates: vi.fn(),
     },
   }
 })
+vi.mock('../contexts/AuthContext', () => ({ useAuth: vi.fn() }))
 
 const mocked = vi.mocked(api)
+const mockedUseAuth = vi.mocked(useAuth)
+type AuthShape = ReturnType<typeof useAuth>
 
 const adoSource = {
   id: 'c1',
@@ -84,6 +89,8 @@ beforeEach(() => {
   mocked.getHealthWorkflow.mockResolvedValue('health yaml placeholder')
   mocked.listCISourcePipelines.mockResolvedValue([])
   mocked.listCISourceWorkflows.mockResolvedValue([])
+  mocked.listCITemplates.mockResolvedValue([])
+  mockedUseAuth.mockReturnValue({ hasScope: () => false } as unknown as AuthShape)
 })
 
 describe('DriftRepoWizard', () => {
@@ -256,5 +263,86 @@ describe('DriftRepoWizard', () => {
         }),
       ),
     )
+  })
+
+  it('offers the built-in profiles (including fan-out for ADO) to a non-admin caller', async () => {
+    renderWizard()
+    const dialog = await pickSourceAndRepo(/corp-ado/)
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+    await within(dialog).findByText(/drift yaml/)
+
+    fireEvent.mouseDown(within(dialog).getByLabelText(i18n.t('pages.drift.wizard.profile') as string))
+    expect(await screen.findByRole('option', { name: 'default' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'suite' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'fan-out' })).toBeInTheDocument()
+    expect(mocked.listCITemplates).not.toHaveBeenCalled()
+  })
+
+  it('does not offer the fan-out profile for a GitHub source', async () => {
+    renderWizard()
+    const dialog = await pickSourceAndRepo(/corp-gh/)
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+    await within(dialog).findByText(/drift yaml/)
+
+    fireEvent.mouseDown(within(dialog).getByLabelText(i18n.t('pages.drift.wizard.profile') as string))
+    expect(await screen.findByRole('option', { name: 'default' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'fan-out' })).not.toBeInTheDocument()
+  })
+
+  it('loads profiles from the template registry for an admin caller, and requests the picked one', async () => {
+    mockedUseAuth.mockReturnValue({ hasScope: () => true } as unknown as AuthShape)
+    mocked.listCITemplates.mockResolvedValue([
+      { id: 't1', provider: 'azure_devops', kind: 'drift', profile: 'brunswick-azure-ext', name: 'n', description: '', content: '', is_builtin: true, created_at: '', updated_at: '' },
+      { id: 't2', provider: 'azure_devops', kind: 'drift', profile: 'fan-out', name: 'n', description: '', content: '', is_builtin: true, created_at: '', updated_at: '' },
+      { id: 't3', provider: 'github_actions', kind: 'drift', profile: 'default', name: 'n', description: '', content: '', is_builtin: true, created_at: '', updated_at: '' },
+    ] as unknown as Awaited<ReturnType<typeof api.listCITemplates>>)
+    renderWizard()
+    const dialog = await pickSourceAndRepo(/corp-ado/)
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+    await within(dialog).findByText(/drift yaml/)
+
+    fireEvent.mouseDown(within(dialog).getByLabelText(i18n.t('pages.drift.wizard.profile') as string))
+    expect(await screen.findByRole('option', { name: 'brunswick-azure-ext' })).toBeInTheDocument()
+    // Only this source's provider+kind — not the GitHub row.
+    expect(screen.queryByRole('option', { name: 'default' })).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('option', { name: 'brunswick-azure-ext' }))
+    await waitFor(() => expect(mocked.getDriftWorkflow).toHaveBeenCalledWith('azure_devops', 'brunswick-azure-ext'))
+  })
+
+  it('writes config.fan_out on the created connection when the fan-out checkbox is checked (ADO)', async () => {
+    mocked.createCISourcePipeline.mockResolvedValue({ id: 42, name: 'corp drift', folder: '\\' } as Awaited<
+      ReturnType<typeof api.createCISourcePipeline>
+    >)
+    mocked.createPipeline.mockResolvedValue({ id: 'p9', name: 'corp drift', provider: 'azure_devops', config: {} } as Awaited<
+      ReturnType<typeof api.createPipeline>
+    >)
+    renderWizard()
+    const dialog = await pickSourceAndRepo(/corp-ado/)
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+    await within(dialog).findByText(/drift yaml/)
+
+    fireEvent.click(within(dialog).getByLabelText(new RegExp(i18n.t('pages.drift.wizard.fanOut') as string)))
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+
+    fireEvent.change(
+      await within(dialog).findByLabelText(new RegExp(`^${i18n.t('pages.drift.wizard.pipelineName')}`)),
+      { target: { value: 'corp drift' } },
+    )
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('pages.drift.wizard.createBoth') as string }))
+
+    await waitFor(() =>
+      expect(mocked.createPipeline).toHaveBeenCalledWith(
+        expect.objectContaining({ config: expect.objectContaining({ fan_out: true }) }),
+      ),
+    )
+  })
+
+  it('does not show the fan-out checkbox for a GitHub source', async () => {
+    renderWizard()
+    const dialog = await pickSourceAndRepo(/corp-gh/)
+    fireEvent.click(within(dialog).getByRole('button', { name: i18n.t('common.next') as string }))
+    await within(dialog).findByText(/drift yaml/)
+    expect(screen.queryByLabelText(new RegExp(i18n.t('pages.drift.wizard.fanOut') as string))).not.toBeInTheDocument()
   })
 })

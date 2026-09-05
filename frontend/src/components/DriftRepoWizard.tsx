@@ -26,8 +26,16 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import { Trans, useTranslation } from 'react-i18next'
 import { api, type CIRepoRef, type CIServiceConnectionRef, type CIWorkflowSetupResult } from '../services/api'
 import { queryKeys } from '../services/queryKeys'
+import { useAuth } from '../contexts/AuthContext'
 import { extractApiError as apiErr } from '../utils/apiError'
 import { isSafeExternalUrl } from '../utils/externalUrl'
+
+// Built-in profiles served without an admin session — mirrors the backend's
+// seeded (provider, kind=drift) rows (workflow_templates_seed.go): "fan-out"
+// exists for azure_devops only.
+function builtinProfiles(provider: string): string[] {
+  return provider === 'azure_devops' ? ['default', 'suite', 'fan-out'] : ['default', 'suite']
+}
 
 // DriftRepoWizard walks a repo from "has terraform" to "drift-enabled":
 // pick a CI source + repo, configure and copy the TSM workflow template,
@@ -63,12 +71,16 @@ export default function DriftRepoWizard({
   onCreated: () => void
 }) {
   const { t } = useTranslation()
+  const { hasScope } = useAuth()
+  const isAdmin = hasScope('admin')
   const queryClient = useQueryClient()
   const [step, setStep] = useState(0)
   const [sourceId, setSourceId] = useState('')
   const [repo, setRepo] = useState<CIRepoRef | null>(null)
   const [workingDir, setWorkingDir] = useState('.')
   const [serviceConnection, setServiceConnection] = useState<CIServiceConnectionRef | null>(null)
+  const [profile, setProfile] = useState('default')
+  const [fanOut, setFanOut] = useState(false)
   const [pipelineName, setPipelineName] = useState('')
   const [copied, setCopied] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -106,9 +118,32 @@ export default function DriftRepoWizard({
     retry: false,
   })
 
+  // Admin callers pick from the live template registry (their own uploaded
+  // profiles included); everyone else sees the built-in set the backend seeds
+  // unconditionally, so the picker is never empty for a non-admin operator.
+  const templatesQuery = useQuery({
+    queryKey: queryKeys.admin.ciTemplates(),
+    queryFn: api.listCITemplates,
+    enabled: open && isAdmin,
+  })
+  const profiles = useMemo(() => {
+    if (!source) return builtinProfiles('azure_devops')
+    if (isAdmin) {
+      const names = Array.from(
+        new Set(
+          (templatesQuery.data ?? [])
+            .filter((tpl) => tpl.provider === source.provider && tpl.kind === 'drift')
+            .map((tpl) => tpl.profile),
+        ),
+      )
+      if (names.length > 0) return names
+    }
+    return builtinProfiles(source.provider)
+  }, [source, isAdmin, templatesQuery.data])
+
   const templateQuery = useQuery({
-    queryKey: queryKeys.drift.workflow(source?.provider ?? ''),
-    queryFn: () => api.getDriftWorkflow(source?.provider ?? 'github_actions'),
+    queryKey: queryKeys.drift.workflow(source?.provider ?? '', profile),
+    queryFn: () => api.getDriftWorkflow(source?.provider ?? 'github_actions', profile),
     enabled: open && Boolean(source),
   })
   const healthTemplateQuery = useQuery({
@@ -185,6 +220,8 @@ export default function DriftRepoWizard({
     setRepo(null)
     setWorkingDir('.')
     setServiceConnection(null)
+    setProfile('default')
+    setFanOut(false)
     setPipelineName('')
     setCopied(false)
     setError(null)
@@ -229,6 +266,7 @@ export default function DriftRepoWizard({
           organization: source.organization,
           project: source.project ?? '',
           pipeline_id: String(created.id),
+          ...(fanOut ? { fan_out: true } : {}),
         },
       })
       if (includeVersionLab) {
@@ -271,6 +309,7 @@ export default function DriftRepoWizard({
           organization: source.organization,
           project: source.project ?? '',
           pipeline_id: String(existingPipeline.id),
+          ...(fanOut ? { fan_out: true } : {}),
         },
       })
       await maybeFirstRun(conn.id)
@@ -378,6 +417,8 @@ export default function DriftRepoWizard({
                 setSourceId(e.target.value)
                 setRepo(null)
                 setServiceConnection(null)
+                setProfile('default')
+                setFanOut(false)
               }}
               helperText={
                 sourcesQuery.data && sourcesQuery.data.length === 0
@@ -444,6 +485,31 @@ export default function DriftRepoWizard({
                 />
               )}
             </Stack>
+            <TextField
+              select
+              label={t('pages.drift.wizard.profile')}
+              value={profile}
+              onChange={(e) => setProfile(e.target.value)}
+              helperText={t('pages.drift.wizard.profileHelp')}
+              sx={{ maxWidth: 320 }}
+            >
+              {profiles.map((p) => (
+                <MenuItem key={p} value={p}>
+                  {p}
+                </MenuItem>
+              ))}
+            </TextField>
+            {isADO && (
+              <FormControlLabel
+                control={<Checkbox checked={fanOut} onChange={(e) => setFanOut(e.target.checked)} />}
+                label={t('pages.drift.wizard.fanOut')}
+              />
+            )}
+            {isADO && fanOut && (
+              <Typography variant="caption" color="text.secondary" sx={{ mt: -1 }}>
+                {t('pages.drift.wizard.fanOutHelp')}
+              </Typography>
+            )}
             <FormControlLabel
               control={
                 <Checkbox checked={includeVersionLab} onChange={(e) => setIncludeVersionLab(e.target.checked)} />
