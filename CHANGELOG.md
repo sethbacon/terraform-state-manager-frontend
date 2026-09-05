@@ -1,5 +1,71 @@
 # Changelog
 
+## [1.30.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.1...v1.30.2) (2026-09-03)
+
+
+### Bug Fixes
+
+* send the upstream Host when proxying /api/ to the backend ([#408](https://github.com/sethbacon/terraform-state-manager-frontend/issues/408)) ([04f1b62](https://github.com/sethbacon/terraform-state-manager-frontend/commit/04f1b624d4134ccfde6bfd081bd9196f4f5f4d6e))
+
+## [1.30.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.0...v1.30.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* send TLS SNI to backend on proxied requests (nginx) ([#406](https://github.com/sethbacon/terraform-state-manager-frontend/issues/406)) ([8c38dde](https://github.com/sethbacon/terraform-state-manager-frontend/commit/8c38dde4ce2a238c030eeff98f4bf3ec0211f394))
+
+## [1.30.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.29.0...v1.30.0) (2026-08-31)
+
+
+### Features
+
+* **ci:** adopt the shared Dependabot CI-health check ([#403](https://github.com/sethbacon/terraform-state-manager-frontend/issues/403)) ([0b3d9db](https://github.com/sethbacon/terraform-state-manager-frontend/commit/0b3d9db4e399ab054952bd6717d5c78a0a23ed71))
+
+## [1.29.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.28.0...v1.29.0) (2026-08-31)
+
+
+### Features
+
+* **ci:** adopt the release-PR closing-keyword guard ([cb3800c](https://github.com/sethbacon/terraform-state-manager-frontend/commit/cb3800c58806015bd3dcdaab151fadabfd1108e9))
+
+
+### Bug Fixes
+
+* **ci:** a non-empty, non-ref-shaped comment satisfies both pin gates ([a307170](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a3071700cff94d647783e8ab5290fd70f55839a7))
+* **ci:** correct the pin comment to name the commit actually referenced ([886ee07](https://github.com/sethbacon/terraform-state-manager-frontend/commit/886ee075cd69322af5da42c9eaff5dd6b177a9ff))
+* **ci:** drop the unresolvable pin comment zizmor's ref-version-mismatch flagged ([f799dd8](https://github.com/sethbacon/terraform-state-manager-frontend/commit/f799dd816d9fa688d2426a78bf588e9870b942f2))
+* **ci:** re-pin the release-close guard to the fixed shared-workflows commit ([ae9717d](https://github.com/sethbacon/terraform-state-manager-frontend/commit/ae9717da36e977c791e1a748a141074ae3dcccd4))
+
+## [1.28.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.27.0...v1.28.0) (2026-08-30)
+
+
+### Features
+
+* **auth:** accept the session's remaining lifetime from /auth/me ([#395](https://github.com/sethbacon/terraform-state-manager-frontend/issues/395)) ([a7ea73b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a7ea73b4190d6bee9fb487308ad6a3b972a19d8e))
+
+## [1.27.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.4...v1.27.0) (2026-08-28)
+
+
+### Features
+
+* **identity:** offer a platform administrator the organization picker ([#392](https://github.com/sethbacon/terraform-state-manager-frontend/issues/392)) ([904d48b](https://github.com/sethbacon/terraform-state-manager-frontend/commit/904d48b5d538fa665f2995d5275844b010f2c98c))
+
+## [1.26.4](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.3...v1.26.4) (2026-08-28)
+
+
+### Bug Fixes
+
+* **ci:** stop piping into grep -q, which dies 141 under pipefail ([#390](https://github.com/sethbacon/terraform-state-manager-frontend/issues/390)) ([2476c37](https://github.com/sethbacon/terraform-state-manager-frontend/commit/2476c3763e947f030a7a37b62767d403911583b9))
+
+## [1.26.3](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.2...v1.26.3) (2026-08-28)
+
+
+### Bug Fixes
+
+* **ci:** give translation PRs the CI every other PR gets ([#387](https://github.com/sethbacon/terraform-state-manager-frontend/issues/387)) ([a3e39b1](https://github.com/sethbacon/terraform-state-manager-frontend/commit/a3e39b11f960ed80b754dfbea4342a11b57704b8)), closes [#379](https://github.com/sethbacon/terraform-state-manager-frontend/issues/379)
+* **ci:** tell a broken OSV scanner from a clean one ([#385](https://github.com/sethbacon/terraform-state-manager-frontend/issues/385)) ([5f41e02](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5f41e02291b172d37ae01dad4efa7d6ac037e2ac))
+* **ci:** test the resolved YAML value, not the workflow source text ([#388](https://github.com/sethbacon/terraform-state-manager-frontend/issues/388)) ([5b17dcf](https://github.com/sethbacon/terraform-state-manager-frontend/commit/5b17dcf93ad53369dd2fa20a4c41d89b0c2cd122))
+
 ## [1.26.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.26.1...v1.26.2) (2026-08-26)
 
 

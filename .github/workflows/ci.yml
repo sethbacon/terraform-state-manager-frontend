@@ -78,7 +78,10 @@ jobs:
           set -euo pipefail
           conf=$(docker run --rm --entrypoint sh tsm-frontend:ci -c 'cat /etc/nginx/conf.d/default.conf')
           grep -q "nonce-\$csp_nonce" <<<"$conf"
-          grep -q 'proxy_set_header Host \$host;' <<<"$conf"
+          # $host moved from Host to X-Forwarded-Host: proxying to a platform ingress
+          # needs the upstream's name in Host, so $host is carried alongside instead.
+          grep -q 'proxy_set_header X-Forwarded-Host \$host;' <<<"$conf"
+          grep -q 'proxy_set_header Host \$proxy_host;' <<<"$conf"
           grep -q 'X-Forwarded-For \$proxy_add_x_forwarded_for;' <<<"$conf"
 
       # The template must not sit where nginx's own entrypoint would render it
@@ -92,9 +95,16 @@ jobs:
       - name: BACKEND_URL unset serves, and keeps the Compose upstream
         run: |
           set -euo pipefail
+          # NO PIPE INTO grep -q. `grep -q` exits at the first match, and a producer
+          # still writing then takes SIGPIPE and dies 141. Under `set -o pipefail`
+          # that 141 becomes the pipeline's status and fails the step -- but only
+          # when the producer happened to have more to write, so it reads as a flake
+          # rather than a bug. `docker logs ro | grep -q` failed exactly this way on
+          # PR #389. Capture first, then match: same assertion, no pipeline.
           docker run -d --name unset --add-host backend:127.0.0.1 tsm-frontend:ci
           sleep 4
-          docker ps --format '{{.Names}}' | grep -qx unset
+          running=$(docker ps --format '{{.Names}}')
+          grep -qx unset <<<"$running"
           docker exec unset grep -q 'proxy_pass http://backend:8080;' /etc/nginx/conf.d/default.conf
           docker exec unset wget -q --spider http://127.0.0.1:80/
           docker rm -f unset
@@ -107,7 +117,8 @@ jobs:
           set -euo pipefail
           docker run -d --name set -e BACKEND_URL=http://127.0.0.1:9999 tsm-frontend:ci
           sleep 4
-          docker ps --format '{{.Names}}' | grep -qx set
+          running=$(docker ps --format '{{.Names}}')
+          grep -qx set <<<"$running"
           docker exec set grep -q 'proxy_pass http://127.0.0.1:9999;' /etc/nginx/conf.d/default.conf
           docker exec set grep -q "nonce-\$csp_nonce" /etc/nginx/conf.d/default.conf
           docker exec set wget -q --spider http://127.0.0.1:80/
@@ -125,9 +136,11 @@ jobs:
           docker run -d --name ro -e BACKEND_URL=http://ignored:1234 \
             -v "$PWD/mounted.conf:/etc/nginx/conf.d/default.conf:ro" tsm-frontend:ci
           sleep 4
-          docker ps --format '{{.Names}}' | grep -qx ro
+          running=$(docker ps --format '{{.Names}}')
+          grep -qx ro <<<"$running"
           docker exec ro grep -q 'proxy_pass http://127.0.0.1:7777;' /etc/nginx/conf.d/default.conf
-          docker logs ro 2>&1 | grep -q 'not writable'
+          ro_logs=$(docker logs ro 2>&1)
+          grep -q 'not writable' <<<"$ro_logs"
           docker exec ro wget -q --spider http://127.0.0.1:80/
           docker rm -f ro
 

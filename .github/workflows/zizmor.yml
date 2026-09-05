@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   workflow-security:
-    uses: 4cloudguru/shared-workflows/.github/workflows/workflow-security.yml@9ed6d3c988fb075f1023680d92eb4cf5a8e55056 # v1.14.0
+    uses: 4cloudguru/shared-workflows/.github/workflows/workflow-security.yml@3aae0966a70daa50bcfe741ef07e20e86c814af4 # v1.20.2
 
   # Second gate, same family: zizmor audits workflow SECURITY, this audits
   # workflow HARDENING -- pins labelled, jobs bounded by a timeout,
@@ -45,6 +45,6 @@ jobs:
   # shared-workflows at that commit, so this repo cannot weaken its own gate by
   # editing a local copy -- there is no local copy.
   workflow-hardening:
-    uses: 4cloudguru/shared-workflows/.github/workflows/workflow-hardening.yml@9ed6d3c988fb075f1023680d92eb4cf5a8e55056 # v1.14.0
+    uses: 4cloudguru/shared-workflows/.github/workflows/workflow-hardening.yml@3aae0966a70daa50bcfe741ef07e20e86c814af4 # v1.20.2
     with:
-      script-ref: 9ed6d3c988fb075f1023680d92eb4cf5a8e55056
+      script-ref: 3aae0966a70daa50bcfe741ef07e20e86c814af4

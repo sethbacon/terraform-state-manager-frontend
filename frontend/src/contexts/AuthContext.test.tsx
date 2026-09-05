@@ -20,6 +20,12 @@ vi.mock('../services/api', () => ({
     refreshToken: vi.fn(),
     login: vi.fn(),
     logout: vi.fn(),
+    // Read by the platform-admin organization bridge. Present here because the
+    // admin-wildcard case below is a session with the `admin` scope and no
+    // memberships -- which is exactly the standing the bridge acts on -- so
+    // omitting it would exercise the failure path while looking like the
+    // ordinary one.
+    listAdminOrganizations: vi.fn(),
   },
   setUnauthorizedHandler: vi.fn((h: (() => void) | null) => {
     unauth.handler = h
@@ -86,22 +92,28 @@ describe('AuthProvider', () => {
     expect(admin.result.current.hasScope('sources:manage')).toBe(true)
   })
 
-  it('ends an already-expired session immediately rather than warning about it', async () => {
-    // @4cloudguru/cloud-suite-ui 0.8.1 changed this to fail closed: a session
-    // already past its expiry when /me resolves is ENDED, not flagged with
-    // sessionExpiresSoon. Warning about a session the client already knows is dead
-    // leaves the UI rendered against it until the user acts on the warning, so the
-    // assertion here is that authentication is gone -- sessionExpiresSoon staying
-    // false is the point, not an omission.
+  it('keeps a session whose server expiry is already past, treating it as clock skew', async () => {
+    // @4cloudguru/cloud-suite-ui 0.11.1 (4cloudguru/cloud-suite-ui#178) changed this again, and
+    // reversed the 0.8.1 behaviour this test used to pin. Failing closed here was a hard lockout:
+    // the instant comes from the SERVER and was compared against the CLIENT's clock, so a browser
+    // ahead of the server by more than the session's remaining lifetime ended the session on
+    // EVERY /me. The user could never get past login, with nothing on screen to explain it.
+    //
+    // A 200 from /me is the server asserting the session is live, so it outranks our unsynchronised
+    // clock; a genuinely expired session 401s and is failed closed by the error path instead. The
+    // library now schedules nothing and warns. sessionExpiresSoon staying false is still the point
+    // -- what changed is that authentication survives.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     mocked.getCurrentUser.mockResolvedValue({
       ...me,
       session_expires_at: new Date(Date.now() - 1000).toISOString(),
     } as Awaited<ReturnType<typeof api.getCurrentUser>>)
     const { result } = await renderAuth()
-    await waitFor(() => expect(result.current.isAuthenticated).toBe(false))
-    expect(result.current.user).toBeNull()
-    expect(result.current.allowedScopes).toEqual([])
+    await waitFor(() => expect(result.current.isAuthenticated).toBe(true))
+    expect(result.current.user).not.toBeNull()
     expect(result.current.sessionExpiresSoon).toBe(false)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('clock'))
+    warn.mockRestore()
   })
 
   it('devLogin sets the cookie then re-resolves the user', async () => {
