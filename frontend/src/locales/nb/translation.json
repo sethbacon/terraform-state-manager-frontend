@@ -148,6 +148,16 @@
       "rumHint": "Forvaltede ressurser",
       "totalResources": "Totale ressurser"
     },
+    "driftTitle": "Driftstatus",
+    "driftLoadFailed": "Det gikk ikke an å laste inn driftsammendraget.",
+    "drift": {
+      "openDrift": "Åpen drift",
+      "critical": "Kritisk",
+      "inFlight": "Under flyvningen",
+      "inFlightHint": "Driftkjøringer som for øyeblikket er utsendt eller pågår",
+      "unverified": "Ubekreftet",
+      "unverifiedHint": "Live-poster der selve kontrollen ikke kunne analyseres eller var avkortet"
+    },
     "featuresTitle": "Hva du kan gjøre",
     "open": "Åpne",
     "signInToUse": "Logg inn for å bruke",
@@ -729,7 +739,9 @@
       "authMethod": "Autentiseringsmetode",
       "authMethodPat": "Personlig tilgangstoken",
       "authMethodApp": "App-registrering (Entra)",
+      "authMethodWorkloadIdentity": "Arbeidsbelastningsidentitet (AKS)",
       "appAuthHelp": "Registrering av Microsoft Entra-app (klientlegitimasjon) — anbefales for planlagt drift; ingen utløpsdato for PAT.",
+      "workloadIdentityHelp": "AKS Workload Identity — ingen hemmelighet lagres i TSM. Krever en føderert påloggingsinformasjon på den administrerte identiteten som angir denne klient-ID-en; se avsnittet «Workload Identity» i distribusjonsveiledningen.",
       "tenantId": "Leietaker-ID",
       "clientId": "Kunde-ID",
       "clientSecret": "Klienthemmelighet",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Start en første driftkjøring etter tilkobling",
         "firstRunDispatched": "Første driftkjøring er i gang — se den på denne siden.",
         "firstRunFailed": "Tilkoblingen ble opprettet, men den første kjøringen kunne ikke sendes ut: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Malsprofil",
+        "profileHelp": "Hvilken innebygd eller operatørredigert mal som skal brukes.",
+        "fanOut": "Fan-out på repo-nivå",
+        "fanOutHelp": "Kjører flere apper i dette repositoriet i én CI-jobb. Krever «fan-out»-malprofilen; tidsplanen for den resulterende tilkoblingen kan da omfatte flere delstater samtidig."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Løs valgt",
       "bulkPartialFailure": "{{count}} kunne ikke oppdateres",
       "sourceOptional": "Kilde (valgfritt)",
-      "stateOptional": "Delstat (valgfritt)"
+      "stateOptional": "Delstat (valgfritt)",
+      "openCiRun": "Start CI-kjøring",
+      "batchFilter": "Batch: {{id}}",
+      "tabOverview": "Oversikt",
+      "tabCoverage": "Dekning",
+      "completenessColumn": "Fullstendighet",
+      "recordAcknowledgedAt": "Kildeangitt på {{when}}",
+      "recordResolvedAt": "Løst på {{when}}",
+      "completeness": {
+        "unparseable": "Ikke bekreftet",
+        "unparseableHint": "Ikke verifisert — planen kunne ikke analyseres; dette resultatet er ukjent, ikke gyldig.",
+        "truncated": "Ufullstendig: Oppføringer fra {{entries}} / attributter fra {{attrs}} er utelatt",
+        "truncatedHint": "Delresultat — {{entries}} oppføringer / {{attrs}} attributter utelatt fra planen.",
+        "unmasked": "Verdier uten maske",
+        "unmaskedHint": "Denne planen kan inneholde sensitive verdier som ikke er maskert."
+      },
+      "coverage": {
+        "sourceLabel": "Kilde",
+        "chooseSource": "Velg en kilde for å se hva den dekker.",
+        "filterAll": "Alle",
+        "filterUnscheduled": "Uplanlagt",
+        "filterStale": "Gammelt",
+        "filterIncomplete": "Ufullstendig",
+        "filterDrifted": "Drivet",
+        "colState": "Stat",
+        "colScheduled": "Planlagt",
+        "colLastChecked": "Sist sjekket",
+        "colDrifted": "Drivet",
+        "colRecord": "Opptak",
+        "colCi": "CI-kjøring",
+        "neverChecked": "Aldri sjekket",
+        "summaryTotal": "{{count}} stater",
+        "summaryScheduled": "Planlagt: {{count}}",
+        "summaryUnscheduled": "Uplanlagt: {{count}}",
+        "summaryStale": "Uaktuelt: {{count}}",
+        "summaryIncomplete": "Ufullstendig: {{count}}",
+        "summaryOpen": "Åpningstider: {{count}}",
+        "summaryCritical": "Viktig: {{count}}",
+        "empty": "Ingen delstater for denne kilden."
+      }
     },
     "versionLab": {
       "noPipelines": "Ingen rørledningsforbindelser ennå — legg til en på Drift-siden, og gå deretter tilbake hit.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Slett tidsplan",
       "deleteConfirm": "Skal du slette tidsplanen «{{name}}»? Da vil den slutte å kjøre.",
       "sourceOptional": "Kilde (valgfritt)",
-      "stateOptional": "Delstat (valgfritt)"
+      "stateOptional": "Delstat (valgfritt)",
+      "viewRun": "Vis kjøring",
+      "fanOutTargets": "Mål (fan-out)",
+      "fanOutTargetsHelp": "Denne tilkoblingen støtter fan-out — oppgi alle tilstandene som denne tidsplanen skal planlegge for i én CI-jobb.",
+      "addTarget": "Legg til mål",
+      "removeTarget": "Fjern mål",
+      "targetSource": "Kilde",
+      "targetState": "Stat",
+      "targetWorkingDir": "Arbeidskatalog",
+      "bulkSourceLabel": "Legg til delstater fra kilden",
+      "bulkPattern": "Mønster for statlig nøkkel (regulært uttrykk)",
+      "bulkAdd": "Legg til tilhørende tilstander",
+      "targetsRequired": "Det kreves minst ett mål"
     },
     "branding": {
       "title": "Merkevarebygging",

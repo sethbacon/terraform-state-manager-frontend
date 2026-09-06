@@ -148,6 +148,16 @@
       "rumHint": "Recursos sob gestão",
       "totalResources": "Recursos totais"
     },
+    "driftTitle": "Estado da deriva",
+    "driftLoadFailed": "Não foi possível carregar o resumo do drift.",
+    "drift": {
+      "openDrift": "Derrapagem aberta",
+      "critical": "Crítico",
+      "inFlight": "Em voo",
+      "inFlightHint": "Provas de drift atualmente programadas ou em curso",
+      "unverified": "Não verificado",
+      "unverifiedHint": "Registos ativos cuja verificação própria não foi possível analisar ou estava truncada"
+    },
     "featuresTitle": "O que pode fazer",
     "open": "Abrir",
     "signInToUse": "Inicie sessão para utilizar",
@@ -729,7 +739,9 @@
       "authMethod": "Método de autenticação",
       "authMethodPat": "Token de acesso pessoal",
       "authMethodApp": "Registo da aplicação (Entra)",
+      "authMethodWorkloadIdentity": "Identidade da carga de trabalho (AKS)",
       "appAuthHelp": "Registo da aplicação Microsoft Entra (credenciais de cliente) — recomendado para a deriva programada; sem prazo de validade do PAT.",
+      "workloadIdentityHelp": "Identidade de carga de trabalho do AKS — não há segredos armazenados no TSM. Requer uma credencial federada na identidade gerida que indique este ID de cliente; consulte a secção «Identidade de carga de trabalho» do guia de implementação.",
       "tenantId": "N.º de identificação do inquilino",
       "clientId": "ID do cliente",
       "clientSecret": "Segredo do cliente",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Enviar a primeira série de medições após a ligação",
         "firstRunDispatched": "Primeira descida de drift já está disponível — veja-a nesta página.",
         "firstRunFailed": "A ligação foi criada, mas a primeira execução não conseguiu ser enviada: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Perfil do modelo",
+        "profileHelp": "Qual modelo integrado ou editado pelo operador deve ser utilizado.",
+        "fanOut": "Distribuição de sinais ao nível do Repo",
+        "fanOutHelp": "Executa várias aplicações deste repositório numa única tarefa de CI. Requer o perfil de modelo «fan-out»; o horário da ligação resultante pode, assim, abranger vários estados em simultâneo."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Resolução selecionada",
       "bulkPartialFailure": "{{count}} não foi possível atualizar",
       "sourceOptional": "Fonte (opcional)",
-      "stateOptional": "Estado (opcional)"
+      "stateOptional": "Estado (opcional)",
+      "openCiRun": "Iniciar execução do CI",
+      "batchFilter": "Lote: {{id}}",
+      "tabOverview": "Visão geral",
+      "tabCoverage": "Cobertura",
+      "completenessColumn": "Exaustividade",
+      "recordAcknowledgedAt": "Fonte: {{when}}",
+      "recordResolvedAt": "Resolvido em {{when}}",
+      "completeness": {
+        "unparseable": "Não verificado",
+        "unparseableHint": "Não verificado — não foi possível analisar o plano; este resultado é desconhecido, não é válido.",
+        "truncated": "Parcial: entradas «{{entries}}» / atributos «{{attrs}}» omitidos",
+        "truncatedHint": "Resultado parcial — entradas «{{entries}}» / atributos «{{attrs}}» omitidos do plano.",
+        "unmasked": "Valores não mascarados",
+        "unmaskedHint": "Este plano pode conter valores sensíveis não encriptados."
+      },
+      "coverage": {
+        "sourceLabel": "Fonte",
+        "chooseSource": "Escolha uma fonte para ver a cobertura que esta faz.",
+        "filterAll": "Todos",
+        "filterUnscheduled": "Não programado",
+        "filterStale": "Vencido",
+        "filterIncomplete": "Incompleto",
+        "filterDrifted": "À deriva",
+        "colState": "Estado",
+        "colScheduled": "Agendado",
+        "colLastChecked": "Última verificação",
+        "colDrifted": "À deriva",
+        "colRecord": "Registo",
+        "colCi": "Execução da CI",
+        "neverChecked": "Nunca verifiquei",
+        "summaryTotal": "{{count}} estados",
+        "summaryScheduled": "Agendado: {{count}}",
+        "summaryUnscheduled": "Sem data marcada: {{count}}",
+        "summaryStale": "Stale: {{count}}",
+        "summaryIncomplete": "Incompleto: {{count}}",
+        "summaryOpen": "Acesse: {{count}}",
+        "summaryCritical": "Crítico: {{count}}",
+        "empty": "Não existem estados para esta fonte."
+      }
     },
     "versionLab": {
       "noPipelines": "Ainda não há ligações de pipeline — adicione uma na página do Drift e, em seguida, volte aqui.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Eliminar agendamento",
       "deleteConfirm": "Apagar a tarefa agendada «{{name}}»? Isso fará com que deixe de ser executada.",
       "sourceOptional": "Fonte (opcional)",
-      "stateOptional": "Estado (opcional)"
+      "stateOptional": "Estado (opcional)",
+      "viewRun": "Ver execução",
+      "fanOutTargets": "Alvos (dispersão)",
+      "fanOutTargetsHelp": "Esta ligação permite o «fan-out» — indique todos os estados que este calendário deve planear numa única tarefa CI.",
+      "addTarget": "Adicionar destino",
+      "removeTarget": "Remover alvo",
+      "targetSource": "Fonte",
+      "targetState": "Estado",
+      "targetWorkingDir": "Diretório de trabalho",
+      "bulkSourceLabel": "Adicionar estados a partir da fonte",
+      "bulkPattern": "Padrão de chave de estado (expressão regular)",
+      "bulkAdd": "Adicionar estados correspondentes",
+      "targetsRequired": "É necessário indicar pelo menos um alvo"
     },
     "branding": {
       "title": "Imagem de marca",
