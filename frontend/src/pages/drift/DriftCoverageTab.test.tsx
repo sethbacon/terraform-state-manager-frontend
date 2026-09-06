@@ -112,6 +112,10 @@ describe('DriftCoverageTab', () => {
     fireEvent.click(await screen.findByRole('option', { name: 'estate' }))
     await screen.findByText('app3.tfstate')
     expect(screen.getByLabelText(i18n.t('pages.drift.completeness.unparseableHint') as string)).toBeInTheDocument()
+    // app3 (completed, drifted=false, unparseable) must show "unverified", and only
+    // app1 — the genuinely clean state — may show "no drift".
+    expect(screen.getAllByText(i18n.t('pages.drift.statusUnverified') as string)).toHaveLength(1)
+    expect(screen.getAllByText(i18n.t('pages.drift.statusNoDrift') as string)).toHaveLength(1)
   })
 
   it('links out to the CI run for a state that has one', async () => {
