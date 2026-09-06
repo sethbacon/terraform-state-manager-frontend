@@ -789,6 +789,20 @@ export interface DriftRun extends DriftCompleteness {
   batch_id: string | null
   ci_run_id: string
   ci_run_url: string
+  // The drift contract's SECOND triplet (Phase 5, terraform-drift-contract
+  // 1.4.0+): resources changed OUTSIDE Terraform (resource_drift), as opposed
+  // to added/changed/destroyed above, which count a plan's resource_changes
+  // (edits nobody has applied yet). Plain number, never null, unlike
+  // added/changed/destroyed — the backend column defaults to 0 rather than
+  // NULL, so a run that has not yet reported still reads 0/0/0 here; render it
+  // only once `status === 'completed'` is known, the same guard the UI already
+  // applies to distinguish "clean" from "not yet resolved" for the other
+  // triplet. NEVER derive `drifted` from these fields or vice versa — they are
+  // independent signals with independent meanings.
+  drift_added: number
+  drift_changed: number
+  drift_destroyed: number
+  drift_summary?: DriftSummaryItem[]
 }
 
 // One target inside a fan-out dispatch/schedule: its own state, planned
@@ -883,6 +897,16 @@ export interface DriftRecord extends DriftCompleteness {
   detections: number
   first_detected_at: string
   last_detected_at: string
+  // The drift contract's second triplet (see DriftRun.drift_added) — attached
+  // to a record only when the detection that created/updated it also carried
+  // it (the record itself only ever exists for `added/changed/destroyed`
+  // drift; a state whose ONLY drift is infra-side never gets a record, so
+  // /drift/coverage's per-state infra_drifted is the fleet-wide signal for
+  // that case, not this list).
+  drift_added: number
+  drift_changed: number
+  drift_destroyed: number
+  drift_summary?: DriftSummaryItem[]
 }
 
 export interface DriftRecordsResponse {
@@ -909,6 +933,11 @@ export interface DriftCoverageState {
   record_id: string | null
   record_status: string | null
   severity: string | null
+  // The latest run's drift contract second triplet (Phase 5), independent of
+  // `drifted` above. Null under the exact same condition `drifted` is null —
+  // no run has ever been dispatched for this state — never "no drift"; render
+  // it the same way (e.g. an em dash), never as a false "no".
+  infra_drifted: boolean | null
 }
 
 export interface DriftCoverageSummary {
@@ -919,6 +948,10 @@ export interface DriftCoverageSummary {
   incomplete: number
   open: number
   critical: number
+  // Count of states above whose infra_drifted is true (Phase 5) — the
+  // coverage view's own chip for resource_drift, kept separate from
+  // open/critical (which describe live drift_records, not the latest run).
+  infra_drifted: number
 }
 
 export interface DriftCoverage {
@@ -933,12 +966,21 @@ export interface DriftSummaryBySource {
   open: number
   acknowledged: number
   critical: number
+  // How many of this source's LIVE records carry infra drift (Phase 5) —
+  // independent of open/acknowledged/critical, which classify a record
+  // regardless of which triplet produced it.
+  infra_drift: number
 }
 
 export interface DriftSummary {
   records_by_source: DriftSummaryBySource[]
   runs_24h: { completed: number; failed: number; dispatched: number }
   incomplete_records: number
+  // How many LIVE records carry infra drift (Phase 5), deployment-wide —
+  // mirrors incomplete_records' shape, classifies by the drift contract's
+  // second triplet instead. Never conflated with incomplete_records or with
+  // open/critical drift computed from records_by_source.
+  infra_drift_records: number
   in_flight: number
 }
 

@@ -29,6 +29,10 @@ const baseRun: DriftRun = {
   omitted_attrs: 0,
   unparseable: false,
   unmasked: false,
+  drift_added: 0,
+  drift_changed: 0,
+  drift_destroyed: 0,
+  drift_summary: [],
 }
 
 describe('DriftRunDetailDialog', () => {
@@ -70,5 +74,23 @@ describe('DriftRunDetailDialog', () => {
   it('does not render a CI link for an unsafe URL', () => {
     render(<DriftRunDetailDialog run={{ ...baseRun, ci_run_url: 'javascript:alert(1)' }} onClose={() => {}} />)
     expect(screen.queryByRole('link', { name: i18n.t('pages.drift.openCiRun') as string })).not.toBeInTheDocument()
+  })
+
+  it('shows both count triplets, distinctly labelled, for a run with only infra drift', () => {
+    // added=0/drifted=false but infra drift present — the case Phase 5 exists
+    // to surface: the main status must stay "no drift" while the infra chip
+    // and its own count line report the resource_drift finding.
+    const infraOnly = { ...baseRun, added: 0, changed: 0, destroyed: 0, drifted: false, drift_added: 2 }
+    render(<DriftRunDetailDialog run={infraOnly} onClose={() => {}} />)
+    expect(screen.getByText(i18n.t('pages.drift.statusNoDrift') as string)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.drift.infraDriftDetected') as string)).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`^${i18n.t('pages.drift.unappliedLabel')}:`))).toBeInTheDocument()
+    expect(screen.getByText(new RegExp(`^${i18n.t('pages.drift.infraLabel')}:`))).toBeInTheDocument()
+  })
+
+  it('shows the infra chip as unverified, not clean, for an unparseable run', () => {
+    render(<DriftRunDetailDialog run={{ ...baseRun, unparseable: true }} onClose={() => {}} />)
+    expect(screen.getByText(i18n.t('pages.drift.infraUnverified') as string)).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.drift.infraNoDrift') as string)).not.toBeInTheDocument()
   })
 })

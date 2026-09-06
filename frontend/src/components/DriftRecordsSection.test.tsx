@@ -54,6 +54,10 @@ const openRecord: DriftRecord = {
   omitted_attrs: 0,
   unparseable: false,
   unmasked: false,
+  drift_added: 0,
+  drift_changed: 0,
+  drift_destroyed: 0,
+  drift_summary: [],
 }
 
 const ackedRecord: DriftRecord = {
@@ -133,6 +137,34 @@ describe('DriftRecordsSection', () => {
     // per-resource changed attribute (name + before -> after)
     expect(within(dialog).getByText('instance_type')).toBeInTheDocument()
     expect(within(dialog).getByText(/t2\.micro → t3\.micro/)).toBeInTheDocument()
+  })
+
+  it('shows both count triplets, distinctly labelled, in the table and the detail dialog', async () => {
+    mocked.listDriftRecords.mockResolvedValue({
+      records: [{ ...openRecord, drift_added: 5 }, ackedRecord],
+      counts: { open: 1, acknowledged: 1 },
+      total: 2,
+    })
+    renderSection()
+    await screen.findByText(/estate \/ envs\/prod.tfstate/)
+    expect(screen.getByText(i18n.t('pages.drift.unappliedColumn') as string)).toBeInTheDocument()
+    expect(screen.getByText(i18n.t('pages.drift.infraColumn') as string)).toBeInTheDocument()
+    // Both records share the same unapplied triplet (ackedRecord spreads
+    // openRecord's added/changed/destroyed); only the first carries infra drift.
+    expect(screen.getAllByText('1 / 2 / 1')).toHaveLength(2)
+    expect(screen.getByText('5 / 0 / 0')).toBeInTheDocument()
+    expect(screen.getByText('0 / 0 / 0')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText(/estate \/ envs\/prod.tfstate/))
+    const dialog = await screen.findByRole('dialog')
+    expect(within(dialog).getByText(new RegExp(`^${i18n.t('pages.drift.unappliedLabel')}:`))).toBeInTheDocument()
+    expect(
+      within(dialog).getByText(
+        new RegExp(
+          `^${i18n.t('pages.drift.infraLabel')}: ${i18n.t('pages.drift.addedChangedDestroyed', { added: 5, changed: 0, destroyed: 0 })}$`,
+        ),
+      ),
+    ).toBeInTheDocument()
   })
 
   it('flags an unparseable live record as not verified, in the table and in the detail dialog', async () => {

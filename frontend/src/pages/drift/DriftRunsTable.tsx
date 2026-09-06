@@ -22,7 +22,7 @@ import { queryKeys } from '../../services/queryKeys'
 import TableSkeleton from '../../components/skeletons/TableSkeleton'
 import CompletenessChips from '../../components/CompletenessChips'
 import DriftRunDetailDialog from './DriftRunDetailDialog'
-import { statusChip } from './statusChip'
+import { statusChip, infraDriftChip } from './statusChip'
 
 const RUNS_PAGE_SIZE = 20
 
@@ -101,7 +101,8 @@ export default function DriftRunsTable() {
                   <TableCell>{t('common.status')}</TableCell>
                   <TableCell>{t('common.ref')}</TableCell>
                   <TableCell>{t('pages.drift.dir')}</TableCell>
-                  <TableCell align="right">+ / ~ / -</TableCell>
+                  <TableCell align="right">{t('pages.drift.unappliedColumn')}</TableCell>
+                  <TableCell align="right">{t('pages.drift.infraColumn')}</TableCell>
                   <TableCell align="center">{t('pages.drift.completenessColumn')}</TableCell>
                   <TableCell>{t('common.created')}</TableCell>
                   <TableCell>{t('common.detail')}</TableCell>
@@ -110,11 +111,21 @@ export default function DriftRunsTable() {
               <TableBody>
                 {runs.map((r) => (
                   <TableRow key={r.id} hover sx={{ cursor: 'pointer' }} onClick={() => setSelectedRun(r)}>
-                    <TableCell>{statusChip(r, t)}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap' }}>
+                        {statusChip(r, t)}
+                        {infraDriftChip(r, t)}
+                      </Stack>
+                    </TableCell>
                     <TableCell>{r.repo_ref || '—'}</TableCell>
                     <TableCell>{r.working_dir || '.'}</TableCell>
                     <TableCell align="right">
                       {r.added != null ? `${r.added} / ${r.changed} / ${r.destroyed}` : '—'}
+                    </TableCell>
+                    <TableCell align="right">
+                      {r.status === 'completed'
+                        ? `${r.drift_added} / ${r.drift_changed} / ${r.drift_destroyed}`
+                        : '—'}
                     </TableCell>
                     <TableCell align="center">
                       <CompletenessChips completeness={r} variant="icon" />

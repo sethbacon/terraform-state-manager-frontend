@@ -87,6 +87,22 @@ describe('validateDriftRunsResponse', () => {
     const payload = { runs: [{ id: 'r1', summary: [{ address: 'a', actions: 'update' }] }] }
     expect(() => validateDriftRunsResponse(payload)).toThrow(/expected "runs\[0\].summary\[0\].actions" to be an array/)
   })
+
+  it('accepts runs with and without drift_summary (Phase 5, the resource_drift parallel)', () => {
+    const payload = {
+      runs: [
+        { id: 'r1' },
+        { id: 'r2', drift_summary: [{ address: 'aws_s3_bucket.logs', actions: ['update'] }] },
+      ],
+    }
+    expect(validateDriftRunsResponse(payload)).toBe(payload)
+  })
+
+  it('throws when a run drift_summary is present but not an array', () => {
+    expect(() => validateDriftRunsResponse({ runs: [{ id: 'r1', drift_summary: 'oops' }] })).toThrow(
+      /expected "runs\[0\].drift_summary" to be an array/,
+    )
+  })
 })
 
 describe('validateDriftRecordsResponse', () => {
@@ -114,6 +130,12 @@ describe('validateDriftRecordsResponse', () => {
   it('throws when a record summary is malformed', () => {
     expect(() => validateDriftRecordsResponse({ records: [{ id: 'rec1', summary: {} }] })).toThrow(
       /expected "records\[0\].summary" to be an array/,
+    )
+  })
+
+  it('throws when a record drift_summary is malformed (Phase 5, the resource_drift parallel)', () => {
+    expect(() => validateDriftRecordsResponse({ records: [{ id: 'rec1', drift_summary: {} }] })).toThrow(
+      /expected "records\[0\].drift_summary" to be an array/,
     )
   })
 })

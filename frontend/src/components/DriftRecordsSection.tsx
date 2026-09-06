@@ -260,7 +260,8 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                 <TableCell>{t('common.status')}</TableCell>
                 <TableCell>{t('pages.drift.recordSeverity')}</TableCell>
                 <TableCell>{t('pages.drift.recordState')}</TableCell>
-                <TableCell align="right">+ / ~ / -</TableCell>
+                <TableCell align="right">{t('pages.drift.unappliedColumn')}</TableCell>
+                <TableCell align="right">{t('pages.drift.infraColumn')}</TableCell>
                 <TableCell align="center">{t('pages.drift.completenessColumn')}</TableCell>
                 <TableCell align="right">{t('pages.drift.recordDetections')}</TableCell>
                 <TableCell>{t('pages.drift.recordLastDetected')}</TableCell>
@@ -288,6 +289,7 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                     {sourceLabel(r)} / {r.state_key}
                   </TableCell>
                   <TableCell align="right">{`${r.added} / ${r.changed} / ${r.destroyed}`}</TableCell>
+                  <TableCell align="right">{`${r.drift_added} / ${r.drift_changed} / ${r.drift_destroyed}`}</TableCell>
                   <TableCell align="center">
                     <CompletenessChips completeness={r} variant="icon" />
                   </TableCell>
@@ -415,6 +417,22 @@ export default function DriftRecordsSection({ sourceNames }: { sourceNames: Reco
                   {sourceLabel(detail)} / {detail.state_key}
                 </Typography>
               </Stack>
+              <Typography variant="body2" color="text.secondary">
+                {t('pages.drift.unappliedLabel')}:{' '}
+                {t('pages.drift.addedChangedDestroyed', {
+                  added: detail.added,
+                  changed: detail.changed,
+                  destroyed: detail.destroyed,
+                })}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('pages.drift.infraLabel')}:{' '}
+                {t('pages.drift.addedChangedDestroyed', {
+                  added: detail.drift_added,
+                  changed: detail.drift_changed,
+                  destroyed: detail.drift_destroyed,
+                })}
+              </Typography>
               <Typography variant="body2">
                 {t('pages.drift.recordFirstDetected')}: {new Date(detail.first_detected_at).toLocaleString()} ·{' '}
                 {t('pages.drift.recordLastDetected')}: {new Date(detail.last_detected_at).toLocaleString()} ·{' '}

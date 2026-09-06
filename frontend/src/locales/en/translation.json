@@ -156,7 +156,9 @@
       "inFlight": "In flight",
       "inFlightHint": "Drift runs currently dispatched or running",
       "unverified": "Unverified",
-      "unverifiedHint": "Live records whose own check was unparseable or truncated"
+      "unverifiedHint": "Live records whose own check was unparseable or truncated",
+      "infraDriftRecords": "Infra drift",
+      "infraDriftRecordsHint": "Live records whose last check found drift outside Terraform"
     },
     "featuresTitle": "What you can do",
     "open": "Open",
@@ -863,9 +865,16 @@
       "statusDriftDetected": "drift detected",
       "statusNoDrift": "no drift",
       "statusUnverified": "unverified",
+      "infraDriftDetected": "infra drift detected",
+      "infraNoDrift": "no infra drift",
+      "infraUnverified": "infra unverified",
       "recentRuns": "Recent runs",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Unapplied",
+      "infraLabel": "Infra drift",
+      "unappliedColumn": "Unapplied (+/~/-)",
+      "infraColumn": "Infra drift (+/~/-)",
       "setUpRepo": "Set up repo",
       "ciSources": "CI sources",
       "deletePipelineTitle": "Delete pipeline connection",
@@ -1070,6 +1079,7 @@
         "colScheduled": "Scheduled",
         "colLastChecked": "Last checked",
         "colDrifted": "Drifted",
+        "colInfraDrifted": "Infra drifted",
         "colRecord": "Record",
         "colCi": "CI run",
         "neverChecked": "Never checked",
@@ -1080,6 +1090,7 @@
         "summaryIncomplete": "Incomplete: {{count}}",
         "summaryOpen": "Open: {{count}}",
         "summaryCritical": "Critical: {{count}}",
+        "summaryInfraDrifted": "Infra drift: {{count}}",
         "empty": "No states for this source."
       }
     },

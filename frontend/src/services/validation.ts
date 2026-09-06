@@ -69,7 +69,7 @@ function validateDriftSummary(context: string, path: string, summary: unknown): 
   })
 }
 
-/** Validate the drift-runs listing (each run's optional summary). */
+/** Validate the drift-runs listing (each run's optional summary/drift_summary). */
 export function validateDriftRunsResponse(raw: unknown): { runs: DriftRun[]; total?: number } {
   const ctx = 'drift runs'
   const root = requireObject(ctx, 'response', raw)
@@ -77,11 +77,14 @@ export function validateDriftRunsResponse(raw: unknown): { runs: DriftRun[]; tot
   runs.forEach((run, i) => {
     const record = requireObject(ctx, `runs[${i}]`, run)
     validateDriftSummary(ctx, `runs[${i}].summary`, record.summary)
+    // drift_summary (Phase 5) is the resource_drift-derived parallel to
+    // summary — same shape, same optional/omitted-when-empty contract.
+    validateDriftSummary(ctx, `runs[${i}].drift_summary`, record.drift_summary)
   })
   return raw as { runs: DriftRun[]; total?: number }
 }
 
-/** Validate the drift-records listing (each record's optional summary). */
+/** Validate the drift-records listing (each record's optional summary/drift_summary). */
 export function validateDriftRecordsResponse(raw: unknown): DriftRecordsResponse {
   const ctx = 'drift records'
   const root = requireObject(ctx, 'response', raw)
@@ -89,6 +92,7 @@ export function validateDriftRecordsResponse(raw: unknown): DriftRecordsResponse
   records.forEach((rec, i) => {
     const record = requireObject(ctx, `records[${i}]`, rec)
     validateDriftSummary(ctx, `records[${i}].summary`, record.summary)
+    validateDriftSummary(ctx, `records[${i}].drift_summary`, record.drift_summary)
   })
   return raw as DriftRecordsResponse
 }
