@@ -696,6 +696,7 @@
       "statusFailed": "a échoué",
       "statusDriftDetected": "dérive détectée",
       "statusNoDrift": "pas de dérive",
+      "statusUnverified": "non vérifié",
       "recentRuns": "Sessions récentes",
       "dir": "Réalisateur",
       "plusTildeMinus": "+ / ~ / -",
