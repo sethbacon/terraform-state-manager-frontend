@@ -77,6 +77,10 @@ describe('DriftRunsTable', () => {
     expect(
       screen.getByLabelText(i18n.t('pages.drift.completeness.unparseableHint') as string),
     ).toBeInTheDocument()
+    // ...and the status cell must not contradict it: baseRun is completed with
+    // drifted=false, the exact combination that used to render a green "no drift".
+    expect(screen.getByText(i18n.t('pages.drift.statusUnverified') as string)).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.drift.statusNoDrift') as string)).not.toBeInTheDocument()
   })
 
   it('filters to a batch named in the ?batch= query param, for both a fanned batch and a single legacy run id', async () => {

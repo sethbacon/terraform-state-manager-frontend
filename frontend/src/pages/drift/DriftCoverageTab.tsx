@@ -46,6 +46,10 @@ function statusChipFor(state: DriftCoverageState, t: (k: string) => string) {
   if (state.last_status === 'dispatched' || state.last_status === 'running') {
     return <Chip size="small" color="info" label={state.last_status} />
   }
+  // Same rule as statusChip(): an unparseable last check is unknown, not clean.
+  if (state.unparseable) {
+    return <Chip size="small" variant="outlined" label={t('pages.drift.statusUnverified')} />
+  }
   return state.drifted ? (
     <Chip size="small" color="warning" label={t('pages.drift.statusDriftDetected')} />
   ) : (

@@ -41,6 +41,11 @@ describe('DriftRunDetailDialog', () => {
   it('flags an unparseable run as not verified rather than clean', () => {
     render(<DriftRunDetailDialog run={{ ...baseRun, unparseable: true }} onClose={() => {}} />)
     expect(screen.getByText(i18n.t('pages.drift.completeness.unparseable') as string)).toBeInTheDocument()
+    // The status chip itself must say so too: neither outcome label may render
+    // for a run whose plan was never inspected.
+    expect(screen.getByText(i18n.t('pages.drift.statusUnverified') as string)).toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.drift.statusNoDrift') as string)).not.toBeInTheDocument()
+    expect(screen.queryByText(i18n.t('pages.drift.statusDriftDetected') as string)).not.toBeInTheDocument()
   })
 
   it('shows the truncated chip with omitted counts', () => {
