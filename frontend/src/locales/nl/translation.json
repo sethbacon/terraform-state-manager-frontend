@@ -156,7 +156,9 @@
       "inFlight": "Tijdens de vlucht",
       "inFlightHint": "Driftruns die momenteel zijn ingepland of worden uitgevoerd",
       "unverified": "Niet geverifieerd",
-      "unverifiedHint": "Live-records waarvan de eigen controle niet kon worden geparseerd of was afgekapt"
+      "unverifiedHint": "Live-records waarvan de eigen controle niet kon worden geparseerd of was afgekapt",
+      "infraDriftRecords": "Infradrift",
+      "infraDriftRecordsHint": "Live-records waarbij bij de laatste controle een afwijking buiten Terraform is vastgesteld"
     },
     "featuresTitle": "Wat je kunt doen",
     "open": "Openen",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "drift gedetecteerd",
       "statusNoDrift": "geen afwijking",
       "statusUnverified": "niet-geverifieerd",
+      "infraDriftDetected": "infraredrift gedetecteerd",
+      "infraNoDrift": "geen infrasoonverschuiving",
+      "infraUnverified": "hieronder niet geverifieerd",
       "recentRuns": "Recente hardloopsessies",
       "dir": "Regisseur",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Niet toegepast",
+      "infraLabel": "Infraroodverschuiving",
+      "unappliedColumn": "Niet toegepast (+/~/-)",
+      "infraColumn": "Infra-drift (+/~/-)",
       "setUpRepo": "Repo instellen",
       "ciSources": "CI-bronnen",
       "deletePipelineTitle": "Pijplijnverbinding verwijderen",
@@ -904,6 +913,7 @@
         "colScheduled": "Gepland",
         "colLastChecked": "Laatst gecontroleerd",
         "colDrifted": "Afgedreven",
+        "colInfraDrifted": "Infra dreef af",
         "colRecord": "Record",
         "colCi": "CI-run",
         "neverChecked": "Nooit gecontroleerd",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Onvolledig: {{count}}",
         "summaryOpen": "Open: {{count}}",
         "summaryCritical": "Belangrijk: {{count}}",
+        "summaryInfraDrifted": "Infra drift: {{count}}",
         "empty": "Er zijn geen staten voor deze bron."
       }
     },

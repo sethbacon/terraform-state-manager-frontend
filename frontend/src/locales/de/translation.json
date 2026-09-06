@@ -156,7 +156,9 @@
       "inFlight": "Im Flug",
       "inFlightHint": "Derzeit zugewiesene oder laufende Drift-Läufe",
       "unverified": "Nicht verifiziert",
-      "unverifiedHint": "Live-Datensätze, deren eigene Prüfsumme nicht analysierbar oder unvollständig war"
+      "unverifiedHint": "Live-Datensätze, deren eigene Prüfsumme nicht analysierbar oder unvollständig war",
+      "infraDriftRecords": "Infrarot-Drift",
+      "infraDriftRecordsHint": "Aktuelle Datensätze, bei deren letzter Überprüfung eine Abweichung außerhalb von Terraform festgestellt wurde"
     },
     "featuresTitle": "Was Sie tun können",
     "open": "Öffnen",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "Abweichung festgestellt",
       "statusNoDrift": "keine Abweichung",
       "statusUnverified": "unbestätigt",
+      "infraDriftDetected": "Infra-Drift festgestellt",
+      "infraNoDrift": "keine Infra-Drift",
+      "infraUnverified": "unten: nicht verifiziert",
       "recentRuns": "Letzte Läufe",
       "dir": "Regie",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Nicht angewendet",
+      "infraLabel": "Infrarot-Drift",
+      "unappliedColumn": "Nicht angewendet (+/~/-)",
+      "infraColumn": "Infrarot-Drift (+/~/-)",
       "setUpRepo": "Repo einrichten",
       "ciSources": "CI-Quellen",
       "deletePipelineTitle": "Pipeline-Verbindung löschen",
@@ -904,6 +913,7 @@
         "colScheduled": "Geplant",
         "colLastChecked": "Zuletzt überprüft",
         "colDrifted": "Abgetrieben",
+        "colInfraDrifted": "Infra driftete",
         "colRecord": "Aufzeichnung",
         "colCi": "CI-Lauf",
         "neverChecked": "Noch nie überprüft",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Unvollständig: {{count}}",
         "summaryOpen": "Öffnungszeiten: {{count}}",
         "summaryCritical": "Wichtig: {{count}}",
+        "summaryInfraDrifted": "Infra-Drift: {{count}}",
         "empty": "Für diese Quelle sind keine Bundesstaaten angegeben."
       }
     },
