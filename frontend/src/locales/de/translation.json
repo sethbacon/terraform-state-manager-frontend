@@ -696,6 +696,7 @@
       "statusFailed": "fehlgeschlagen",
       "statusDriftDetected": "Abweichung festgestellt",
       "statusNoDrift": "keine Abweichung",
+      "statusUnverified": "unbestätigt",
       "recentRuns": "Letzte Läufe",
       "dir": "Regie",
       "plusTildeMinus": "+ / ~ / -",

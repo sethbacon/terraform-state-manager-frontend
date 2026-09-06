@@ -696,6 +696,7 @@
       "statusFailed": "失敗した",
       "statusDriftDetected": "ドリフトが検出されました",
       "statusNoDrift": "ドリフトなし",
+      "statusUnverified": "未確認",
       "recentRuns": "最近の走行記録",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
