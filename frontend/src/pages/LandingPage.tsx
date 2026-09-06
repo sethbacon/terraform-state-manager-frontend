@@ -221,6 +221,12 @@ export default function LandingPage() {
               value={driftSummary?.incomplete_records ?? '\u2014'}
               to="/drift"
             />
+            <DashboardCard
+              label={t('landing.drift.infraDriftRecords')}
+              hint={t('landing.drift.infraDriftRecordsHint')}
+              value={driftSummary?.infra_drift_records ?? '\u2014'}
+              to="/drift"
+            />
           </Box>
         </Box>
       )}

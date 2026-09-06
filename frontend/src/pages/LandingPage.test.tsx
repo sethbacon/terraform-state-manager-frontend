@@ -107,11 +107,12 @@ describe('LandingPage', () => {
   it('shows fleet drift cards, summed from the summary endpoint, for authenticated users', async () => {
     mockedApi.getDriftSummary.mockResolvedValue({
       records_by_source: [
-        { source_id: 's1', source_name: 'a', open: 2, acknowledged: 1, critical: 1 },
-        { source_id: 's2', source_name: 'b', open: 3, acknowledged: 0, critical: 0 },
+        { source_id: 's1', source_name: 'a', open: 2, acknowledged: 1, critical: 1, infra_drift: 1 },
+        { source_id: 's2', source_name: 'b', open: 3, acknowledged: 0, critical: 0, infra_drift: 0 },
       ],
       runs_24h: { completed: 10, failed: 1, dispatched: 2 },
       incomplete_records: 4,
+      infra_drift_records: 6,
       in_flight: 2,
     } as DriftSummary)
     setAuth(true)
@@ -123,6 +124,10 @@ describe('LandingPage', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
     expect(screen.getByText('2')).toBeInTheDocument()
     expect(screen.getByText('4')).toBeInTheDocument()
+    // infra_drift_records is its own fleet-wide count, never blended with
+    // incomplete_records or the per-source open/critical totals above.
+    expect(screen.getByText(i18n.t('landing.drift.infraDriftRecords') as string)).toBeInTheDocument()
+    expect(screen.getByText('6')).toBeInTheDocument()
   })
 
   it('hides the drift cards from anonymous visitors', () => {
