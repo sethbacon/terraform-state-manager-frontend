@@ -148,6 +148,16 @@
       "rumHint": "Risorse gestite",
       "totalResources": "Risorse totali"
     },
+    "driftTitle": "Stato della deriva",
+    "driftLoadFailed": "Impossibile caricare il riepilogo del drift.",
+    "drift": {
+      "openDrift": "Deriva libera",
+      "critical": "Critico",
+      "inFlight": "In volo",
+      "inFlightHint": "Prove di drift attualmente assegnate o in corso",
+      "unverified": "Non verificato",
+      "unverifiedHint": "Record in tempo reale il cui controllo interno risultava non analizzabile o troncato"
+    },
     "featuresTitle": "Cosa puoi fare",
     "open": "Apri",
     "signInToUse": "Accedi per utilizzare il servizio",
@@ -729,7 +739,9 @@
       "authMethod": "Metodo di autenticazione",
       "authMethodPat": "Token di accesso personale",
       "authMethodApp": "Registrazione dell'app (Entra)",
+      "authMethodWorkloadIdentity": "Identità del carico di lavoro (AKS)",
       "appAuthHelp": "Registrazione dell'app Microsoft Entra (credenziali client) — consigliata per la deriva programmata; nessuna scadenza del PAT.",
+      "workloadIdentityHelp": "Identità del carico di lavoro AKS — nessun segreto memorizzato in TSM. Richiede una credenziale federata sull'identità gestita che indichi questo ID client; vedere la sezione \"Identità del carico di lavoro\" della guida alla distribuzione.",
       "tenantId": "Codice inquilino",
       "clientId": "ID cliente",
       "clientSecret": "Codice segreto del cliente",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Eseguire una prima prova di drift dopo il collegamento",
         "firstRunDispatched": "Pubblicata la prima manche di drift: guardala su questa pagina.",
         "firstRunFailed": "Connessione creata, ma il primo tentativo di invio non è andato a buon fine: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Profilo modello",
+        "profileHelp": "Quale modello predefinito o modificato dall'operatore utilizzare.",
+        "fanOut": "Fan-out a livello di repo",
+        "fanOutHelp": "Pianifica più app presenti in questo repository in un unico processo di CI. Richiede il profilo del modello \"fan-out\"; la pianificazione della connessione risultante può quindi rivolgersi a più stati contemporaneamente."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Seleziona \"Risolvi\"",
       "bulkPartialFailure": "{{count}} non è stato possibile aggiornarlo",
       "sourceOptional": "Fonte (facoltativa)",
-      "stateOptional": "Stato (facoltativo)"
+      "stateOptional": "Stato (facoltativo)",
+      "openCiRun": "Avvia esecuzione CI",
+      "batchFilter": "Lotto: {{id}}",
+      "tabOverview": "Panoramica",
+      "tabCoverage": "Copertura",
+      "completenessColumn": "Completezza",
+      "recordAcknowledgedAt": "Citato su {{when}}",
+      "recordResolvedAt": "Risolto su {{when}}",
+      "completeness": {
+        "unparseable": "Non verificato",
+        "unparseableHint": "Non verificato — non è stato possibile analizzare il piano; questo risultato è sconosciuto, non corretto.",
+        "truncated": "Parziale: voci {{entries}} / attributi {{attrs}} omessi",
+        "truncatedHint": "Risultato parziale — voci \"{{entries}}\" / attributi \"{{attrs}}\" omessi dal piano.",
+        "unmasked": "Valori non mascherati",
+        "unmaskedHint": "Questo piano potrebbe contenere valori sensibili non mascherati."
+      },
+      "coverage": {
+        "sourceLabel": "Fonte",
+        "chooseSource": "Scegli una fonte per visualizzarne la copertura.",
+        "filterAll": "Tutto",
+        "filterUnscheduled": "Non programmato",
+        "filterStale": "Rimani",
+        "filterIncomplete": "Incompleto",
+        "filterDrifted": "Alla deriva",
+        "colState": "Stato",
+        "colScheduled": "In programma",
+        "colLastChecked": "Ultimo controllo",
+        "colDrifted": "Alla deriva",
+        "colRecord": "Record",
+        "colCi": "Esecuzione CI",
+        "neverChecked": "Mai controllato",
+        "summaryTotal": "{{count}} stati",
+        "summaryScheduled": "In programma: {{count}}",
+        "summaryUnscheduled": "Non in programma: {{count}}",
+        "summaryStale": "Non più valido: {{count}}",
+        "summaryIncomplete": "Incompleto: {{count}}",
+        "summaryOpen": "Vai a: {{count}}",
+        "summaryCritical": "Importante: {{count}}",
+        "empty": "Non ci sono stati per questa fonte."
+      }
     },
     "versionLab": {
       "noPipelines": "Non ci sono ancora collegamenti alla pipeline: aggiungine uno nella pagina Drift, poi torna qui.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Elimina programma",
       "deleteConfirm": "Elimina la pianificazione “{{name}}”? La sua esecuzione verrà interrotta.",
       "sourceOptional": "Fonte (facoltativa)",
-      "stateOptional": "Stato (facoltativo)"
+      "stateOptional": "Stato (facoltativo)",
+      "viewRun": "Visualizza esecuzione",
+      "fanOutTargets": "Obiettivi (fan-out)",
+      "fanOutTargetsHelp": "Questa connessione supporta il fan-out: elenca tutti gli stati che questa pianificazione deve considerare in un unico processo CI.",
+      "addTarget": "Aggiungi destinazione",
+      "removeTarget": "Rimuovi il bersaglio",
+      "targetSource": "Fonte",
+      "targetState": "Stato",
+      "targetWorkingDir": "Directory di lavoro",
+      "bulkSourceLabel": "Aggiungi stati dalla fonte",
+      "bulkPattern": "Modello di chiave di stato (espressione regolare)",
+      "bulkAdd": "Aggiungi stati corrispondenti",
+      "targetsRequired": "È necessario specificare almeno un obiettivo"
     },
     "branding": {
       "title": "Branding",

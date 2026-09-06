@@ -148,6 +148,16 @@
       "rumHint": "Beheerd vermogen",
       "totalResources": "Totale middelen"
     },
+    "driftTitle": "Driftstatus",
+    "driftLoadFailed": "Het overzicht van de drift kon niet worden geladen.",
+    "drift": {
+      "openDrift": "Open drift",
+      "critical": "Kritisch",
+      "inFlight": "Tijdens de vlucht",
+      "inFlightHint": "Driftruns die momenteel zijn ingepland of worden uitgevoerd",
+      "unverified": "Niet geverifieerd",
+      "unverifiedHint": "Live-records waarvan de eigen controle niet kon worden geparseerd of was afgekapt"
+    },
     "featuresTitle": "Wat je kunt doen",
     "open": "Openen",
     "signInToUse": "Log in om te gebruiken",
@@ -729,7 +739,9 @@
       "authMethod": "Auth-methode",
       "authMethodPat": "Persoonlijk toegangstoken",
       "authMethodApp": "App-registratie (Entra)",
+      "authMethodWorkloadIdentity": "Identiteit van de werklast (AKS)",
       "appAuthHelp": "Registratie via de Microsoft Entra-app (clientreferenties) — aanbevolen voor geplande drift; geen PAT-vervaldatum.",
+      "workloadIdentityHelp": "AKS-workloadidentiteit — er worden geen geheimen opgeslagen in TSM. Hiervoor is een federatieve inlogset vereist op de beheerde identiteit waarin deze client-ID wordt vermeld; zie het gedeelte ‘Workloadidentiteit’ in de implementatiehandleiding.",
       "tenantId": "Huurdersnummer",
       "clientId": "Klant-ID",
       "clientSecret": "Geheim van de klant",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Voer een eerste drift-run uit nadat je verbinding hebt gemaakt",
         "firstRunDispatched": "De eerste driftrun is gestart — bekijk hem op deze pagina.",
         "firstRunFailed": "Verbinding tot stand gebracht, maar de eerste uitvoering kon niet worden verzonden: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Sjabloonprofiel",
+        "profileHelp": "Welk ingebouwd of door de gebruiker bewerkt sjabloon moet worden gebruikt.",
+        "fanOut": "Fan-out op repo-niveau",
+        "fanOutHelp": "Plan meerdere apps in deze repository in één CI-taak. Hiervoor is het fan-out-sjabloonprofiel vereist; het daaruit voortvloeiende verbindingsschema kan dan op meerdere staten tegelijk worden gericht."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Geselecteerd oplossen",
       "bulkPartialFailure": "{{count}} kon niet worden bijgewerkt",
       "sourceOptional": "Bron (optioneel)",
-      "stateOptional": "Provincie (optioneel)"
+      "stateOptional": "Provincie (optioneel)",
+      "openCiRun": "CI-run starten",
+      "batchFilter": "Batch: {{id}}",
+      "tabOverview": "Overzicht",
+      "tabCoverage": "Dekking",
+      "completenessColumn": "Volledigheid",
+      "recordAcknowledgedAt": "Vermeld op {{when}}",
+      "recordResolvedAt": "Opgelost op {{when}}",
+      "completeness": {
+        "unparseable": "Niet geverifieerd",
+        "unparseableHint": "Niet geverifieerd — het plan kon niet worden geparseerd; dit resultaat is onbekend, niet correct.",
+        "truncated": "Gedeeltelijk: {{entries}} vermeldingen / {{attrs}} attributen weggelaten",
+        "truncatedHint": "Gedeeltelijk resultaat — {{entries}}-vermeldingen / {{attrs}}-attributen zijn weggelaten uit het plan.",
+        "unmasked": "Onthulde waarden",
+        "unmaskedHint": "Dit plan kan gevoelige waarden bevatten die niet zijn gemaskeerd."
+      },
+      "coverage": {
+        "sourceLabel": "Bron",
+        "chooseSource": "Kies een bron om de berichtgeving te bekijken.",
+        "filterAll": "Alles",
+        "filterUnscheduled": "Niet gepland",
+        "filterStale": "Oudbakken",
+        "filterIncomplete": "Onvolledig",
+        "filterDrifted": "Afgedreven",
+        "colState": "Staat",
+        "colScheduled": "Gepland",
+        "colLastChecked": "Laatst gecontroleerd",
+        "colDrifted": "Afgedreven",
+        "colRecord": "Record",
+        "colCi": "CI-run",
+        "neverChecked": "Nooit gecontroleerd",
+        "summaryTotal": "{{count}} staten",
+        "summaryScheduled": "Gepland: {{count}}",
+        "summaryUnscheduled": "Niet gepland: {{count}}",
+        "summaryStale": "Verouderd: {{count}}",
+        "summaryIncomplete": "Onvolledig: {{count}}",
+        "summaryOpen": "Open: {{count}}",
+        "summaryCritical": "Belangrijk: {{count}}",
+        "empty": "Er zijn geen staten voor deze bron."
+      }
     },
     "versionLab": {
       "noPipelines": "Er zijn nog geen pijplijnaansluitingen — voeg er een toe op de Drift-pagina en ga daarna terug naar deze pagina.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Schema verwijderen",
       "deleteConfirm": "Het schema „{{name}}” verwijderen? Dan wordt de uitvoering ervan gestopt.",
       "sourceOptional": "Bron (optioneel)",
-      "stateOptional": "Provincie (optioneel)"
+      "stateOptional": "Provincie (optioneel)",
+      "viewRun": "Weergave van de run",
+      "fanOutTargets": "Doelen (fan-out)",
+      "fanOutTargetsHelp": "Deze koppeling ondersteunt fan-out — geef alle staten op die in dit schema in één CI-taak moeten worden verwerkt.",
+      "addTarget": "Doel toevoegen",
+      "removeTarget": "Doel verwijderen",
+      "targetSource": "Bron",
+      "targetState": "Staat",
+      "targetWorkingDir": "Werkmap",
+      "bulkSourceLabel": "Staten uit bron toevoegen",
+      "bulkPattern": "Patroon van de staatssleutel (regex)",
+      "bulkAdd": "Bijbehorende statussen toevoegen",
+      "targetsRequired": "Er is ten minste één doelwit vereist"
     },
     "branding": {
       "title": "Merkopbouw",

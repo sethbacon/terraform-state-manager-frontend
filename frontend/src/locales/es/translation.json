@@ -148,6 +148,16 @@
       "rumHint": "Activos gestionados",
       "totalResources": "Recursos totales"
     },
+    "driftTitle": "Estado de la deriva",
+    "driftLoadFailed": "No se ha podido cargar el resumen de «drift».",
+    "drift": {
+      "openDrift": "Deriva libre",
+      "critical": "Crítico",
+      "inFlight": "En vuelo",
+      "inFlightHint": "Carreras de derrape actualmente programadas o en curso",
+      "unverified": "Sin verificar",
+      "unverifiedHint": "Registros activos cuyo propio control no se pudo analizar o estaba truncado"
+    },
     "featuresTitle": "Qué puedes hacer",
     "open": "Abrir",
     "signInToUse": "Inicia sesión para utilizarlo",
@@ -729,7 +739,9 @@
       "authMethod": "Método de autenticación",
       "authMethodPat": "Token de acceso personal",
       "authMethodApp": "Registro en la aplicación (Entra)",
+      "authMethodWorkloadIdentity": "Identidad de la carga de trabajo (AKS)",
       "appAuthHelp": "Registro de la aplicación Microsoft Entra (credenciales de cliente): recomendado para la deriva programada; sin caducidad de la PAT.",
+      "workloadIdentityHelp": "Identidad de carga de trabajo de AKS: no se almacena ningún secreto en TSM. Requiere una credencial federada en la identidad gestionada que indique este ID de cliente; consulta la sección «Identidad de carga de trabajo» de la guía de implementación.",
       "tenantId": "N.º de identificación del inquilino",
       "clientId": "ID de cliente",
       "clientSecret": "Secreto de cliente",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Realizar una primera prueba de desplazamiento tras la conexión",
         "firstRunDispatched": "Ya se ha publicado la primera manga de drift: míralo en esta página.",
         "firstRunFailed": "Se ha creado la conexión, pero no se ha podido enviar la primera ejecución: {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Perfil de plantilla",
+        "profileHelp": "Qué plantilla utilizar: si la integrada o la editada por el operador.",
+        "fanOut": "Distribución a nivel de repo",
+        "fanOutHelp": "Planifica varias aplicaciones de este repositorio en una sola tarea de CI. Requiere el perfil de plantilla «fan-out»; de este modo, la programación de la conexión resultante puede dirigirse a varios estados a la vez."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Resolver selección",
       "bulkPartialFailure": "{{count}} no se ha podido actualizar",
       "sourceOptional": "Fuente (opcional)",
-      "stateOptional": "Estado (opcional)"
+      "stateOptional": "Estado (opcional)",
+      "openCiRun": "Ejecutar CI de forma abierta",
+      "batchFilter": "Lote: {{id}}",
+      "tabOverview": "Resumen",
+      "tabCoverage": "Cobertura",
+      "completenessColumn": "Exhaustividad",
+      "recordAcknowledgedAt": "Reconocido en {{when}}",
+      "recordResolvedAt": "Resuelto en {{when}}",
+      "completeness": {
+        "unparseable": "No verificado",
+        "unparseableHint": "No verificado: no se ha podido analizar el plan; este resultado es desconocido, no es válido.",
+        "truncated": "Parcial: se han omitido las entradas «{{entries}}» y los atributos «{{attrs}}»",
+        "truncatedHint": "Resultado parcial: se han omitido del plan las entradas «{{entries}}» y los atributos «{{attrs}}».",
+        "unmasked": "Valores sin enmascarar",
+        "unmaskedHint": "Este plan puede contener valores confidenciales sin enmascarar."
+      },
+      "coverage": {
+        "sourceLabel": "Fuente",
+        "chooseSource": "Elige una fuente para ver su cobertura.",
+        "filterAll": "Todos",
+        "filterUnscheduled": "No programado",
+        "filterStale": "Rancio",
+        "filterIncomplete": "Incompleto",
+        "filterDrifted": "A la deriva",
+        "colState": "Estado",
+        "colScheduled": "Programado",
+        "colLastChecked": "Última consulta",
+        "colDrifted": "A la deriva",
+        "colRecord": "Récord",
+        "colCi": "Ejecución de CI",
+        "neverChecked": "Nunca lo he comprobado",
+        "summaryTotal": "{{count}} estados",
+        "summaryScheduled": "Programado: {{count}}",
+        "summaryUnscheduled": "Sin programar: {{count}}",
+        "summaryStale": "Enlaces obsoletos: {{count}}",
+        "summaryIncomplete": "Incompleto: {{count}}",
+        "summaryOpen": "Enlace: {{count}}",
+        "summaryCritical": "Crítico: {{count}}",
+        "empty": "No hay estados para esta fuente."
+      }
     },
     "versionLab": {
       "noPipelines": "Aún no hay conexiones de tuberías: añade una en la página «Drift» y, a continuación, vuelve aquí.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Eliminar programación",
       "deleteConfirm": "¿Quieres eliminar la tarea programada «{{name}}»? Dejará de ejecutarse.",
       "sourceOptional": "Fuente (opcional)",
-      "stateOptional": "Estado (opcional)"
+      "stateOptional": "Estado (opcional)",
+      "viewRun": "Ver ejecución",
+      "fanOutTargets": "Objetivos (distribución)",
+      "fanOutTargetsHelp": "Esta conexión admite la distribución en rama: enumera todos los estados que este programa debe planificar en una única tarea de CI.",
+      "addTarget": "Añadir destino",
+      "removeTarget": "Eliminar objetivo",
+      "targetSource": "Fuente",
+      "targetState": "Estado",
+      "targetWorkingDir": "Directorio de trabajo",
+      "bulkSourceLabel": "Añadir estados desde la fuente",
+      "bulkPattern": "Patrón de clave de estado (expresión regular)",
+      "bulkAdd": "Añadir estados coincidentes",
+      "targetsRequired": "Se requiere al menos un objetivo"
     },
     "branding": {
       "title": "Imagen de marca",

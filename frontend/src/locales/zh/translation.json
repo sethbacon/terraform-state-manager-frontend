@@ -148,6 +148,16 @@
       "rumHint": "管理下的资源",
       "totalResources": "资源总计"
     },
+    "driftTitle": "漂移状态",
+    "driftLoadFailed": "无法加载漂移摘要。",
+    "drift": {
+      "openDrift": "开放漂移",
+      "critical": "关键",
+      "inFlight": "飞行中",
+      "inFlightHint": "当前已派发或正在进行的漂移赛段",
+      "unverified": "未经核实",
+      "unverifiedHint": "其自身校验码无法解析或被截断的实时记录"
+    },
     "featuresTitle": "你可以做些什么",
     "open": "打开",
     "signInToUse": "登录后即可使用",
@@ -729,7 +739,9 @@
       "authMethod": "身份验证方法",
       "authMethodPat": "个人访问令牌",
       "authMethodApp": "应用注册（Entra）",
+      "authMethodWorkloadIdentity": "工作负载标识 (AKS)",
       "appAuthHelp": "Microsoft Entra 应用注册（客户端凭据）—— 推荐用于计划性漂移；PAT 无过期时间。",
+      "workloadIdentityHelp": "AKS 工作负载身份 — TSM 中不存储任何机密。需要在管理身份上配置一个联合凭据，并在其中指定此客户端 ID；请参阅部署指南中的“工作负载身份”部分。",
       "tenantId": "租户编号",
       "clientId": "客户ID",
       "clientSecret": "客户端密钥",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "连接后发送首次漂移运行指令",
         "firstRunDispatched": "首轮漂移赛段已出发——请在本页面观看。",
         "firstRunFailed": "已建立连接，但首次运行未能分发：{{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "模板配置文件",
+        "profileHelp": "应使用哪个内置模板或由操作员编辑的模板。",
+        "fanOut": "Repo级扇出",
+        "fanOutHelp": "在该代码库中，将多个应用纳入同一个持续集成任务。需要使用“扇出”模板配置；这样生成的连接调度即可同时针对多个状态。"
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "已选定“Resolve”",
       "bulkPartialFailure": "{{count}} 无法更新",
       "sourceOptional": "来源（可选）",
-      "stateOptional": "州（可选）"
+      "stateOptional": "州（可选）",
+      "openCiRun": "启动 CI 运行",
+      "batchFilter": "批次：{{id}}",
+      "tabOverview": "概述",
+      "tabCoverage": "报道范围",
+      "completenessColumn": "完备性",
+      "recordAcknowledgedAt": "来源：{{when}}",
+      "recordResolvedAt": "已在 {{when}} 解决",
+      "completeness": {
+        "unparseable": "未验证",
+        "unparseableHint": "未验证——无法解析该计划；此结果未知，不明确。",
+        "truncated": "部分内容：{{entries}}条目 / {{attrs}}属性已省略",
+        "truncatedHint": "部分结果——计划中省略了{{entries}}条目/{{attrs}}个属性。",
+        "unmasked": "未掩码的值",
+        "unmaskedHint": "该计划可能包含未加密的敏感值。"
+      },
+      "coverage": {
+        "sourceLabel": "来源",
+        "chooseSource": "选择一个来源，查看其报道内容。",
+        "filterAll": "全部",
+        "filterUnscheduled": "未安排",
+        "filterStale": "过期",
+        "filterIncomplete": "不完整",
+        "filterDrifted": "漂流",
+        "colState": "州",
+        "colScheduled": "已安排",
+        "colLastChecked": "最后检查时间",
+        "colDrifted": "漂流",
+        "colRecord": "记录",
+        "colCi": "CI 运行",
+        "neverChecked": "从未检查过",
+        "summaryTotal": "{{count}} 州",
+        "summaryScheduled": "已安排：{{count}}",
+        "summaryUnscheduled": "未安排：{{count}}",
+        "summaryStale": "过期：{{count}}",
+        "summaryIncomplete": "不完整：{{count}}",
+        "summaryOpen": "打开：{{count}}",
+        "summaryCritical": "重要：{{count}}",
+        "empty": "此来源无状态信息。简体中文（大陆）"
+      }
     },
     "versionLab": {
       "noPipelines": "目前尚无管道连接——请在“Drift”页面添加一个，然后返回此处。",
@@ -911,7 +966,19 @@
       "deleteTitle": "删除计划",
       "deleteConfirm": "删除计划任务“{{name}}”？这将停止其运行。",
       "sourceOptional": "来源（可选）",
-      "stateOptional": "州（可选）"
+      "stateOptional": "州（可选）",
+      "viewRun": "查看运行情况",
+      "fanOutTargets": "目标（扇出）",
+      "fanOutTargetsHelp": "此连接支持扇出——请列出该计划应在一个 CI 任务中安排的所有状态。",
+      "addTarget": "添加目标",
+      "removeTarget": "移除目标",
+      "targetSource": "来源",
+      "targetState": "州",
+      "targetWorkingDir": "工作目录",
+      "bulkSourceLabel": "从源文件中添加状态",
+      "bulkPattern": "状态键模式（正则表达式）",
+      "bulkAdd": "添加匹配状态",
+      "targetsRequired": "至少需要一个目标"
     },
     "branding": {
       "title": "品牌建设",

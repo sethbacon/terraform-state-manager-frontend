@@ -148,6 +148,16 @@
       "rumHint": "Actifs sous gestion",
       "totalResources": "Total des ressources"
     },
+    "driftTitle": "État de la dérive",
+    "driftLoadFailed": "Impossible de charger le résumé de la dérive.",
+    "drift": {
+      "openDrift": "Dérive libre",
+      "critical": "Critique",
+      "inFlight": "En vol",
+      "inFlightHint": "Sessions de drift actuellement programmées ou en cours",
+      "unverified": "Non vérifié",
+      "unverifiedHint": "Enregistrements en temps réel dont la vérification interne était impossible à analyser ou tronquée"
+    },
     "featuresTitle": "Ce que vous pouvez faire",
     "open": "Ouvrir",
     "signInToUse": "Connectez-vous pour utiliser cette fonctionnalité",
@@ -729,7 +739,9 @@
       "authMethod": "Méthode d'authentification",
       "authMethodPat": "Jeton d'accès personnel",
       "authMethodApp": "Inscription à l'application (Entra)",
+      "authMethodWorkloadIdentity": "Identité de la charge de travail (AKS)",
       "appAuthHelp": "Enregistrement de l'application Microsoft Entra (identifiants client) — recommandé pour la dérive programmée ; pas de date d'expiration du PAT.",
+      "workloadIdentityHelp": "Identité de charge de travail AKS — aucun secret n'est stocké dans TSM. Nécessite un identifiant fédéré sur l'identité gérée désignant cet ID client ; consultez la section « Identité de charge de travail » du guide de déploiement.",
       "tenantId": "Numéro d'identification du locataire",
       "clientId": "Identifiant client",
       "clientSecret": "Clé secrète du client",
@@ -797,7 +809,11 @@
         "dispatchFirstRun": "Lancer une première série de mesures après la connexion",
         "firstRunDispatched": "Première descente de drift réalisée — à découvrir sur cette page.",
         "firstRunFailed": "Connexion établie, mais l'exécution initiale a échoué : {{error}}",
-        "versionLabSuffix": "Version Lab"
+        "versionLabSuffix": "Version Lab",
+        "profile": "Profil du modèle",
+        "profileHelp": "Quel modèle utiliser : celui intégré ou celui modifié par l'opérateur ?",
+        "fanOut": "Répartition au niveau du Repo",
+        "fanOutHelp": "Permet de planifier plusieurs applications de ce dépôt dans une seule tâche de CI. Nécessite le profil de modèle « fan-out » ; le planning de connexion ainsi généré peut alors cibler plusieurs États à la fois."
       },
       "fields": {
         "github_actions": {
@@ -859,7 +875,46 @@
       "resolveSelected": "Résolution sélectionnée",
       "bulkPartialFailure": "{{count}} n'a pas pu être mis à jour",
       "sourceOptional": "Source (facultatif)",
-      "stateOptional": "État (facultatif)"
+      "stateOptional": "État (facultatif)",
+      "openCiRun": "Lancer une exécution CI",
+      "batchFilter": "Lot : {{id}}",
+      "tabOverview": "Présentation générale",
+      "tabCoverage": "Couverture",
+      "completenessColumn": "Exhaustivité",
+      "recordAcknowledgedAt": "Source : {{when}}",
+      "recordResolvedAt": "Résolution disponible à l'adresse {{when}}",
+      "completeness": {
+        "unparseable": "Non vérifié",
+        "unparseableHint": "Non vérifié — le plan n'a pas pu être analysé ; ce résultat est inconnu, il n'est pas valide.",
+        "truncated": "Extrait : entrées « {{entries}} » / attributs « {{attrs}} » omis",
+        "truncatedHint": "Résultat partiel — entrées « {{entries}} » / attributs « {{attrs}} » omis du plan.",
+        "unmasked": "Valeurs non masquées",
+        "unmaskedHint": "Ce plan peut contenir des valeurs sensibles non masquées."
+      },
+      "coverage": {
+        "sourceLabel": "Source",
+        "chooseSource": "Choisissez une source pour consulter ses articles.",
+        "filterAll": "Tout",
+        "filterUnscheduled": "Non programmé",
+        "filterStale": "Périmé",
+        "filterIncomplete": "Incomplet",
+        "filterDrifted": "À la dérive",
+        "colState": "État",
+        "colScheduled": "Prévu",
+        "colLastChecked": "Dernière vérification",
+        "colDrifted": "À la dérive",
+        "colRecord": "Enregistrement",
+        "colCi": "Exécution CI",
+        "neverChecked": "Jamais vérifié",
+        "summaryTotal": "{{count}} États",
+        "summaryScheduled": "Diffusion prévue : {{count}}",
+        "summaryUnscheduled": "Non programmé : {{count}}",
+        "summaryStale": "Obsolète : {{count}}",
+        "summaryIncomplete": "Incomplet : {{count}}",
+        "summaryOpen": "Lire l'article : {{count}}",
+        "summaryCritical": "À lire absolument : {{count}}",
+        "empty": "Aucun état n'est indiqué pour cette source."
+      }
     },
     "versionLab": {
       "noPipelines": "Il n'y a pas encore de liens vers des pipelines — ajoutez-en un sur la page « Drift », puis revenez ici.",
@@ -911,7 +966,19 @@
       "deleteTitle": "Supprimer la planification",
       "deleteConfirm": "Supprimer la tâche planifiée « {{name}} » ? Elle cessera alors de s'exécuter.",
       "sourceOptional": "Source (facultatif)",
-      "stateOptional": "État (facultatif)"
+      "stateOptional": "État (facultatif)",
+      "viewRun": "Afficher l'exécution",
+      "fanOutTargets": "Cibles (répartition)",
+      "fanOutTargetsHelp": "Cette connexion prend en charge la répartition des tâches : répertoriez tous les états que ce planning doit prendre en compte dans une seule tâche CI.",
+      "addTarget": "Ajouter une cible",
+      "removeTarget": "Supprimer la cible",
+      "targetSource": "Source",
+      "targetState": "État",
+      "targetWorkingDir": "Répertoire de travail",
+      "bulkSourceLabel": "Ajouter des États à partir de la source",
+      "bulkPattern": "Modèle de clé d'état (expression régulière)",
+      "bulkAdd": "Ajouter les états correspondants",
+      "targetsRequired": "Au moins une cible est requise"
     },
     "branding": {
       "title": "Image de marque",
