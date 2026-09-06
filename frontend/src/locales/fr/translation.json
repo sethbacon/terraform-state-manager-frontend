@@ -156,7 +156,9 @@
       "inFlight": "En vol",
       "inFlightHint": "Sessions de drift actuellement programmées ou en cours",
       "unverified": "Non vérifié",
-      "unverifiedHint": "Enregistrements en temps réel dont la vérification interne était impossible à analyser ou tronquée"
+      "unverifiedHint": "Enregistrements en temps réel dont la vérification interne était impossible à analyser ou tronquée",
+      "infraDriftRecords": "Dérive infrarouge",
+      "infraDriftRecordsHint": "Enregistrements en temps réel pour lesquels la dernière vérification a révélé une dérive en dehors de Terraform"
     },
     "featuresTitle": "Ce que vous pouvez faire",
     "open": "Ouvrir",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "dérive détectée",
       "statusNoDrift": "pas de dérive",
       "statusUnverified": "non vérifié",
+      "infraDriftDetected": "dérive infra détectée",
+      "infraNoDrift": "pas de dérive infrarouge",
+      "infraUnverified": "ci-dessous (non vérifié)",
       "recentRuns": "Sessions récentes",
       "dir": "Réalisateur",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Non appliqué",
+      "infraLabel": "Dérive infrarouge",
+      "unappliedColumn": "Non appliqué (+/~/-)",
+      "infraColumn": "Dérive de l'infrarouge (+/~/-)",
       "setUpRepo": "Configurer le dépôt",
       "ciSources": "Sources de CI",
       "deletePipelineTitle": "Supprimer la connexion au pipeline",
@@ -904,6 +913,7 @@
         "colScheduled": "Prévu",
         "colLastChecked": "Dernière vérification",
         "colDrifted": "À la dérive",
+        "colInfraDrifted": "Infra a dérivé",
         "colRecord": "Enregistrement",
         "colCi": "Exécution CI",
         "neverChecked": "Jamais vérifié",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Incomplet : {{count}}",
         "summaryOpen": "Lire l'article : {{count}}",
         "summaryCritical": "À lire absolument : {{count}}",
+        "summaryInfraDrifted": "Infra drift : {{count}}",
         "empty": "Aucun état n'est indiqué pour cette source."
       }
     },

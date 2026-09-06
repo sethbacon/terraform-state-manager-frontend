@@ -156,7 +156,9 @@
       "inFlight": "In volo",
       "inFlightHint": "Prove di drift attualmente assegnate o in corso",
       "unverified": "Non verificato",
-      "unverifiedHint": "Record in tempo reale il cui controllo interno risultava non analizzabile o troncato"
+      "unverifiedHint": "Record in tempo reale il cui controllo interno risultava non analizzabile o troncato",
+      "infraDriftRecords": "Deriva infrarossa",
+      "infraDriftRecordsHint": "Record in tempo reale per i quali l'ultimo controllo ha rilevato una deriva al di fuori di Terraform"
     },
     "featuresTitle": "Cosa puoi fare",
     "open": "Apri",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "rilevata deriva",
       "statusNoDrift": "nessuna deriva",
       "statusUnverified": "non verificato",
+      "infraDriftDetected": "rilevata deriva infrarossa",
+      "infraNoDrift": "nessuna deriva infrarossa",
+      "infraUnverified": "di seguito non verificato",
       "recentRuns": "Corse recenti",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Non applicato",
+      "infraLabel": "Deriva infrarossa",
+      "unappliedColumn": "Non applicato (+/~/-)",
+      "infraColumn": "Deriva infrarossa (+/~/-)",
       "setUpRepo": "Configurare il repository",
       "ciSources": "Fonti CI",
       "deletePipelineTitle": "Elimina connessione alla pipeline",
@@ -904,6 +913,7 @@
         "colScheduled": "In programma",
         "colLastChecked": "Ultimo controllo",
         "colDrifted": "Alla deriva",
+        "colInfraDrifted": "Infra è andato alla deriva",
         "colRecord": "Record",
         "colCi": "Esecuzione CI",
         "neverChecked": "Mai controllato",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Incompleto: {{count}}",
         "summaryOpen": "Vai a: {{count}}",
         "summaryCritical": "Importante: {{count}}",
+        "summaryInfraDrifted": "Deriva infrarossa: {{count}}",
         "empty": "Non ci sono stati per questa fonte."
       }
     },

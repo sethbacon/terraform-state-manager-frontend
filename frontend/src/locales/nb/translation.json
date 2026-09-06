@@ -156,7 +156,9 @@
       "inFlight": "Under flyvningen",
       "inFlightHint": "Driftkjøringer som for øyeblikket er utsendt eller pågår",
       "unverified": "Ubekreftet",
-      "unverifiedHint": "Live-poster der selve kontrollen ikke kunne analyseres eller var avkortet"
+      "unverifiedHint": "Live-poster der selve kontrollen ikke kunne analyseres eller var avkortet",
+      "infraDriftRecords": "Infradrift",
+      "infraDriftRecordsHint": "Live-poster der den siste kontrollen avdekket avvik utenfor Terraform"
     },
     "featuresTitle": "Hva du kan gjøre",
     "open": "Åpne",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "avdrift oppdaget",
       "statusNoDrift": "ingen avvik",
       "statusUnverified": "ubekreftet",
+      "infraDriftDetected": "det er oppdaget infrarød drift",
+      "infraNoDrift": "ingen infrarød drift",
+      "infraUnverified": "nedenfor – ikke bekreftet",
       "recentRuns": "Siste løpeturer",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Ikke brukt",
+      "infraLabel": "Infradrift",
+      "unappliedColumn": "Ikke anvendt (+/~/-)",
+      "infraColumn": "Infradrift (+/~/-)",
       "setUpRepo": "Konfigurer repo",
       "ciSources": "CI-kilder",
       "deletePipelineTitle": "Slett rørledningsforbindelse",
@@ -904,6 +913,7 @@
         "colScheduled": "Planlagt",
         "colLastChecked": "Sist sjekket",
         "colDrifted": "Drivet",
+        "colInfraDrifted": "Infra drev av gårde",
         "colRecord": "Opptak",
         "colCi": "CI-kjøring",
         "neverChecked": "Aldri sjekket",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Ufullstendig: {{count}}",
         "summaryOpen": "Åpningstider: {{count}}",
         "summaryCritical": "Viktig: {{count}}",
+        "summaryInfraDrifted": "Infra-drift: {{count}}",
         "empty": "Ingen delstater for denne kilden."
       }
     },
