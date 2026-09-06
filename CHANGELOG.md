@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.31.0...v1.32.0) (2026-09-06)
+
+
+### Features
+
+* **drift:** distinguish infrastructure drift from unapplied changes in the UI ([#421](https://github.com/sethbacon/terraform-state-manager-frontend/issues/421)) ([eee6df7](https://github.com/sethbacon/terraform-state-manager-frontend/commit/eee6df786df0cf12175d343ab2d9272a51fcd962))
+
 ## [1.31.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.2...v1.31.0) (2026-09-06)
 
 
