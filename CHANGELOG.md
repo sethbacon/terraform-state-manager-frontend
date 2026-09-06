@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.31.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.2...v1.31.0) (2026-09-06)
+
+
+### Features
+
+* **drift:** fleet coverage dashboard, completeness badges and fan-out schedule targets ([#416](https://github.com/sethbacon/terraform-state-manager-frontend/issues/416)) ([f0b2326](https://github.com/sethbacon/terraform-state-manager-frontend/commit/f0b2326b776706787f6640d7df4f26c1ffa167c9))
+
+
+### Bug Fixes
+
+* **drift:** an unparseable check must not read as "no drift" ([#419](https://github.com/sethbacon/terraform-state-manager-frontend/issues/419)) ([697471e](https://github.com/sethbacon/terraform-state-manager-frontend/commit/697471eb518bc204ee4863e9b87bc807c9bda599))
+
 ## [1.30.2](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.30.1...v1.30.2) (2026-09-03)
 
 
