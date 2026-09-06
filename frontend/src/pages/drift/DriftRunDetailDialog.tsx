@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next'
 import { type DriftRun } from '../../services/api'
 import CompletenessChips from '../../components/CompletenessChips'
 import { isSafeExternalUrl } from '../../utils/externalUrl'
-import { statusChip } from './statusChip'
+import { statusChip, infraDriftChip } from './statusChip'
 
 function actionColor(actions: string[]): 'success' | 'warning' | 'error' | 'default' {
   if (actions.includes('delete')) return 'error'
@@ -49,6 +49,7 @@ export default function DriftRunDetailDialog({ run, onClose }: { run: DriftRun |
             <Box>
               <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
                 {statusChip(run, t)}
+                {infraDriftChip(run, t)}
                 <CompletenessChips completeness={run} />
                 {isSafeExternalUrl(run.ci_run_url) && (
                   <Link href={run.ci_run_url} target="_blank" rel="noopener noreferrer">
@@ -57,12 +58,25 @@ export default function DriftRunDetailDialog({ run, onClose }: { run: DriftRun |
                 )}
               </Stack>
               <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                {run.repo_ref || t('pages.drift.defaultRef')} · {run.working_dir || '.'} ·{' '}
+                {run.repo_ref || t('pages.drift.defaultRef')} · {run.working_dir || '.'}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('pages.drift.unappliedLabel')}:{' '}
                 {run.added != null
                   ? t('pages.drift.addedChangedDestroyed', {
                     added: run.added,
                     changed: run.changed,
                     destroyed: run.destroyed,
+                  })
+                  : t('pages.drift.pending')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('pages.drift.infraLabel')}:{' '}
+                {run.status === 'completed'
+                  ? t('pages.drift.addedChangedDestroyed', {
+                    added: run.drift_added,
+                    changed: run.drift_changed,
+                    destroyed: run.drift_destroyed,
                   })
                   : t('pages.drift.pending')}
               </Typography>
