@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import DriftCoverageTab from './DriftCoverageTab'
 import { api, type DriftCoverage, type StateSource } from '../../services/api'
@@ -37,6 +37,8 @@ const coverage: DriftCoverage = {
       record_id: null,
       record_status: null,
       severity: null,
+      // The Phase 5 case: no unapplied changes, but hand-edited infrastructure.
+      infra_drifted: true,
     },
     {
       key: 'app2.tfstate',
@@ -51,6 +53,7 @@ const coverage: DriftCoverage = {
       record_id: null,
       record_status: null,
       severity: null,
+      infra_drifted: null,
     },
     {
       key: 'app3.tfstate',
@@ -65,9 +68,19 @@ const coverage: DriftCoverage = {
       record_id: null,
       record_status: null,
       severity: null,
+      infra_drifted: false,
     },
   ],
-  summary: { total: 3, scheduled: 2, unscheduled: 1, stale: 1, incomplete: 1, open: 0, critical: 0 },
+  summary: {
+    total: 3,
+    scheduled: 2,
+    unscheduled: 1,
+    stale: 1,
+    incomplete: 1,
+    open: 0,
+    critical: 0,
+    infra_drifted: 1,
+  },
 }
 
 function renderTab() {
@@ -125,6 +138,32 @@ describe('DriftCoverageTab', () => {
     await screen.findByText('app1.tfstate')
     const link = screen.getByRole('link', { name: i18n.t('pages.drift.openCiRun') as string })
     expect(link).toHaveAttribute('href', 'https://dev.azure.com/org/proj/_build/1')
+  })
+
+  it('surfaces infra_drifted per state, distinctly from the unapplied drifted column', async () => {
+    renderTab()
+    fireEvent.mouseDown(screen.getByLabelText(i18n.t('pages.drift.coverage.sourceLabel') as string))
+    fireEvent.click(await screen.findByRole('option', { name: 'estate' }))
+    await screen.findByText('app1.tfstate')
+
+    expect(screen.getByText(i18n.t('pages.drift.coverage.colInfraDrifted') as string)).toBeInTheDocument()
+    // Columns: State, Scheduled, Last checked, Status, Drifted, Infra drifted, …
+    const driftedIdx = 4
+    const infraDriftedIdx = 5
+
+    // app1: no unapplied drift, but infra drift — the case Phase 5 surfaces.
+    const app1Cells = within(screen.getByText('app1.tfstate').closest('tr')!).getAllByRole('cell')
+    expect(app1Cells[driftedIdx]).toHaveTextContent(i18n.t('common.no') as string)
+    expect(app1Cells[infraDriftedIdx]).toHaveTextContent(i18n.t('common.yes') as string)
+
+    // app2: never checked — infra_drifted is null, must read as "not checked"
+    // (an em dash), never as "no drift".
+    const app2Cells = within(screen.getByText('app2.tfstate').closest('tr')!).getAllByRole('cell')
+    expect(app2Cells[driftedIdx]).toHaveTextContent('—')
+    expect(app2Cells[infraDriftedIdx]).toHaveTextContent('—')
+
+    // Summary chip mirrors the endpoint's own infra_drifted count.
+    expect(screen.getByText(i18n.t('pages.drift.coverage.summaryInfraDrifted', { count: 1 }) as string)).toBeInTheDocument()
   })
 
   it('filters to unscheduled states only', async () => {

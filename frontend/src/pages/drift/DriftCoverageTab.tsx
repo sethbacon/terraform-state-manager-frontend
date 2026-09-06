@@ -140,6 +140,12 @@ export default function DriftCoverageTab() {
             color={summary.critical > 0 ? 'error' : 'default'}
             label={t('pages.drift.coverage.summaryCritical', { count: summary.critical })}
           />
+          <Chip
+            size="small"
+            variant="outlined"
+            color={summary.infra_drifted > 0 ? 'warning' : 'default'}
+            label={t('pages.drift.coverage.summaryInfraDrifted', { count: summary.infra_drifted })}
+          />
         </Stack>
       )}
 
@@ -173,6 +179,7 @@ export default function DriftCoverageTab() {
                 <TableCell>{t('pages.drift.coverage.colLastChecked')}</TableCell>
                 <TableCell>{t('common.status')}</TableCell>
                 <TableCell align="center">{t('pages.drift.coverage.colDrifted')}</TableCell>
+                <TableCell align="center">{t('pages.drift.coverage.colInfraDrifted')}</TableCell>
                 <TableCell align="center">{t('pages.drift.completenessColumn')}</TableCell>
                 <TableCell>{t('pages.drift.coverage.colRecord')}</TableCell>
                 <TableCell>{t('pages.drift.coverage.colCi')}</TableCell>
@@ -194,6 +201,9 @@ export default function DriftCoverageTab() {
                   <TableCell>{statusChipFor(s, t)}</TableCell>
                   <TableCell align="center">
                     {s.drifted == null ? '—' : s.drifted ? t('common.yes') : t('common.no')}
+                  </TableCell>
+                  <TableCell align="center">
+                    {s.infra_drifted == null ? '—' : s.infra_drifted ? t('common.yes') : t('common.no')}
                   </TableCell>
                   <TableCell align="center">
                     <CompletenessChips completeness={s} variant="icon" />
