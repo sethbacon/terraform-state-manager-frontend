@@ -696,6 +696,7 @@
       "statusFailed": "mislukt",
       "statusDriftDetected": "drift gedetecteerd",
       "statusNoDrift": "geen afwijking",
+      "statusUnverified": "niet-geverifieerd",
       "recentRuns": "Recente hardloopsessies",
       "dir": "Regisseur",
       "plusTildeMinus": "+ / ~ / -",

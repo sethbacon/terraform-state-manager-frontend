@@ -696,6 +696,7 @@
       "statusFailed": "失败",
       "statusDriftDetected": "检测到漂移",
       "statusNoDrift": "无漂移",
+      "statusUnverified": "未经核实",
       "recentRuns": "最近的跑步记录",
       "dir": "Dir简体中文（大陆）",
       "plusTildeMinus": "+ / ~ / -",

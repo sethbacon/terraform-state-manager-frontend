@@ -696,6 +696,7 @@
       "statusFailed": "mislyktes",
       "statusDriftDetected": "avdrift oppdaget",
       "statusNoDrift": "ingen avvik",
+      "statusUnverified": "ubekreftet",
       "recentRuns": "Siste løpeturer",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",

@@ -696,6 +696,7 @@
       "statusFailed": "falhou",
       "statusDriftDetected": "detetou-se um desvio",
       "statusNoDrift": "sem desvio",
+      "statusUnverified": "não verificado",
       "recentRuns": "Corridas recentes",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
