@@ -156,7 +156,9 @@
       "inFlight": "Em voo",
       "inFlightHint": "Provas de drift atualmente programadas ou em curso",
       "unverified": "Não verificado",
-      "unverifiedHint": "Registos ativos cuja verificação própria não foi possível analisar ou estava truncada"
+      "unverifiedHint": "Registos ativos cuja verificação própria não foi possível analisar ou estava truncada",
+      "infraDriftRecords": "Desvio infra",
+      "infraDriftRecordsHint": "Registos ativos cuja última verificação revelou desvios fora do Terraform"
     },
     "featuresTitle": "O que pode fazer",
     "open": "Abrir",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "detetou-se um desvio",
       "statusNoDrift": "sem desvio",
       "statusUnverified": "não verificado",
+      "infraDriftDetected": "detetou-se um desvio infra",
+      "infraNoDrift": "sem desvio de infra",
+      "infraUnverified": "informações não verificadas",
       "recentRuns": "Corridas recentes",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Não aplicado",
+      "infraLabel": "Desvio infra",
+      "unappliedColumn": "Não aplicado (+/~/-)",
+      "infraColumn": "Desvio infra (+/~/-)",
       "setUpRepo": "Configurar o repositório",
       "ciSources": "Fontes da CI",
       "deletePipelineTitle": "Eliminar ligação do pipeline",
@@ -904,6 +913,7 @@
         "colScheduled": "Agendado",
         "colLastChecked": "Última verificação",
         "colDrifted": "À deriva",
+        "colInfraDrifted": "A infraestrutura sofreu uma deriva",
         "colRecord": "Registo",
         "colCi": "Execução da CI",
         "neverChecked": "Nunca verifiquei",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Incompleto: {{count}}",
         "summaryOpen": "Acesse: {{count}}",
         "summaryCritical": "Crítico: {{count}}",
+        "summaryInfraDrifted": "Infra drift: {{count}}",
         "empty": "Não existem estados para esta fonte."
       }
     },

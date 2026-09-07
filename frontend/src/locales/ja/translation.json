@@ -156,7 +156,9 @@
       "inFlight": "飛行中",
       "inFlightHint": "現在割り当て済みまたは実行中のドリフト走行",
       "unverified": "未確認",
-      "unverifiedHint": "自身のチェックが解析不能または切り捨てられていたライブレコード"
+      "unverifiedHint": "自身のチェックが解析不能または切り捨てられていたライブレコード",
+      "infraDriftRecords": "インフラのドリフト",
+      "infraDriftRecordsHint": "前回のチェックでTerraformの範囲外のドリフトが検出されたライブレコード"
     },
     "featuresTitle": "できること",
     "open": "開く",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "ドリフトが検出されました",
       "statusNoDrift": "ドリフトなし",
       "statusUnverified": "未確認",
+      "infraDriftDetected": "インフラのドリフトが検出されました",
+      "infraNoDrift": "インフラのドリフトなし",
+      "infraUnverified": "以下は未確認です",
       "recentRuns": "最近の走行記録",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "未適用",
+      "infraLabel": "インフラのドリフト",
+      "unappliedColumn": "未適用（+/~/-)",
+      "infraColumn": "インフラのドリフト (+/~/-)",
       "setUpRepo": "リポジトリを設定する",
       "ciSources": "CIの情報源",
       "deletePipelineTitle": "パイプライン接続を削除する",
@@ -904,6 +913,7 @@
         "colScheduled": "予定",
         "colLastChecked": "最終確認日",
         "colDrifted": "漂流した",
+        "colInfraDrifted": "インフラがドリフトした",
         "colRecord": "記録",
         "colCi": "CIの実行",
         "neverChecked": "確認したことがない",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "未完成：{{count}}",
         "summaryOpen": "記事はこちら：{{count}}",
         "summaryCritical": "重要：{{count}}",
+        "summaryInfraDrifted": "Infra drift：{{count}}",
         "empty": "この情報源に関する州の情報はありません。"
       }
     },

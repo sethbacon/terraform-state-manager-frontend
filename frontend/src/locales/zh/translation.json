@@ -156,7 +156,9 @@
       "inFlight": "飞行中",
       "inFlightHint": "当前已派发或正在进行的漂移赛段",
       "unverified": "未经核实",
-      "unverifiedHint": "其自身校验码无法解析或被截断的实时记录"
+      "unverifiedHint": "其自身校验码无法解析或被截断的实时记录",
+      "infraDriftRecords": "基线漂移",
+      "infraDriftRecordsHint": "实时记录中，上次检查发现其值已偏离Terraform范围"
     },
     "featuresTitle": "你可以做些什么",
     "open": "打开",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "检测到漂移",
       "statusNoDrift": "无漂移",
       "statusUnverified": "未经核实",
+      "infraDriftDetected": "检测到基础设施漂移",
+      "infraNoDrift": "无基线漂移",
+      "infraUnverified": "下文未经核实",
       "recentRuns": "最近的跑步记录",
       "dir": "Dir简体中文（大陆）",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "未应用",
+      "infraLabel": "基线漂移",
+      "unappliedColumn": "未应用 (+/~/-)",
+      "infraColumn": "基线漂移 (+/~/-)",
       "setUpRepo": "设置代码库",
       "ciSources": "CI 来源",
       "deletePipelineTitle": "删除管道连接",
@@ -904,6 +913,7 @@
         "colScheduled": "已安排",
         "colLastChecked": "最后检查时间",
         "colDrifted": "漂流",
+        "colInfraDrifted": "基础设施出现漂移",
         "colRecord": "记录",
         "colCi": "CI 运行",
         "neverChecked": "从未检查过",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "不完整：{{count}}",
         "summaryOpen": "打开：{{count}}",
         "summaryCritical": "重要：{{count}}",
+        "summaryInfraDrifted": "Infra drift：{{count}}",
         "empty": "此来源无状态信息。简体中文（大陆）"
       }
     },

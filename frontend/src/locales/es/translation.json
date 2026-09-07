@@ -156,7 +156,9 @@
       "inFlight": "En vuelo",
       "inFlightHint": "Carreras de derrape actualmente programadas o en curso",
       "unverified": "Sin verificar",
-      "unverifiedHint": "Registros activos cuyo propio control no se pudo analizar o estaba truncado"
+      "unverifiedHint": "Registros activos cuyo propio control no se pudo analizar o estaba truncado",
+      "infraDriftRecords": "Deriva infra",
+      "infraDriftRecordsHint": "Registros en tiempo real en los que la última comprobación detectó una desviación fuera de Terraform"
     },
     "featuresTitle": "Qué puedes hacer",
     "open": "Abrir",
@@ -697,9 +699,16 @@
       "statusDriftDetected": "Se ha detectado una deriva",
       "statusNoDrift": "sin desviación",
       "statusUnverified": "sin verificar",
+      "infraDriftDetected": "Se ha detectado una deriva infra",
+      "infraNoDrift": "sin deriva de infrarrojos",
+      "infraUnverified": "a continuación, sin verificar",
       "recentRuns": "Carreras recientes",
       "dir": "Dir",
       "plusTildeMinus": "+ / ~ / -",
+      "unappliedLabel": "Sin aplicar",
+      "infraLabel": "Deriva de Infra",
+      "unappliedColumn": "Sin aplicar (+/~/-)",
+      "infraColumn": "Deriva de la infraestructura (+/~/-)",
       "setUpRepo": "Configurar el repositorio",
       "ciSources": "Fuentes de CI",
       "deletePipelineTitle": "Eliminar conexión de canalización",
@@ -904,6 +913,7 @@
         "colScheduled": "Programado",
         "colLastChecked": "Última consulta",
         "colDrifted": "A la deriva",
+        "colInfraDrifted": "Infra se desvió",
         "colRecord": "Récord",
         "colCi": "Ejecución de CI",
         "neverChecked": "Nunca lo he comprobado",
@@ -914,6 +924,7 @@
         "summaryIncomplete": "Incompleto: {{count}}",
         "summaryOpen": "Enlace: {{count}}",
         "summaryCritical": "Crítico: {{count}}",
+        "summaryInfraDrifted": "Infra drift: {{count}}",
         "empty": "No hay estados para esta fuente."
       }
     },
