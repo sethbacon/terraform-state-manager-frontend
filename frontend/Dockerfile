@@ -34,7 +34,7 @@ RUN npm run build
 
 # Stage 2: serve via nginx (proxies /api and probes to the backend).
 # Pinned by digest for reproducibility and supply-chain hardening (nginx:1.27-alpine).
-FROM nginx:1.31-alpine@sha256:db35bfc6b2951e7f8a72db5db120288c127ffaeeb4a6d4b95a26fead017d5913
+FROM nginx:1.31-alpine@sha256:72ba65eb42c10344912a84ff42408db7d34f2feb642204570ab8fc5ffd29f1d3
 # The nginx config is a TEMPLATE with one substitution, ${BACKEND_URL}.
 #
 # It is rendered TWICE, on purpose. Here at build time with the Docker Compose
