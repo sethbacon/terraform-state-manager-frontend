@@ -5,7 +5,7 @@
 # @4cloudguru/cloud-suite-ui). .npmrc sets engine-strict=true, so a mismatch
 # fails this build instead of printing an EBADENGINE warning nobody reads.
 # Digest-pinned like the nginx stage below, so the builder cannot float.
-FROM node:24-alpine@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS builder
+FROM node:24-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81 AS builder
 WORKDIR /app
 # .npmrc carries legacy-peer-deps=true (eslint-plugin-jsx-a11y hasn't declared
 # ESLint 10 support yet); npm ci needs it to resolve the dependency tree.
