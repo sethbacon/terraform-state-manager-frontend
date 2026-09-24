@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.32.1](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.32.0...v1.32.1) (2026-09-24)
+
+
+### Bug Fixes
+
+* **zizmor:** drop the dead github-app ignore for release-please.yml ([#438](https://github.com/sethbacon/terraform-state-manager-frontend/issues/438)) ([9afee52](https://github.com/sethbacon/terraform-state-manager-frontend/commit/9afee52a8787c8c27a39afbdce662b83178aefc2))
+
 ## [1.32.0](https://github.com/sethbacon/terraform-state-manager-frontend/compare/v1.31.0...v1.32.0) (2026-09-07)
 
 
