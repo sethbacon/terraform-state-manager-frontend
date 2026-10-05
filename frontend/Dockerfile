@@ -5,7 +5,7 @@
 # @4cloudguru/cloud-suite-ui). .npmrc sets engine-strict=true, so a mismatch
 # fails this build instead of printing an EBADENGINE warning nobody reads.
 # Digest-pinned like the nginx stage below, so the builder cannot float.
-FROM node:24-alpine@sha256:50c8e8ca1d27439048670df5883f32d57cf81cff6233222c893fd0d9884cbd81 AS builder
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS builder
 WORKDIR /app
 # .npmrc carries legacy-peer-deps=true (eslint-plugin-jsx-a11y hasn't declared
 # ESLint 10 support yet); npm ci needs it to resolve the dependency tree.
@@ -34,7 +34,7 @@ RUN npm run build
 
 # Stage 2: serve via nginx (proxies /api and probes to the backend).
 # Pinned by digest for reproducibility and supply-chain hardening (nginx:1.27-alpine).
-FROM nginx:1.31-alpine@sha256:72ba65eb42c10344912a84ff42408db7d34f2feb642204570ab8fc5ffd29f1d3
+FROM nginx:1.31-alpine@sha256:df221db836e1754089190208cee7eeda94f233197056426eda74a43ab1abeac2
 # The nginx config is a TEMPLATE with one substitution, ${BACKEND_URL}.
 #
 # It is rendered TWICE, on purpose. Here at build time with the Docker Compose
